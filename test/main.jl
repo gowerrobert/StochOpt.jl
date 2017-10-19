@@ -19,7 +19,7 @@ options.batchsize =100;
 options.embeddim = 10; # The dimension of the S embedding matrix
 ## load problem
 datapath = ""# "/local/rgower/libsvmdata/"
-probname = "madelon";# gisette_scale   w8a  madelon splice
+probname = "w8a";# gisette_scale   w8a  madelon splice
 # a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders_scale
 prob =  load_logistic(probname,datapath,options);  # Loads logisitc
 ## Running methods
