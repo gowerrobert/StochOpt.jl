@@ -1,0 +1,8 @@
+include("load_logistic.jl")
+include("logistic_phi.jl")
+include("logistic_eval.jl")
+include("logistic_grad.jl")
+include("logistic_hess.jl")
+include("logistic_hessv.jl")
+#include("logistic_grad_sub.jl")
+#include("logistic_hessv_sub.jl")

@@ -1,0 +1,62 @@
+function   load_logistic(probname::AbstractString, datapath::AbstractString,opts::MyOptions)
+  # Load logistic regression problem
+  #try
+  name = string("lgstc_",  probname);  # maybe add different regularizor later opts.regularizor
+  datafile = string(datapath,probname); println("loading:  ",datafile)
+  X,y = loadDataset(datafile);
+  stdX = std(X,2);
+  #replace 0 in std by 1 incase there is a constant feature
+  ind = (0.==stdX); stdX[ind] =1.0; # Testing for a zero std
+  X[:,:]= (X.-mean(X,2))./stdX; # Centering and scaling the data.
+  X = [ X ; ones(size(X,2))'];
+  sX = size(X);
+  numfeatures = sX[1];
+  numdata = sX[2];
+  #Transforming y to the binary to -1 and 1 representation
+  miny=  minimum(y);
+  maxy=  maximum(y);
+  y[find(x->x==miny,y)] = -1;
+  y[find(x->x==maxy,y)] = 1;
+  if(sum(abs(y))  != length(y))
+    println("FAILED TO TRANSFORM y into -1 and 1, ABORT!!!!!");
+    return;
+  end
+  println("loaded ", name, " with ", numfeatures, " features and ",numdata, " data");
+  if opts.regulatrizor_parameter=="1/num_data"
+    lambda = 1/numdata;
+  elseif opts.regulatrizor_parameter=="normalized"
+    # weight =0;
+    # for i = 1: sX[1]
+    #   weight = weight + norm(X[i,:]);
+    # end
+    lambda = maximum(sum(X.^2,1))/(4.0*numdata);
+    println("maximum(sum(X.^2,1)):  ",maximum(sum(X.^2,1)))
+  else
+    lambda = opts.regulatrizor_parameter;
+  end
+  # if opts.regularizor =="huber"
+  #         f_eval(x,S) =  (1./length(S))*logistic_eval(Xt,y,x,S)+(reg)* huber_eval(x,opts.hubermu);
+  #         g_eval(x,S) = ((1./length(S))*logistic_grad_sub(Xt,y,x,S)+(reg)*huber_grad(x,opts.hubermu));
+  #         Hess_opt(x,S,v) = ((1./length(S))*logistic_hessv_sub(Xt,y,x,S,v)+(reg)*bsxfun(@times, huber_hess_kimon(x,opts.hubermu), v) );
+  #if opts.regularizor =="L2"# is the default
+  f_eval(x,S) = ((1./length(S))*logistic_eval(X[:,S],y[S],x)+(lambda)*(0.5)* norm(x)^2);
+  g_eval(x,S) = ((1./length(S))*logistic_grad(X[:,S],y[S],x).+(lambda).*x);
+  g_eval!(x,S,g) =              logistic_grad!(X[:,S],y[S],x, lambda,length(S),g);
+  Hess_eval(x,S) = ((1./length(S))*logistic_hess(X[:,S],y[S],x).+ (lambda).*eye(numfeatures));
+  Hess_eval!(x,S,g,H) =              logistic_hess!(X[:,S],y[S],x,lambda,length(S),g,H) ;
+  Hess_C(x,S,C) =                  logistic_hessC(X[:,S],y[S],x,C,lambda,length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
+  Hess_C!(x,S,C,g,HC) = logistic_hessC!(X[:,S],y[S],x,C,lambda,length(S),g,HC);
+  Hess_C2(x,S,C) = logistic_hessC(X[:,S],y[S],x,C,lambda,length(S));
+  Hess_opt(x,S,v)     = ( (1./length(S))*logistic_hessv(X[:,S],y[S],x,v).+ (lambda).*v);
+  Hess_opt!(x,S,v,g,Hv) =                  logistic_hessv!(X[:,S],y[S],x,v,lambda,length(S),g,Hv);
+  Hess_D(x,S) = ((1./length(S))*logistic_hessD(X[:,S],y[S],x).+ (lambda).*ones(numfeatures));
+  Hess_D!(x,S,g,D) =              logistic_hessD!(X[:,S],y[S],x,lambda,length(S),g,D);
+    #Hess_vv(x,S,v) = ((1./length(S))*logistic_hessvv(X[:,S],y[S],x,v).+ (lambda).*v'*v);
+  #else
+  #        println("Choose regularizor huber or L2");
+  #        error("Unknown regularizor"+ opts.regularizor);
+  #end
+
+  prob = Prob(X,y,numfeatures,numdata,0.0,name, f_eval,g_eval,g_eval!,Hess_eval,Hess_eval!,Hess_opt,Hess_opt!,Hess_D,Hess_D!,Hess_C,Hess_C!,Hess_C2,lambda)
+  return prob
+end
