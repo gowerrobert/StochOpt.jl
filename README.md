@@ -20,8 +20,8 @@ AM, which uses the low-rank action matching approximation of the Hessian. <br>
 
 More details on the methods can be found in <br>
 
-``Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods'' ,
-  Robert M. Gower, Nicolas Le Roux and Francis Bach
+``Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods'',
+  Robert M. Gower, Nicolas Le Roux and Francis Bach, AISTATS 2018.
 
 # Demo
 Try the 
