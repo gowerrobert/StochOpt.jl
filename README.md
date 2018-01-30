@@ -24,12 +24,12 @@ More details on the methods can be found in <br>
   Robert M. Gower, Nicolas Le Roux and Francis Bach, AISTATS 2018.
 
 # Demo
-Try the 
+Try  
 ./test/demo.jl
-
+for a demo of the use of the package. 
 
 # Adding more data
-for a demo of the use of the package. The package is setup so that it is easily extendable. For instance:
+The package is setup so that it is easily extendable. For instance:
  
 => to test new data, download the raw data of a binary classification problem from LIBSVM and place it in the folder ./data. Then change the variable probname in demo.jl from "phishing" to the name of the newly downloaded file. 
 
@@ -38,6 +38,5 @@ for a demo of the use of the package. The package is setup so that it is easily 
 to include new objective function, see load_problem.jl
 
 # Adding new methods
-
 to include new method X, you need to write a descent_X.jl and boot_X.jl function. See descent_grad and boot_grad for an example
  
