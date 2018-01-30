@@ -1,6 +1,6 @@
 # A wrapper function for testing and timing iterative methods for
-# solving the empirical risk minimization problem - 2016 - Robert M. Gower
-# PseudoInvRand Copyright (C) 2016, Robert Gower
+# solving the empirical risk minimization problem - 2018 - Robert M. Gower
+# StochOpt Copyright (C) 2018, Robert Gower
 function  minimizeFunc(prob::Prob, method_name::AbstractString, options::MyOptions )
   method = boot_method(method_name,prob,options);
   if(method=="METHOD DOES NOT EXIST")

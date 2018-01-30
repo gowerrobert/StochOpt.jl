@@ -53,8 +53,5 @@ function  minimizeFunc_grid_stepsize(prob::Prob, method_name::AbstractString, op
 #  end
   save("$(default_path)$(savename).jld", "output",outputfirst)
   options.force_continue = false;
-  #PyPlot PGFPlots Plotly GR
-  # gr()# gr() pyplot() # pgfplots() #plotly()
-  # plot_outputs_Plots([output],prob)
   return outputfirst
 end

@@ -8,7 +8,8 @@ maxiter=10^8;
 max_time = 350;
 max_epocs = 10;
 printiters = true;
-exacterror =true; repeat = false;
+exacterror =true;
+repeat = false;       # repeat the grid_search calculation for finding the stepsize
 tol = 10.0^(-6.0);
 skip_error_calculation =0.0;   # number of iterations where error is not calculated (to save time!). Use 0 for default value
 rep_number = 10;# number of times the optimization should be repeated. This is because of julia just in time compiling
