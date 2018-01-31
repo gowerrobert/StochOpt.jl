@@ -26,12 +26,12 @@ More details on the methods can be found in <br>
 # Demo
 Try  
 ./test/demo.jl
-for a demo of the use of the package. 
+for a demo of the use of the package.
 
 # Adding more data
 The package is setup so that it is easily extendable. For instance:
- 
-=> to test new data, download the raw data of a binary classification problem from LIBSVM and place it in the folder ./data. Then change the variable probname in demo.jl from "phishing" to the name of the newly downloaded file. 
+
+=> to test new data, download the raw data of a binary classification problem from LIBSVM and place it in the folder ./data. Then change the variable probname in demo.jl from "phishing" to the name of the newly downloaded file.
 
 
 # Adding new loss functions
@@ -39,4 +39,6 @@ to include new objective function, see load_problem.jl
 
 # Adding new methods
 to include new method X, you need to write a descent_X.jl and boot_X.jl function. See descent_grad and boot_grad for an example
- 
+
+# TODO
+The option "exacterror" is obsolete for now since minimizeFunc runs assuming there is and prob.fsol.

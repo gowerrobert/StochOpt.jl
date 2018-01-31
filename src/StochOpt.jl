@@ -89,7 +89,7 @@ include("minimizeFunc_with_test.jl")
 include("boot_method.jl")
 #Including test and problem generating functions
 #Including iterative methods for calculating search direction
-allmethods = ["SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "DFPgauss","DFPprev",  "DFPcoord" ] ;
+allmethods = ["SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "DFPgauss","DFPprev",  "DFPcoord", "BFGS" ] ;
 for method in allmethods
   include(string("boot_", method ,".jl"))
   include(string("descent_", method ,".jl"))
@@ -98,3 +98,6 @@ end
 #Including utilities, plotting, data analysis
 include("plot_outputs_Plots.jl")
 include("get_saved_stepsize.jl");
+
+#Additional
+include("BFGS_update!.jl")

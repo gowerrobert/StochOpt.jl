@@ -5,9 +5,10 @@ function BFGS_update!(mth::Method, dx_dy)
 c1 = (dx_dy + vecdot(mth.HS,mth.S)) / (dx_dy * dx_dy);
 c2 = 1 / dx_dy;
 
+# Test speed of looping instead
 # for i =1:length(dx_dy)
 #     for i =1:length(dx_dy)
-#           @inbounds mth.H[i,j] +=
+#           @inbounds mth.H[i,j] += c1*mth.diffpnt[i]*mth.diffpnt[j]- c2*(mth.HS[i]*mth.diffpnt[j]+mth.diffpnt[i]*mth.HS[j]);
 #     end
 # end
 

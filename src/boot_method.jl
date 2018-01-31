@@ -40,6 +40,7 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
   end
 
   #  end
+  # Setting up parameters of class Method
   S = [0.0];  H = [0.0];  HS = [0.0]; HSi=[0.0];  SHS = [0.0]; Hsp = spzeros(1);
   prevx = zeros(prob.numfeatures); # Reference point
   diffpnt = [0.0];  Sold = [0.0];
@@ -67,6 +68,7 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
     "DFPprev" => method = boot_DFPprev(prob,method,options);
     "DFPprev6" => method = boot_DFPprev6(prob,method,options);
     "DFPcoord" => method = boot_DFPcoord(prob,method,options);
+    "BFGS" => method = boot_BFGS(prob,method,options);    
     _ => println("METHOD DOES NOT EXIST");
   end #    "grad"  =>  method = boot_grad(prob,method,options);
 
