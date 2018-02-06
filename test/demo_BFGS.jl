@@ -2,6 +2,7 @@ using JLD
 using Plots
 using StatsBase
 using Match
+using LaTeXStrings
 include("../src/StochOpt.jl")
 ## Basic parameters
 maxiter=10^6;

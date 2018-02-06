@@ -26,7 +26,7 @@ function plot_outputs_Plots(OUTPUTS,prob::Prob, options, datapassbnd::Int64) #, 
     plot!(output.epocsperiter*(1:bnd)*(output.iterations/bnd),(output.fs[1:bnd].-prob.fsol)./(output.fs[1].-prob.fsol),
     yscale = :log10, label  =output.name, linestyle=:auto, marker =:auto, grid = false, markersize = 8, linewidth =4)
   end
-
+#  println("./figures/$(probname)-epoc.pdf")
   savefig("./figures/$(probname)-epoc.pdf");
   # plotting gradient computations per iteration
   output = OUTPUTS[1];
