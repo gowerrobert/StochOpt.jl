@@ -40,11 +40,11 @@ function  minimizeFunc(prob::Prob, method_name::AbstractString, options::MyOptio
         ## printing iterations info
         @printf "%3.0d  | %3.2f  |  %3.2f  | %3.4f |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
       end
-      if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
-        fail ="tol-reached"; iterations =iter;
-        break;
-      end
       if(options.force_continue== false)
+        if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
+          fail ="tol-reached"; iterations =iter;
+          break;
+        end
         if(fs[end]/f0 >1.10 || (fs[end]-prob.fsol)/(f0-prob.fsol) >1.1 || fs[end]/fs[end-1] >1.5 || (fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) >1.15) # testing if method gone wild
           fail ="diverging"; iterations =iter;
           break;
