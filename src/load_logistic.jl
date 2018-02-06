@@ -25,12 +25,9 @@ function   load_logistic(probname::AbstractString, datapath::AbstractString,opts
   if opts.regulatrizor_parameter=="1/num_data"
     lambda = 1/numdata;
   elseif opts.regulatrizor_parameter=="normalized"
-    # weight =0;
-    # for i = 1: sX[1]
-    #   weight = weight + norm(X[i,:]);
-    # end
     lambda = maximum(sum(X.^2,1))/(4.0*numdata);
     println("maximum(sum(X.^2,1)):  ",maximum(sum(X.^2,1)))
+    println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
   else
     lambda = opts.regulatrizor_parameter;
   end

@@ -25,11 +25,10 @@ function  minimizeFunc(prob::Prob, method_name::AbstractString, options::MyOptio
     println("-------------------")
   end
   for iter= 1:options.maxiter
-    tic();
-    method.stepmethod(x,prob,options,method,iter,d);
+    time_elapsed = @elapsed method.stepmethod(x,prob,options,method,iter,d);
     x[:] = x + method.stepsize * d;
     #  println("method.stepsize ", method.stepsize, "norm(d): ", norm(d) );
-    timeaccum= timeaccum +  toq(); # Keeps track of time accumulated at every iteration
+    timeaccum= timeaccum +  time_elapsed; # Keeps track of time accumulated at every iteration
 
     if(mod(iter,options.skip_error_calculation)==0 )
       if(options.exacterror)

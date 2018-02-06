@@ -1,5 +1,5 @@
 function boot_BFGS(prob::Prob,method::Method, options::MyOptions)
-
+  
   method.diffpnt = zeros(prob.numfeatures);
   method.prevx  = zeros(prob.numfeatures);
   method.gradsamp= zeros(prob.numfeatures); # storing the previous gradient
