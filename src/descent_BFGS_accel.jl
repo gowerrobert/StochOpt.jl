@@ -8,6 +8,7 @@ function descent_BFGS_accel(x::Array{Float64},prob::Prob,options::MyOptions,mth:
 # mth.HSi   # stores the Y_k's
 # mth.SHS   # stores the V_k's
 
+## Adaptive mu and nu:
 # mu = options.embeddim[1];
 # Hd = prob.Hess_D(x, 1:prob.numdata)
 # nu =  sum(Hd)/minimum(Hd);

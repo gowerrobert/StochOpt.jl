@@ -8,7 +8,6 @@ function boot_BFGS_accel(prob::Prob,method::Method, options::MyOptions)
   method.H = eye(prob.numfeatures);  # Store inverse Hessian approximation
   method.S = zeros(prob.numfeatures);  # Stores the difference between gradients
   method.HS= zeros(prob.numfeatures);  # Stores product of H*dy difference between gradients
-  method.name = string("BFGS-a");#-",options.batchsize);
   method.gradsperiter = 3*prob.numfeatures;
 
   # assuming options.embeddim = [mu, nu]
@@ -23,6 +22,7 @@ function boot_BFGS_accel(prob::Prob,method::Method, options::MyOptions)
   method.aux[2] = beta;
   method.aux[3] = gamma;
   println("alpha, beta, gamma = ", method.aux[1], ", ", method.aux[2], ", ", method.aux[3])
+  method.name = string("BFGS-a-",round(mu,2),"-",round(nu,2) );#-",options.batchsize);
 #  method.gradsperiter = (embeddim+2)*options.batchsize+(embeddim+2)*prob.numdata/method.numinneriters+1; #includes the cost of performing the Hessian vector product.
   method.stepmethod = descent_BFGS_accel;
   return method;

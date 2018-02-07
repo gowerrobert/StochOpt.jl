@@ -7,8 +7,9 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
   end
   numinneriters = convert(Int64,floor(prob.numdata/options.batchsize));
   #numinneriters = convert(Int64,floor(prob.numdata/options.batchsize));#)
-  #  if(options.skip_error_calculation ==0.0)
+  if(options.skip_error_calculation ==0.0)
   options.skip_error_calculation =ceil(numinneriters./(5.0)); # show 5 times per lopp over data
+end
   println("Skipping ", options.skip_error_calculation, " iterations per epoch")
 # Setting the embedding dimension
   if(contains(method_name,"DFP") || contains(method_name,"CM") )
