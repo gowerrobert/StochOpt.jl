@@ -7,10 +7,10 @@ include("../src/StochOpt.jl")
 ## Basic parameters
 maxiter=10^6;
 max_time = 200;
-max_epocs = 200;
+max_epocs = 100;
 printiters = true;
 exacterror =true;
-repeat = false;       # repeat the grid_search calculation for finding the stepsize
+repeat = true;       # repeat the grid_search calculation for finding the stepsize
 tol = 10.0^(-16.0);
 skip_error_calculation =5.0;   # number of iterations where error is not calculated (to save time!). Use 0 for default value
 rep_number = 2;# number of times the optimization should be repeated. This is because of julia just in time compiling
@@ -18,7 +18,7 @@ options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
 printiters,exacterror,0,"normalized",0.0,false, false,rep_number,0)
 ## load problem
 datapath = ""#
-probname = "w8a";   # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders_scale
+probname = "liver-disorders";   # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
 prob =  load_logistic(probname,datapath,options);  # Loads logisitc problem
 options.batchsize =prob.numdata;  # full batch
 # H0 = prob.Hess_eval(zeros(prob.numfeatures), 1:prob.numdata);
@@ -45,12 +45,12 @@ OUTPUTS = [OUTPUTS ; output1];
 beststep, savename = get_saved_stepsize(prob.name, "BFGS",options);
 options.stepsize_multiplier =beststep;
 ######
-options.embeddim = [0.9, 1.25];
+options.embeddim =[prob.lambda, prob.numdata];
 method_name = "BFGS_accel";
 output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
 OUTPUTS = [OUTPUTS ; output1];
 ######
-options.embeddim = [0.9, 2.5];
+options.embeddim =[sqrt(prob.lambda), sqrt(prob.numdata)];
 method_name = "BFGS_accel";
 output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
 OUTPUTS = [OUTPUTS ; output1];

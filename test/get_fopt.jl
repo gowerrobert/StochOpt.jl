@@ -20,15 +20,18 @@ printiters,exacterror,0,"normalized",0.0,false, force_continue,rep_number,0)
 datapath = ""# "/local/rgower/libsvmdata/"
 default_path = "./data/";
 #problemnames =[ "mushrooms"] #,
-problemnames =[  "splice"] #,  [  "a9a", "madelon", "phishing", "covtype", "gisette_scale", "w8a"]
+problemnames =[  "australian"] #,  [  "a9a", "madelon", "phishing", "covtype", "gisette_scale", "w8a"]
 
-for probname in problemnames
+ for probname in problemnames
   prob =  load_logistic(probname,datapath,options);  # Loads logisitc
   options.batchsize =prob.numdata; ## load problem
   # prob.fsol = 0.0;
   method_name = "BFGS";
   output= minimizeFunc_grid_stepsize(prob, method_name, options, repeat);
-  fsol = minimum(output.fs);#min(output.fs[end],fsol);
+  options.embeddim =  [0.9, 5];
+  method_name = "BFGS_accel";
+  output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
+  fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
   savename = string(replace(prob.name, r"[\/]", "-"),"-fsol");
   save("$(default_path)$(savename).jld", "fsol", fsol)
-end
+ end
