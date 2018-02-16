@@ -47,10 +47,10 @@ Then replace "liver-disorders" in the code *src/load_new_LIBSVM_data.jl* and exe
 include("dataLoad.jl")
 initDetails()
 
-datasets = ["liver-disorders"] #  
+datasets = ["liver-disorders"]  
 for  dataset in datasets
 transformDataJLD(dataset)
-X,y = loadDataset(dataset) #
+X,y = loadDataset(dataset) 
 showDetails(dataset)
 end
 ```
