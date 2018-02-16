@@ -17,23 +17,24 @@ SVRG2, which tracks the gradients using the full Hessian. <br>
 SVRG2emb, which tracks the gradients using a low-rank approximation of the Hessians. <br>
 CM, which tracks the gradients using the low-rank curvature matching approximation of the Hessian <br>
 AM, which uses the low-rank action matching approximation of the Hessian. <br>
+BFGS, the standard, full memory BFGS method. <br>
+BFGS_accel, an accelerated BFGS method. <br>
 
-More details on the methods can be found in <br>
 
-``Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods'',
-  Robert M. Gower, Nicolas Le Roux and Francis Bach, AISTATS 2018.
+More details on the methods can be found in [1] and [2] <br>
+
 
 # Demo
 Try  
-./test/demo.jl
+```./test/demo.jl```
 for a simple demo of the use of the package.
 
 Run
-./test/test/demo_SVRG2.jl
+```./test/test/demo_SVRG2.jl```
 for a demo of methods from [1]
 
 Run
-./test/demo_BFGS_accel_paper_results.jl
+```./test/demo_BFGS_accel_paper_results.jl```
 for a demo of methods from [2]
 
 # Adding more data
