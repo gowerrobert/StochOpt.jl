@@ -70,7 +70,11 @@ To appear in AISTATS 2018
 RMG, Filip Hanzely, P. Richtárik and S. Stich.
 arXiv:1801.05490, 2018 
 
-For updated reference, see https://perso.telecom-paristech.fr/rgower/publications.html
+[3]  *LIBSVM : a library for support vector machines.* <br>
+Chih-Chung Chang and Chih-Jen Lin, ACM Transactions on Intelligent Systems and Technology, 2:27:1--27:27, 2011. <bf>
+  Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm 
+
+For update to date references, see https://perso.telecom-paristech.fr/rgower/publications.html
 
 # TODO
 * The option "exacterror" is obsolete for now since minimizeFunc runs assuming there is and prob.fsol.
