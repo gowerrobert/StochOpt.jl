@@ -38,10 +38,21 @@ More details on the methods can be found in [1] and [2] <br>
 
 
 # Adding more data
-The package is setup so that it is easily extendable. For instance:
+To test a new data set, download the raw data of a binary classifiction fomr LIBSVM [3] and place it in the folder ./data. 
+Then replace "liver-disorders" in the code *src/load_new_LIBSVM_data.jl* and execute. In other words, run the code 
 
-* [Testing new data]: download the raw data of a binary classification problem from LIBSVM and place it in the folder ./data. Then change the variable probname in demo.jl from "phishing" to the name of the newly downloaded file.
+```
+include("dataLoad.jl")
+initDetails()
 
+datasets = ["liver-disorders"] #  
+for  dataset in datasets
+transformDataJLD(dataset)
+X,y = loadDataset(dataset) #
+showDetails(dataset)
+end
+```
+where "liver-disorders" has been replaced with the name of the new raw data file.
 
 # Adding new loss functions
 to include new objective function, see load_problem.jl
