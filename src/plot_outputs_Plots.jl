@@ -6,7 +6,7 @@ function plot_outputs_Plots(OUTPUTS,prob::Prob, options, datapassbnd::Int64) #, 
     probname= string(probname,"-precon")
   end
    default_path = "./data/";  # savename= string(replace(prob.name, r"[\/]", "-"),"-", options.batchsize);
-  save("$(default_path)$(probname)_$(options.embeddim).jld", "OUTPUTS",OUTPUTS);
+  save("$(default_path)$(probname).jld", "OUTPUTS",OUTPUTS);
   fontsmll = 8;
   fontmed = 14;
   fontbig = 14;
@@ -37,7 +37,7 @@ function plot_outputs_Plots(OUTPUTS,prob::Prob, options, datapassbnd::Int64) #, 
   fs = output.fs[rel_loss.>0];
   lf = length(fs);
   bnd = convert(Int64,min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)),lf));
-  plot(output.times[1:bnd],(fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel = "time", ylabel = "subopt", yscale = :log10, label  = output.name, linestyle=:auto,   tickfont=font(12), guidefont=font(18), legendfont =font(12),  markersize = 6, linewidth =4, marker =:auto,  grid = false)
+  plot(output.times[1:bnd],(fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel = "time", ylabel = "subopt", yscale = :log10, label  = output.name, linestyle=:auto,  tickfont=font(fontsmll), guidefont=font(fontbig), legendfont =font(fontmed),  markersize = 6, linewidth =4, marker =:auto,  grid = false)
   println(output.name,": 2^", log(2,output.stepsize_multiplier))
   for jiter =2:length(OUTPUTS)
     output = OUTPUTS[jiter];
@@ -45,11 +45,11 @@ function plot_outputs_Plots(OUTPUTS,prob::Prob, options, datapassbnd::Int64) #, 
     fs = output.fs[rel_loss.>0];
     lf = length(fs);
     bnd = convert(Int64,min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)),lf));
-    plot!(output.times[1:bnd],(fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel = "time", ylabel = "subopt", yscale = :log10, label  = output.name, linestyle=:auto,   tickfont=font(12), guidefont=font(18), legendfont =font(12),  markersize = 6, linewidth =4, marker =:auto,  grid = false)
+    plot!(output.times[1:bnd],(fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel = "time", ylabel = "subopt", yscale = :log10, label  = output.name, linestyle=:auto,  tickfont=font(fontsmll), guidefont=font(fontbig), legendfont =font(fontmed),  markersize = 6, linewidth =4, marker =:auto,  grid = false)
     println(output.name,": 2^", log(2,output.stepsize_multiplier))
   end
   println(probname)
-  savefig("./figures/$(probname)-$(options.embeddim)-time.pdf");
+  savefig("./figures/$(probname)-time.pdf");
 
   open("./figures/$(probname)-stepsizes.txt", "w") do f
     write(f, "$(probname) stepsize_multiplier \n")
