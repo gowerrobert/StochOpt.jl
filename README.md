@@ -1,9 +1,10 @@
 # Dependencies
 
-```Pkg.add("JLD") <br>
-Pkg.add("Plots")  <br>
-Pkg.add("StatsBase")  <br>
-Pkg.add("Match")  <br> ```
+```Pkg.add("JLD")
+Pkg.add("Plots")
+Pkg.add("StatsBase")
+Pkg.add("Match")
+```
 
 # StochOpt
 A suite of stochastic optimization methods for solving the empirical risk minimization problem.  <br>
