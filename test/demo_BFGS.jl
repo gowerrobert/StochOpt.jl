@@ -18,7 +18,7 @@ options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
 printiters,exacterror,0,"normalized",0.0,false, false,rep_number,0)
 ## load problem
 datapath = ""#
-probname = "madelon";   # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
+probname = "mushrooms";   # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
 prob =  load_logistic(probname,datapath,options);  # Loads logisitc problem
 options.batchsize =prob.numdata;  # full batch
 ## Running methods
@@ -26,49 +26,15 @@ OUTPUTS = [];  # List of saved outputs
 method_name = "BFGS";
 output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
 OUTPUTS = [OUTPUTS ; output1];
-###
-options.embeddim =   [800,0.1];
+####
+options.embeddim = [prob.numdata, 1/prob.numfeatures]; #  = [mu, nu], sorry about the terrible name
 method_name = "BFGS_accel";
 output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
 OUTPUTS = [OUTPUTS ; output1];
-# # ###
-options.embeddim = [prob.numdata, 0.01]; # options.embeddim =  [prob.numdata/2, 2/prob.numfeatures];
-method_name = "BFGS_accel";
-output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output1];
-# ###
-options.embeddim =   [sqrt(prob.numdata), sqrt(1/prob.numfeatures)]; # options.embeddim =  [prob.numdata/2, 2/prob.numfeatures];
-method_name = "BFGS_accel";
-output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output1];
-# # ###
-options.embeddim = [prob.numdata, 1/prob.numfeatures]; # options.embeddim =  [prob.numdata/2, 2/prob.numfeatures];
-method_name = "BFGS_accel";
-output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output1];
-# # ###
-# fendgrid, mu_opt,nu_opt  = load("$(default_path)$(probname)_opt_mu_nu.jld", "fendgrid", "mu_opt", "nu_opt" );
-# options.embeddim =  [mu_opt, nu_opt];
-# method_name = "BFGS_accel";
-# output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-# OUTPUTS = [OUTPUTS ; output1];
-######
-# method_name = "grad";
-# output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-# OUTPUTS = [OUTPUTS ; output3];
+#####
+method_name = "grad";
+output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
+OUTPUTS = [OUTPUTS ; output3];
 
 pgfplots()
 plot_outputs_Plots(OUTPUTS,prob,options,max_epocs) # Plot and save output # max_epocs
-
-
-
-## Junk code for generating theoretical nu and mu parameters
-# H0 = prob.Hess_eval(zeros(prob.numfeatures), 1:prob.numdata);
-# TrH0 = trace(H0);
-# nu_theo = TrH0/minimum(diag(H0));
-# mu_theo = min(eigmin(H0))/TrH0;
-# options.embeddim = [mu_theo, nu_theo]; # =[mu, nu]  # [prob.lambda, prob.numdata]   # [mu_theo, nu_theo];
-# options.embeddim =[prob.lambda, prob.numdata];
-# nu = 10^10;
-# mu = 1/nu;
-# options.embeddim =[mu, nu] # Sanity check, should be the same as BFGS

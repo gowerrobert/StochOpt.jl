@@ -82,3 +82,22 @@ for probname in problems
     plot_outputs_Plots(OUTPUTS,prob,options,max_epocs) # Plot and save output # max_epocs
     println("optimal (mu, nu) =  (", round(mu_opt,3), ", ", round(nu_opt,2), ")")
 end
+
+
+## Junk code for generating theoretical nu and mu parameters
+# H0 = prob.Hess_eval(zeros(prob.numfeatures), 1:prob.numdata);
+# TrH0 = trace(H0);
+# nu_theo = TrH0/minimum(diag(H0));
+# mu_theo = min(eigmin(H0))/TrH0;
+# options.embeddim = [mu_theo, nu_theo]; # =[mu, nu]  # [prob.lambda, prob.numdata]   # [mu_theo, nu_theo];
+# options.embeddim =[prob.lambda, prob.numdata];
+# nu = 10^10;
+# mu = 1/nu;
+# options.embeddim =[mu, nu] # Sanity check, should be the same as BFGS
+
+
+# fendgrid, mu_opt,nu_opt  = load("$(default_path)$(probname)_opt_mu_nu.jld", "fendgrid", "mu_opt", "nu_opt" );
+# options.embeddim =  [mu_opt, nu_opt];
+# method_name = "BFGS_accel";
+# output1= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
+# OUTPUTS = [OUTPUTS ; output1];
