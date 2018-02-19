@@ -2,7 +2,7 @@
 
 # Dependencies
 
-```
+```julia
 Pkg.add("JLD")
 Pkg.add("Plots")
 Pkg.add("StatsBase")
@@ -14,7 +14,8 @@ A suite of stochastic optimization methods for solving the empirical risk minimi
 
 
 # Demo
-Run   ```julia ./test/demo.jl``` for a simple demo of the use of the package.
+Run   ```julia
+julia ./test/demo.jl``` for a simple demo of the use of the package.
 
 Run
 ```julia ./test/test/demo_SVRG2.jl```
