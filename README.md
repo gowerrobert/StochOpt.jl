@@ -14,19 +14,28 @@ A suite of stochastic optimization methods for solving the empirical risk minimi
 
 
 # Demo
-Run   ```julia
-julia ./test/demo.jl``` for a simple demo of the use of the package.
+Run   
+```julia
+julia ./test/demo.jl
+``` 
+for a simple demo of the use of the package.
 
 Run
-```julia ./test/test/demo_SVRG2.jl```
+```julia
+julia ./test/test/demo_SVRG2.jl
+```
 for a demo of methods from [1]
 
 Run
-```julia ./test/demo_BFGS.jl```
+```julia
+julia ./test/demo_BFGS.jl
+```
 for a demo of methods from [2]
 
 Run
-```julia ./test/demo_BFGS_accel_paper_results.jl```
+```julia
+julia ./test/demo_BFGS_accel_paper_results.jl
+```
 to re-generate the experiments from [2]
 
 # Methods currently implemented 
@@ -48,7 +57,7 @@ More details on the methods can be found in [1] and [2] <br>
 To test a new data set, download the raw data of a binary classifiction fomr LIBSVM [3] and place it in the folder ./data. 
 Then replace "liver-disorders" in the code *src/load_new_LIBSVM_data.jl* and execute. In other words, run the code 
 
-```
+```julia
 include("dataLoad.jl")
 initDetails()
 
