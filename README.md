@@ -14,15 +14,19 @@ A suite of stochastic optimization methods for solving the empirical risk minimi
 
 
 # Demo
-Run   ```./test/demo.jl``` for a simple demo of the use of the package.
+Run   ```julia ./test/demo.jl``` for a simple demo of the use of the package.
 
 Run
-```./test/test/demo_SVRG2.jl```
+```julia ./test/test/demo_SVRG2.jl```
 for a demo of methods from [1]
 
 Run
-```./test/demo_BFGS_accel_paper_results.jl```
+```julia ./test/demo_BFGS.jl```
 for a demo of methods from [2]
+
+Run
+```julia ./test/demo_BFGS_accel_paper_results.jl```
+to re-generate the experiments from [2]
 
 # Methods currently implemented 
 
