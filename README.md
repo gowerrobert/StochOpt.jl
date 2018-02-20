@@ -38,7 +38,7 @@ julia ./test/demo_BFGS_accel_paper_results.jl
 ```
 to re-generate the experiments from [2]
 
-# Methods currently implemented 
+# Methods implemented 
 
 SVRG, the original SVRG algorithm; <br>
 SVRG2, which tracks the gradients using the full Hessian. <br>
