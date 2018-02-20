@@ -25,11 +25,10 @@ function  minimizeFunc(prob::Prob, method_name::AbstractString, options::MyOptio
     println("-------------------")
   end
   for iter= 1:options.maxiter
-    tic();
-    method.stepmethod(x,prob,options,method,iter,d);
+    time_elapsed = @elapsed method.stepmethod(x,prob,options,method,iter,d);
     x[:] = x + method.stepsize * d;
     #  println("method.stepsize ", method.stepsize, "norm(d): ", norm(d) );
-    timeaccum= timeaccum +  toq(); # Keeps track of time accumulated at every iteration
+    timeaccum= timeaccum +  time_elapsed; # Keeps track of time accumulated at every iteration
 
     if(mod(iter,options.skip_error_calculation)==0 )
       if(options.exacterror)
@@ -41,11 +40,11 @@ function  minimizeFunc(prob::Prob, method_name::AbstractString, options::MyOptio
         ## printing iterations info
         @printf "%3.0d  | %3.2f  |  %3.2f  | %3.4f |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
       end
-      if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
-        fail ="tol-reached"; iterations =iter;
-        break;
-      end
       if(options.force_continue== false)
+        if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
+          fail ="tol-reached"; iterations =iter;
+          break;
+        end
         if(fs[end]/f0 >1.10 || (fs[end]-prob.fsol)/(f0-prob.fsol) >1.1 || fs[end]/fs[end-1] >1.5 || (fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) >1.15) # testing if method gone wild
           fail ="diverging"; iterations =iter;
           break;

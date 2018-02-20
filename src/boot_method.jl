@@ -7,8 +7,9 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
   end
   numinneriters = convert(Int64,floor(prob.numdata/options.batchsize));
   #numinneriters = convert(Int64,floor(prob.numdata/options.batchsize));#)
-  #  if(options.skip_error_calculation ==0.0)
+  if(options.skip_error_calculation ==0.0)
   options.skip_error_calculation =ceil(numinneriters./(5.0)); # show 5 times per lopp over data
+end
   println("Skipping ", options.skip_error_calculation, " iterations per epoch")
 # Setting the embedding dimension
   if(contains(method_name,"DFP") || contains(method_name,"CM") )
@@ -47,8 +48,8 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
   ind = zeros(options.batchsize); aux =[0.0]
   gradsamp =[0];
   grad = prob.g_eval(prevx, 1:prob.numdata); # Reference gradient
-
   epocsperiter = options.batchsize/prob.numdata+ 1.0/numinneriters; #The average number of data passes der iteration
+  if(numinneriters ==1 && options.batchsize/prob.numdata ==1 ) epocsperiter =1; end
   gradsperiter = 2.0*options.batchsize+prob.numdata/numinneriters;
   method = Method(epocsperiter,gradsperiter," ",x->x, grad,gradsamp,S,H,Hsp,HS,HSi, SHS,stepsize, prevx, diffpnt,Sold,ind,aux,numinneriters);
 
@@ -68,9 +69,11 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
     "DFPprev" => method = boot_DFPprev(prob,method,options);
     "DFPprev6" => method = boot_DFPprev6(prob,method,options);
     "DFPcoord" => method = boot_DFPcoord(prob,method,options);
-    "BFGS" => method = boot_BFGS(prob,method,options);    
+    "BFGS" => method = boot_BFGS(prob,method,options);
+    "BFGS_accel" => method = boot_BFGS_accel(prob,method,options);
+     "grad"  =>  method = boot_grad(prob,method,options);
     _ => println("METHOD DOES NOT EXIST");
-  end #    "grad"  =>  method = boot_grad(prob,method,options);
-
+  end #
+  # println("numinneriters,  epocsperiter, stepsize, skip_error_calculation = ", numinneriters, ", ", epocsperiter, ", ", stepsize, ", ", options.skip_error_calculation)
   return method;
 end

@@ -12,7 +12,7 @@ exacterror =true;
 repeat = false;       # repeat the grid_search calculation for finding the stepsize
 tol = 10.0^(-6.0);
 skip_error_calculation =0.0;   # number of iterations where error is not calculated (to save time!). Use 0 for default value
-rep_number = 10;# number of times the optimization should be repeated. This is because of julia just in time compiling
+rep_number = 5;# number of times the optimization should be repeated. This is because of julia just in time compiling
 options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
 printiters,exacterror,0,"normalized",0.0,false, false,rep_number,0)
 options.batchsize =100;
