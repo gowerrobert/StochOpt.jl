@@ -6,7 +6,7 @@ include("../src/StochOpt.jl")
 ## Basic parameters
 maxiter=10^8;
 max_time = 350;
-max_epocs = 10;
+max_epocs = 15;
 printiters = true;
 exacterror =true;
 repeat = false;       # repeat the grid_search calculation for finding the stepsize
@@ -19,7 +19,7 @@ options.batchsize =100;
 options.embeddim = 10; # The max number of columns of the S sketching matrix
 ## load problem
 datapath = ""#
-probname = "australian";   # Data tested in paper: gisette_scale   madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders_scale
+probname = "mushrooms";   # Data tested in paper: gisette_scale   madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders_scale
 prob =  load_logistic(probname,datapath,options);  # Loads logisitc problem
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
