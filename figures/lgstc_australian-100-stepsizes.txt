@@ -1,8 +1,0 @@
-lgstc_australian-100 stepsize_multiplier 
-SVRG : 2^ 6.0
-2D : 2^ 7.0
-2Dsec : 2^ 6.0
-CMgauss-3 : 2^ 6.0
-CMprev-3 : 2^ 7.0
-AMgauss-3 : 2^ 7.0
-AMprev-3 : 2^ 7.0
