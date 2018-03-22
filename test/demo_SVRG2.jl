@@ -6,7 +6,7 @@ include("../src/StochOpt.jl")
 ## Basic parameters
 maxiter=10^8;
 max_time = 350;
-max_epocs = 15;
+max_epocs = 30;
 printiters = true;
 exacterror =true;
 repeat = false;       # repeat the grid_search calculation for finding the stepsize
