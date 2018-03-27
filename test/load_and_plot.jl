@@ -17,13 +17,15 @@ options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
 printiters,exacterror,0,"normalized",0.0,precondition, false,rep_number,0)
 options.batchsize =100;
 ## load problem
-datapath = ""# 
+datapath = ""#
 probnames = ["phishing", "madelon",  "a9a",  "mushrooms", "phishing", "w8a", "gisette_scale"  ,"covtype"]#  rcv1_train  liver-disorders_scale
-for probname in probnames
-  prob =  load_logistic(probname,datapath,options);
-  boot_method("-", prob,options);
-  default_path = "./data/";   loadname= replace(prob.name, r"[\/]", "-");
+# for probname in probnames
+  probname = "madelon";
+  name = string("lgstc_",  probname);
+  # prob =  load_logistic(probname,datapath,options);
+  # boot_method("-", prob,options);
+  default_path = "./data/";   loadname= replace(name, r"[\/]", "-");
   OUTPUTS = load("$(default_path)$(loadname).jld", "OUTPUTS");
   pgfplots()# gr() pyplot() # pgfplots() #plotly()
   plot_outputs_Plots(OUTPUTS,prob,options,20)
- end
+ # end

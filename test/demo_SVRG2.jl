@@ -12,7 +12,7 @@ exacterror =true;
 repeat = false;       # repeat the grid_search calculation for finding the stepsize
 tol = 10.0^(-6.0);
 skip_error_calculation =0.0;   # number of iterations where error is not calculated (to save time!). Use 0 for default value
-rep_number = 2;# number of times the optimization should be repeated. This is because of julia just in time compiling
+rep_number = 5;# number of times the optimization should be repeated. This is because of julia just in time compiling
 options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
 printiters,exacterror,0,"normalized",0.0,false, false,rep_number,0)
 options.batchsize =100;
@@ -28,10 +28,6 @@ method_name = "SVRG";
 output= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
 OUTPUTS = [OUTPUTS ; output];
 # # # # #
-method_name = "SVRG2";
-output= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output];
-####
 method_name = "2D";
 output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
 OUTPUTS = [OUTPUTS ; output3];
@@ -62,10 +58,3 @@ save("$(default_path)$(savename).jld", "OUTPUTS",OUTPUTS);
 
 pgfplots()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS,prob,options,20) # Plot and save output
-
-# 
-# options.batchsize = prob.numdata;
-# options.skip_error_calculation =1.0;
-# method_name = "grad";
-# output= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-# OUTPUTS = [OUTPUTS ; output];

@@ -14,7 +14,6 @@ printiters = true;
 exacterror =true; repeat = false;
 tol = 10.0^(-6.0);
 skip_error_calculation =0.0;   # number of iterations where error is not calculated (to save time!)
-rep_number =10;
 precondition = false;
 options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
 printiters,exacterror,0,"normalized",0.0,precondition, false,rep_number,0.0)
