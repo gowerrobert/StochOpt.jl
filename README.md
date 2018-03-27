@@ -1,4 +1,4 @@
-**warning** package under development: it will break. But renewed shall be the code that was broken, the crashless again shall compile.
+**warning package under development:** it will break. But renewed shall be the code that was broken, the crashless again shall compile.
 
 # Dependencies
 
@@ -14,29 +14,24 @@ A suite of stochastic optimization methods for solving the empirical risk minimi
 
 
 # Demo
-Run   
+For a simple demo of the use of the package 
 ```julia
 julia ./test/demo.jl
 ``` 
-for a simple demo of the use of the package.
 
-Run
+For a demo of the methods from [1]
 ```julia
 julia ./test/test/demo_SVRG2.jl
 ```
-for a demo of methods from [1]
-
-Run
+For a demo of the methods from [2]
 ```julia
 julia ./test/demo_BFGS.jl
 ```
-for a demo of methods from [2]
 
-Run
+To re-generate all of the experiments from [2]
 ```julia
 julia ./test/demo_BFGS_accel_paper_results.jl
 ```
-to re-generate the experiments from [2]
 
 # Methods implemented 
 
@@ -71,10 +66,10 @@ end
 where "liver-disorders" has been replaced with the name of the new raw data file.
 
 # Adding new loss functions
-to include new objective function, see load_problem.jl
+to include new objective function, see load_logistic.jl and copy the same structure
 
 # Adding new methods
-to include new method X, you need to write a descent_X.jl and boot_X.jl function. See descent_grad and boot_grad for an example
+to include a new method X, you need to write a descent_X.jl and boot_X.jl function. See descent_grad and boot_grad for an example
 
 # References
 
@@ -94,4 +89,4 @@ For up-to-date references see https://perso.telecom-paristech.fr/rgower/publicat
 
 # TODO
 * The option "exacterror" is obsolete for now since minimizeFunc runs assuming there is and prob.fsol.
-* Change organization of boot methods. Allow user to directly call boot function, with named parameters. Create different types for each method, as oppose to re-using one type with a cacophony of bizarre fields. 
+* Change organization of boot methods. Allow user to directly call boot function, with named parameters. Create different types for each method, stop re-using one type with a cacophony of bizarre unintelligible fields. 
