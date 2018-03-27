@@ -49,7 +49,7 @@ function  minimizeFunc_grid_stepsize(prob::Prob, method_name::AbstractString, op
   options.stepsize_multiplier =beststep;
   outputfirst= minimizeFunc(prob, method_name, options);
   for expnum =2: options.rep_number
-    outputfirst= minimizeFunc(prob, method_name, options); # Repeat twice to account for Julia just intime compiling
+    outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling
   end
   save("$(default_path)$(savename).jld", "output",outputfirst)
   options.force_continue = false;
