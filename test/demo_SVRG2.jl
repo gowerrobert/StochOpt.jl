@@ -19,7 +19,7 @@ options.batchsize =100;
 options.embeddim = 10; # The max dimension of the S embedding matrix
 ## load problem
 datapath = ""#
-probname = "australian";   # Data tested in paper: gisette_scale   madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders_scale
+probname = "w8a";   # Data tested in paper: gisette_scale   madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders_scale
 prob =  load_logistic(probname,datapath,options);  # Loads logisitc problem
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
