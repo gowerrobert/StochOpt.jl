@@ -1,15 +1,22 @@
 # A wrapper function for testing and timing iterative methods for
 # solving the empirical risk minimization problem - 2018 - Robert M. Gower
 # StochOpt Copyright (C) 2018, Robert Gower
-function  minimizeFunc(prob::Prob, method_name::AbstractString, options::MyOptions )
-  method = boot_method(method_name,prob,options);
-  if(method=="METHOD DOES NOT EXIST")
-    println("FAIL: unknown method name:")
-    return
+function  minimizeFunc(prob::Prob, method_input, options::MyOptions )
+
+  if(typeof(method_input) == String)
+    method = boot_method(method_input,prob,options);
+    if(method=="METHOD DOES NOT EXIST")
+      println("FAIL: unknown method name:")
+      return
+    end
+  else
+    method = method_input;
+    method = method.bootmethod(prob,method, options);
   end
   println(method.name);
   times= [0];
   x =  zeros(prob.numfeatures); # initial point
+  load_fsol!(options, prob);  # load a pre-calculated best  solution
   # println("size of X: ", size(X), " ", "prob.numdata ",prob.numdata, " length(1:prob.numdata): ",length(1:prob.numdata) )
   f0= prob.f_eval(x,1:prob.numdata)
   fs = [f0];
@@ -24,7 +31,7 @@ function  minimizeFunc(prob::Prob, method_name::AbstractString, options::MyOptio
     println("It   | (f(x)-fsol)/(f0-fsol)  |  datap  | Time   ")
     println("-------------------")
   end
-  for iter= 1:options.maxiter
+  for iter= 1:options.max_iter
     time_elapsed = @elapsed method.stepmethod(x,prob,options,method,iter,d);
     x[:] = x + method.stepsize * d;
     #  println("method.stepsize ", method.stepsize, "norm(d): ", norm(d) );

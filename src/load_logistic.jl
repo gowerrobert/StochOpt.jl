@@ -38,6 +38,7 @@ function   load_logistic(probname::AbstractString, datapath::AbstractString,opts
   f_eval(x,S) = ((1./length(S))*logistic_eval(X[:,S],y[S],x)+(lambda)*(0.5)* norm(x)^2);
   g_eval(x,S) = ((1./length(S))*logistic_grad(X[:,S],y[S],x).+(lambda).*x);
   g_eval!(x,S,g) =              logistic_grad!(X[:,S],y[S],x, lambda,length(S),g);
+  Jac_eval!(x,S,Jac) =           logistic_Jac!(X[:,S],y[S],x, lambda,S, Jac);
   Hess_eval(x,S) = ((1./length(S))*logistic_hess(X[:,S],y[S],x).+ (lambda).*eye(numfeatures));
   Hess_eval!(x,S,g,H) =              logistic_hess!(X[:,S],y[S],x,lambda,length(S),g,H) ;
   Hess_C(x,S,C) =                  logistic_hessC(X[:,S],y[S],x,C,lambda,length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
@@ -53,6 +54,6 @@ function   load_logistic(probname::AbstractString, datapath::AbstractString,opts
   #        error("Unknown regularizor"+ opts.regularizor);
   #end
 
-  prob = Prob(X,y,numfeatures,numdata,0.0,name, f_eval,g_eval,g_eval!,Hess_eval,Hess_eval!,Hess_opt,Hess_opt!,Hess_D,Hess_D!,Hess_C,Hess_C!,Hess_C2,lambda)
+  prob = Prob(X,y,numfeatures,numdata,0.0,name, f_eval,g_eval,g_eval!,Jac_eval!,Hess_eval,Hess_eval!,Hess_opt,Hess_opt!,Hess_D,Hess_D!,Hess_C,Hess_C!,Hess_C2,lambda)
   return prob
 end

@@ -14,10 +14,10 @@ A suite of stochastic optimization methods for solving the empirical risk minimi
 
 
 # Demo
-For a simple demo of the use of the package 
+For a simple demo of the use of the package
 ```julia
 julia ./test/demo.jl
-``` 
+```
 
 For a demo of the methods from [1]
 ```julia
@@ -33,7 +33,7 @@ To re-generate all of the experiments from [2]
 julia ./test/demo_BFGS_accel_paper_results.jl
 ```
 
-# Methods implemented 
+# Methods implemented
 
 SVRG, the original SVRG algorithm; <br>
 SVRG2, which tracks the gradients using the full Hessian. <br>
@@ -49,8 +49,8 @@ More details on the methods can be found in [1] and [2] <br>
 
 
 # Adding more data
-To test a new data set, download the raw data of a binary classifiction fomr LIBSVM [3] and place it in the folder ./data. 
-Then replace "liver-disorders" in the code *src/load_new_LIBSVM_data.jl* and execute. In other words, run the code 
+To test a new data set, download the raw data of a binary classifiction fomr LIBSVM [3] and place it in the folder ./data.
+Then replace "liver-disorders" in the code *src/load_new_LIBSVM_data.jl* and execute. In other words, run the code
 
 ```julia
 include("dataLoad.jl")
@@ -59,7 +59,7 @@ initDetails()
 datasets = ["liver-disorders"]  
 for  dataset in datasets
 transformDataJLD(dataset)
-X,y = loadDataset(dataset) 
+X,y = loadDataset(dataset)
 showDetails(dataset)
 end
 ```
@@ -75,18 +75,20 @@ to include a new method X, you need to write a descent_X.jl and boot_X.jl functi
 
 [1]  *Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods* <br>
 RMG, Nicolas Le Roux and Francis Bach.
-To appear in AISTATS 2018 
+To appear in AISTATS 2018
 
 [2] *Accelerated stochastic matrix inversion: general theory and speeding up BFGS rules for faster second-order optimization* <br>
 RMG, Filip Hanzely, P. Richtárik and S. Stich.
-arXiv:1801.05490, 2018 
+arXiv:1801.05490, 2018
 
 [3]  *LIBSVM : a library for support vector machines.* <br>
 Chih-Chung Chang and Chih-Jen Lin, ACM Transactions on Intelligent Systems and Technology, 2:27:1--27:27, 2011. <bf>
-  Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm 
+  Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
 
 For up-to-date references see https://perso.telecom-paristech.fr/rgower/publications.html
 
 # TODO
-* The option "exacterror" is obsolete for now since minimizeFunc runs assuming there is and prob.fsol.
-* Change organization of boot methods. Allow user to directly call boot function, with named parameters. Create different types for each method, stop re-using one type with a cacophony of bizarre unintelligible fields. 
+* The option "exacterror" is obsolete for now since minimizeFunc runs assuming that prob.fsol has been save and calculated.
+* Implement the calculation of the Jacobian.
+* The code for SVRG2 type methods (DFPprev, DFPgauss, CMprev, CMgauss) should have their own type. Right now they are definied using the generic Method type, which is why the code for these functions is illegible.
+* Change organization of how methods are booted. Allow user to directly call initiation function, with named parameters inputs. Create different types for each method, stop re-using one generic Method type with a cacophony of bizarre unintelligible fields.

@@ -1,13 +1,15 @@
-function  minimizeFunc_grid_stepsize(prob::Prob, method_name::AbstractString, options::MyOptions , repeat::Bool )
+function  minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions)
   default_path = "./data/";
-  method_name_temp =   method_name;
-  if(options.precondition)
-    method_name_temp = string(method_name,"-qN");
-  end
 #  savename = string(replace(prob.name, r"[\/]", "-"),'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
  #savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
-  beststep, savename = get_saved_stepsize(prob.name, method_name_temp,options);
-  if(beststep ==0.0 ||  repeat==1)
+ if(typeof(method_input) == String)
+   method_name = method_input;
+ else
+   method_name = method_input.name;
+ end
+
+  beststep, savename = get_saved_stepsize(prob.name, method_name,options);
+  if(beststep ==0.0 ||  options.repeat_stepsize_calculation==true)
     stepsizes = [2.0^(15) 2.0^(14) 2.0^(13) 2.0^(12) 2.0^(11) 2.0^(10) 2.0^(9) 2.0^(8) 2.0^(7) 2.0^(6) 2.0^(5) 2.0^(3) 2.0^(1) 2.0^(-1) 2.0^(-3)  2.0^(-5) 2.0^(-7) 2.0^(-9)  2.0^(-11) ];
     bestindx = length(stepsizes);
     beststeps_found = zeros(options.rep_number);
@@ -19,7 +21,7 @@ function  minimizeFunc_grid_stepsize(prob::Prob, method_name::AbstractString, op
       #  println("Trying stepsize ", step);
         step = stepsizes[stepind];
         options.stepsize_multiplier =step
-        output= minimizeFunc(prob, method_name, options);
+        output= minimizeFunc(prob, method_input, options);
         if(output.fs[end] < minfval && (output.fail =="max_time" || output.fail =="max_epocs" || output.fail =="tol-reached"))
           #println("found a better stepsize: ",beststep, " because ",minfval, " > ", output.fs[end], )
           minfval =output.fs[end];
@@ -42,15 +44,15 @@ function  minimizeFunc_grid_stepsize(prob::Prob, method_name::AbstractString, op
     println("best steps:")
     println(beststeps_found)
     beststep = mode(beststeps_found);
-    println("median best step:")
+    println("mode best step:")
     println(beststep)
    end
   options.force_continue = true;
   options.stepsize_multiplier =beststep;
-  outputfirst= minimizeFunc(prob, method_name, options);
-  for expnum =2: options.rep_number
-    outputfirst= minimizeFunc(prob, method_name, options); # Repeat twice to account for Julia just intime compiling
-  end
+  outputfirst= minimizeFunc(prob, method_input, options);
+  # for expnum =2: options.rep_number
+  #   outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling
+  # end
   save("$(default_path)$(savename).jld", "output",outputfirst)
   options.force_continue = false;
   return outputfirst

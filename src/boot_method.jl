@@ -8,8 +8,8 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
   numinneriters = convert(Int64,floor(prob.numdata/options.batchsize));
   #numinneriters = convert(Int64,floor(prob.numdata/options.batchsize));#)
   if(options.skip_error_calculation ==0.0)
-  options.skip_error_calculation =ceil(numinneriters./(5.0)); # show 5 times per lopp over data
-end
+    options.skip_error_calculation =ceil(numinneriters./(5.0)); # show 5 times per lopp over data
+  end
   println("Skipping ", options.skip_error_calculation, " iterations per epoch")
 # Setting the embedding dimension
   if(contains(method_name,"DFP") || contains(method_name,"CM") )
@@ -26,18 +26,6 @@ end
     stepsize =  (1.0/(prob.numdata-1))*( options.batchsize*(1.0/Lmean-1.0/Lmax)  +prob.numdata/Lmax-1/Lmean  );
   else
     stepsize =  (options.stepsize_multiplier/(prob.numdata-1))*( options.batchsize*(1.0/Lmean-1.0/Lmax)  +prob.numdata/Lmax-1/Lmean  );
-  end
-  if(exacterror)
-    try # getting saved optimal f
-      savename = string(replace(prob.name, r"[\/]", "-"),"-fsol");
-      default_path = "./data/";
-      prob.fsol = load("$(default_path)$(savename).jld", "fsol")
-    catch
-      println("No fsol for ",prob.name);
-      prob.fsol =  0.0
-    end
-  else
-    prob.fsol =  0.0
   end
 
   #  end

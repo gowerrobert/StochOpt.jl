@@ -4,24 +4,49 @@ using StatsBase
 using Match
 include("../src/StochOpt.jl")
 pgfplots()
+
+
 ## Basic parameters
-maxiter=10^8;
-max_time = 350;
-max_epocs = 20;
-printiters = true;
-exacterror =true; repeat = false;
-tol = 10.0^(-6.0);
-skip_error_calculation =0.0;   # number of iterations where error is not calculated (to save time!)
-precondition = false; # Using a precondition/quasi-Newton type
-options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,printiters,exacterror,0,"normalized",0.0,precondition, false)
+options = set_options(tol =10.0^(-6.0), max_iter=10^8, max_time = 300.0, max_epocs = 30,  rep_number =5);
 options.batchsize =100;
 ## load problem
 # datapath = "./data";   # THIS RELATIVE PATH ONLY WORKS IF YOU ARE IN THE ROOT FOLDER !
 datapath = ""# "/local/rgower/libsvmdata/"
-probname = "covtype";
+probname = "phishing";
 prob =  load_logistic(probname,datapath,options);  # Loads logisitc
-options.batchsize =prob.numdata;
 
+## Testing and benchmarking Jacobian code
+Jac = zeros(prob.numfeatures, prob.numdata);#zeros(prob.numfeatures,prob.numfeatures);
+Jac2 =  zeros(prob.numfeatures, prob.numdata);
+timeinplace = 0.0; time1 =0.0; errorsacc=0.0;
+numtrials = 100; batchsize= 500;
+# w = rand(prob.numfeatures);
+# s = sample(1:prob.numdata,options.batchsize,replace=false);
+# X = prob.X[:,s];
+# y = prob.y[s];
+# t = logistic_phi(y.*X'*w);
+# broadcast!(*,Jac[:,s],X, (y.*(t .- 1))');
+# Jac[:,s] = Jac[:,s] .+ (0.01).*w;
+# Jac[:,s] .+=  (0.01).*w;
+for iteri = 1:numtrials
+  x = rand(prob.numfeatures);
+  s = sample(1:prob.numdata,options.batchsize,replace=false);
+  tic();
+  prob.Jac_eval!(x,s,Jac);
+  time1 += toc();
+  tic();
+  for i in s
+    Jac2[:,i] =  prob.g_eval(x,[i]);
+  end
+  timeinplace+= toc();
+  # S = eye(prob.numfeatures)[:,C];
+  # HS[:] = prob.Hess_opt(x,1:prob.numdata,S);
+  errorsacc+=norm(Jac-Jac2)/numtrials;
+  Jac2[:] .=0.0;
+  Jac[:] .=0.0;
+end
+println("timeinplace: ", timeinplace, "  time1: ", time1)
+println("average Jacobian error: ", errorsacc)
 
 ## Benchmarking Hess_opt against Hess_opt!
 # time1 = 0.0; time2 =0.0; errorsacc=0.0;
@@ -67,29 +92,29 @@ options.batchsize =prob.numdata;
 # println("timeinplace: ", timeinplace, "  time1: ", time1)
 # println("average error: ", errorsacc)
 
-#Benchmarking Hess_D against Hess_D!
-
-println("average Hess_eval error: ")
-embeddim =20;
-H2 = zeros(prob.numfeatures);#zeros(prob.numfeatures,prob.numfeatures);
-H1 = zeros(prob.numfeatures);
-timeinplace = 0.0; time1 =0.0; errorsacc=0.0;
-numtrials = 100; batchsize= 500;
-for iteri = 1:numtrials
-  x = rand(prob.numfeatures);
-  tic();
-  H1[:] = prob.Hess_D(x,1:batchsize);
-  time1 += toc();
-  tic();
-  prob.Hess_D!(x,1:batchsize,H2);
-  timeinplace+= toc();
-  # S = eye(prob.numfeatures)[:,C];
-  # HS[:] = prob.Hess_opt(x,1:prob.numdata,S);
-  errorsacc+=norm(H1-H2)/numtrials;
-  #H2[:] .=0.0;
-end
-println("timeinplace: ", timeinplace, "  time1: ", time1)
-println("average error: ", errorsacc)
+## Benchmarking Hess_D against Hess_D!
+#
+# println("average Hess_eval error: ")
+# embeddim =20;
+# H2 = zeros(prob.numfeatures);#zeros(prob.numfeatures,prob.numfeatures);
+# H1 = zeros(prob.numfeatures);
+# timeinplace = 0.0; time1 =0.0; errorsacc=0.0;
+# numtrials = 100; batchsize= 500;
+# for iteri = 1:numtrials
+#   x = rand(prob.numfeatures);
+#   tic();
+#   H1[:] = prob.Hess_D(x,1:batchsize);
+#   time1 += toc();
+#   tic();
+#   prob.Hess_D!(x,1:batchsize,H2);
+#   timeinplace+= toc();
+#   # S = eye(prob.numfeatures)[:,C];
+#   # HS[:] = prob.Hess_opt(x,1:prob.numdata,S);
+#   errorsacc+=norm(H1-H2)/numtrials;
+#   #H2[:] .=0.0;
+# end
+# println("timeinplace: ", timeinplace, "  time1: ", time1)
+# println("average error: ", errorsacc)
 
 # Benchmarknig  Hess_eval against Hess_eval!
 # println("average Hess_eval error: ")

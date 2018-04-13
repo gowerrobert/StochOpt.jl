@@ -3,18 +3,9 @@ using Plots
 using StatsBase
 using Match
 include("../src/StochOpt.jl")
+
 ## Basic parameters
-maxiter=10^8;
-max_time = 350;
-max_epocs = 30;
-printiters = true;
-exacterror =true;
-repeat = false;       # repeat the grid_search calculation for finding the stepsize
-tol = 10.0^(-6.0);
-skip_error_calculation =0.0;   # number of iterations where error is not calculated (to save time!). Use 0 for default value
-rep_number = 5;# number of times the optimization should be repeated. This is because of julia just in time compiling
-options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
-printiters,exacterror,0,"normalized",0.0,false, false,rep_number,0)
+options = set_options(max_iter=10^8, max_time = 350.0, max_epocs = 30, repeat_stepsize_calculation = false, rep_number =5);
 options.batchsize =100;
 options.embeddim = 10; # The max number of columns of the S sketching matrix
 ## load problem
@@ -24,34 +15,17 @@ prob =  load_logistic(probname,datapath,options);  # Loads logisitc problem
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
 # # #
-method_name = "SVRG";
-output= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
+method_names = ["SVRG", "2Dsec", "DFPgauss", "DFPprev"]  # Curvature matching methods: CMgauss,  CMprev
+for method_name in method_names
+    output= minimizeFunc_grid_stepsize(prob, method_name, options);
+    OUTPUTS = [OUTPUTS ; output];
+end
+### Gradient with fixed step
+options.batchsize =prob.numdata;
+options.skip_error_calculation =1.0;
+method_name = "grad";
+output= minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS ; output];
-# # # # #
-method_name = "2D";
-output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output3];
-# # #
-method_name = "2Dsec";
-output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output3];
-# ##
-# # # # #
-method_name = "CMgauss";
-output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output3];
-# # #
-method_name = "CMprev";
-output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output3];
-# # # #
-method_name = "DFPgauss";
-output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output3];
-# # ##
-method_name = "DFPprev";
-output3= minimizeFunc_grid_stepsize(prob, method_name, options,repeat);
-OUTPUTS = [OUTPUTS ; output3];
 
 default_path = "./data/";   savename= replace(prob.name, r"[\/]", "-");
 save("$(default_path)$(savename).jld", "OUTPUTS",OUTPUTS);
