@@ -18,7 +18,6 @@ for probname in probnames
   # name = string("lgstc_",  probname);
   # beststep, savename = get_saved_stepsize(prob.name, method_name,options);
    prob =  load_logistic(probname,datapath,options);
-   boot_method("-", prob,options);
    load_fsol!(options, prob);  # load a pre-calculated best  solution
    default_path = "./data/";   loadname= replace(prob.name, r"[\/]", "-");
    OUTPUTS = load("$(default_path)$(loadname).jld", "OUTPUTS");

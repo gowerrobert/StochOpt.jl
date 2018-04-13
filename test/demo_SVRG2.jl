@@ -5,7 +5,7 @@ using Match
 include("../src/StochOpt.jl")
 
 ## Basic parameters
-options = set_options(max_iter=10^8, max_time = 350.0, max_epocs = 30, repeat_stepsize_calculation = false, rep_number =5);
+options = set_options(max_iter=10^8, max_time = 350.0, max_epocs = 30, repeat_stepsize_calculation = true, rep_number =5);
 options.batchsize =100;
 options.embeddim = 10; # The max number of columns of the S sketching matrix
 ## load problem

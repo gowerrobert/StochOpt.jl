@@ -76,6 +76,7 @@ type SAGAmethod
     bootmethod::Function
     minibatches::Array{Int64}
     minibatch_type::AbstractString  # Type of mini-batching, e.g, tau-nice, tau-partition, tau-with replacement
+    unbiased::Bool        # unbiased = true for SAGA and unbiased = false for SAG
     Jac::Array{Float64}  #Jacobian estimate
     Jacsp::SparseMatrixCSC #Sparse JAcobian estimate
     SAGgrad::Array{Float64}  # The SAG estimate of full gradient, needed for computing unbiased gradient estimate.
@@ -122,6 +123,7 @@ end
 #Functions for getting and manipulating data
 include("dataLoad.jl")
 include("logistic_defintions.jl") # includes all functions and definitions pertaining to logistic regression
+# load_ridge_regression
 #Including method wrappers
 include("minimizeFunc.jl") # minimizing a given prob::Prob using a method
 include("minimizeFunc_grid_stepsize.jl")  # minimizing a given prob::Prob using a method and determines the stepsize using a grid search
@@ -134,7 +136,7 @@ for method in allmethods
   include(string("boot_", method ,".jl"))
   include(string("descent_", method ,".jl"))
 end
-
+include("descent_SAGApartition.jl")
 #Including utilities, plotting, data analysis
 include("plot_outputs_Plots.jl")
 include("get_saved_stepsize.jl");
