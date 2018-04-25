@@ -38,6 +38,6 @@ problemnames =[  "a9a"] #,  [  "a9a", "madelon", "phishing", "covtype", "gisette
   pgfplots()# gr() pyplot() # pgfplots() #plotly()
   plot_outputs_Plots(OUTPUTS,prob,options)
   fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
-  savename = string(replace(prob.name, r"[\/]", "-"),"-fsol");
-  save("$(default_path)$(savename).jld", "fsol", fsol)
+  fsolfilename = get_fsol_filename(prob);
+  save("$(fsolfilename).jld", "fsol", fsol)
  end

@@ -2,7 +2,7 @@
 include("dataLoad.jl")
 initDetails()
 
-datasets = ["liver-disorders"] #  w1a, SUSY,
+datasets = ["heart"] #  w1a, SUSY, pendigits, heart
 for  dataset in datasets
 transformDataJLD(dataset)
 X,y = loadDataset(dataset) #

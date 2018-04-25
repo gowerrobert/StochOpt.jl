@@ -34,10 +34,10 @@ function set_options(; tol::Float64 = 10.0^(-6.0),
     repeat_stepsize_calculation::Bool = false,
     batchsize::Int64 =100,
     regulatrizor_parameter::AbstractString = "normalized",
-    stepsize_multiplier::Float64=0.0,
+    stepsize_multiplier::Float64=1.0,
     precondition::Bool=false,
-    force_continue::Bool=false,
-    rep_number::Int64=10, # number of times the optimization should be repeated. Only the average is reported.
+    force_continue::Bool=true,
+    rep_number::Int64=5, # number of times the optimization should be repeated. Only the average is reported.
     embeddim=0)
 
     options = MyOptions(tol,aux,max_iter,skip_error_calculation,max_time,max_epocs,
@@ -45,7 +45,7 @@ function set_options(; tol::Float64 = 10.0^(-6.0),
 end
 
 type Prob
-    X::Array{Float64}  # why not a sparse array?
+    X  # why not a sparse array?
     y::Array{Float64}
     numfeatures::Int64
     numdata::Int64
@@ -86,6 +86,8 @@ type SAGAmethod
     probs::Array{Float64}  # Probability of selecting a coordinate or mini-batch
     probability_type::AbstractString # type of probabilities used, e.g., uniform, nonuniform, nonuniform_opt
     L::Float64  # An estimate of the smoothness constant
+    Lmax::Float64  # the max smoothness constant of the f_i functions
+    mu::Float64
 end
 type Method
     epocsperiter::Float64
@@ -122,8 +124,9 @@ type Output
 end
 #Functions for getting and manipulating data
 include("dataLoad.jl")
+include("data_generation.jl")
 include("logistic_defintions.jl") # includes all functions and definitions pertaining to logistic regression
-# load_ridge_regression
+include("load_ridge_regression.jl")
 #Including method wrappers
 include("minimizeFunc.jl") # minimizing a given prob::Prob using a method
 include("minimizeFunc_grid_stepsize.jl")  # minimizing a given prob::Prob using a method and determines the stepsize using a grid search
@@ -143,3 +146,4 @@ include("get_saved_stepsize.jl");
 include("load_fsol.jl");
 #Additional
 include("BFGS_update!.jl")
+include("calculate_SAGA_rates_and_complexities.jl")

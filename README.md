@@ -28,10 +28,25 @@ For a demo of the methods from [2]
 julia ./test/demo_BFGS.jl
 ```
 
+# Repeating paper results
+
+To re-generate all of the experiments from [1]
+```julia
+julia ./repeat_paper_experiments/repeat_SVRG2_paper_experiments.jl
+```
+
 To re-generate all of the experiments from [2]
 ```julia
-julia ./test/demo_BFGS_accel_paper_results.jl
+julia ./repeat_paper_experiments/repeat_BFGS_accel_paper_results.jl
 ```
+
+
+To re-generate the experiments from Section 6.1 of [4]
+```julia
+julia ./repeat_paper_experiments/test_optimal_minibatch_SAGA_nice.jl
+```
+
+
 
 # Methods implemented
 
@@ -44,6 +59,7 @@ CM, which tracks the gradients using the low-rank curvature matching approximati
 AM, which uses the low-rank action matching approximation of the Hessian. <br>
 BFGS, the standard, full memory BFGS method. <br>
 BFGS_accel, an accelerated BFGS method. <br>
+SAGA, stochastic average gradient descent, with several options of samplings (including optimal probabilities) <br>
 
 More details on the methods can be found in [1] and [2] <br>
 
@@ -69,7 +85,7 @@ where "liver-disorders" has been replaced with the name of the new raw data file
 to include new objective function, see load_logistic.jl and copy the same structure
 
 # Adding new methods
-to include a new method X, you need to write a descent_X.jl and boot_X.jl function. See descent_grad and boot_grad for an example
+to include a new method X, you need to write a descent_X.jl and boot_X.jl function. See descent_grad and boot_grad for an example. I also recommend writing your type and including it in StochOpt or using one of the types there defined already.
 
 # References
 
@@ -84,6 +100,11 @@ arXiv:1801.05490, 2018
 [3]  *LIBSVM : a library for support vector machines.* <br>
 Chih-Chung Chang and Chih-Jen Lin, ACM Transactions on Intelligent Systems and Technology, 2:27:1--27:27, 2011. <bf>
   Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
+
+[4] *Stochastic Quasi-Gradient Methods:
+Variance Reduction via Jacobian Sketching* <br>
+RMG, Peter Richtárik, Francis Bach
+
 
 For up-to-date references see https://perso.telecom-paristech.fr/rgower/publications.html
 

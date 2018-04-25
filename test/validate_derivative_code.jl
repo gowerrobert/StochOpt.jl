@@ -8,26 +8,26 @@ pgfplots()
 
 ## Basic parameters
 options = set_options(tol =10.0^(-6.0), max_iter=10^8, max_time = 300.0, max_epocs = 30,  rep_number =5);
-options.batchsize =100;
+options.batchsize =5;
 ## load problem
 # datapath = "./data";   # THIS RELATIVE PATH ONLY WORKS IF YOU ARE IN THE ROOT FOLDER !
 datapath = ""# "/local/rgower/libsvmdata/"
-probname = "phishing";
-prob =  load_logistic(probname,datapath,options);  # Loads logisitc
+# probname = "phishing";
+# prob =  load_logistic(probname,datapath,options);  # Loads logisitc
+numdata  = 100;
+numfeatures =60;
+X = rand(numfeatures,numdata);
+y = rand(numdata);
+  x = rand(numfeatures);
+ V = X.*((X'*x -y)');
 
+probname = string("gauss-",numfeatures,"-",numdata);   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
+prob =   load_ridge_regression(X, y, probname, options, lambda  = 10.0);
 ## Testing and benchmarking Jacobian code
 Jac = zeros(prob.numfeatures, prob.numdata);#zeros(prob.numfeatures,prob.numfeatures);
 Jac2 =  zeros(prob.numfeatures, prob.numdata);
 timeinplace = 0.0; time1 =0.0; errorsacc=0.0;
-numtrials = 100; batchsize= 500;
-# w = rand(prob.numfeatures);
-# s = sample(1:prob.numdata,options.batchsize,replace=false);
-# X = prob.X[:,s];
-# y = prob.y[s];
-# t = logistic_phi(y.*X'*w);
-# broadcast!(*,Jac[:,s],X, (y.*(t .- 1))');
-# Jac[:,s] = Jac[:,s] .+ (0.01).*w;
-# Jac[:,s] .+=  (0.01).*w;
+numtrials = 5;
 for iteri = 1:numtrials
   x = rand(prob.numfeatures);
   s = sample(1:prob.numdata,options.batchsize,replace=false);
@@ -150,19 +150,24 @@ println("average Jacobian error: ", errorsacc)
 #
 # Testing gradient code
 # errorsacc = 0;
-# numtrials = 10;
+# errorinplace =0;
+# numtrials = 20;
 # grad = zeros(prob.numfeatures);
 # for iteri = 1:numtrials
 #   s = sample(1:prob.numdata,5,replace=false);
 #   x = rand(prob.numfeatures);
 #   d = rand(prob.numfeatures);
-#   eps = 10.0^(-7);
+#   eps = 10.0^(-6);
 #   graestdd= (prob.f_eval(x+eps.*d,s) - prob.f_eval(x,s))/eps;
-#   gradd = prob.g_eval!(x,s,grad)'*d;
+#   gradd = prob.g_eval(x,s)'*d;
+#   gradd2 = prob.g_eval!(x,s,grad)'*d;
 #   errorsacc = errorsacc + norm(graestdd-gradd);
+#   errorinplace = errorinplace + norm(gradd2-gradd);
 # end
 # errorsacc = errorsacc/numtrials;
+# errorinplace = errorinplace/numtrials;
 # println("average grad error: ", errorsacc)
+# println("average grad inplace error: ", errorinplace)
 #
 #
 ##Testing full Hessian code
