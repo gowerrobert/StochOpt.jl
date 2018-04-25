@@ -19,14 +19,21 @@ For a simple demo of the use of the package
 julia ./test/demo.jl
 ```
 
-For a demo of the methods from [1]
+For a demo of the SVRG2 type methods from [1]
 ```julia
 julia ./test/test/demo_SVRG2.jl
 ```
-For a demo of the methods from [2]
+For a demo of the BFGS and accelerated BFGS methods from [2]
 ```julia
 julia ./test/demo_BFGS.jl
 ```
+
+
+For a demo of SAGA with optimized probabilities from [4]
+```julia
+julia ./test/demo_BFGS.jl
+```
+
 
 # Repeating paper results
 
@@ -43,9 +50,13 @@ julia ./repeat_paper_experiments/repeat_BFGS_accel_paper_results.jl
 
 To re-generate the experiments from Section 6.1 of [4]
 ```julia
-julia ./repeat_paper_experiments/test_optimal_minibatch_SAGA_nice.jl
+julia ./repeat_paper_experiments/compare_SAGA_importance_opt_Lis.jl
 ```
 
+To re-generate the experiments from Section 6.1 of [4]
+```julia
+julia ./repeat_paper_experiments/test_optimal_minibatch_SAGA_nice.jl
+```
 
 
 # Methods implemented
@@ -61,7 +72,7 @@ BFGS, the standard, full memory BFGS method. <br>
 BFGS_accel, an accelerated BFGS method. <br>
 SAGA, stochastic average gradient descent, with several options of samplings (including optimal probabilities) <br>
 
-More details on the methods can be found in [1] and [2] <br>
+More details on the methods can be found in [1], [2] and [4] <br>
 
 
 # Adding more data
