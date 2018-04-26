@@ -31,7 +31,7 @@ julia ./test/demo_BFGS.jl
 
 For a demo of SAGA with optimized probabilities from [4]
 ```julia
-julia ./test/demo_BFGS.jl
+julia ./test/demo_SAGA.jl
 ```
 
 

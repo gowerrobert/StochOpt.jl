@@ -15,19 +15,17 @@ prob =  load_logistic(probname,datapath,options);  # Loads logisitc problem
 OUTPUTS = [];  # List of saved outputs
 # #####
 SAGA = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "opt")
-options.stepsize_multiplier =4;
+options.stepsize_multiplier =8;
 output= minimizeFunc(prob, SAGA, options);
 OUTPUTS = [OUTPUTS ; output];
 #
 SAGA.unbiased =false;
 SAGA.name = "SAG-100-opt";
-options.stepsize_multiplier =4;
+options.stepsize_multiplier =8;
 output= minimizeFunc(prob, SAGA, options);
 OUTPUTS = [OUTPUTS ; output];
 # ######
-# # something might be wrong with nice sampling
 # SAGA = intiate_SAGA(prob , options, minibatch_type = "nice")
-# options.stepsize_multiplier =40;
 # output= minimizeFunc(prob, SAGA, options);
 # OUTPUTS = [OUTPUTS ; output];
 # #######
@@ -47,5 +45,5 @@ OUTPUTS = [OUTPUTS ; output3];
 default_path = "./data/";   savename= replace(replace(prob.name, r"[\/]", "-"),".","_");
 save("$(default_path)$(savename).jld", "OUTPUTS",OUTPUTS);
 
-pgfplots()# gr() pyplot() # pgfplots() #plotly()
+pyplot()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS,prob,options) # Plot and save output

@@ -12,6 +12,7 @@ X = X';
 length(X)
 y = convert(Array{Float64}, 1:1:size(X)[2]);
 
+
 ## load artificial data
 # numfeatures = 20;
 # numdata = 20;
