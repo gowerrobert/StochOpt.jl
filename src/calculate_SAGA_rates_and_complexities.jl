@@ -6,6 +6,13 @@ function calculate_rate_SAGA_nice(prob::Prob,method,options::MyOptions)
 
 end
 
+function get_LC(prob::Prob, C)
+    # if( length(C) < prob.features)
+        return eigmax(Symmetric(full(prob.X[:,C]'*prob.X[:,C])))/length(C) +prob.lambda; #
+    # else
+    #     return eigmax(Symmetric(prob.X[:,C]*prob.X[:,C]'))/length(C) +prob.lambda;
+    # end
+end
 
 function calculate_complex_SAGA_partition_optimal(prob::Prob,method,options::MyOptions)
 
@@ -56,14 +63,6 @@ function calculate_complex_Hofmann(prob::Prob,options::MyOptions)
     return itercomp
 end
 
-
-function get_LC(prob::Prob, C)
-    # if( length(C) < prob.features)
-        return eigmax(Symmetric(full(prob.X[:,C]'*prob.X[:,C])))/length(C) +prob.lambda; #
-    # else
-    #     return eigmax(Symmetric(prob.X[:,C]*prob.X[:,C]'))/length(C) +prob.lambda;
-    # end
-end
 
 function get_mu_str_conv(prob::Prob)
     if(prob.numfeatures< prob.numdata)

@@ -1,7 +1,7 @@
 # A wrapper function for testing and timing iterative methods for
 # solving the empirical risk minimization problem - 2018 - Robert M. Gower
 # StochOpt Copyright (C) 2018, Robert Gower
-function  minimizeFunc(prob::Prob, method_input, options::MyOptions )
+function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = nothing )
 
   if(typeof(method_input) == String)
     method = boot_method(method_input,prob,options);
@@ -15,16 +15,36 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions )
   end
   println(method.name);
   times= [0];
-  x =  zeros(prob.numfeatures); # initial point
-  load_fsol!(options, prob);  # load a pre-calculated best  solution
+  if(options.initial_point == "randn") # set initial point
+    x =  randn(prob.numfeatures);
+  elseif(options.initial_point == "rand")
+    x =  rand(prob.numfeatures); #
+  elseif(options.initial_point == "ones")
+    x =  ones(prob.numfeatures); #
+  else
+    x =  zeros(prob.numfeatures); #
+  end
+  ##
+  if(options.exacterror == false)
+    prob.fsol = 0.0; # Using suboptimality as a measure of error
+  else
+    load_fsol!(options, prob);
+  end
+  # load a pre-calculated best  solution
   # println("size of X: ", size(X), " ", "prob.numdata ",prob.numdata, " length(1:prob.numdata): ",length(1:prob.numdata) )
   f0= prob.f_eval(x,1:prob.numdata)
   fs = [f0];
+  if(testprob != nothing)   # calculating the test error
+    testerrors = [testerror(testprob,x)];
+  else
+    testerrors =[];
+  end
   d = zeros(prob.numfeatures); # Search direction vector
   local tickcounter =1;
   local timeaccum=0;
   iterations =0;
   fail = "failed";
+
   ## Print heard
   if(options.printiters)
     println("-------------------")
@@ -38,13 +58,12 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions )
     timeaccum= timeaccum +  time_elapsed; # Keeps track of time accumulated at every iteration
 
     if(mod(iter,options.skip_error_calculation)==0 )
-      if(options.exacterror)
-        #println(options.exacterror);# if f* is given do something
-      end
       fs= [fs prob.f_eval(x,1:prob.numdata) ];
+      if(testprob != nothing) # calculating the test error
+        testerrors = [testerrors testerror(testprob,x)];
+      end
       times = [ times   timeaccum];
-      if(options.printiters)
-        ## printing iterations info
+      if(options.printiters)   ## printing iterations info
         @printf "%3.0d  | %3.2f  |  %3.2f  | %3.4f |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
       end
       if(options.force_continue== false)
@@ -67,10 +86,10 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions )
       elseif(iter*method.epocsperiter > options.max_epocs ) fail = "max_epocs"
       end
       iterations = iter;
-      if(options.exacterror)
-        #println(options.exacterror)
-      end
       fs= [fs prob.f_eval(x,1:prob.numdata) ];
+      if(testprob != nothing)   # calculating the test error
+        testerrors = [testerrors testerror(testprob,x)];
+      end
       times = [ times   timeaccum];
       if(options.printiters)
         @printf "%3.0d  | %3.2f  |  %3.2f  | %3.4f \n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
@@ -81,7 +100,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions )
   end # End of For loop
 
   outputname = method.name;
-  output = Output(outputname,iterations,method.epocsperiter, method.gradsperiter, times, fs, x,fail,  options.stepsize_multiplier); #./(f0.-prob.fsol)
+  output = Output(outputname,iterations,method.epocsperiter, method.gradsperiter, times, fs, testerrors, x,fail,  options.stepsize_multiplier); #./(f0.-prob.fsol)
   return output
 
 end

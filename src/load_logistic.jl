@@ -1,4 +1,4 @@
-function   load_logistic(probname::AbstractString, datapath::AbstractString,opts::MyOptions)
+function   load_logistic(probname::AbstractString, datapath::AbstractString,opts::MyOptions ; scaling = "column-scaling")
   # Load logistic regression problem
   #try
   name = string("lgstc_",  probname);  # maybe add different regularizor later opts.regularizor
@@ -9,18 +9,24 @@ function   load_logistic(probname::AbstractString, datapath::AbstractString,opts
   ind = (0.==stdX); stdX[ind] =1.0; # Testing for a zero std
   X[:,:]= (X.-mean(X,2))./stdX; # Centering and scaling the data.
   X = [ X ; ones(size(X,2))'];
+  # Underdevelopment: a Datascaling structure
+  datascaling = DataScaling([], [], [], "..");
+  # if(typeof(scaling) == String)
+  #   datascaling = fit_apply_datascaling(X, scaling);
+  # elseif(typeof(scaling) == DataScaling)
+  #   datascaling = scaling;
+  #   apply_datascaling(X, datascaling);
+  # end
+  # if(datascaling.name != "column-scaling")
+  #   name = string(name,"-",datascaling.name)
+  # end
   sX = size(X);
   numfeatures = sX[1];
   numdata = sX[2];
   #Transforming y to the binary to -1 and 1 representation
-  miny=  minimum(y);
-  maxy=  maximum(y);
-  y[find(x->x==miny,y)] = -1;
-  y[find(x->x==maxy,y)] = 1;
-  if(sum(abs(y))  != length(y))
-    println("FAILED TO TRANSFORM y into -1 and 1, ABORT!!!!!");
-    return;
-  end
+  y[find(x->x==minimum(y),y)] = -1;
+  y[find(x->x==maximum(y),y)] = 1;
+
   println("loaded ", name, " with ", numfeatures, " features and ",numdata, " data");
   if opts.regulatrizor_parameter=="1/num_data"
     lambda = 1/numdata;
@@ -39,6 +45,8 @@ function   load_logistic(probname::AbstractString, datapath::AbstractString,opts
   g_eval(x,S) = ((1./length(S))*logistic_grad(X[:,S],y[S],x).+(lambda).*x);
   g_eval!(x,S,g) =              logistic_grad!(X[:,S],y[S],x, lambda,length(S),g);
   Jac_eval!(x,S,Jac) =           logistic_Jac!(X[:,S],y[S],x, lambda,S, Jac);
+  scalar_grad_eval(x,S) = logistic_scalar_grad(X[:,S],y[S],x)
+  scalar_grad_hess_eval(x,S) = logistic_scalar_grad_hess(X[:,S],y[S],x)
   Hess_eval(x,S) = ((1./length(S))*logistic_hess(X[:,S],y[S],x).+ (lambda).*eye(numfeatures));
   Hess_eval!(x,S,g,H) =              logistic_hess!(X[:,S],y[S],x,lambda,length(S),g,H) ;
   Hess_C(x,S,C) =                  logistic_hessC(X[:,S],y[S],x,C,lambda,length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
@@ -48,12 +56,12 @@ function   load_logistic(probname::AbstractString, datapath::AbstractString,opts
   Hess_opt!(x,S,v,g,Hv) =                  logistic_hessv!(X[:,S],y[S],x,v,lambda,length(S),g,Hv);
   Hess_D(x,S) = ((1./length(S))*logistic_hessD(X[:,S],y[S],x).+ (lambda).*ones(numfeatures));
   Hess_D!(x,S,g,D) =              logistic_hessD!(X[:,S],y[S],x,lambda,length(S),g,D);
-    #Hess_vv(x,S,v) = ((1./length(S))*logistic_hessvv(X[:,S],y[S],x,v).+ (lambda).*v'*v);
+  #Hess_vv(x,S,v) = ((1./length(S))*logistic_hessvv(X[:,S],y[S],x,v).+ (lambda).*v'*v);
   #else
   #        println("Choose regularizor huber or L2");
   #        error("Unknown regularizor"+ opts.regularizor);
   #end
 
-  prob = Prob(X,y,numfeatures,numdata,0.0,name, f_eval,g_eval,g_eval!,Jac_eval!,Hess_eval,Hess_eval!,Hess_opt,Hess_opt!,Hess_D,Hess_D!,Hess_C,Hess_C!,Hess_C2,lambda)
+  prob = Prob(X,y,numfeatures,numdata,0.0,name, datascaling, f_eval,g_eval, g_eval!,Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, Hess_eval,Hess_eval!,Hess_opt,Hess_opt!,Hess_D,Hess_D!,Hess_C,Hess_C!,Hess_C2,lambda)
   return prob
 end

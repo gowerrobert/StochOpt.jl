@@ -21,6 +21,7 @@ type MyOptions
     force_continue::Bool
     rep_number::Int64 # number of times the optimization should be repeated. Only the average is reported.
     embeddim# Hessian_type::AbstractString
+    initial_point::AbstractString
 end
 
 function set_options(; tol::Float64 = 10.0^(-6.0),
@@ -38,10 +39,18 @@ function set_options(; tol::Float64 = 10.0^(-6.0),
     precondition::Bool=false,
     force_continue::Bool=true,
     rep_number::Int64=5, # number of times the optimization should be repeated. Only the average is reported.
-    embeddim=0)
+    embeddim=0,
+    initial_point = "zeros")
 
     options = MyOptions(tol,aux,max_iter,skip_error_calculation,max_time,max_epocs,
-    printiters,exacterror,repeat_stepsize_calculation, batchsize,"normalized",stepsize_multiplier,precondition, force_continue,rep_number,embeddim)
+    printiters,exacterror,repeat_stepsize_calculation, batchsize,"normalized",stepsize_multiplier,precondition, force_continue,rep_number,embeddim,initial_point)
+end
+
+type DataScaling
+    rowscaling::Array{Float64}
+    colscaling::Array{Float64}
+    colsmean::Array{Float64}
+    name::AbstractString
 end
 
 type Prob
@@ -51,10 +60,13 @@ type Prob
     numdata::Int64
     fsol::Float64
     name::AbstractString
+    datascaling::DataScaling
     f_eval::Function
     g_eval::Function
     g_eval!::Function
     Jac_eval!::Function
+    scalar_grad_eval::Function #This is phi' in the linear model sum_i phi_i( <x_i,w> -y_i)    
+    scalar_grad_hess_eval::Function #This is phi' and phi'' in the linear model sum_i phi_i( <x_i,w> -y_i)
     Hess_eval::Function# Calculates the Hessian Hess_eval,Hess_opt,Hess_vv,Hess_D
     Hess_eval!::Function# Calculates the Hessian Hess_eval,Hess_opt,Hess_vv,Hess_D
     Hess_opt::Function # Calculates the Hessian-vector product Hv
@@ -85,6 +97,7 @@ type SAGAmethod
     stepsize::Float64     # The stepsize
     probs::Array{Float64}  # Probability of selecting a coordinate or mini-batch
     probability_type::AbstractString # type of probabilities used, e.g., uniform, nonuniform, nonuniform_opt
+    Z    # normalizing variable for probabilities
     L::Float64  # An estimate of the smoothness constant
     Lmax::Float64  # the max smoothness constant of the f_i functions
     mu::Float64
@@ -118,6 +131,7 @@ type Output
     gradsperiter::Float64
     times::Array{Float64}
     fs::Array{Float64}   # recorded function values
+    testerrors::Array{Float64}
     xfinal::Array{Float64}  #The final x of the method
     fail::AbstractString
     stepsize_multiplier::Float64
@@ -130,9 +144,9 @@ include("load_ridge_regression.jl")
 #Including method wrappers
 include("minimizeFunc.jl") # minimizing a given prob::Prob using a method
 include("minimizeFunc_grid_stepsize.jl")  # minimizing a given prob::Prob using a method and determines the stepsize using a grid search
-#include("minimizeFunc_with_test.jl")
 include("boot_method.jl")
 #Including test and problem generating functions
+include("testing.jl")
 #Including iterative methods for calculating search direction
 allmethods = ["SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "DFPgauss","DFPprev",  "DFPcoord", "BFGS", "BFGS_accel", "grad" ] ;
 for method in allmethods
@@ -144,6 +158,8 @@ include("descent_SAGApartition.jl")
 include("plot_outputs_Plots.jl")
 include("get_saved_stepsize.jl");
 include("load_fsol.jl");
+include("../util/matrix_scaling.jl");
+include("../util/preprocessing.jl");
 #Additional
 include("BFGS_update!.jl")
 include("calculate_SAGA_rates_and_complexities.jl")

@@ -120,7 +120,6 @@ RMG, Peter Richtárik, Francis Bach
 For up-to-date references see https://perso.telecom-paristech.fr/rgower/publications.html
 
 # TODO
-* The option "exacterror" is obsolete for now since minimizeFunc runs assuming that prob.fsol has been save and calculated.
+* change output type to have a testerrors field. Think where best to load a test problem. Probably outside of minimizeFunc. Where best to place code for test_error ?  Probably best to start a new src file for error calculations? or testing related things?
 * Implement the calculation of the Jacobian.
 * The code for SVRG2 type methods (DFPprev, DFPgauss, CMprev, CMgauss) should have their own type. Right now they are definied using the generic Method type, which is why the code for these functions is illegible.
-* Change organization of how methods are booted. Allow user to directly call initiation function, with named parameters inputs. Create different types for each method, stop re-using one generic Method type with a cacophony of bizarre unintelligible fields.

@@ -37,18 +37,31 @@ totcomp = (itercomp').*(1:prob.numdata);
 ##Calculate iteration complexity from T. Hofmann, A. Lucchi, S. Lacoste-Julien &  B. C. McWilliams, Variance reduced stochastic gradient descent with neighbors. NIPS 28, 2015, 2305-2313
 itercomphoff = calculate_complex_Hofmann(prob,options);
 
-pyplot()
+pgfplots() # pyplot
 fontsmll = 8; fontmed = 14; fontbig = 14;
 plot([totcomp  itercomp' itercomphoff'], label = ["our total complex" "our iter complex" "Hofmann et al iter complex"],
 linestyle=:auto,  xlabel = "batchsize",  tickfont=font(fontsmll), guidefont=font(fontbig), legendfont =font(fontmed), markersize = 6, linewidth =4, marker =:auto,  grid = false)
 ylims!((minimum(itercomp),maximum(totcomp)+minimum(itercomp)))
 savefig("./figures/$(savenamesmooth).pdf");
 
-
 # Comparing only the iteration complexities
+plot(Lsides', ylabel = "expected smoothness",  label = false, xlabel = "batchsize",  tickfont=font(fontsmll), guidefont=font(fontbig),  markersize = 6, linewidth =4, marker =:auto,  grid = false)
+savenamesmoothhof = string(savenamesmooth,"-exp");
+savefig("./figures/$(savenamesmoothhof).pdf");
+
+
 plot([itercomp'  itercomphoff'], label = ["our iter complex" "Hofmann et al."], linestyle=:auto,  xlabel = "batchsize",  tickfont=font(fontsmll), guidefont=font(fontbig), legendfont =font(fontmed), markersize = 6, linewidth =4, marker =:auto,  grid = false)
 savenamesmoothhof = string(savenamesmooth,"-hof");
 savefig("./figures/$(savenamesmoothhof).pdf");
+
+
+# n= 100;
+# batchsizes = 1:n;
+# rhos = (n./batchsizes).*(n.-batchsizes)./(n-1);
+# plot(rhos, label = false, linestyle=:auto,  xlabel = "batchsize", ylabel = "sketchresidual",  tickfont=font(fontsmll), guidefont=font(fontbig), legendfont =font(fontmed), markersize = 6, linewidth =4, marker =:auto,  grid = false)
+# savefig("./figures/sketchresidualmini.pdf");
+
+
 #
 
 
