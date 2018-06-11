@@ -1,4 +1,4 @@
-function intiate_SAGA( prob::Prob, options::MyOptions ; minibatch_type="nice", probability_type = "", unbiased = true)
+function initiate_SAGA( prob::Prob, options::MyOptions ; minibatch_type="nice", probability_type = "", unbiased = true)
   # function for setting the parameters and initiating the SAGA method (and all it's variants)
   options.stepsize_multiplier =1;
   epocsperiter = options.batchsize/prob.numdata;

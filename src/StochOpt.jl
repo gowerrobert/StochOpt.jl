@@ -65,7 +65,7 @@ type Prob
     g_eval::Function
     g_eval!::Function
     Jac_eval!::Function
-    scalar_grad_eval::Function #This is phi' in the linear model sum_i phi_i( <x_i,w> -y_i)    
+    scalar_grad_eval::Function #This is phi' in the linear model sum_i phi_i( <x_i,w> -y_i)
     scalar_grad_hess_eval::Function #This is phi' and phi'' in the linear model sum_i phi_i( <x_i,w> -y_i)
     Hess_eval::Function# Calculates the Hessian Hess_eval,Hess_opt,Hess_vv,Hess_D
     Hess_eval!::Function# Calculates the Hessian Hess_eval,Hess_opt,Hess_vv,Hess_D
@@ -148,7 +148,7 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "DFPgauss","DFPprev",  "DFPcoord", "BFGS", "BFGS_accel", "grad" ] ;
+allmethods = ["SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev",  "AMcoord", "BFGS", "BFGS_accel", "grad" ] ;
 for method in allmethods
   include(string("boot_", method ,".jl"))
   include(string("descent_", method ,".jl"))

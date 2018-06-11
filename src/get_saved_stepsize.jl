@@ -6,7 +6,7 @@ function get_saved_stepsize(probname::AbstractString, method_name::AbstractStrin
   else
     method_name_temp = method_name;
   end
-  if(contains(method_name_temp, "CM") || contains(method_name_temp, "DFP"))
+  if(contains(method_name_temp, "CM") || contains(method_name_temp, "AM"))
     savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-",options.embeddim,"-stepsize") ;
   else
     savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-stepsize") ;

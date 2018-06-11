@@ -23,19 +23,19 @@ prob =   load_ridge_regression(X, y, probname, options, lambda = lambda_input,  
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
 # # # #
-SAGA = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "uni")
+SAGA = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "uni")
 output= minimizeFunc(prob, SAGA, options);
 OUTPUTS = [OUTPUTS ; output];
 # # # #
-SAGA_li = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "Li")
+SAGA_li = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "Li")
 output= minimizeFunc(prob, SAGA_li, options);
 OUTPUTS = [OUTPUTS ; output];
 # # #####
-SAGA_opt = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "opt")
+SAGA_opt = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "opt")
 output= minimizeFunc(prob, SAGA_opt, options);
 OUTPUTS = [OUTPUTS ; output];
 # # #####
-SAGA_opt = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "ada")
+SAGA_opt = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "ada")
 output= minimizeFunc(prob, SAGA_opt, options);
 OUTPUTS = [OUTPUTS ; output];
 # method_name = "grad";

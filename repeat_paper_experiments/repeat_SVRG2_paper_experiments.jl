@@ -20,7 +20,7 @@ for probname in probnames
   prob =  load_logistic(probname,datapath,options);  # Loads logisitc
   ## Running methods
   OUTPUTS = [];
-  method_names = ["SVRG", "2D", "2Dsec", "CMprev","CMgauss", "DFPgauss", "DFPprev"];  # Curvature matching methods: CMgauss,  CMprev
+  method_names = ["SVRG", "2D", "2Dsec", "CMprev","CMgauss", "AMgauss", "AMprev"];  # Curvature matching methods: CMgauss,  CMprev
   for method_name in method_names
     output2= minimizeFunc_grid_stepsize(prob, method_name, options);
     OUTPUTS = [OUTPUTS ; output2];

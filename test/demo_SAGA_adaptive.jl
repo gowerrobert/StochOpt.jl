@@ -5,7 +5,7 @@ using Match
 include("../src/StochOpt.jl")
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time = 3000.0, max_epocs = 50,  force_continue = true, initial_point = "randn"); #,repeat_stepsize_calculation =true, rep_number =10
+options = set_options(max_iter=10^8, max_time = 3000.0, max_epocs = 10,  force_continue = true, initial_point = "randn"); #,repeat_stepsize_calculation =true, rep_number =10
 options.batchsize =1;
 options.stepsize_multiplier =1;
 ## load problem
@@ -16,16 +16,16 @@ prob =  load_logistic(probname,datapath,options);  # Loads logisitc problem
 OUTPUTS = [];  # List of saved outputs
 
 #######
-sg = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "uni")
+sg = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "uni")
 output= minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS ; output];
 # #####
-sg = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "opt") #
+sg = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "opt") #
 output= minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS ; output];
 #######
 options.stepsize_multiplier =1;
-sg = intiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "ada")
+sg = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "ada")
 output= minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS ; output];
 
