@@ -122,4 +122,4 @@ For up-to-date references see https://perso.telecom-paristech.fr/rgower/publicat
 # TODO
 * change output type to have a testerrors field. Think where best to load a test problem. Probably outside of minimizeFunc. Where best to place code for test_error ?  Probably best to start a new src file for error calculations? or testing related things?
 * Implement the calculation of the Jacobian.
-* The code for SVRG2 type methods (DFPprev, DFPgauss, CMprev, CMgauss) should have their own type. Right now they are definied using the generic Method type, which is why the code for these functions is illegible.
+* The code for SVRG2 type methods (AMprev, AMgauss, CMprev, CMgauss) should have their own type. Right now they are definied using the generic Method type, which is why the code for these functions is illegible.
