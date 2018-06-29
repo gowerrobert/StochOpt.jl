@@ -12,7 +12,7 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
   end
   println("Skipping ", options.skip_error_calculation, " iterations per epoch")
 # Setting the embedding dimension
-  if(contains(method_name,"DFP") || contains(method_name,"CM") )
+  if(contains(method_name,"AM") || contains(method_name,"CM") )
     if(options.embeddim==0 )
       options.aux= convert(Int64,min(20,ceil(prob.numfeatures/2)));
     elseif (0 <options.embeddim <1.0 )
@@ -52,11 +52,11 @@ function boot_method(method_name::AbstractString, prob::Prob,options::MyOptions)
     "CMcoord"  => method  = boot_CMcoord(prob,method,options);
     "CMgauss"  => method  = boot_CMgauss(prob,method,options);
     "CMprev"  => method  = boot_CMprev(prob,method,options);
-    "DFPgauss" => method = boot_DFPgauss(prob,method,options);
-    "DFPgauss6" => method = boot_DFPgauss6(prob,method,options);
-    "DFPprev" => method = boot_DFPprev(prob,method,options);
-    "DFPprev6" => method = boot_DFPprev6(prob,method,options);
-    "DFPcoord" => method = boot_DFPcoord(prob,method,options);
+    "AMgauss" => method = boot_AMgauss(prob,method,options);
+    "AMgauss6" => method = boot_AMgauss6(prob,method,options);
+    "AMprev" => method = boot_AMprev(prob,method,options);
+    "AMprev6" => method = boot_AMprev6(prob,method,options);
+    "AMcoord" => method = boot_AMcoord(prob,method,options);
     "BFGS" => method = boot_BFGS(prob,method,options);
     "BFGS_accel" => method = boot_BFGS_accel(prob,method,options);
      "grad"  =>  method = boot_grad(prob,method,options);

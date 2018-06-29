@@ -27,5 +27,5 @@ method_name = "grad";
 output3= minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS ; output3];
 
-pyplot() # pgfplots
+pgfplots() # pgfplots
 plot_outputs_Plots(OUTPUTS,prob,options,options.max_epocs) # Plot and save output # max_epocs

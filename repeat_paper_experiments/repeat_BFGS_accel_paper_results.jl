@@ -78,8 +78,8 @@ OUTPUTS = [];  # List of saved outputs
 method_name = "BFGS";
 output1= minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS ; output1];
-options.embeddim = [prob.numdata, 1/prob.numfeatures];
 ###
+options.embeddim = [prob.numdata, 1/prob.numfeatures];
 method_name = "BFGS_accel";
 output3= minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS ; output3];

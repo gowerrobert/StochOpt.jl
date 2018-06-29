@@ -1,20 +1,18 @@
 using Plots
-using JLD
-using StatsBase
-using Match
+using JLD, StatsBase, Match
 include("../src/StochOpt.jl")
 ## This is a basic demo showing how to setup and call different optimization methods for the ERM problem
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time = 1000.0, max_epocs = 150,  force_continue = true, initial_point ="randn"); #repeat_stepsize_calculation =true, rep_number =10
+options = set_options(max_iter=10^8, max_time = 1000.0, max_epocs = 50,  force_continue = true, initial_point ="randn"); #repeat_stepsize_calculation =true, rep_number =10
 options.batchsize =100;
 ## load problem
 datapath = ""#
 probname = "mushrooms";   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
 
- # Loads logisitc problem
+## Loads logisitc problem
 prob =  load_logistic(probname,datapath,options);
 
-# Load a quadratic problem
+## Load a quadratic problem
 # X, y, probname = gen_gauss_data(numfeatures, numdata, lambda = lambda_input);
 # prob =   load_ridge_regression(X, y, probname, options, lambda = lambda_input,  scaling = "none");
 
@@ -22,23 +20,31 @@ prob =  load_logistic(probname,datapath,options);
 OUTPUTS = [];  # List of saved outputs
 #######
 
-# Most methods are called by name, for example the SVRG
+## Most methods are called by name, for example the SVRG
 output= minimizeFunc_grid_stepsize(prob, "SVRG", options);
 OUTPUTS = [OUTPUTS ; output];
 
-# or the "SVRG2" type methods from [1]
-# options.embeddim = 10;
-# output= minimizeFunc_grid_stepsize(prob, "AMprev", options);
-# OUTPUTS = [OUTPUTS ; output];
+## or the "Action Matching" method call AMprev from [1]
+options.embeddim = 10;
+output= minimizeFunc_grid_stepsize(prob, "AMprev", options);
+OUTPUTS = [OUTPUTS ; output];
 
 # The SAGA methods need to be initited before by calling "initiate_SAGA" for example
-options.stepsize_multiplier =10;
-sg = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "opt")
-output= minimizeFunc(prob, sg, options);
+sg = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "opt") # Saga with optimal sampling probabilities as given in [4]
+output= minimizeFunc_grid_stepsize(prob, sg, options); # then pass the type sg
 OUTPUTS = [OUTPUTS ; output];
 #######
 
+# If you don't want to use a grid search to determine the stepsize, you can call "minimizeFunc" directly and specify a stepsize_multiplier (it multiplies a baseline stepsize such as 1/L)
+options.stepsize_multiplier =25;
+sg = initiate_SAGA(prob , options, minibatch_type = "partition", probability_type= "uni")  # Saga with uniform sampling
+output= minimizeFunc(prob, sg, options); # then pass the type sg
+OUTPUTS = [OUTPUTS ; output];
+#######
+
+
 # There are also several full batch methods such as gradient descent
+options.batchsize =prob.numdata; # Use full batch
 method_name = "BFGS";
 output1= minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS ; output1];
@@ -54,7 +60,7 @@ default_path = "./data/";   savename= replace(replace(prob.name, r"[\/]", "-"),"
 save("$(default_path)$(savename).jld", "OUTPUTS",OUTPUTS);
 
 #plot and save graphs
-pyplot()# gr() pyplot() # pgfplots() #plotly()
+gr()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS,prob,options) # Plot and save output
 
 # References

@@ -74,6 +74,9 @@ SAGA, stochastic average gradient descent, with several options of samplings (in
 
 More details on the methods can be found in [1], [2] and [4] <br>
 
+# Code Philosophy
+
+To provide en enviroment where competing stochastic methods can be compared on equal footing. This is why all methods are called by the same wrapper function "minimizeFunc" (or it's extension minimizeFunc_grid_stepsize). All performance measures such as time taken, test error or epochs are calculated by these wrapper functions. Each new method need only supply a *stepmethod* and a *bootmethod*. The stepmethod returns an update vector d which is then added to x_k to give the next iterate x_{k+1}. The bootmethod is called once to initialize the method.
 
 # Adding more data
 To test a new data set, download the raw data of a binary classifiction fomr LIBSVM [3] and place it in the folder ./data.
