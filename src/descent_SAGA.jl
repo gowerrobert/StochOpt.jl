@@ -23,10 +23,6 @@ function descent_SAGA(x::Array{Float64},prob::Prob,options::MyOptions,sg::SAGAme
     sg.Jac[s]  =  scalargrad;
   end
 
-
-
-
-
   #update SAG estimate:   1/n J^{k+1}1 = 1/n J^k 1 + 1/n (DF^k-J^k) Proj 1
   sg.SAGgrad[:] = sg.SAGgrad + (1/prob.numdata)*sg.aux;
   # Gradient estimate

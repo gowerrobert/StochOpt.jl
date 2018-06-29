@@ -102,6 +102,7 @@ type SAGAmethod
     Lmax::Float64  # the max smoothness constant of the f_i functions
     mu::Float64
 end
+
 type Method
     epocsperiter::Float64
     gradsperiter::Float64

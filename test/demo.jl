@@ -8,13 +8,8 @@ options.batchsize =100;
 ## load problem
 datapath = ""#
 probname = "mushrooms";   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
-
 ## Loads logisitc problem
 prob =  load_logistic(probname,datapath,options);
-
-## Load a quadratic problem
-# X, y, probname = gen_gauss_data(numfeatures, numdata, lambda = lambda_input);
-# prob =   load_ridge_regression(X, y, probname, options, lambda = lambda_input,  scaling = "none");
 
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
