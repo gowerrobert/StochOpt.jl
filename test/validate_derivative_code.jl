@@ -7,43 +7,43 @@ pgfplots()
 
 
 ## Basic parameters
-options = set_options(tol =10.0^(-6.0), max_iter=10^8, max_time = 300.0, max_epocs = 30,  rep_number =5);
-options.batchsize =5;
+options = set_options(tol=10.0^(-6.0), max_iter=10^8, max_time=300.0, max_epocs=30, rep_number=5);
+options.batchsize = 5;
 ## load problem
 # datapath = "./data";   # THIS RELATIVE PATH ONLY WORKS IF YOU ARE IN THE ROOT FOLDER !
 datapath = ""# "/local/rgower/libsvmdata/"
 # probname = "phishing";
 # prob =  load_logistic(probname,datapath,options);  # Loads logisitc
-numdata  = 100;
-numfeatures =60;
-X = rand(numfeatures,numdata);
+numdata = 100;
+numfeatures = 60;
+X = rand(numfeatures, numdata);
 y = rand(numdata);
-  x = rand(numfeatures);
- V = X.*((X'*x -y)');
+x = rand(numfeatures);
+V = X.*((X'*x -y)');
 
-probname = string("gauss-",numfeatures,"-",numdata);   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
-prob =   load_ridge_regression(X, y, probname, options, lambda  = 10.0);
+probname = string("gauss-", numfeatures, "-", numdata);   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
+prob = load_ridge_regression(X, y, probname, options, lambda=10.0);
 ## Testing and benchmarking Jacobian code
 Jac = zeros(prob.numfeatures, prob.numdata);#zeros(prob.numfeatures,prob.numfeatures);
-Jac2 =  zeros(prob.numfeatures, prob.numdata);
-timeinplace = 0.0; time1 =0.0; errorsacc=0.0;
+Jac2 = zeros(prob.numfeatures, prob.numdata);
+timeinplace = 0.0; time1 = 0.0; errorsacc = 0.0;
 numtrials = 5;
 for iteri = 1:numtrials
-  x = rand(prob.numfeatures);
-  s = sample(1:prob.numdata,options.batchsize,replace=false);
-  tic();
-  prob.Jac_eval!(x,s,Jac);
-  time1 += toc();
-  tic();
-  for i in s
-    Jac2[:,i] =  prob.g_eval(x,[i]);
-  end
-  timeinplace+= toc();
-  # S = eye(prob.numfeatures)[:,C];
-  # HS[:] = prob.Hess_opt(x,1:prob.numdata,S);
-  errorsacc+=norm(Jac-Jac2)/numtrials;
-  Jac2[:] .=0.0;
-  Jac[:] .=0.0;
+    x = rand(prob.numfeatures);
+    s = sample(1:prob.numdata, options.batchsize, replace=false);
+    tic();
+    prob.Jac_eval!(x, s, Jac);
+    time1 += toc();
+    tic();
+    for i in s
+        Jac2[:,i] = prob.g_eval(x, [i]);
+    end
+    timeinplace += toc();
+    # S = eye(prob.numfeatures)[:,C];
+    # HS[:] = prob.Hess_opt(x,1:prob.numdata,S);
+    errorsacc += norm(Jac-Jac2)/numtrials;
+    Jac2[:] .= 0.0;
+    Jac[:] .= 0.0;
 end
 println("timeinplace: ", timeinplace, "  time1: ", time1)
 println("average Jacobian error: ", errorsacc)
