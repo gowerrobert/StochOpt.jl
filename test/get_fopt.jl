@@ -18,7 +18,7 @@ include("../src/StochOpt.jl")
 # options = MyOptions(tol,Inf,maxiter,skip_error_calculation,max_time,max_epocs,
 # printiters,exacterror,0,"normalized",0.0,false, force_continue,rep_number,0)
 options = set_options(tol = 10.0^(-16.0), skip_error_calculation = 20, exacterror = false, max_iter = 10^8, max_time = 60.0*60.0*3.0,
-                      max_epocs = 500, repeat_stepsize_calculation = true, rep_number = 2);
+        max_epocs = 500, repeat_stepsize_calculation = true, rep_number = 2);
 
 datapath = "" # "/local/rgower/libsvmdata/"
 default_path = "./data/";
