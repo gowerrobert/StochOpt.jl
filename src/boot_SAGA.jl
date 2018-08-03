@@ -1,4 +1,4 @@
-function initiate_SAGA( prob::Prob, options::MyOptions ; minibatch_type="nice", probability_type = "", unbiased = true)
+function initiate_SAGA( prob::Prob, options::MyOptions, x::Array{Float64} ; minibatch_type="nice", probability_type = "", unbiased = true)
   # function for setting the parameters and initiating the SAGA method (and all it's variants)
   options.stepsize_multiplier =1;
   epocsperiter = options.batchsize/prob.numdata;
@@ -23,18 +23,14 @@ function initiate_SAGA( prob::Prob, options::MyOptions ; minibatch_type="nice", 
   if(minibatch_type =="partition")
     # L = mean(sum(prob.X.^2,1));
     if(probability_type == "ada")
-      if(options.initial_point =="randn")
-        xstart = randn(prob.numfeatures);
-      elseif(options.initial_point =="zeros")
+      if(options.initial_point =="zeros")
         println("adaSAGA doesn't work well with zeros initial point! Existing")
         return [];
-      else
-        xstart = rand(prob.numfeatures);
       end
       Jac= zeros(prob.numdata);
       # Jac= zeros(prob.numfeatures, prob.numdata);
       name = string(name,"-",probability_type);
-      yXx = prob.y.*(prob.X'*xstart); # initial random guess
+      yXx = prob.y.*(prob.X'*x); # initial random guess
       probs =logistic_phi(yXx) ;
       probs[:] = probs.*(1-probs);
       probs[:] = max.(probs, 0.25/8.0); ## IMPORTANT: this establishes a minimum value for phi''

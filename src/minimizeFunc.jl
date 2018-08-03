@@ -3,18 +3,6 @@
 # StochOpt Copyright (C) 2018, Robert Gower
 function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = nothing )
 
-  if(typeof(method_input) == String)
-    method = boot_method(method_input,prob,options);
-    if(method=="METHOD DOES NOT EXIST")
-      println("FAIL: unknown method name:")
-      return
-    end
-  else
-    method = method_input;
-    method = method.bootmethod(prob,method, options);
-  end
-  println(method.name);
-  times= [0];
   if(options.initial_point == "randn") # set initial point
     x =  randn(prob.numfeatures);
   elseif(options.initial_point == "rand")
@@ -24,6 +12,18 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
   else
     x =  zeros(prob.numfeatures); #
   end
+  if(typeof(method_input) == String)
+    method = boot_method(method_input,prob,options);
+    if(method=="METHOD DOES NOT EXIST")
+      println("FAIL: unknown method name:")
+      return
+    end
+  else
+    method = method_input;
+    method = method.bootmethod(prob,method, options, x);
+  end
+  println(method.name);
+  times= [0];
   ##
   if(options.exacterror == false)
     prob.fsol = 0.0; # Using suboptimality as a measure of error

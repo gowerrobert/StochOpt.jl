@@ -103,6 +103,24 @@ type SAGAmethod
     mu::Float64
 end
 
+type SPIN
+    epocsperiter::Float64
+    gradsperiter::Float64
+    name::AbstractString
+    stepmethod::Function
+    bootmethod::Function
+    sketchsize::Int64
+    dn::Array{Float64}   # currrent estimate of Newton direction
+    rhs::Array{Float64}
+    S::Array{Float64}  # Sketched Hessian
+    HS::Array{Float64}  # Sketched Hessian
+    SHS::Array{Float64}  # Sketched Hessian
+    grad::Array{Float64} # gradient
+    stepsize::Float64
+    sketchtype::AbstractString
+end
+
+
 type Method
     epocsperiter::Float64
     gradsperiter::Float64
@@ -149,7 +167,7 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev",  "AMcoord", "BFGS", "BFGS_accel", "grad" ] ;
+allmethods = ["SPIN","SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev",  "AMcoord", "BFGS", "BFGS_accel", "grad" ] ;
 for method in allmethods
   include(string("boot_", method ,".jl"))
   include(string("descent_", method ,".jl"))
