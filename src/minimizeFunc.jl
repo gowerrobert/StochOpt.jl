@@ -47,9 +47,9 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
 
   ## Print heard
   if(options.printiters)
-    println("-------------------")
-    println("It   | (f(x)-fsol)/(f0-fsol)  |  datap  | Time   ")
-    println("-------------------")
+    println("----------------------------------------------------------")
+    println("    It  | (f(x)-fsol)/(f0-fsol) |    datap  |     Time   |")
+    println("----------------------------------------------------------")
   end
   for iter= 1:options.max_iter
     time_elapsed = @elapsed method.stepmethod(x,prob,options,method,iter,d);
@@ -64,7 +64,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
       end
       times = [ times   timeaccum];
       if(options.printiters)   ## printing iterations info
-        @printf "%3.0d  | %3.2f  |  %3.2f  | %3.4f |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
+        @printf "  %4.0d  |         %4.2f         |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
       end
       if(options.force_continue== false)
         if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
@@ -92,7 +92,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
       end
       times = [ times   timeaccum];
       if(options.printiters)
-        @printf "%3.0d  | %3.2f  |  %3.2f  | %3.4f \n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
+        @printf "  %4.0d  |         %4.2f         |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end] ;
       end
       break;
     end

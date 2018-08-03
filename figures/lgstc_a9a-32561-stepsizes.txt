@@ -1,0 +1,3 @@
+lgstc_a9a-32561 stepsize_multiplier 
+BFGS : 2^ 7.0
+BFGS-a-32561.0-0.01 : 2^ 7.0

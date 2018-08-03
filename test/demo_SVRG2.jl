@@ -30,5 +30,5 @@ OUTPUTS = [OUTPUTS ; output];
 default_path = "./data/";   savename= replace(prob.name, r"[\/]", "-");
 save("$(default_path)$(savename).jld", "OUTPUTS",OUTPUTS);
 
-pgfplots()# gr() pyplot() # pgfplots() #plotly()
+gr()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS,prob,options,20) # Plot and save output

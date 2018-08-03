@@ -1,3 +1,7 @@
+# ERROR with SPIN : 
+# - not loaded in StochOpt.jl 
+# - when loaded, problem with descent_SPIN.jl
+
 using Plots
 using JLD, StatsBase, Match
 include("../src/StochOpt.jl")
@@ -50,5 +54,5 @@ default_path = "./data/";   savename= replace(replace(prob.name, r"[\/]", "-"),"
 save("$(default_path)$(savename).jld", "OUTPUTS",OUTPUTS);
 
 #plot and save graphs
-pgfplots()# gr() pyplot() # pgfplots() #plotly()
+gr()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS,prob,options) # Plot and save output
