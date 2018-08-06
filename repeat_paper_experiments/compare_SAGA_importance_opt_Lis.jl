@@ -6,12 +6,12 @@ include("../src/StochOpt.jl")
 
 ## Basic parameters and options for solvers
 options = set_options(max_iter=10^8, max_time =10.0, max_epocs = 50, repeat_stepsize_calculation = true, regulatrizor_parameter="1/num_data", initial_point = "randn"); # =100, ,skip_error_calculation =5
-options.batchsize =1;
-options.stepsize_multiplier =1;
+options.batchsize = 1;
+options.stepsize_multiplier = 1;
 ## load data
 
 numdata = 2000;
-numfeatures =numdata;
+numfeatures = numdata;
 lambda_input = 1/(numdata^2);
 a =1./numdata;
   # X, y, probname = gen_diag_lone_eig_data(numfeatures, numdata, lambda = lambda_input, a =1/lambda_input );
