@@ -1,20 +1,20 @@
-name = string("lgstc_",  probname );  # maybe add different regularizor later opts.regularizor
-datafile = string(datapath,probname); println("loading:  ",datafile)
-X,y = loadDataset(datafile);
-stdX = std(X,2);
+name = string("lgstc_", probname);  # maybe add different regularizor later opts.regularizor
+datafile = string(datapath, probname); println("loading:  ", datafile)
+X, y = loadDataset(datafile);
+stdX = std(X, 2);
 #replace 0 in std by 1 incase there is a constant feature
-ind = (0.==stdX); stdX[ind] =1.0; # Testing for a zero std
-X[:,:]= (X.-mean(X,2))./stdX; # Centering and scaling the data.
-X = [ X ; ones(size(X,2))'];
+ind = (0.==stdX); stdX[ind] = 1.0; # Testing for a zero std
+X[:, :]= (X.-mean(X, 2))./stdX; # Centering and scaling the data.
+X = [X; ones(size(X, 2))'];
 sX = size(X);
 numfeatures = sX[1];
 numdata = sX[2];
 
 # setup for tests
 w = rand(numfeatures);
-Xx  = X'*w;
+Xx = X'*w;
 yXx = y.*Xx;
-t=logistic_phi(yXx) ;
+t = logistic_phi(yXx) ;
 
 
 ## Full sparse Hessian

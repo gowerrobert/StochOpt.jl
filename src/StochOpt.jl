@@ -28,22 +28,22 @@ function set_options(; tol::Float64 = 10.0^(-6.0),
     aux::Float64 = Inf,
     max_iter::Int = 10^8,
     skip_error_calculation::Int = 0,
-    max_time::Float64 =350.0,
-    max_epocs::Int64 =30,
-    printiters::Bool =true,
-    exacterror::Bool =true,
+    max_time::Float64 = 350.0,
+    max_epocs::Int64 = 30,
+    printiters::Bool = true,
+    exacterror::Bool = true,
     repeat_stepsize_calculation::Bool = false,
-    batchsize::Int64 =100,
+    batchsize::Int64 = 100,
     regulatrizor_parameter::AbstractString = "normalized",
-    stepsize_multiplier::Float64=1.0,
-    precondition::Bool=false,
-    force_continue::Bool=true,
-    rep_number::Int64=5, # number of times the optimization should be repeated. Only the average is reported.
-    embeddim=0,
+    stepsize_multiplier::Float64 = 1.0,
+    precondition::Bool = false,
+    force_continue::Bool = true,
+    rep_number::Int64 = 5, # number of times the optimization should be repeated. Only the average is reported.
+    embeddim = 0,
     initial_point = "zeros")
 
-    options = MyOptions(tol,aux,max_iter,skip_error_calculation,max_time,max_epocs,
-    printiters,exacterror,repeat_stepsize_calculation, batchsize,"normalized",stepsize_multiplier,precondition, force_continue,rep_number,embeddim,initial_point)
+    options = MyOptions(tol, aux, max_iter, skip_error_calculation, max_time, max_epocs,
+        printiters, exacterror, repeat_stepsize_calculation, batchsize, "normalized", stepsize_multiplier, precondition, force_continue, rep_number, embeddim, initial_point)
 end
 
 type DataScaling
@@ -167,10 +167,10 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SPIN","SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev",  "AMcoord", "BFGS", "BFGS_accel", "grad" ] ;
+allmethods = ["SPIN","SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev",  "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
 for method in allmethods
-  include(string("boot_", method ,".jl"))
-  include(string("descent_", method ,".jl"))
+    include(string("boot_", method , ".jl"))
+    include(string("descent_", method , ".jl"))
 end
 include("descent_SAGApartition.jl")
 #Including utilities, plotting, data analysis
