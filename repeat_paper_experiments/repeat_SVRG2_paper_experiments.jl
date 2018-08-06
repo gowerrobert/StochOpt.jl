@@ -37,7 +37,7 @@ for probname in probnames
     default_path = "./data/";   savename = replace(prob.name, r"[\/]", "-");
     save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
     savename = string(replace(prob.name, r"[\/]", "-")) ;
-    pgfplots()
+    gr()
 #  gr()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS, prob, options,20)
 
