@@ -13,6 +13,7 @@ options = set_options(tol=10.0^(-16.0), skip_error_calculation=5, max_iter=10^6,
 datapath = ""#
 gr() # gr()
 # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
+
 ##################
 ## splice problem
 ##################
@@ -31,6 +32,7 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
 plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+
 ##################
 ## australian problem
 ##################
@@ -49,6 +51,7 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
 plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+
 ##################
 ##  phishing problem
 ##################
@@ -67,6 +70,7 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
 plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+
 ##################
 ##  mushrooms problem
 ##################
@@ -85,6 +89,7 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
 plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+
 ##################
 ## Madelon problem
 ##################
@@ -103,6 +108,7 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
 plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs) # Plot and save output # max_epocs
+
 ##################
 ## a9a problem
 ##################
@@ -121,6 +127,7 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
 plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs) # Plot and save output # max_epocs
+
 #################
 # w8a problem
 ##################
@@ -139,6 +146,7 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 # ### plotting and saving
 plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs) # Plot and save output # max_epocs
+
 ##################
 ## covtype problem
 ##################
