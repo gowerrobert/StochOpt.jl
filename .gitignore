@@ -1,3 +1,8 @@
-## My Visual Studio Code settings
+## Local Visual Studio Code settings
 # using spaces and tab equals 4 spaces
 .vscode/settings.json
+
+## Figures
+figures/*.txt
+figures/*.pdf
+!figures/lgstc_mushrooms-100-time.pdf
