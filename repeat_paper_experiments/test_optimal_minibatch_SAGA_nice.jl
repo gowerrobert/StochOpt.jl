@@ -44,10 +44,10 @@ savefig("./figures/$(savenamesmooth).pdf");
 
 # Comparing only the iteration complexities
 plot(Lsides', ylabel="expected smoothness", label=false, xlabel="batchsize", tickfont=font(fontsmll), guidefont=font(fontbig), markersize=6, linewidth=4, marker=:auto, grid=false)
-savenamesmoothhof = string(savenamesmooth, "-exp");
+    savenamesmoothhof = string(savenamesmooth, "-exp");
 savefig("./figures/$(savenamesmoothhof).pdf");
 
-plot([itercomp'  itercomphoff'], label=["our iter complex" "Hofmann et al."], linestyle=:auto, xlabel="batchsize", tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed),
+plot([itercomp' itercomphoff'], label=["our iter complex" "Hofmann et al."], linestyle=:auto, xlabel="batchsize", tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed),
     markersize=6, linewidth=4, marker=:auto, grid=false)
 savenamesmoothhof = string(savenamesmooth, "-hof");
 savefig("./figures/$(savenamesmoothhof).pdf");

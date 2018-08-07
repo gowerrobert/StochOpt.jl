@@ -10,7 +10,7 @@ options = set_options(tol=10.0^(-16.0), skip_error_calculation=5, max_iter=10^6,
         max_epocs=200, repeat_stepsize_calculation=false, rep_number=2);
 
 ## load problem
-datapath = ""#
+datapath = ""
 gr() # gr()
 # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
 
