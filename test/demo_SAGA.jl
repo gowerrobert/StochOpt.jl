@@ -25,7 +25,7 @@ output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 ######
 sg = initiate_SAGA(prob, options, minibatch_type="nice")
-output= minimizeFunc(prob, sg, options);
+output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 #######
 output3 = minimizeFunc_grid_stepsize(prob, "SVRG", options);
