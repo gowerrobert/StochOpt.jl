@@ -42,24 +42,24 @@ function boot_method(method_name::AbstractString, prob::Prob, options::MyOptions
     method = Method(epocsperiter, gradsperiter, " ", x->x, grad, gradsamp, S, H, Hsp, HS, HSi, SHS, stepsize, prevx, diffpnt, Sold, ind, aux, numinneriters);
 
     # Trying to make the following selectcase with some metaprogramming
-    # method =  eval(parse(string("boot_",method_name,"(prob,method,options)")));
+    # method =  eval(parse(string("boot_",method_name,"(prob, method, options)")));
 
     @match method_name begin
-        "SVRG" => method = boot_SVRG(prob,method,options);
-        "SVRG2" => method = boot_SVRG2(prob,method,options);
-        "2D" => method = boot_2D(prob,method,options);
-        "2Dsec" => method  = boot_2Dsec(prob,method,options);
-        "CMcoord" => method  = boot_CMcoord(prob,method,options);
-        "CMgauss" => method  = boot_CMgauss(prob,method,options);
-        "CMprev" => method  = boot_CMprev(prob,method,options);
-        "AMgauss" => method = boot_AMgauss(prob,method,options);
-        "AMgauss6" => method = boot_AMgauss6(prob,method,options);
-        "AMprev" => method = boot_AMprev(prob,method,options);
-        "AMprev6" => method = boot_AMprev6(prob,method,options);
-        "AMcoord" => method = boot_AMcoord(prob,method,options);
-        "BFGS" => method = boot_BFGS(prob,method,options);
-        "BFGS_accel" => method = boot_BFGS_accel(prob,method,options);
-        "grad" => method = boot_grad(prob,method,options);
+        "SVRG" => method = boot_SVRG(prob, method, options);
+        "SVRG2" => method = boot_SVRG2(prob, method, options);
+        "2D" => method = boot_2D(prob, method, options);
+        "2Dsec" => method  = boot_2Dsec(prob, method, options);
+        "CMcoord" => method  = boot_CMcoord(prob, method, options);
+        "CMgauss" => method  = boot_CMgauss(prob, method, options);
+        "CMprev" => method  = boot_CMprev(prob, method, options);
+        "AMgauss" => method = boot_AMgauss(prob, method, options);
+        "AMgauss6" => method = boot_AMgauss6(prob, method, options);
+        "AMprev" => method = boot_AMprev(prob, method, options);
+        "AMprev6" => method = boot_AMprev6(prob, method, options);
+        "AMcoord" => method = boot_AMcoord(prob, method, options);
+        "BFGS" => method = boot_BFGS(prob, method, options);
+        "BFGS_accel" => method = boot_BFGS_accel(prob, method, options);
+        "grad" => method = boot_grad(prob, method, options);
       _ => println("METHOD DOES NOT EXIST");
     end #
     # println("numinneriters,  epocsperiter, stepsize, skip_error_calculation = ", numinneriters, ", ", epocsperiter, ", ", stepsize, ", ", options.skip_error_calculation)

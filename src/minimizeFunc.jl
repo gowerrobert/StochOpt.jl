@@ -1,7 +1,7 @@
 # A wrapper function for testing and timing iterative methods for
 # solving the empirical risk minimization problem - 2018 - Robert M. Gower
 # StochOpt Copyright (C) 2018, Robert Gower
-function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = nothing )
+function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing)
     if(options.initial_point == "randn") # set initial point
         x = randn(prob.numfeatures);
     elseif(options.initial_point == "rand")
@@ -20,7 +20,8 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
         end
     else
         method = method_input;
-        method = method.bootmethod(prob, method, options, x);
+        method = method.bootmethod(prob, method, options); # Previous code
+        # method = method.bootmethod(prob, method, options, x);
     end
     println(method.name);
     times = [0];
@@ -37,7 +38,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
     if(testprob != nothing)   # calculating the test error
         testerrors = [testerror(testprob, x)];
     else
-        testerrors =[];
+        testerrors = [];
     end
     d = zeros(prob.numfeatures); # Search direction vector
     local tickcounter = 1;
@@ -46,9 +47,9 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
     fail = "failed";
     ## Print heard
     if(options.printiters)
-        println("----------------------------------------------------------")
-        println("    It  | (f(x)-fsol)/(f0-fsol) |    datap  |     Time   |")
-        println("----------------------------------------------------------")
+        println("------------------------------------------------------------")
+        println("     It   | (f(x)-fsol)/(f0-fsol) |    datap  |     Time   |")
+        println("------------------------------------------------------------")
     end
     for iter = 1:options.max_iter
         time_elapsed = @elapsed method.stepmethod(x, prob,options, method, iter, d);
@@ -62,7 +63,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob = 
             end
             times = [times timeaccum];
             if(options.printiters)   ## printing iterations info
-                @printf "  %4.0d  |         %5.2f         |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                @printf "  %6.0d  |         %5.2f         |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
             end
             if(options.force_continue == false)
                 if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
