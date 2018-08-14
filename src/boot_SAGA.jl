@@ -109,15 +109,16 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
             probs[:] = probs/Z;
             stepsize = prob.numdata/Z;
             descent_method = descent_SAGA_adapt2;#descent_SAGA_adapt;
-        else
+        else # It means "uni" or the default value "" 
             Jac, minibatches, probs, name, L, Lmax, stepsize = boot_SAGA_partition(prob, options, probability_type, name, mu);
             descent_method = descent_SAGApartition;
         end
-        # elseif(minibatch_type =="Li_order_partition")
     elseif(minibatch_type == "Li_order_partition")
-        Jac, minibatches, probs, name, L, Lmax = boot_SAGA_Li_order_partition(prob,options,probability_type,name,mu);
+        Jac, minibatches, probs, name, L, Lmax = boot_SAGA_Li_order_partition(prob, options, probability_type, name, mu); # Here probability_type = ""
         descent_method = descent_SAGApartition;
     else
+        # Is it relevant to put "nice" in else????
+        # Here probability_type = ""
         name = string(name, "-", minibatch_type);
         L = eigmax(full(prob.X*prob.X'))/prob.numdata + prob.lambda;
         Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;

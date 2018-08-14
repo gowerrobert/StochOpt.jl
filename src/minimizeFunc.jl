@@ -19,6 +19,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=no
             return
         end
     else
+        println("\n---Method is not a String---\n") # To try if this else is for SAGA
         method = method_input;
         method = method.bootmethod(prob, method, options); # Previous code
         # method = method.bootmethod(prob, method, options, x);
@@ -52,7 +53,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=no
         println("------------------------------------------------------------")
     end
     for iter = 1:options.max_iter
-        time_elapsed = @elapsed method.stepmethod(x, prob,options, method, iter, d);
+        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
         x[:] = x + method.stepsize * d;
         #  println("method.stepsize ", method.stepsize, "norm(d): ", norm(d) );
         timeaccum = timeaccum +  time_elapsed; # Keeps track of time accumulated at every iteration
@@ -93,7 +94,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=no
             end
             times = [times timeaccum];
             if(options.printiters)
-                @printf "  %4.0d  |         %5.2f         |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                @printf "  %6.0d  |         %5.2f         |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
             end
             break;
         end
