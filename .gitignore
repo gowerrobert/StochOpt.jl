@@ -6,3 +6,6 @@
 figures/*.txt
 figures/*.pdf
 !figures/lgstc_mushrooms-100-time.pdf
+
+## Data
+data/*.jld
