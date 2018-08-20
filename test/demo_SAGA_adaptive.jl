@@ -20,7 +20,7 @@ sg = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 #####
-sg = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="opt") #
+sg = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="opt")
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 #######

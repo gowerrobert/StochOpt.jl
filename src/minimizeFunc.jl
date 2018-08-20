@@ -19,7 +19,7 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=no
             return
         end
     else
-        println("\n---Method is not a String---\n") # To try if this else is for SAGA
+        # println("\n---Method is not a String---\n") # To try if this else is for SAGA
         method = method_input;
         method = method.bootmethod(prob, method, options); # Previous code
         # method = method.bootmethod(prob, method, options, x);

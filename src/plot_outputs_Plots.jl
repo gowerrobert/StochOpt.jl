@@ -56,6 +56,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         println(output.name,": 2^", log(2,output.stepsize_multiplier))
     end
     println(probname)
+    println("./figures/$(probname)-time.pdf")
     savefig("./figures/$(probname)-time.pdf");
 
     if(!isempty(OUTPUTS[1].testerrors)) # plot test error as well

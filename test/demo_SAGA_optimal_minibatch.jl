@@ -19,27 +19,27 @@ OUTPUTS = [];  # List of saved outputs
 ###### SAGA + nice minibatch + default ("") probability
 ## Minibatch size = 1 : SGD
 options.batchsize = 1;
-sg = initiate_SAGA(prob, options, minibatch_type="nice", probability_type="");
+sg = initiate_SAGA(prob, options, minibatch_type="nice");
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 
 ## Minibatch size = 10
 options.batchsize = 10;
-sg = initiate_SAGA(prob, options, minibatch_type="nice", probability_type="");
+sg = initiate_SAGA(prob, options, minibatch_type="nice");
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 
 ## Minibatch size = 20
 options.batchsize = 20;
-sg = initiate_SAGA(prob, options, minibatch_type="nice", probability_type="");
+sg = initiate_SAGA(prob, options, minibatch_type="nice");
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 
 ## Minibatch size = numdata : Gradrient descent
-options.batchsize = prob.numdata;
-options.skip_error_calculation = 1.0; # What is skip_error_calculation ??
-output3 = minimizeFunc_grid_stepsize(prob, "grad", options);
-OUTPUTS = [OUTPUTS; output3];
+# options.batchsize = prob.numdata;
+# options.skip_error_calculation = 1.0; # What is skip_error_calculation ??
+# output3 = minimizeFunc_grid_stepsize(prob, "grad", options);
+# OUTPUTS = [OUTPUTS; output3];
 
 ## Saving results into Julia Data format
 # default_path = "./data/";
