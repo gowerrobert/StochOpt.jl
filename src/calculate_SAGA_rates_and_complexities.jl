@@ -23,7 +23,8 @@ end
 
 
 function calculate_complex_SAGA_nice(prob::Prob,options::MyOptions)
-    # calculating the expected smoothness constants for nice mini-batch SAGA
+    # Calculating the expected smoothness constants for nice mini-batch SAGA
+    # for all possible mini-batch size from 1 (SGD) to gradient descent (n)
     n = prob.numdata;
     mu = get_mu_str_conv(prob);
     Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
@@ -33,8 +34,10 @@ function calculate_complex_SAGA_nice(prob::Prob,options::MyOptions)
     for tau = 1:n
         # display(string("Calculating for tau =", tau))
         print("Calculating for tau = ", tau, "\n");
-        Csets = combinations(1:n, tau);
+        ## Computing the right-hand side term of the complexity from RMG, Richtarik and Bach(2018), eq. (103)
         Rsides[tau] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
+        ## Computing the right-hand side term, i.e. the expected smoothness constant
+        Csets = combinations(1:n, tau);
         Ls = zeros(1, n);
         c1 = binomial(n-1, tau-1);
         for C in Csets
