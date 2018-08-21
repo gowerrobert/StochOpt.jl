@@ -31,7 +31,8 @@ function calculate_complex_SAGA_nice(prob::Prob,options::MyOptions)
     Lsides = zeros(1,n);
     Rsides = zeros(1,n);
     for tau = 1:n
-        display(string("Calculating for tau =", tau))
+        # display(string("Calculating for tau =", tau))
+        print("Calculating for tau = ", tau, "\n");
         Csets = combinations(1:n, tau);
         Rsides[tau] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
         Ls = zeros(1, n);
