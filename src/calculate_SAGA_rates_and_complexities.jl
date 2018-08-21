@@ -24,7 +24,7 @@ end
 
 function calculate_complex_SAGA_nice(prob::Prob,options::MyOptions)
     # Calculating the expected smoothness constants for nice mini-batch SAGA
-    # for all possible mini-batch size from 1 (SGD) to gradient descent (n)
+    # for all possible mini-batch size from 1 (SGD) to n (gradient descent)
     n = prob.numdata;
     mu = get_mu_str_conv(prob);
     Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
