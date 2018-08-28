@@ -2,6 +2,10 @@
 # using spaces and tab equals 4 spaces
 .vscode/settings.json
 
+## Useless test code
+repeat_paper_experiments/plot_vscode_test.jl
+repeat_paper_experiments/test_julia.jl
+
 ## Figures
 figures/*.txt
 figures/*.pdf

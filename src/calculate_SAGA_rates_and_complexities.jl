@@ -12,7 +12,7 @@ function get_LC(prob::Prob, C)
     # end
 end
 
-function calculate_complex_SAGA_partition_optimal(prob::Prob,method,options::MyOptions)
+function calculate_complex_SAGA_partition_optimal(prob::Prob, method, options::MyOptions)
 
     # Calculate the
     # \left(n +4\frac{ \bar{L}}{\mu}  \right)  \log\left(\frac{1}{\epsilon} \right).
@@ -22,20 +22,32 @@ function calculate_complex_SAGA_partition_optimal(prob::Prob,method,options::MyO
 end
 
 
-function calculate_complex_SAGA_nice(prob::Prob,options::MyOptions)
+function calculate_complex_SAGA_nice(prob::Prob, options::MyOptions, tauseq::Vector{Int64}=1:prob.numdata)
+    # "Writing Vector{Float64} is equivalent to writing Array{Float64,1}"
+
     # Calculating the expected smoothness constants for nice mini-batch SAGA
     # for all possible mini-batch size from 1 (SGD) to n (gradient descent)
+    # tauseq : array of the mini-batch sizes for which the complexity is computed
+
     n = prob.numdata;
+    numtau = length(tauseq);
+    itercomp = zeros(1, numtau);
+    Lsides = zeros(1, numtau);
+    Rsides = zeros(1, numtau);
+
+    # Computing smallest and largest eigenvalues of the design matrix
     mu = get_mu_str_conv(prob);
     Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
-    itercomp = zeros(1,n);
-    Lsides = zeros(1,n);
-    Rsides = zeros(1,n);
-    for tau = 1:n
+
+    # For each mini-batch size computing the expected smoothness constant and then the iteration complexity
+    for tauidx = 1:numtau
+        tau = tauseq[tauidx];
+    # for tau in tauseq
         # display(string("Calculating for tau =", tau))
         print("Calculating for tau = ", tau, "\n");
         ## Computing the right-hand side term of the complexity from RMG, Richtarik and Bach(2018), eq. (103)
-        Rsides[tau] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
+        # Rsides[tau] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
+        Rsides[tauidx] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
         ## Computing the right-hand side term, i.e. the expected smoothness constant
         Csets = combinations(1:n, tau);
         Ls = zeros(1, n);
@@ -45,8 +57,10 @@ function calculate_complex_SAGA_nice(prob::Prob,options::MyOptions)
                 Ls[i] = Ls[i] + (1/c1)*get_LC(prob, C);
             end
         end
-        Lsides[tau] = maximum(Ls)*(4/mu);
-        itercomp[tau] = max(Lsides[tau], Rsides[tau]);
+        # Lsides[tau] = maximum(Ls)*(4/mu);
+        # itercomp[tau] = max(Lsides[tau], Rsides[tau]);
+        Lsides[tauidx] = maximum(Ls)*(4/mu);
+        itercomp[tauidx] = max(Lsides[tauidx], Rsides[tauidx]);
     end
     itercomp = itercomp;
 
