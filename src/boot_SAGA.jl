@@ -52,16 +52,18 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
             Jac, minibatches, probs, name, L, Lmax, stepsize = boot_SAGA_partition(prob, options, probability_type, name, mu); # Does "ada" exist for "partition"?
             descent_method = descent_SAGApartition;
         else
-            println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
-            exit(1);
+            error("unknown probability_type name (", probability_type, ").");
+            # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
+            # exit(1);
         end
     elseif(minibatch_type == "Li_order_partition")
         if(probability_type == "uni"||probability_type == "Li"||probability_type == "opt") # adding "Li" and "opt" cases
             Jac, minibatches, probs, name, L, Lmax = boot_SAGA_Li_order_partition(prob, options, probability_type, name, mu); # Does "ada" exist for "Li_order_partition"?
             descent_method = descent_SAGApartition;
         else
-            println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
-            exit(1);
+            error("unknown probability_type name (", probability_type, ").");
+            # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
+            # exit(1);
         end
     elseif(minibatch_type == "nice")
         println("\nFor nice minibatch: probability_type is useless\n");
@@ -70,8 +72,9 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
         Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
         Jac = zeros(prob.numfeatures, prob.numdata);     
     else
-        println("\nFAIL: unknown minibatch_type name (", minibatch_type, ")\n");
-        exit(1);
+        error("unknown minibatch_type name (", minibatch_type, ").")
+        # println("\nFAIL: unknown minibatch_type name (", minibatch_type, ")\n");
+        # exit(1);
     end
     return SAGAmethod(epocsperiter, gradsperiter, name, descent_method, boot_SAGA, minibatches, minibatch_type, unbiased,
         Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, probability_type, Z, L, Lmax, mu);
@@ -136,8 +139,9 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
         stepsize = 1/(mean(probs));
         probs[:] = probs./sum(probs);
     else
-        println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
-        exit(1);
+        error("unknown probability_type name (", probability_type, ").")
+        # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
+        # exit(1);
     end
     # probs[ = vec(probs);
     return Jac, minibatches, vec(probs), name, L, Lmax, stepsize
@@ -187,8 +191,9 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
         probs[:] = probs.*4.+numpartitions*mu;
         probs[:] = probs./sum(probs);
     else
-        println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
-        exit(1);
+        error("unknown probability_type name (", probability_type, ").")
+        # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
+        # exit(1);
     end
 
     # Lcuppers = zeros(numpartitions);
