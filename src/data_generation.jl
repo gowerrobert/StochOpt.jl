@@ -6,7 +6,7 @@ function gen_gauss_data(numfeatures::Int64, numdata::Int64; lambda=1, err=0.001)
     return X, y, probname
 end
 
-function gen_diag_data(numfeatures::Int64, numdata::Int64; lambda=1, Lmax=numdata, err=0.001)
+function gen_diag_data(numdata::Int64; lambda=1, Lmax=numdata, err=0.001)
     # Load ridge regression problem
     X = diagm([1; (1.0:1.0:numdata-1).*(Lmax/numdata)]);
     y = X'*rand(numdata) .+ err*rand(numdata);

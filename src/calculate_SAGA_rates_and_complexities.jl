@@ -4,12 +4,40 @@ function calculate_rate_SAGA_nice(prob::Prob, method, options::MyOptions)
 
 end
 
+function get_Li(prob::Prob)
+    # Return an array of the Li_s
+    n = prob.numdata;
+    Li_s = zeros(1, n);
+    for i = 1:n
+        Li_s[i] = prob.X[:,i]'*prob.X[:,i] + prob.lambda;
+    end
+    return Li_s
+end
+
 function get_LC(prob::Prob, C)
     # if( length(C) < prob.features)
-        return eigmax(Symmetric(full(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda; #
+        return eigmax(Symmetric(full(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda #
     # else
     #     return eigmax(Symmetric(prob.X[:,C]*prob.X[:,C]'))/length(C) +prob.lambda;
     # end
+end
+
+function get_expected_smoothness_cst(prob::Prob, tau::Int64)
+    ## Computing the expected smoothness constant for a given minibatch size tau
+    n = prob.numdata;
+    Csets = combinations(1:n, tau);
+    Ls = zeros(1, n);
+    c1 = binomial(n-1, tau-1);
+    # Iteration is on the sets then saving is done for corresponding indices
+    # It's another way of counting than in the definition of the expected smoothness constant
+    # (first an iteration over the indices, then an iteration over the sets containing the picked index)
+    for C in Csets
+        for i in C
+            Ls[i] = Ls[i] + (1/c1)*get_LC(prob, C);
+        end
+    end
+    expsmoothcst = maximum(Ls);
+    return expsmoothcst
 end
 
 function calculate_complex_SAGA_partition_optimal(prob::Prob, method, options::MyOptions)
@@ -20,7 +48,6 @@ function calculate_complex_SAGA_partition_optimal(prob::Prob, method, options::M
 
     # \epsilon  = e^(-(mu k)/(4( mu n/4 +\bar{L} )))
 end
-
 
 function calculate_complex_SAGA_nice(prob::Prob, options::MyOptions, tauseq::Vector{Int64}=1:prob.numdata)
     # "Writing Vector{Float64} is equivalent to writing Array{Float64,1}"
@@ -45,21 +72,13 @@ function calculate_complex_SAGA_nice(prob::Prob, options::MyOptions, tauseq::Vec
     # for tau in tauseq
         # display(string("Calculating for tau =", tau))
         print("Calculating for tau = ", tau, "\n");
+
         ## Computing the right-hand side term of the complexity from RMG, Richtarik and Bach(2018), eq. (103)
         # Rsides[tau] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
         Rsides[tauidx] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
+
         ## Computing the right-hand side term, i.e. the expected smoothness constant
-        Csets = combinations(1:n, tau);
-        Ls = zeros(1, n);
-        c1 = binomial(n-1, tau-1);
-        for C in Csets
-            for i in C
-                Ls[i] = Ls[i] + (1/c1)*get_LC(prob, C);
-            end
-        end
-        # Lsides[tau] = maximum(Ls)*(4/mu);
-        # itercomp[tau] = max(Lsides[tau], Rsides[tau]);
-        Lsides[tauidx] = maximum(Ls)*(4/mu);
+        Lsides[tauidx] = get_expected_smoothness_cst(prob, tau)*(4/mu);
         itercomp[tauidx] = max(Lsides[tauidx], Rsides[tauidx]);
     end
     itercomp = itercomp;
@@ -78,7 +97,6 @@ function calculate_complex_Hofmann(prob::Prob, options::MyOptions)
     end
     return itercomp
 end
-
 
 function get_mu_str_conv(prob::Prob)
     if(prob.numfeatures < prob.numdata)
