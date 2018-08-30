@@ -11,8 +11,8 @@ probname = "diagonal"; # "artificial" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
 srand(1234) # fixing the seed
-numdata = 10;
-numfeatures = 10;
+numdata = 15;
+numfeatures = 100; # useless for gen_diag_data
 
 println("--- Loading data ---");
 probnames = ["australian", "covtype"]; #, "letter_scale", "heart", "phishing", "madelon", "a9a", "mushrooms", "phishing", "w8a", "gisette_scale", 
@@ -20,17 +20,19 @@ if(probname == "gaussian")
     ## Load artificial data
     X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0);
 elseif(probname == "diagonal")
-    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=10)
+    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100)
 elseif(probname in probnames)
     ## Load truncated LIBSVM data
     X, y = loadDataset(probname);
-    # X = X';
-    # numfeatures = size(X)[1];
-    # numdata = size(X)[2];
-    # y = convert(Array{Float64}, 1:1:size(X)[2]) ; # 14 data taken from X instead of 690
+    X = X';
+    numfeatures = size(X)[1];
+    numdata = size(X)[2];
+    y = convert(Array{Float64}, 1:1:size(X)[2]) ; # 14 data taken from X instead of 690
 else
     error("unkown problem name.");
 end
+
+println(norm(X));
 
 
 ### SETTING UP THE PROBLEM ###
@@ -105,9 +107,11 @@ println(d) # d in the paper notation
 
 ### COMPUTING THE CHARACTERISTIC CONSTANTS ###
 # Compute the smoothness constants L, L_max, \cL, \bar{L}
-Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
+# Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda; # Algebraic formula
+# Lbis =  eigmax(prob.X*prob.X')/n + prob.lambda;
 L = get_LC(prob, collect(1:n));
 Li_s = get_Li(prob);
+Lmax = maximum(Li_s);
 Lbar = mean(Li_s);
 
 ### PLOTTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
@@ -117,23 +121,23 @@ heuristicbound = zeros(n, 1);
 concentrationbound = zeros(n, 1);
 for tau = 1:n
     print("Calculating bounds for tau = ", tau, "\n");
-    # tic();
-    # expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
+    tic();
+    expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
     leftcoeff = (n*(tau-1))/(tau*(n-1));
     rightcoeff = (n-tau)/(tau*(n-1));
     simplebound[tau] = leftcoeff*Lbar + rightcoeff*Lmax;
     heuristicbound[tau] = leftcoeff*L + rightcoeff*Lmax;
     concentrationbound[tau] = ((2*n*(tau-1))/(tau*(n-1)))*L + (1/tau)*(((n-tau)/(n-1)) + (4*log(d))/3)*Lmax;
-    # concentrationbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax; 
-    # toc();
+    concentrationbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax; 
+    toc();
 end
 
 ### PLOTING ###
 println("\n--- Ploting complexities ??? ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename,"-nidham");
-# pyplot()
-plotly()
+pyplot()
+# plotly()
 fontsmll = 8; fontmed = 14; fontbig = 14;
 # plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
 #     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
@@ -146,7 +150,7 @@ fontsmll = 8; fontmed = 14; fontbig = 14;
 plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
-    ylim=(0, 1.5*max(maximum(simplebound),maximum(heuristicbound))+minimum(expsmoothcst)),
+    ylim=(0, 2*max(maximum(simplebound),maximum(heuristicbound))+minimum(expsmoothcst)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 # savenameexpsmoothzoom = string(savenamecomp, "-expsmoothbounds-zoom");
 # savefig("./figures/$(savenameexpsmoothzoom).pdf");
@@ -155,7 +159,7 @@ plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["
 # heuristicbound .== expsmoothcst
 # heuristicbound .> expsmoothcst
 
-println("Lmax :\n", Lmax);
-println("L :\n", L);
-println("Li_s :\n", Li_s);
-println("Lbar :\n", Lbar);
+println("Lmax : ", Lmax);
+println("L : ", L);
+println("Li_s : ", Li_s);
+println("Lbar : ", Lbar);

@@ -1,4 +1,5 @@
 function fit_apply_datascaling(X, scaling::AbstractString)
+    ## WARNING: mutating function without "!" in its name 
     # centering
     rowscaling = [];
     colscaling =[];

@@ -38,7 +38,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda)
     # ((1/n)X X' +lambda I)w= Xy
     # xsol = ((1/n)X X' +lambda I) \ ( (1/n)*Xy)
-    xsol =(X*X' +numdata*lambda*eye(numfeatures)) \ ( X*y);
+    xsol = (X*X' +numdata*lambda*eye(numfeatures)) \ ( X*y);
     prob.fsol = f_eval(xsol, 1:numdata);
 
     fsolfilename = get_fsol_filename(prob);
