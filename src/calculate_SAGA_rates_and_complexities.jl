@@ -25,13 +25,17 @@ function get_LC(prob::Prob, C)
     if(length(C) < prob.numfeatures)
         try
             LC = eigmax(Symmetric(full(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
-        catch loaderror   # Uses power iteration if eigmax fails
-            println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
+        catch loaderror # Uses power iteration if eigmax fails
+            # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
             LC = power_iteration(Symmetric(full(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
         end
     else
-        println("lenght C >= number features");
-        LC = eigmax(Symmetric(prob.X[:,C]*prob.X[:,C]'))/length(C) + prob.lambda;
+        try
+            LC = eigmax(Symmetric(full(prob.X[:,C]*prob.X[:,C]')))/length(C) + prob.lambda;
+        catch loaderror # Uses power iteration if eigmax fails
+            # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
+            LC = power_iteration(Symmetric(full(prob.X[:, C]*prob.X[:, C]')))/length(C) + prob.lambda;
+        end
     end
     return LC
 end
@@ -46,7 +50,7 @@ function get_expected_smoothness_cst(prob::Prob, tau::Int64)
     # It's another way of counting than in the definition of the expected smoothness constant
     # (first an iteration over the indices, then an iteration over the sets containing the picked index)
     for C in Csets
-        Ls[C] = Ls[C] + (1/c1)*get_LC(prob, C);
+        Ls[C] = Ls[C] + (1/c1)*get_LC(prob, C); # Implementation without inner loop
     end
     expsmoothcst = maximum(Ls);
     return expsmoothcst

@@ -7,11 +7,11 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
-probname = "diagonal"; # "artificial" for artificaly generated data
+probname = "gaussian"; # "gaussian" or "diagonal" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
 srand(1234) # fixing the seed
-numdata = 15;
+numdata = 14;
 numfeatures = 100; # useless for gen_diag_data
 
 println("--- Loading data ---");
@@ -32,13 +32,11 @@ else
     error("unkown problem name.");
 end
 
-println(norm(X));
-
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the ridge regression problem ---");
 options = set_options(max_iter=10^8, max_time=0.02, max_epocs=3000, repeat_stepsize_calculation=true, skip_error_calculation=51);
-prob = load_ridge_regression(X, y, probname, options, lambda=-1);  # Loads logisitc problem
+prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none");  # Disabling scaling
 n = prob.numdata;
 d = prob.numfeatures;
 println(n) # n in the paper notation
@@ -139,6 +137,7 @@ savenamecomp = string(savename,"-nidham");
 pyplot()
 # plotly()
 fontsmll = 8; fontmed = 14; fontbig = 14;
+# PROBLEM: there is still a problem of ticking non integer on the xaxis
 # plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
 #     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
 #     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
