@@ -4,18 +4,20 @@ using StatsBase
 using Match
 using Combinatorics
 include("./src/StochOpt.jl") # Be carefull about the path here
+srand(1234) # fixing the seed
 
 
 ### LOADING DATA ###
-probname = "gaussian"; # "gaussian" or "diagonal" for artificaly generated data
+probname = "gaussian"; # "australian" | "gaussian" or "diagonal" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-srand(1234) # fixing the seed
-numdata = 14;
-numfeatures = 100; # useless for gen_diag_data
+numdata = 24;
+numfeatures = 10; # useless for gen_diag_data
 
 println("--- Loading data ---");
-probnames = ["australian", "covtype"]; #, "letter_scale", "heart", "phishing", "madelon", "a9a", "mushrooms", "phishing", "w8a", "gisette_scale", 
+probnames = ["australian", "covtype"]; 
+#, "letter_scale", "heart", "phishing", "madelon", "a9a", 
+# "mushrooms", "phishing", "w8a", "gisette_scale", 
 if(probname == "gaussian")
     ## Load artificial data
     X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0);
@@ -35,13 +37,25 @@ end
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the ridge regression problem ---");
-options = set_options(max_iter=10^8, max_time=0.02, max_epocs=3000, repeat_stepsize_calculation=true, skip_error_calculation=51);
+options = set_options(max_iter=10^8, max_time=0.02, max_epocs=3000,
+                      repeat_stepsize_calculation=true, skip_error_calculation=51);
 prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none");  # Disabling scaling
+# QUESTION: how is lambda selected?
 n = prob.numdata;
 d = prob.numfeatures;
 println(n) # n in the paper notation
 println(d) # d in the paper notation
 
+### COMPUTING THE CHARACTERISTIC CONSTANTS ###
+# Compute the smoothness constants L, L_max, \cL, \bar{L}
+# Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda; # Algebraic formula
+# Lbis =  eigmax(prob.X*prob.X')/n + prob.lambda;
+L = get_LC(prob, collect(1:n));
+Li_s = get_Li(prob);
+Lmax = maximum(Li_s);
+Lbar = mean(Li_s);
+
+############################################ THEORETICAL COMPLEXITIES ############################################
 
 # ### CREATING THE MINI-BATCH SIZE SEQUENCE ###
 # # tauseq = collect(1:14);
@@ -90,29 +104,26 @@ println(d) # d in the paper notation
 # pyplot() # pyplot
 # fontsmll = 8; fontmed = 14; fontbig = 14;
 # plot(tauseq, [totcomp itercomp'], label=["total complex" "iter complex"],
-#     linestyle=:auto, xlabel="batchsize", ylabel="complexity", tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed),
-#     markersize=6, linewidth=4, marker=:auto, grid=false, ylim=(0, maximum(totcomp)+minimum(itercomp)), xticks=tauseq)
-# #    ylim=(minimum(itercomp), maximum(totcomp)+minimum(itercomp))
+#     linestyle=:auto, xlabel="batchsize", ylabel="complexity", tickfont=font(fontsmll),
+#     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,
+#     grid=false, ylim=(0, maximum(totcomp)+minimum(itercomp)), xticks=tauseq)
+#    ylim=(minimum(itercomp), maximum(totcomp)+minimum(itercomp))
 # # savefig("./figures/$(savenamecomp).pdf");
 
 # # Comparing only the iteration complexities
 # ## WARNING: Lsides is not exactly the expected smoothness cosntant but 4*\cL/mu !!
-# plot(tauseq, Lsides', ylabel="expected smoothness", xlabel="batchsize", tickfont=font(fontsmll), guidefont=font(fontbig),
-#     markersize=6, linewidth=4, marker=:auto, grid=false, legend=false, xticks=tauseq)
+# plot(tauseq, Lsides', ylabel="expected smoothness", xlabel="batchsize", tickfont=font(fontsmll),
+#     guidefont=font(fontbig), markersize=6, linewidth=4, marker=:auto, grid=false, legend=false, 
+#     xticks=tauseq)
 # savenameexpsmooth = string(savenamecomp, "-expsmooth");
 # # savefig("./figures/$(savenameexpsmooth).pdf");
 
+##################################################################################################################
 
-### COMPUTING THE CHARACTERISTIC CONSTANTS ###
-# Compute the smoothness constants L, L_max, \cL, \bar{L}
-# Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda; # Algebraic formula
-# Lbis =  eigmax(prob.X*prob.X')/n + prob.lambda;
-L = get_LC(prob, collect(1:n));
-Li_s = get_Li(prob);
-Lmax = maximum(Li_s);
-Lbar = mean(Li_s);
 
-### PLOTTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
+################################################ EMPIRICAL BOUNDS ################################################
+
+### COMPUTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
 expsmoothcst = zeros(n, 1);
 simplebound = zeros(n, 1);
 heuristicbound = zeros(n, 1);
@@ -138,21 +149,22 @@ pyplot()
 # plotly()
 fontsmll = 8; fontmed = 14; fontbig = 14;
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
-# plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
-#     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
-#     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
-#     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)))
-# savenameexpsmooth = string(savenamecomp, "-expsmoothbounds");
-# savefig("./figures/$(savenameexpsmooth).pdf");
+plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
+    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
+    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+    ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
+    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+savenameexpsmooth = string(savenamecomp, "-expsmoothbounds");
+savefig("./figures/$(savenameexpsmooth).pdf");
 
 # Zoom
 plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
-    ylim=(0, 2*max(maximum(simplebound),maximum(heuristicbound))+minimum(expsmoothcst)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-# savenameexpsmoothzoom = string(savenamecomp, "-expsmoothbounds-zoom");
-# savefig("./figures/$(savenameexpsmoothzoom).pdf");
+    ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
+    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
+savenameexpsmoothzoom = string(savenamecomp, "-expsmoothbounds-zoom");
+savefig("./figures/$(savenameexpsmoothzoom).pdf");
 
 # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
 # heuristicbound .== expsmoothcst
@@ -162,3 +174,48 @@ println("Lmax : ", Lmax);
 println("L : ", L);
 println("Li_s : ", Li_s);
 println("Lbar : ", Lbar);
+
+##################################################################################################################
+
+######################################## EMPIRICAL BOUNDS OF THE STEPSIZES #######################################
+
+### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
+# alpha = (1/4)*min(1/a, 1/b)
+# with: a = expsmoothcst
+#       b = (rho/n)*Lmax + (mu*n)/(4*tau)
+# alpha = 1/(4*max(expsmoothcst, ((n-tau)/(tau*(n-1)))*Lmax + (mu*n)/(4*tau)))
+
+# expsmoothcst = zeros(n, 1);
+# simplebound = zeros(n, 1);
+# heuristicbound = zeros(n, 1);
+# concentrationbound = zeros(n, 1);
+# for tau = 1:n
+#     print("Calculating bounds for tau = ", tau, "\n");
+#     tic();
+#     expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
+#     leftcoeff = (n*(tau-1))/(tau*(n-1));
+#     rightcoeff = (n-tau)/(tau*(n-1));
+#     simplebound[tau] = leftcoeff*Lbar + rightcoeff*Lmax;
+#     heuristicbound[tau] = leftcoeff*L + rightcoeff*Lmax;
+#     concentrationbound[tau] = ((2*n*(tau-1))/(tau*(n-1)))*L + (1/tau)*(((n-tau)/(n-1)) + (4*log(d))/3)*Lmax;
+#     concentrationbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax; 
+#     toc();
+# end
+
+### PLOTING ###
+println("\n--- Ploting stepsizes ---");
+default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+savenamecomp = string(savename,"-nidham");
+# pyplot()
+# plotly()
+# PROBLEM: there is still a problem of ticking non integer on the xaxis
+
+# savenameexpsmooth = string(savenamecomp, "-stepsizes");
+# savefig("./figures/$(savenameexpsmooth).pdf");
+
+# Zoom
+
+# savenameexpsmoothzoom = string(savenamecomp, "-stepsizes-zoom");
+# savefig("./figures/$(savenameexpsmoothzoom).pdf");
+
+##################################################################################################################
