@@ -11,7 +11,7 @@ srand(1234) # fixing the seed
 probname = "gaussian"; # "australian" | "gaussian" or "diagonal" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 24;
+numdata = 14;
 numfeatures = 10; # useless for gen_diag_data
 
 println("--- Loading data ---");
@@ -46,14 +46,21 @@ d = prob.numfeatures;
 println(n) # n in the paper notation
 println(d) # d in the paper notation
 
-### COMPUTING THE CHARACTERISTIC CONSTANTS ###
+### COMPUTING THE SMOOTHNESS CONSTANTS ###
 # Compute the smoothness constants L, L_max, \cL, \bar{L}
 # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda; # Algebraic formula
 # Lbis =  eigmax(prob.X*prob.X')/n + prob.lambda;
+mu = minimum(sum(prob.X.^2, 1)) + prob.lambda # TO BE VERIFIED
 L = get_LC(prob, collect(1:n));
 Li_s = get_Li(prob);
 Lmax = maximum(Li_s);
 Lbar = mean(Li_s);
+
+println("SMOOTHNESS CONSTANTS")
+println("Lmax : ", Lmax);
+println("L : ", L);
+println("Li_s : ", Li_s);
+println("Lbar : ", Lbar);
 
 ############################################ THEORETICAL COMPLEXITIES ############################################
 
@@ -155,7 +162,7 @@ plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["
     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 savenameexpsmooth = string(savenamecomp, "-expsmoothbounds");
-savefig("./figures/$(savenameexpsmooth).pdf");
+# savefig("./figures/$(savenameexpsmooth).pdf");
 
 # Zoom
 plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
@@ -164,16 +171,12 @@ plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["
     ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
 savenameexpsmoothzoom = string(savenamecomp, "-expsmoothbounds-zoom");
-savefig("./figures/$(savenameexpsmoothzoom).pdf");
+# savefig("./figures/$(savenameexpsmoothzoom).pdf");
 
 # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
 # heuristicbound .== expsmoothcst
 # heuristicbound .> expsmoothcst
 
-println("Lmax : ", Lmax);
-println("L : ", L);
-println("Li_s : ", Li_s);
-println("Lbar : ", Lbar);
 
 ##################################################################################################################
 
@@ -185,20 +188,21 @@ println("Lbar : ", Lbar);
 #       b = (rho/n)*Lmax + (mu*n)/(4*tau)
 # alpha = 1/(4*max(expsmoothcst, ((n-tau)/(tau*(n-1)))*Lmax + (mu*n)/(4*tau)))
 
-# expsmoothcst = zeros(n, 1);
-# simplebound = zeros(n, 1);
-# heuristicbound = zeros(n, 1);
-# concentrationbound = zeros(n, 1);
+#(1/4).*
+rho = ((n- (1:n) )./( (1:n).*(n-1)));
+expsmoothstepsize = (1/4).* (1./max.(expsmoothcst, (rho/n)*Lmax + (mu*n)/(4*(1:n))));
+
+# expsmoothstepsize = zeros(n, 1);
+# simplestepsize = zeros(n, 1);
+# heuristicstepsize = zeros(n, 1);
+# concentrationstepsize = zeros(n, 1);
 # for tau = 1:n
 #     print("Calculating bounds for tau = ", tau, "\n");
 #     tic();
-#     expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
-#     leftcoeff = (n*(tau-1))/(tau*(n-1));
-#     rightcoeff = (n-tau)/(tau*(n-1));
-#     simplebound[tau] = leftcoeff*Lbar + rightcoeff*Lmax;
-#     heuristicbound[tau] = leftcoeff*L + rightcoeff*Lmax;
-#     concentrationbound[tau] = ((2*n*(tau-1))/(tau*(n-1)))*L + (1/tau)*(((n-tau)/(n-1)) + (4*log(d))/3)*Lmax;
-#     concentrationbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax; 
+#     expsmoothstepsize[tau] =
+#     simplestepsize[tau] = 
+#     concentrationstepsize[tau] = 
+#     heuristicstepsize[tau] = 
 #     toc();
 # end
 
@@ -206,10 +210,14 @@ println("Lbar : ", Lbar);
 println("\n--- Ploting stepsizes ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename,"-nidham");
-# pyplot()
+pyplot()
 # plotly()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
-
+plot(1:n, [expsmoothstepsize], label=["true"],
+    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
+    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+    # ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
+    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 # savenameexpsmooth = string(savenamecomp, "-stepsizes");
 # savefig("./figures/$(savenameexpsmooth).pdf");
 
