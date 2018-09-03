@@ -33,7 +33,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         plot!(output.epocsperiter*(1:bnd)*(output.iterations/lf), (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
             linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,  grid=false)
     end
-    println("./figures/$(probname)-epoc.pdf")
+    println("./figures/$(probname)-epoc.pdf");
     savefig("./figures/$(probname)-epoc.pdf");
     #
     #   # plotting times
@@ -56,8 +56,9 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         println(output.name,": 2^", log(2,output.stepsize_multiplier))
     end
     println(probname)
-    println("./figures/$(probname)-time.pdf")
+    println("./figures/$(probname)-time.pdf");
     savefig("./figures/$(probname)-time.pdf");
+    
 
     if(!isempty(OUTPUTS[1].testerrors)) # plot test error as well
         output = OUTPUTS[1];

@@ -1,4 +1,4 @@
-function boot_AMcoord(prob::Prob,method::Method, options::MyOptions)
+function boot_AMcoord(prob::Prob, method::Method, options::MyOptions)
     # embeddim = convert(Int64,min(20,ceil(prob.numfeatures/2)));
     # embeddim = min(method.numinneriters,embeddim);
     # embeddim = convert(Int64,ceil(prob.numfeatures/1.0));

@@ -1,7 +1,7 @@
 # A wrapper function for testing and timing iterative methods for
 # solving the empirical risk minimization problem - 2018 - Robert M. Gower
 # StochOpt Copyright (C) 2018, Robert Gower
-function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing)
+function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing)
     if(options.initial_point == "randn") # set initial point
         x = randn(prob.numfeatures);
     elseif(options.initial_point == "rand")
@@ -48,14 +48,15 @@ function  minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=no
     fail = "failed";
     ## Print heard
     if(options.printiters)
-        println("------------------------------------------------------------")
-        println("      It    | (f(x)-fsol)/(f0-fsol) |    datap  |     Time   |")
-        println("------------------------------------------------------------")
+        println("--------------------------------------------------------------")
+        println("      It    | (f(x)-fsol)/(f0-fsol) |    datap  |     Time   |") # why "datap" and not "epoch"? 
+        println("--------------------------------------------------------------")
     end
     for iter = 1:options.max_iter
         time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
         x[:] = x + method.stepsize * d;
-        #  println("method.stepsize ", method.stepsize, "norm(d): ", norm(d) );
+        # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
+        # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));
         timeaccum = timeaccum +  time_elapsed; # Keeps track of time accumulated at every iteration
         if(mod(iter, options.skip_error_calculation) == 0)
             fs = [fs prob.f_eval(x, 1:prob.numdata) ];
