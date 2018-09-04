@@ -23,13 +23,13 @@ using JLD
 default_path = "./data/"; #"/home/robert/git/online_saga/julia-online-SAGA/data/"
 
 function initDetails() # creates a blank details dictionary
-    details = Dict()
+    details = Dict();
     save("$(default_path)details.jld", "details", details)
 end
 
-function transformDataJLD(dataset) # transforms LIBSVM to JLD for faster loading
-    details = load( "$(default_path)details.jld", "details")
-    X, y = readLIBSVM(string(default_path, "$(dataset)"), true) # false leads to regression
+function transformDataJLD(dataset, classification) # transforms LIBSVM to JLD for faster loading
+    details = load("$(default_path)details.jld", "details")
+    X, y = readLIBSVM(string(default_path, "$(dataset)"), classification) # classification=false leads to regression
     save("$(default_path)$(dataset).jld", "X", X, "y", y)
     detail = Dict(:dims => size(X, 1), :n => size(X, 2), :sparsity => nnz(X)/(size(X, 1)*size(X, 2)))
     details[dataset] = detail
@@ -75,7 +75,7 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
             b[i] = (b[i] > mb)? 1. : -1.
         end
     end
-    A = sparse(round(Integer, Ir), round(Integer, Jr), Pr)
+    A = sparse(round.(Integer, Ir), round.(Integer, Jr), Pr)
     if size(A)[1] == length(b)
         A = A'
     end

@@ -8,21 +8,23 @@ srand(1234) # fixing the seed
 
 
 ### LOADING DATA ###
-probname = "australian"; # "australian" | "gaussian" or "diagonal" for artificaly generated data
+probname = "gaussian"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 1000;
+numdata = 500;
 numfeatures = 20; # useless for gen_diag_data
 
 println("--- Loading data ---");
-probnames = ["australian", "covtype"]; 
+probnames = ["abalone", "housing"]; 
 #, "letter_scale", "heart", "phishing", "madelon", "a9a", 
 # "mushrooms", "phishing", "w8a", "gisette_scale", 
 if(probname == "gaussian")
     ## Load artificial data
-    X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0);
+    X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0, err=0.001);
 elseif(probname == "diagonal")
-    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100)
+    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=2);
+elseif(probname == "lone_eig_val")
+    X, y, probname = gen_diag_lone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
 elseif(probname in probnames)
     ## Load truncated LIBSVM data
     X, y = loadDataset(probname);
@@ -42,14 +44,13 @@ prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none")
 # QUESTION: how is lambda selected?
 n = prob.numdata;
 d = prob.numfeatures;
-println(n) # n in the paper notation
-println(d) # d in the paper notation
+
 
 ### COMPUTING THE SMOOTHNESS CONSTANTS ###
 # Compute the smoothness constants L, L_max, \cL, \bar{L}
-if(n > 15) # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
+datathreshold = 20;
+if(n > datathreshold) # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
     println("The number of data is to large to compute the expected smoothness constant exactly");
-    sleep(1)
     computeexpsmooth = false;
 else
     computeexpsmooth = true;
@@ -63,12 +64,6 @@ L = get_LC(prob, collect(1:n));
 Li_s = get_Li(prob);
 Lmax = maximum(Li_s);
 Lbar = mean(Li_s);
-
-println("SMOOTHNESS CONSTANTS")
-println("Lmax : ", Lmax);
-println("L : ", L);
-println("Li_s : ", Li_s);
-println("Lbar : ", Lbar);
 
 
 ############################################ THEORETICAL COMPLEXITIES ############################################
@@ -166,11 +161,11 @@ println("\n--- Ploting upper bounds of the expected smoothness constant ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename,"-nidham");
 fontsmll = 8; fontmed = 14; fontbig = 14;
-# pyplot()
-plotly()
+# plotly()
+pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 if(computeexpsmooth)
-    plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
+    plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
@@ -178,7 +173,7 @@ if(computeexpsmooth)
 else
     plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false, 
     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(heuristicbound)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 end
@@ -187,7 +182,7 @@ savenameexpsmooth = string(savenamecomp, "-expsmoothbounds");
 
 # Zoom
 if(computeexpsmooth)
-    plot(1:n, [expsmoothcst simplebound concentrationbound heuristicbound], label=["true" "simple" "concentration" "heuristic"],
+    plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
     ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
@@ -195,7 +190,7 @@ if(computeexpsmooth)
 else
     plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false,  #marker=:auto,
+    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
     # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
     ylim=(0.85*minimum(heuristicbound), 10.0*minimum(heuristicbound)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
@@ -228,11 +223,11 @@ heuristicstepsize = (1/4).* (1./max.(heuristicbound, rightterm));
 println("\n--- Ploting stepsizes ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename,"-nidham");
-# pyplot()
-plotly()
+# plotly()
+pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 if(computeexpsmooth)
-    plot(1:n, [truestepsize simplestepsize concentrationstepsize heuristicstepsize], label=["true" "simple" "concentration" "heuristic"],
+    plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize truestepsize], label=["simple" "concentration" "heuristic" "true"],
     linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
     ylim=(0, maximum(truestepsize)+minimum(concentrationstepsize)),
@@ -241,7 +236,7 @@ else
     plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize], label=["simple" "concentration" "heuristic"],
     linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto, 
-    ylim=(0, maximum(simplestepsize)+minimum(concentrationstepsize)),
+    ylim=(0, maximum(heuristicstepsize)+minimum(concentrationstepsize)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 end
 
@@ -255,20 +250,24 @@ end
 
 ## Compute optimal tau
 tautheory = round(Int, 1 + (mu*(n-1))/(4*Lbar)); # One should not add again lambda since it is already taken into account in Lbar
-println("Theoretical optimal tau = ", tautheory);
-sleep(1);
+tauheuristic = round(Int, 1 + (mu*(n-1))/(4*L));
+# sleep(3);
 
 ## Empirical stepsizes returned by optimal mini-batch SAGa with line searchs
-if(tautheory == 1)
-    taulist = [tautheory, tautheory+1, tautheory+2, tautheory+3, n];
-elseif(tautheory == 2)
-    taulist = [tautheory-1, tautheory, tautheory+1, tautheory+2, n];
+if(n <= datathreshold)
+    taulist = 1:n;
 else
-    taulist = [1, tautheory-1, tautheory, tautheory+1, n];
+    taulist = [collect(1:(tautheory+1)); n];
 end
 
-options = set_options(tol=10.0^(-2.0), max_iter=10^8, max_time=1000.0, max_epocs=300, repeat_stepsize_calculation=true,
-                      skip_error_calculation=51, force_continue=false, initial_point="zeros"); # fix initial point to zeros for a maybe fairer comparison?
+
+tolerance = 10.0^(-6.0); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+options = set_options(max_iter=10^8, max_time=10.0, max_epocs=100, repeat_stepsize_calculation=true, skip_error_calculation=51,
+                      force_continue=false, initial_point="zeros");
+# options = set_options(tol=tolerance, max_iter=10^8, max_time=1000.0, max_epocs=3000, initial_point="zeros",
+#                     #   repeat_stepsize_calculation=true,
+#                       skip_error_calculation=51,
+#                       force_continue=true); # fix initial point to zeros for a maybe fairer comparison?
 OUTPUTS = []; # List of saved outputs
 for tau in taulist # 1:n
     println("\nCurrent mini-batch size: ", tau);
@@ -282,12 +281,34 @@ plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
 
 ## Computing the empirical complexity
 empcomplex = taulist.*[OUTPUTS[i].iterations for i=1:length(OUTPUTS)] ; # tau times number of iterations
+# # plotly()
+# pyplot()
+# plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity",
+#     # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
+#     xticks = taulist,
+#     # xticks=(taulist, ["1\n= tau_theory" "2" "3" "4" "n"]),
+#     legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+
 # plotly()
 pyplot()
-plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity",
-    ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
-    xticks = taulist,
+plot(taulist[1:end-1], empcomplex[1:end-1], linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity",
+    # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
+    xticks = taulist, 
     # xticks=(taulist, ["1\n= tau_theory" "2" "3" "4" "n"]),
     legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 
+println("\nPROBLEM DIMENSIONS:");
+println("   Number of datapoints", n); # n in the paper notation
+println("   Number of features", d); # d in the paper notation
+
+println("\nSMOOTHNESS CONSTANTS:");
+println("   Lmax : ", Lmax);
+println("   L : ", L);
+# println("Li_s : ", Li_s);
+println("   Lbar : ", Lbar);
+# sleep(3);
+
+println("\nTheoretical optimal tau = ", tautheory);
+println("Heuristic optimal tau = ", tauheuristic);
