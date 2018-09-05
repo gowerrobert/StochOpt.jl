@@ -260,14 +260,16 @@ else
     taulist = [collect(1:(tautheory+1)); n];
 end
 
+# taulist = collect(1:10);
 
-tolerance = 10.0^(-6.0); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
-options = set_options(max_iter=10^8, max_time=10.0, max_epocs=100, repeat_stepsize_calculation=true, skip_error_calculation=51,
-                      force_continue=false, initial_point="zeros");
-# options = set_options(tol=tolerance, max_iter=10^8, max_time=1000.0, max_epocs=3000, initial_point="zeros",
-#                     #   repeat_stepsize_calculation=true,
-#                       skip_error_calculation=51,
-#                       force_continue=true); # fix initial point to zeros for a maybe fairer comparison?
+
+# options = set_options(max_iter=10^8, max_time=10.0, max_epocs=100, repeat_stepsize_calculation=true, skip_error_calculation=51,
+#                       force_continue=false, initial_point="rand");
+tolerance = 10.0^(-4.0); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+options = set_options(tol=tolerance, max_iter=10^8, max_time=1000.0, max_epocs=3000, initial_point="zeros",
+                    #   repeat_stepsize_calculation=true,
+                      skip_error_calculation=51,
+                      force_continue=false); # fix initial point to zeros for a maybe fairer comparison?
 OUTPUTS = []; # List of saved outputs
 for tau in taulist # 1:n
     println("\nCurrent mini-batch size: ", tau);
