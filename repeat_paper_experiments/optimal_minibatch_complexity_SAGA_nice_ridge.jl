@@ -3,6 +3,9 @@ using Plots
 using StatsBase
 using Match
 using Combinatorics
+
+tic();
+
 include("./src/StochOpt.jl") # Be carefull about the path here
 srand(1234) # fixing the seed
 
@@ -314,3 +317,5 @@ println("   Lbar : ", Lbar);
 
 println("\nTheoretical optimal tau = ", tautheory);
 println("Heuristic optimal tau = ", tauheuristic);
+
+toc();
