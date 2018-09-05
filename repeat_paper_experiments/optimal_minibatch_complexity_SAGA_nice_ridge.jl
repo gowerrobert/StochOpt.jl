@@ -6,7 +6,7 @@ using Combinatorics
 
 tic();
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("./src/StochOpt.jl") # Be carefull about the path here
 srand(1234) # fixing the seed
 
 
@@ -164,9 +164,9 @@ println("\n--- Ploting upper bounds of the expected smoothness constant ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename,"-nidham");
 fontsmll = 8; fontmed = 14; fontbig = 14;
-# plotly()
-pyplot()
-# PROBLEM: there is still a problem of ticking non integer on the xaxis
+# # plotly()
+# pyplot()
+# # PROBLEM: there is still a problem of ticking non integer on the xaxis
 # if(computeexpsmooth)
 #     plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
 #     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
@@ -268,24 +268,32 @@ end
 
 # options = set_options(max_iter=10^8, max_time=10.0, max_epocs=100, repeat_stepsize_calculation=true, skip_error_calculation=51,
 #                       force_continue=false, initial_point="rand");
-tolerance = 10.0^(-4.0); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
-options = set_options(tol=tolerance, max_iter=10^8, max_time=1000.0, max_epocs=3000, initial_point="zeros",
+tolerance = 10.0^(-1.0); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+options = set_options(tol=tolerance, max_iter=10^8, max_time=1000.0, max_epocs=3000, initial_point="rand",
                     #   repeat_stepsize_calculation=true,
                       skip_error_calculation=51,
                       force_continue=false); # fix initial point to zeros for a maybe fairer comparison?
-OUTPUTS = []; # List of saved outputs
-for tau in taulist # 1:n
+
+numsimu = 10;
+itercomplex = zeros(length(taulist), 1); # List of saved outputs
+for idxtau in 1:length(taulist) # 1:n
+    tau = taulist[idxtau];
     println("\nCurrent mini-batch size: ", tau);
     options.batchsize = tau;
-    sg = initiate_SAGA(prob, options, minibatch_type="nice");
-    output = minimizeFunc(prob, sg, options);
-    OUTPUTS = [OUTPUTS; output];
+    for i=1:numsimu
+        sg = initiate_SAGA(prob, options, minibatch_type="nice");
+        output = minimizeFunc(prob, sg, options);
+        itercomplex[idxtau] += output.iterations;
+    end
 end
-gr()
-plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
+itercomplex = itercomplex ./ numsimu;
+
+# gr()
+# plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
 
 ## Computing the empirical complexity
-empcomplex = taulist.*[OUTPUTS[i].iterations for i=1:length(OUTPUTS)] ; # tau times number of iterations
+# empcomplex = taulist.*[OUTPUTS[i].iterations for i=1:length(OUTPUTS)] # tau times number of iterations
+empcomplex = taulist.*itercomplex;
 # # plotly()
 # pyplot()
 # plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity",
@@ -317,5 +325,8 @@ println("   Lbar : ", Lbar);
 
 println("\nTheoretical optimal tau = ", tautheory);
 println("Heuristic optimal tau = ", tauheuristic);
+
+println("List of mini-batch sizes = ", taulist);
+println("\nEmpirical complexity = ", empcomplex);
 
 toc();
