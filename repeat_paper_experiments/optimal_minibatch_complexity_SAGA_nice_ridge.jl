@@ -257,7 +257,7 @@ tauheuristic = round(Int, 1 + (mu*(n-1))/(4*L));
 if(n <= datathreshold)
     taulist = 1:n;
 else
-    taulist = [collect(1:(tautheory+1)); n];
+    taulist = [1; tautheory; n]#[collect(1:(tautheory+1)); n];
 end
 
 # taulist = collect(1:10);
