@@ -6,7 +6,7 @@ using Combinatorics
 
 tic();
 
-include("./src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl") # Be carefull about the path here
 srand(1234) # fixing the seed
 
 
