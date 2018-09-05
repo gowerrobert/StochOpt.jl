@@ -6,7 +6,7 @@ using Combinatorics
 
 tic();
 
-include("./src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl") # Be carefull about the path here
 srand(1234) # fixing the seed
 
 
@@ -167,37 +167,37 @@ fontsmll = 8; fontmed = 14; fontbig = 14;
 # plotly()
 pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
-if(computeexpsmooth)
-    plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
-    ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-else
-    plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false, 
-    ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(heuristicbound)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-end
+# if(computeexpsmooth)
+#     plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
+#     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
+#     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+#     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+# else
+#     plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
+#     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
+#     guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false, 
+#     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(heuristicbound)),
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+# end
 savenameexpsmooth = string(savenamecomp, "-expsmoothbounds");
 # savefig("./figures/$(savenameexpsmooth).pdf");
 
 # Zoom
-if(computeexpsmooth)
-    plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
-    ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
-else
-    plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
-    # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
-    ylim=(0.85*minimum(heuristicbound), 10.0*minimum(heuristicbound)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
-end
+# if(computeexpsmooth)
+#     plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
+#     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
+#     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+#     ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
+# else
+#     plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
+#     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
+#     guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
+#     # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
+#     ylim=(0.85*minimum(heuristicbound), 10.0*minimum(heuristicbound)),
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
+# end
 savenameexpsmoothzoom = string(savenamecomp, "-expsmoothbounds-zoom");
 # savefig("./figures/$(savenameexpsmoothzoom).pdf");
 
@@ -226,22 +226,22 @@ heuristicstepsize = (1/4).* (1./max.(heuristicbound, rightterm));
 println("\n--- Ploting stepsizes ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename,"-nidham");
-# plotly()
-pyplot()
-# PROBLEM: there is still a problem of ticking non integer on the xaxis
-if(computeexpsmooth)
-    plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize truestepsize], label=["simple" "concentration" "heuristic" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
-    ylim=(0, maximum(truestepsize)+minimum(concentrationstepsize)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-else
-    plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize], label=["simple" "concentration" "heuristic"],
-    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto, 
-    ylim=(0, maximum(heuristicstepsize)+minimum(concentrationstepsize)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-end
+# # plotly()
+# pyplot()
+# # PROBLEM: there is still a problem of ticking non integer on the xaxis
+# if(computeexpsmooth)
+#     plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize truestepsize], label=["simple" "concentration" "heuristic" "true"],
+#     linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
+#     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+#     ylim=(0, maximum(truestepsize)+minimum(concentrationstepsize)),
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+# else
+#     plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize], label=["simple" "concentration" "heuristic"],
+#     linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
+#     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto, 
+#     ylim=(0, maximum(heuristicstepsize)+minimum(concentrationstepsize)),
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+# end
 
 # savenamestepsize = string(savenamecomp, "-stepsizes");
 # savefig("./figures/$(savenamestepsize).pdf");
@@ -295,14 +295,14 @@ empcomplex = taulist.*[OUTPUTS[i].iterations for i=1:length(OUTPUTS)] ; # tau ti
 #     legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
 #     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 
-# plotly()
-pyplot()
-plot(taulist[1:end-1], empcomplex[1:end-1], linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity",
-    # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
-    xticks = taulist, 
-    # xticks=(taulist, ["1\n= tau_theory" "2" "3" "4" "n"]),
-    legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+# # plotly()
+# pyplot()
+# plot(taulist[1:end-1], empcomplex[1:end-1], linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity",
+#     # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
+#     xticks = taulist, 
+#     # xticks=(taulist, ["1\n= tau_theory" "2" "3" "4" "n"]),
+#     legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
+#     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 
 println("\nPROBLEM DIMENSIONS:");
 println("   Number of datapoints", n); # n in the paper notation
