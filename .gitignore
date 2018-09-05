@@ -12,4 +12,6 @@ figures/*.pdf
 !figures/lgstc_mushrooms-100-time.pdf
 
 ## Data
-data/*.jld
+data/*
+!data/housing.jld
+!data/abalone.jld
