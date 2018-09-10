@@ -5,12 +5,6 @@ using Match
 using Combinatorics
 include("../src/StochOpt.jl") # Be carefull about the path here
 
-### SAVING AND PRINTING OPTIONS ###
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename);
-fontsmll = 8; fontmed = 14; fontbig = 14;
-
-
 ### LOADING DATA ###
 probname = "diagonal"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
@@ -63,6 +57,11 @@ Lbar = mean(Li_s);
 
 
 ################################################ EMPIRICAL BOUNDS ################################################
+
+### SAVING AND PRINTING OPTIONS ###
+default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+savenamecomp = string(savename);
+fontsmll = 8; fontmed = 14; fontbig = 14;
 
 ### COMPUTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
 if(computeexpsmooth)
