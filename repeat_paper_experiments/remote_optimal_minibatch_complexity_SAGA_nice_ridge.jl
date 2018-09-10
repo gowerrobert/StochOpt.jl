@@ -145,8 +145,10 @@ println("Heuristic optimal tau = ", tauheuristic);
 
 savenamecsts = string(savenamecomp, "-constants");
 if(computeexpsmooth)
-save("./figures/$(savenamecsts)-with-true-expected-smoothness-cst.jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
-    "tautheory", tautheory, "tauheuristic", tauheuristic, "expsmoothcst", expsmoothcst);
+    save("./figures/$(savenamecsts)-with-true-expected-smoothness-cst.jld", "n", n, "d", d,
+        "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
+        # "heuristicbound", heuristicbound, "simplebound", simplebound, "concentrationbound", concentrationbound, "expsmoothcst" , expsmoothcst,
+        "tautheory", tautheory, "tauheuristic", tauheuristic, "expsmoothcst", expsmoothcst);
 else
     save("./figures/$(savenamecsts).jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s);
 end
