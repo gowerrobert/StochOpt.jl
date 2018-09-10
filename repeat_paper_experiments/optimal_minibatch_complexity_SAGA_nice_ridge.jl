@@ -4,17 +4,15 @@ using StatsBase
 using Match
 using Combinatorics
 
-# tic();
-
 include("./src/StochOpt.jl") # Be carefull about the path here
-srand(1234) # fixing the seed
+# srand(1234) # fixing the seed
 
 
 ### LOADING DATA ###
 probname = "diagonal"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 100;
+numdata = 10;
 numfeatures = 50; # useless for gen_diag_data
 
 println("--- Loading data ---");
@@ -25,7 +23,7 @@ if(probname == "gaussian")
     ## Load artificial data
     X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0, err=0.001);
 elseif(probname == "diagonal")
-    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=2);
+    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100);
 elseif(probname == "lone_eig_val")
     X, y, probname = gen_diag_lone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
 elseif(probname in probnames)
@@ -51,7 +49,7 @@ d = prob.numfeatures;
 
 ### COMPUTING THE SMOOTHNESS CONSTANTS ###
 # Compute the smoothness constants L, L_max, \cL, \bar{L}
-datathreshold = 20;
+datathreshold = 24;
 if(n > datathreshold) # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
     println("The number of data is to large to compute the expected smoothness constant exactly");
     computeexpsmooth = false;
@@ -170,13 +168,13 @@ fontsmll = 8; fontmed = 14; fontbig = 14;
 pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 if(computeexpsmooth)
-    plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
+    plot(1:n, [heuristicbound simplebound concentrationbound expsmoothcst], label=["heuristic" "simple" "concentration" "true"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 else
-    plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
+    plot(1:n, [heuristicbound simplebound concentrationbound], label=["heuristic" "simple" "concentration"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false, 
     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(heuristicbound)),
@@ -187,13 +185,13 @@ savefig("./figures/$(savenameexpsmooth).pdf");
 
 # Zoom
 if(computeexpsmooth)
-    plot(1:n, [simplebound concentrationbound heuristicbound expsmoothcst], label=["simple" "concentration" "heuristic" "true"],
+    plot(1:n, [heuristicbound simplebound concentrationbound expsmoothcst], label=["heuristic" "simple" "concentration" "true"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
     ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
 else
-    plot(1:n, [simplebound concentrationbound heuristicbound], label=["simple" "concentration" "heuristic"],
+    plot(1:n, [heuristicbound simplebound concentrationbound], label=["heuristic" "simple" "concentration"],
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
     # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
@@ -231,13 +229,13 @@ savenamecomp = string(savename);
 pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 if(computeexpsmooth)
-    plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize truestepsize], label=["simple" "concentration" "heuristic" "true"],
+    plot(1:n, [heuristicstepsize simplestepsize concentrationstepsize truestepsize], label=["heuristic" "simple" "concentration" "true"],
     linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
     ylim=(0, maximum(truestepsize)+minimum(concentrationstepsize)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 else
-    plot(1:n, [simplestepsize concentrationstepsize heuristicstepsize], label=["simple" "concentration" "heuristic"],
+    plot(1:n, [heuristicstepsize simplestepsize concentrationstepsize], label=["heuristic" "simple" "concentration"],
     linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto, 
     ylim=(0, maximum(heuristicstepsize)+minimum(concentrationstepsize)),
@@ -249,45 +247,86 @@ savefig("./figures/$(savenamestepsize).pdf");
 ## Empirical stepsizes returned by optimal mini-batch SAGA with line searchs
 # WORK IN PROGRESS
 
-######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
+##################################################################################################################
 
 ## Compute optimal tau
 tautheory = round(Int, 1 + (mu*(n-1))/(4*Lbar)) # One should not add again lambda since it is already taken into account in Lbar
 tauheuristic = round(Int, 1 + (mu*(n-1))/(4*L))
+
+println("\nPROBLEM DIMENSIONS:");
+println("   Number of datapoints", n); # n in the paper notation
+println("   Number of features", d); # d in the paper notation
+
+println("\nSMOOTHNESS CONSTANTS:");
+println("   Lmax : ", Lmax);
+println("   L : ", L);
+# println("Li_s : ", Li_s);
+println("   Lbar : ", Lbar);
 # sleep(3);
+
+println("\nTheoretical optimal tau = ", tautheory);
+println("Heuristic optimal tau = ", tauheuristic);
+
+default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+savenamecomp = string(savename);
+savenamecst = string(savenamecomp, "-constants");
+if(computeexpsmooth)
+save("./figures/$(savenamecst)-with-true-expected-smoothness-cst.jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
+    "tautheory", tautheory, "tauheuristic", tauheuristic, "expsmoothcst", expsmoothcst);
+else
+    save("./figures/$(savenamecst).jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s);
+end
+
+######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
+
 
 ## Empirical stepsizes returned by optimal mini-batch SAGa with line searchs
 if(n <= datathreshold)
     taulist = 1:n;
 elseif(tautheory>2)
-    taulist = [1; round(Int, (tautheory+n)/2); tautheory; tauheuristic; round(Int, (tauheuristic+n)/2); n]#[collect(1:(tautheory+1)); n];
+    taulist = [1; round(Int, (tautheory+n)/2); tautheory; tauheuristic; round(Int, sqrt(n)); n]#[collect(1:(tautheory+1)); n];
 else
-    taulist = [collect(1:(tauheuristic+1)); round(Int, (tauheuristic+n)/2); n];
+    taulist = [collect(1:(tauheuristic+1)); round(Int, sqrt(n)); n];
 end
 
-taulist
+taulist = [1, 5];
+# taulist = 5:-1:1;
+
+# srand(1234);
 
 tic();
-numsimu = 10;
-tolerance = 10.0^(-1.0); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
-options = set_options(tol=tolerance, max_iter=10^8, max_time=1000.0, max_epocs=10, initial_point="rand",
-                    #   repeat_stepsize_calculation=true,
-                      skip_error_calculation=1, # What is this option?
-                      force_continue=false); # fix initial point to zeros for a maybe fairer comparison? -> YES
+numsimu = 1;
+tolerance = 10.0^(-2.5); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=30, initial_point="zeros",
+                #   repeat_stepsize_calculation=true,
+                  skip_error_calculation=1, # What is this option?
+                  force_continue=false); # fix initial point to zeros for a maybe fairer comparison? -> YES
 itercomplex = zeros(length(taulist), 1); # List of saved outputs
 OUTPUTS = [];
+# fail = true;
 for idxtau in 1:length(taulist) # 1:n
     tau = taulist[idxtau];
     println("\nCurrent mini-batch size: ", tau);
     options.batchsize = tau;
     for i=1:numsimu
         sg = initiate_SAGA(prob, options, minibatch_type="nice");
+        # println("STEPSIZE OF sg: ", sg.stepsize);
         output = minimizeFunc(prob, sg, options);
+        println("Output fail = ", output.fail);
+        # fail = !(output.fail == "tol-reached");
+        # while(fail)
+        #     println("ENTERING THE WHILE LOOP")
+        #     sg = initiate_SAGA(prob, options, minibatch_type="nice");
+        #     output = minimizeFunc(prob, sg, options);
+        #     println("Output fail = ", output.fail);
+        #     fail = !(output.fail == "tol-reached");
+        # end
         itercomplex[idxtau] += output.iterations;
         OUTPUTS = [OUTPUTS; output];
     end
 end
-itercomplex = itercomplex ./ numsimu
+fails = [OUTPUTS[i].fail for i=1:length(taulist)];
+itercomplex = itercomplex ./ numsimu;
 toc();
 
 if(numsimu==1)
@@ -305,15 +344,15 @@ pyplot()
 plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize (log scale)", ylabel="empirical complexity",
     # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
     xticks=(taulist, taulist),
-    xscale=:log10,
+    # xscale=:log10,
     # yscale=:log10,
     # xticks=(taulist, ["1\n= tau_theory" "2" "3" "4" "n"]),
     legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
     savenamecomp = string(savename);
 savenameempcomplex = string(savenamecomp, "-empcomplex");
-savefig("./figures/$(savenameempcomplex).pdf");
-
+# savefig("./figures/$(savenameempcomplex).pdf");
+fails
 
 println("\nPROBLEM DIMENSIONS:");
 println("   Number of datapoints", n); # n in the paper notation
@@ -332,5 +371,3 @@ println("Empirical optimal tau = ", taulist[indmin(empcomplex)]);
 
 # println("List of mini-batch sizes = ", taulist);
 # println("\nEmpirical complexity = ", empcomplex);
-
-# toc();
