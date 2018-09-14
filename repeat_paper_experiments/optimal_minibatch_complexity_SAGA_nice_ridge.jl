@@ -9,11 +9,11 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
-probname = "diagonal"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
+probname = "housing"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 10;
-numfeatures = 50; # useless for gen_diag_data
+numdata = 24;
+numfeatures = 12; # useless for gen_diag_data
 
 println("--- Loading data ---");
 probnames = ["abalone", "housing"]; 
@@ -195,7 +195,7 @@ else
     linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
     guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
     # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
-    ylim=(0.85*minimum(heuristicbound), 10.0*minimum(heuristicbound)),
+    ylim=(0.85*minimum(heuristicbound), 1.5*minimum(heuristicbound)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
 end
 savenameexpsmoothzoom = string(savenameexpsmooth, "-zoom");
@@ -271,8 +271,8 @@ default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), "
 savenamecomp = string(savename);
 savenamecst = string(savenamecomp, "-constants");
 if(computeexpsmooth)
-save("./figures/$(savenamecst)-with-true-expected-smoothness-cst.jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
-    "tautheory", tautheory, "tauheuristic", tauheuristic, "expsmoothcst", expsmoothcst);
+    save("./figures/$(savenamecst)-with-true-expected-smoothness-cst.jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
+        "tautheory", tautheory, "tauheuristic", tauheuristic, "expsmoothcst", expsmoothcst);
 else
     save("./figures/$(savenamecst).jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s);
 end
@@ -289,7 +289,7 @@ else
     taulist = [collect(1:(tauheuristic+1)); round(Int, sqrt(n)); n];
 end
 
-taulist = [1, 5];
+# taulist = [1, 5];
 # taulist = 5:-1:1;
 
 # srand(1234);

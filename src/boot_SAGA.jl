@@ -90,12 +90,35 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
             Lexpected = method.L;
         end
     else # nice sampling     # interpolate Lmax and L
+        # println("------------------Rob's previous L and Lmax: ", method.L, " - ", method.Lmax);
+        # L2 = get_LC(prob, collect(1:n));
+        # Li_s = get_Li(prob);
+        # Lbar = mean(Li_s);
+        # Lmax2 = maximum(Li_s);
+        # println("------------------My L and Lmax: ", L2, " - ", Lmax2);
         Lexpected = exp((1 - tau)/((n + 0.1) - tau))*method.Lmax + ((tau - 1)/(n - 1))*method.L;
+        # Lexpected2 = get_expected_smoothness_cst(prob, tau);
     end
     if(contains(prob.name, "lgstc"))
         Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
     end
     method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*method.mu);
+
+    # stepsize2 = options.stepsize_multiplier/(4*Lexpected2 + (n/tau)*method.mu);
+
+    # rho3 = (n*(n-tau))/(tau*(n-1));
+    # rightterm = (rho3/n)*Lmax2 + (method.mu*n)/(4*tau); # Right-hand side term in the max
+    # stepsize3 = 1.0/(4*max(Lexpected2, rightterm));
+
+    # leftcoeff = (n*(tau-1))/(tau*(n-1));
+    # rightcoeff = (n-tau)/(tau*(n-1));
+    # simplebound = leftcoeff*Lbar + rightcoeff*Lmax;
+    # stepsize4 =  1.0/(4*max(simplebound, rightterm));
+    # println("----------------Rob's stepsize: ", method.stepsize);
+    # println("------------------My stepsize2: ", stepsize2);
+    # println("------------------My stepsize3: ", stepsize3);
+    # println("------------------My stepsize4: ", stepsize4);
+
     if(options.skip_error_calculation == 0.0)
         options.skip_error_calculation = ceil(options.max_epocs*prob.numdata/(options.batchsize*30)); # show 5 times per pass over the data
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
