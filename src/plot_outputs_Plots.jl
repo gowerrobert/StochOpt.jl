@@ -26,6 +26,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
+        datapassbnd = output.iterations*output.epocsperiter;
         rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
         fs = output.fs[rel_loss.>0];
         lf = length(fs);
@@ -38,6 +39,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
     #
     #   # plotting times
     output = OUTPUTS[1];
+    datapassbnd = output.iterations*output.epocsperiter;
     rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
     fs = output.fs[rel_loss.>0];
     lf = length(fs);
@@ -47,10 +49,13 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
     println(output.name, ": 2^", log(2, output.stepsize_multiplier))
     for jiter=2:length(OUTPUTS)
         output = OUTPUTS[jiter];
+        datapassbnd = output.iterations*output.epocsperiter;
         rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
         fs = output.fs[rel_loss.>0];
+        println("fs: ", fs);
         lf = length(fs);
         bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
+        println("bnd: ", bnd);
         plot!(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2,output.stepsize_multiplier))
@@ -62,6 +67,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
 
     if(!isempty(OUTPUTS[1].testerrors)) # plot test error as well
         output = OUTPUTS[1];
+        datapassbnd = output.iterations*output.epocsperiter;
         lf = length(output.testerrors);
         bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
         plot(output.times[1:bnd], output.testerrors[1:bnd], xlabel="time", ylabel="residual", label=string(output.name, "-t"), linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig),
@@ -70,6 +76,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         println(output.testerrors[1:bnd])
         for jiter=2:length(OUTPUTS)
             output = OUTPUTS[jiter];
+            datapassbnd = output.iterations*output.epocsperiter;
             lf = length(output.testerrors);
             bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
             plot!(output.times[1:bnd], output.testerrors[1:bnd], xlabel="time", ylabel="residual", label=string(output.name, "-t"), linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig),
