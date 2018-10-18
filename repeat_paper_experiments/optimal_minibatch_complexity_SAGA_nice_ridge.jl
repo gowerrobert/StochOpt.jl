@@ -9,16 +9,16 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
-probname = "housing"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
+probname = "diagonal"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
 numdata = 24;
 numfeatures = 12; # useless for gen_diag_data
 
 println("--- Loading data ---");
-probnames = ["abalone", "housing"]; 
-#, "letter_scale", "heart", "phishing", "madelon", "a9a", 
-# "mushrooms", "phishing", "w8a", "gisette_scale", 
+probnames = ["abalone", "housing"];
+#, "letter_scale", "heart", "phishing", "madelon", "a9a",
+# "mushrooms", "phishing", "w8a", "gisette_scale",
 if(probname == "gaussian")
     ## Load artificial data
     X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0, err=0.001);
@@ -126,7 +126,7 @@ plot(tauseq, [totcomp itercomp'], label=["total complex" "iter complex"],
 # Comparing only the iteration complexities
 ## WARNING: Lsides is not exactly the expected smoothness cosntant but 4*\cL/mu !!
 plot(tauseq, Lsides', ylabel="expected smoothness", xlabel="batchsize", tickfont=font(fontsmll),
-    guidefont=font(fontbig), markersize=6, linewidth=4, marker=:auto, grid=false, legend=false, 
+    guidefont=font(fontbig), markersize=6, linewidth=4, marker=:auto, grid=false, legend=false,
     xticks=tauseq)
 savenameexpsmooth = string(savenamecomp, "-expsmooth");
 # savefig("./figures/$(savenameexpsmooth).pdf");
@@ -155,7 +155,7 @@ for tau = 1:n
     simplebound[tau] = leftcoeff*Lbar + rightcoeff*Lmax;
     heuristicbound[tau] = leftcoeff*L + rightcoeff*Lmax;
     concentrationbound[tau] = ((2*n*(tau-1))/(tau*(n-1)))*L + (1/tau)*(((n-tau)/(n-1)) + (4*log(d))/3)*Lmax;
-    concentrationbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax; 
+    concentrationbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax;
     if(computeexpsmooth) toc(); end
 end
 
@@ -169,14 +169,14 @@ pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 if(computeexpsmooth)
     plot(1:n, [heuristicbound simplebound concentrationbound expsmoothcst], label=["heuristic" "simple" "concentration" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n,
+    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 else
     plot(1:n, [heuristicbound simplebound concentrationbound], label=["heuristic" "simple" "concentration"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false, 
+    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n,
+    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,
     ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(heuristicbound)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 end
@@ -186,13 +186,13 @@ savefig("./figures/$(savenameexpsmooth).pdf");
 # Zoom
 if(computeexpsmooth)
     plot(1:n, [heuristicbound simplebound concentrationbound expsmoothcst], label=["heuristic" "simple" "concentration" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
+    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
     ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
 else
     plot(1:n, [heuristicbound simplebound concentrationbound], label=["heuristic" "simple" "concentration"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n, 
+    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
     guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
     # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
     ylim=(0.85*minimum(heuristicbound), 1.5*minimum(heuristicbound)),
@@ -230,14 +230,14 @@ pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 if(computeexpsmooth)
     plot(1:n, [heuristicstepsize simplestepsize concentrationstepsize truestepsize], label=["heuristic" "simple" "concentration" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false, 
+    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
+    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
     ylim=(0, maximum(truestepsize)+minimum(concentrationstepsize)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 else
     plot(1:n, [heuristicstepsize simplestepsize concentrationstepsize], label=["heuristic" "simple" "concentration"],
-    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n, 
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto, 
+    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
+    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto,
     ylim=(0, maximum(heuristicstepsize)+minimum(concentrationstepsize)),
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
 end
@@ -289,18 +289,25 @@ else
     taulist = [collect(1:(tauheuristic+1)); round(Int, sqrt(n)); n];
 end
 
+# taulist = [1];
+# taulist = [1, 10, 50];
+# taulist = [50, 10, 1];
+
 # taulist = [1, 5];
+# taulist = [5, 1];
 # taulist = 5:-1:1;
+taulist = [1];
 
 # srand(1234);
 
 tic();
-numsimu = 1;
-tolerance = 10.0^(-2.5); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
-options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=30, initial_point="zeros",
+numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
+tolerance = 10.0^(-2); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=50,
+                      initial_point="zeros", # fix initial point to zeros for a maybe fairer comparison? -> YES
                 #   repeat_stepsize_calculation=true,
-                  skip_error_calculation=1, # What is this option?
-                  force_continue=false); # fix initial point to zeros for a maybe fairer comparison? -> YES
+                      skip_error_calculation=1, # What is this option?
+                      force_continue=false); # force continue if diverging or if tolerance reached
 itercomplex = zeros(length(taulist), 1); # List of saved outputs
 OUTPUTS = [];
 # fail = true;
@@ -329,11 +336,56 @@ fails = [OUTPUTS[i].fail for i=1:length(taulist)];
 itercomplex = itercomplex ./ numsimu;
 toc();
 
+
+## Plotting the average behaviour of each mini-batch size
 if(numsimu==1)
-    # gr()
-    pyplot()
+    gr()
+    # pyplot()
     plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
 end
+
+rel_loss_avg = [];
+for i=1:length(taulist)
+    rel_loss_array = [];
+    for j=1:numsimu
+        # println("idx:", (i-1)*numsimu+j);
+        # println(OUTPUTS[(i-1)*numsimu+j].fs[1]);
+        rel_loss_array = [rel_loss_array; [(OUTPUTS[(i-1)*numsimu+j].fs'.-prob.fsol)./(OUTPUTS[(i-1)*numsimu+j].fs[1].-prob.fsol)]];
+    end
+
+    maxlength = maximum([length(rel_loss_array[j]) for j=1:numsimu]);
+    tmp = similar(rel_loss_array[1], maxlength, 0);
+    for j=1:numsimu
+        # resize vector Maybe 0 or NA instead of tolerance
+        tmp = hcat(tmp, vcat(rel_loss_array[j], fill(tolerance, maxlength-length(rel_loss_array[j]), 1)));
+    end
+    tmp = mean(tmp, 2);
+    rel_loss_avg = [rel_loss_avg; [tmp]];
+end
+
+output = OUTPUTS[1];
+epocsperiters = [OUTPUTS[i].epocsperiter for i=1:numsimu:length(OUTPUTS)];
+lfs = [length(rel_loss_avg[i]) for i=1:length(rel_loss_avg)];
+iterations = lfs.-1;
+datapassbnds = iterations.*epocsperiters;
+x_val = datapassbnds.*([collect(1:lfs[i]) for i=1:length(taulist)])./lfs;
+pyplot()
+p = plot(x_val[1], rel_loss_avg[1],
+        xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
+        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+        markersize=6, linewidth=4, marker=:auto, grid=false);
+for i=2:length(taulist)
+    println(i);
+    output = OUTPUTS[1+(i-1)*numsimu];
+    plot!(p, x_val[i], rel_loss_avg[i],
+        xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
+        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+        markersize=6, linewidth=4, marker=:auto, grid=false)
+end
+display(p)
+savenameempcomplex = string(savenamecomp, "epoc-rel-loss-$(numsimu)-avg");
+savefig("./figures/$(savenameempcomplex).pdf");
+
 
 ## Computing the empirical complexity
 # itercomplex -= 1; #-> should we remove 1 from itercomplex?
@@ -341,7 +393,7 @@ empcomplex = taulist.*itercomplex # tau times number of iterations
 
 # plotly()
 pyplot()
-plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize (log scale)", ylabel="empirical complexity",
+plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity",
     # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
     xticks=(taulist, taulist),
     # xscale=:log10,
@@ -350,19 +402,19 @@ plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize (log scale)", ylab
     legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
     savenamecomp = string(savename);
-savenameempcomplex = string(savenamecomp, "-empcomplex");
-# savefig("./figures/$(savenameempcomplex).pdf");
+savenameempcomplex = string(savenamecomp, "-empcomplex-$(numsimu)-avg");
+savefig("./figures/$(savenameempcomplex).pdf");
 fails
 
 println("\nPROBLEM DIMENSIONS:");
-println("   Number of datapoints", n); # n in the paper notation
-println("   Number of features", d); # d in the paper notation
+println("   Number of datapoints = ", n); # n in the paper notation
+println("   Number of features = ", d); # d in the paper notation
 
 println("\nSMOOTHNESS CONSTANTS:");
-println("   Lmax : ", Lmax);
-println("   L : ", L);
-# println("Li_s : ", Li_s);
-println("   Lbar : ", Lbar);
+println("   Lmax = ", Lmax);
+println("   L = ", L);
+# println("Li_s = ", Li_s);
+println("   Lbar = ", Lbar);
 # sleep(3);
 
 println("\nTheoretical optimal tau = ", tautheory);
