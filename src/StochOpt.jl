@@ -103,6 +103,28 @@ type SAGAmethod
     mu::Float64
 end
 
+type SAGA_nice_method
+    epocsperiter::Float64
+    gradsperiter::Float64
+    name::AbstractString
+    stepmethod::Function
+    bootmethod::Function
+    minibatches::Array{Int64}
+    unbiased::Bool        # unbiased = true for SAGA and unbiased = false for SAG
+    Jac::Array{Float64}  #Jacobian estimate
+    Jacsp::SparseMatrixCSC #Sparse JAcobian estimate
+    SAGgrad::Array{Float64}  # The SAG estimate of full gradient, needed for computing unbiased gradient estimate.
+    gi::Array{Float64} # Storage for a single stochastic gradient
+    aux::Array{Float64}  # Storage for an auxiliary vector, used as the update vectoe
+    stepsize::Float64     # The stepsize
+    probs::Array{Float64}  # Probability of selecting a coordinate or mini-batch
+    Z    # normalizing variable for probabilities
+    L::Float64  # An estimate of the smoothness constant
+    Lmax::Float64  # the max smoothness constant of the f_i functions
+    Lbar::Float64  # the average of the smoothness constant of the f_i functions
+    mu::Float64
+end
+
 type SPIN
     epocsperiter::Float64
     gradsperiter::Float64
@@ -166,7 +188,7 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
+allmethods = ["SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
 for method in allmethods
     include(string("boot_", method , ".jl"))
     include(string("descent_", method , ".jl"))

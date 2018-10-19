@@ -1,3 +1,4 @@
+# /!\ WARNING: useless "N" ... it should be removed
 function descent_SAGA(x::Array{Float64}, prob::Prob, options::MyOptions, sg::SAGAmethod, N::Int64, d::Array{Float64})
     s = sample(1:prob.numdata, options.batchsize, replace=false);
     if(sg.minibatch_type == "rade") #Take the averaged of the gradients then broadcast to the columns of Jac

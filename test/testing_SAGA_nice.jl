@@ -1,3 +1,4 @@
+# After developping and testing, this file will becom "demo_SAGA_nice.jl"
 using JLD
 using Plots
 using StatsBase
@@ -9,7 +10,7 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
-probname = "abalone"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
+probname = "gaussian"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
 numdata = 24;
@@ -46,23 +47,6 @@ prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none")
 n = prob.numdata;
 d = prob.numfeatures;
 
-
-### COMPUTING THE SMOOTHNESS CONSTANTS ###
-# Compute the smoothness constants L, L_max, \cL, \bar{L}
-datathreshold = 24;
-if(n > datathreshold) # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
-    println("The number of data is to large to compute the expected smoothness constant exactly");
-    computeexpsmooth = false;
-else
-    computeexpsmooth = true;
-end
-
-mu = get_mu_str_conv(prob);
-L = get_LC(prob, collect(1:n));
-Li_s = get_Li(prob);
-Lmax = maximum(Li_s);
-Lbar = mean(Li_s);
-
 ######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
 
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
@@ -93,7 +77,7 @@ for idxtau in 1:length(taulist) # 1:n
     println("\nCurrent mini-batch size: ", tau);
     options.batchsize = tau;
     for i=1:numsimu
-        sg = initiate_SAGA(prob, options, minibatch_type="nice");
+        sg = initiate_SAGA_nice(prob, options);
         println("STEPSIZE OF sg: ", sg.stepsize);
         output = minimizeFunc(prob, sg, options);
         itercomplex[idxtau] += output.iterations;
