@@ -111,8 +111,8 @@ type SAGA_nice_method
     bootmethod::Function
     minibatches::Array{Int64}
     unbiased::Bool        # unbiased = true for SAGA and unbiased = false for SAG
-    Jac::Array{Float64}  #Jacobian estimate
-    Jacsp::SparseMatrixCSC #Sparse JAcobian estimate
+    Jac::Array{Float64}  # Jacobian estimate
+    Jacsp::SparseMatrixCSC # Sparse JAcobian estimate
     SAGgrad::Array{Float64}  # The SAG estimate of full gradient, needed for computing unbiased gradient estimate.
     gi::Array{Float64} # Storage for a single stochastic gradient
     aux::Array{Float64}  # Storage for an auxiliary vector, used as the update vectoe
