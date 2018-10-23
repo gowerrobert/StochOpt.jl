@@ -64,12 +64,15 @@ function ridge_scalar_grad_hess(X, y::Array{Float64}, w::Array{Float64})
     return (X'*w -y), ones(length(y));
 end
 # (1/n)X (X'w-y) +lambda w
-function  ridge_grad!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, batch::Int64, g::Array{Float64})
+function ridge_grad!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, batch::Int64, g::Array{Float64})
     g[:]= (1/batch)*(X*(X'*w -y)) +(lambda)*w;
 end
 
-function  ridge_Jac!(X, y::Array{Float64}, w::Array{Float64}, lambda, S::Array{Int64}, Jac::Array{Float64})
-    Jac[:, S] = X.*((X'*w -y)');
+function ridge_Jac!(X, y::Array{Float64}, w::Array{Float64}, lambda, S::Array{Int64}, Jac::Array{Float64})
+    Jac[:, S] = X.*((X'*w - y)');
     # broadcast!(*,Jac[:,S],X, (y.*(t .- 1))');
     Jac[:, S] .+= (lambda).*w;
+
+    ## Why not ?
+    # Jac[:, S] = X.*((X'*w - y)') .+ (lambda).*w;
 end
