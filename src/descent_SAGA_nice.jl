@@ -9,7 +9,7 @@ Compute the descent direction (d)
     - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
     - **MyOptions** options: different options such as the mini-batch size, the stepsize_multiplier... (see src/StochOpt.jl)\\
     - **SAGA_nice_method** sg: method of SAGA for ``τ``--nice sampling\\
-    - **::Int64** iter: current iteratio, _useless for SAGA nice_\\
+    - **::Int64** iter: current iteration, _useless for SAGA nice_\\
     - **Array{Float64}** d: descent direction\\
 #OUTPUTS:\\
     - NONE
@@ -17,16 +17,18 @@ Compute the descent direction (d)
 # /!\ WARNING: this function modifies its own arguments (d and sg) and return nothing! Shouldn't we name it "descent_SAGA_nice!(...)" with an "!" ?
 function descent_SAGA_nice(x::Array{Float64}, prob::Prob, options::MyOptions, sg::SAGA_nice_method, iter::Int64, d::Array{Float64})
     s = sample(1:prob.numdata, options.batchsize, replace=false);
-    #Assign each gradient to a different column of Jac
-    # sg.aux[:]  =  -sum(sg.Jac[:,s],2); # calculating the update vector   (DF^k-J^k) Proj 1
-    # prob.Jac_eval!(x,s,sg.Jac);
-    # sg.aux[:]  += sum(sg.Jac[:,s],2);
-    scalargrad = prob.scalar_grad_eval(x, s);
-    sg.gi[:] = (prob.X[:, s])*scalargrad;
-    #  calculating the update vector (DF^k-J^k) Proj 1
-    sg.aux[:] = -(prob.X[:, s])*sg.Jac[s]; # - sum_{i\in S_k} J_ {:i}^k
-    sg.aux[:] += sg.gi; # + sum_{i\in S_k} grad f_i (x^k)
-    sg.Jac[s] = scalargrad;
+    # Assign each gradient to a different column of Jac
+    sg.aux[:] = -sum(sg.Jac[:,s], 2); # calculating the update vector (DF^k-J^k) Proj 1
+    prob.Jac_eval!(x, s, sg.Jac);
+    sg.aux[:] += sum(sg.Jac[:,s], 2);
+
+    # ## Using the scalar gradient trick for "linear models"
+    # scalargrad = prob.scalar_grad_eval(x, s);
+    # sg.gi[:] = (prob.X[:, s])*scalargrad;
+    # ## Calculating the update vector (DF^k-J^k) Proj 1
+    # sg.aux[:] = -(prob.X[:, s])*sg.Jac[s]; # - sum_{i\in S_k} J_ {:i}^k
+    # sg.aux[:] += sg.gi; # + sum_{i\in S_k} grad f_i (x^k)
+    # sg.Jac[s] = scalargrad;
     
     # Minus the gradient estimate = descent direction
     # Update of minus the unbiased gradient estimate: -g^k
