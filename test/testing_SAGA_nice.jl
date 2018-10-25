@@ -1,3 +1,5 @@
+# srand(2);
+
 # After developping and testing, this file will becom "demo_SAGA_nice.jl"
 using JLD
 using Plots
@@ -10,7 +12,7 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
-probname = "gaussian"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
+probname = "diagonal"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
 numdata = 24;
@@ -57,14 +59,14 @@ fontsmll = 8; fontmed = 14; fontbig = 14;
 ## Select the list of mini-batch sizes 
 # taulist = [1, 5];
 # taulist = [5, 1];
-# taulist = 5:-1:1;
-taulist = [5];
+# taulist = 1:3:10;
+taulist = [1];
 
-srand(1234);
+# srand(1234);
 
 tic();
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-tolerance = 10.0^(-2); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+tolerance = 10.0^(-3); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
 options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=30,
                       initial_point="zeros", # fix initial point to zeros for a maybe fairer comparison? -> YES
                 #   repeat_stepsize_calculation=true,
