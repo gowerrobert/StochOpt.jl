@@ -18,8 +18,8 @@ Compute the descent direction (d)
 function descent_SAGA_nice(x::Array{Float64}, prob::Prob, options::MyOptions, sg::SAGA_nice_method, iter::Int64, d::Array{Float64})
     s = sample(1:prob.numdata, options.batchsize, replace=false);
     # Assign each gradient to a different column of Jac
-    sg.aux[:] = -sum(sg.Jac[:,s], 2); # calculating the update vector (DF^k-J^k) Proj 1
-    prob.Jac_eval!(x, s, sg.Jac);
+    sg.aux[:] = -sum(sg.Jac[:,s], 2); # Calculating the update vector aux = (DF^k-J^k) Proj 1 = sum_{i \in S_k} (\nabla f_i (x^k) - J_{:i}^k)
+    prob.Jac_eval!(x, s, sg.Jac); # Update of the Jacobian estimate
     sg.aux[:] += sum(sg.Jac[:,s], 2);
 
     # ## Using the scalar gradient trick for "linear models"
