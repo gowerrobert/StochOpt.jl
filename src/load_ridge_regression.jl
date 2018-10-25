@@ -28,17 +28,18 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         end
     end
 
-    f_eval(x, S)                = ((1./length(S))*ridge_eval(X[:, S],y[S],x) + (lambda)*(0.5)* norm(x)^2);
-    g_eval(x, S)                = ((1./length(S))*ridge_grad(X[:, S],y[S],x).+(lambda).*x);
-    g_eval!(x, S, g)            = ridge_grad!(X[:, S], y[S], x, lambda, length(S), g);
-    Jac_eval!(x, S, Jac)        = ridge_Jac!(X[:, S], y[S], x, lambda, S, Jac);
-    scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:, S], y[S], x);
-    scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:, S], y[S], x);
+    f_eval(x, S)                = ((1./length(S))*ridge_eval(X[:,S], y[S], x) + lambda*0.5*norm(x)^2);
+    g_eval(x, S)                = ((1./length(S))*ridge_grad(X[:,S], y[S], x) .+ lambda*x);
+    g_eval!(x, S, g)            = ridge_grad!(X[:,S], y[S], x, lambda, length(S), g);
+    Jac_eval!(x, S, Jac)        = ridge_Jac!(X[:,S], y[S], x, lambda, S, Jac);
+    scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:,S], y[S], x);
+    scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:,S], y[S], x);
 
-    prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda)
+    prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, 
+                x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda)
     # ((1/n)X X' +lambda I)w= Xy
     # xsol = ((1/n)X X' +lambda I) \ ( (1/n)*Xy)
-    xsol = (X*X' +numdata*lambda*eye(numfeatures)) \ ( X*y);
+    xsol = (X*X' + numdata*lambda*eye(numfeatures)) \ (X*y);
     prob.fsol = f_eval(xsol, 1:numdata);
 
     fsolfilename = get_fsol_filename(prob);
@@ -65,14 +66,14 @@ function ridge_scalar_grad_hess(X, y::Array{Float64}, w::Array{Float64})
 end
 # (1/n)X (X'w-y) +lambda w
 function ridge_grad!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, batch::Int64, g::Array{Float64})
-    g[:]= (1/batch)*(X*(X'*w -y)) +(lambda)*w;
+    g[:] = (1/batch)*(X*(X'*w -y)) + lambda*w;
 end
 
-function ridge_Jac!(X, y::Array{Float64}, w::Array{Float64}, lambda, S::Array{Int64}, Jac::Array{Float64})
+function ridge_Jac!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, S::Array{Int64}, Jac::Array{Float64})
     Jac[:, S] = X.*((X'*w - y)');
     # broadcast!(*,Jac[:,S],X, (y.*(t .- 1))');
-    Jac[:, S] .+= (lambda).*w;
+    Jac[:, S] .+= lambda*w;
 
     ## Why not ?
-    # Jac[:, S] = X.*((X'*w - y)') .+ (lambda).*w;
+    # Jac[:, S] = X.*((X'*w - y)') .+ lambda*w;
 end
