@@ -1,3 +1,5 @@
+srand(1);
+
 using JLD
 using Plots
 using StatsBase
@@ -5,14 +7,13 @@ using Match
 using Combinatorics
 
 include("./src/StochOpt.jl") # Be carefull about the path here
-# srand(1234) # fixing the seed
 
 
 ### LOADING DATA ###
-probname = "abalone"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
+probname = "lone_eig_val"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 24;
+numdata = 5000;
 numfeatures = 12; # useless for gen_diag_data
 
 println("--- Loading data ---");
@@ -215,7 +216,7 @@ savefig("./figures/$(savenameexpsmoothzoom).pdf");
 rho = ((n-(1:n) )./((1:n).*(n-1)));
 rightterm = (rho/n)*Lmax + (mu*n)/(4*(1:n)); # Right-hand side term in the max
 if(computeexpsmooth)
-    truestepsize = (1/4).* (1./max.(expsmoothcst, rightterm));
+    truestepsize = (1/4).*(1./max.(expsmoothcst, rightterm));
 end
 simplestepsize = (1/4).* (1./max.(simplebound, rightterm));
 concentrationstepsize = (1/4).* (1./max.(concentrationbound, rightterm));
@@ -279,11 +280,6 @@ end
 
 ######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
 
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename);
-fontsmll = 8; fontmed = 14; fontbig = 14;
-
-
 ## Empirical stepsizes returned by optimal mini-batch SAGa with line searchs
 if(n <= datathreshold)
     taulist = 1:n;
@@ -293,6 +289,16 @@ else
     taulist = [collect(1:(tauheuristic+1)); round(Int, sqrt(n)); n];
 end
 
+## For abalone sataset
+# taulist = [collect(1:5); 50; 100];
+# taulist = 1:8;
+
+## For n=24
+# taulist = [collect(1:6); 12; 24];
+
+## For n=5000
+taulist = [1; 5; 10; 50; 100; 200; 1000; 5000];
+
 # taulist = [1];
 # taulist = [1, 10, 50];
 # taulist = [50, 10, 1];
@@ -300,17 +306,17 @@ end
 # taulist = [1, 5];
 # taulist = [5, 1];
 # taulist = 5:-1:1;
-taulist = [5];
+# taulist = [1];
 
 # srand(1234);
 
 tic();
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-tolerance = 10.0^(-2); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
-options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=30,
+tolerance = 10.0^(-3); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=100,
                       initial_point="zeros", # fix initial point to zeros for a maybe fairer comparison? -> YES
                 #   repeat_stepsize_calculation=true,
-                      skip_error_calculation=1, # What is this option?
+                      skip_error_calculation=100,
                       force_continue=false); # force continue if diverging or if tolerance reached
 itercomplex = zeros(length(taulist), 1); # List of saved outputs
 OUTPUTS = [];
@@ -320,10 +326,12 @@ for idxtau in 1:length(taulist) # 1:n
     println("\nCurrent mini-batch size: ", tau);
     options.batchsize = tau;
     for i=1:numsimu
-        sg = initiate_SAGA(prob, options, minibatch_type="nice");
+        println("----- Simulation #", i, " -----");
+        # sg = initiate_SAGA(prob, options, minibatch_type="nice"); # Old and diverging implementation
+        sg = initiate_SAGA_nice(prob, options); # new separated implementation
         # println("STEPSIZE OF sg: ", sg.stepsize);
         output = minimizeFunc(prob, sg, options);
-        println("Output fail = ", output.fail);
+        println("Output fail = ", output.fail, "\n");
         # fail = !(output.fail == "tol-reached");
         # while(fail)
         #     println("ENTERING THE WHILE LOOP")
@@ -333,13 +341,13 @@ for idxtau in 1:length(taulist) # 1:n
         #     fail = !(output.fail == "tol-reached");
         # end
         itercomplex[idxtau] += output.iterations;
+        output.name = string("\$\\tau\$=", tau); # Tiny modification for smaller legend name / Latex symbols in strings
         OUTPUTS = [OUTPUTS; output];
     end
 end
 fails = [OUTPUTS[i].fail for i=1:length(taulist)];
 itercomplex = itercomplex ./ numsimu;
 toc();
-
 
 ## Plotting the average behaviour of each mini-batch size
 if(numsimu==1)
@@ -373,8 +381,14 @@ lfs = [length(rel_loss_avg[i]) for i=1:length(rel_loss_avg)];
 iterations = lfs.-1;
 datapassbnds = iterations.*epocsperiters;
 x_val = datapassbnds.*([collect(1:lfs[i]) for i=1:length(taulist)])./lfs;
+x_val *= options.skip_error_calculation; # skipping error calculation changes the epochs scale
+
+default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+savenamecomp = string(savename);
+fontsmll = 8; fontmed = 12; fontbig = 14;
 pyplot()
 p = plot(x_val[1], rel_loss_avg[1],
+        # ylim = (minimum(collect(Iterators.flatten(rel_loss_avg))), 10*maximum(collect(Iterators.flatten(rel_loss_avg))));
         xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
         linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
         markersize=6, linewidth=4, marker=:auto, grid=false);
@@ -409,6 +423,12 @@ plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize", ylabel="empirica
 savenameempcomplex = string(savenamecomp, "-empcomplex-$(numsimu)-avg");
 savefig("./figures/$(savenameempcomplex).pdf");
 fails
+
+## Saving the result
+save("$(default_path)$(savenameempcomplex).jld", "OUTPUTS", OUTPUTS);
+
+
+######################################## SMOOTHNESS CONSTANTS ########################################
 
 println("\nPROBLEM DIMENSIONS:");
 println("   Number of datapoints = ", n); # n in the paper notation
