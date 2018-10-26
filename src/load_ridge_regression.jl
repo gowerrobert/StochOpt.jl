@@ -28,12 +28,12 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         end
     end
 
-    f_eval(x, S)                = ((1./length(S))*ridge_eval(X[:,S], y[S], x) + lambda*0.5*norm(x)^2);
-    g_eval(x, S)                = ((1./length(S))*ridge_grad(X[:,S], y[S], x) .+ lambda*x);
-    g_eval!(x, S, g)            = ridge_grad!(X[:,S], y[S], x, lambda, length(S), g);
-    Jac_eval!(x, S, Jac)        = ridge_Jac!(X[:,S], y[S], x, lambda, S, Jac);
-    scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:,S], y[S], x);
-    scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:,S], y[S], x);
+    f_eval(x, S)                = ((1./length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2);
+    g_eval(x, S)                = ((1./length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x);
+    g_eval!(x, S, g)            = ridge_grad!(X[:, S], y[S], x, lambda, length(S), g);
+    Jac_eval!(x, S, Jac)        = ridge_Jac!(X[:, S], y[S], x, lambda, S, Jac);
+    scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:, S], y[S], x);
+    scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:, S], y[S], x);
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, 
                 x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda)
@@ -49,24 +49,24 @@ end
 
 #  f(w) = 1/2 ||X'w -y||^2
 function ridge_eval(X, y::Array{Float64}, w::Array{Float64}) #,S::Array{Int64}
-    return 0.5*norm(X'*w -y)^2;
+    return 0.5*norm(X'*w - y)^2;
 end
 
 #  sum_i nabla f_i =  sum_i X_{:i}(X_{:i}^T w  -y_i)^2
 function ridge_grad(X, y::Array{Float64}, w::Array{Float64})
-    return (X*(X'*w -y));
+    return (X*(X'*w - y));
 end
 
 function ridge_scalar_grad(X, y::Array{Float64}, w::Array{Float64})
-    return (X'*w -y);
+    return (X'*w - y);
 end
 
 function ridge_scalar_grad_hess(X, y::Array{Float64}, w::Array{Float64})
-    return (X'*w -y), ones(length(y));
+    return (X'*w - y), ones(length(y));
 end
 # (1/n)X (X'w-y) +lambda w
 function ridge_grad!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, batch::Int64, g::Array{Float64})
-    g[:] = (1/batch)*(X*(X'*w -y)) + lambda*w;
+    g[:] = (1/batch)*(X*(X'*w - y)) + lambda*w;
 end
 
 function ridge_Jac!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, S::Array{Int64}, Jac::Array{Float64})
