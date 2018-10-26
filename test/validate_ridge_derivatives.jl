@@ -1,5 +1,6 @@
 ## Testing if our implementation of the gradient for the ridge regression problem is correct.
 ## See "load_ridge_regression.jl"
+## Ref: https://timvieira.github.io/blog/post/2017/04/21/how-to-test-gradient-implementations/
 using JLD
 using Plots
 using StatsBase
@@ -25,20 +26,35 @@ prob = load_ridge_regression(X, y, probname, options, lambda=10.0, scaling="none
 ## Testing gradient code
 errorsacc = 0;
 errorinplace = 0;
-numtrials = 20;
+errorsacc_sym = 0;
+errorinplace_sym = 0;
+numtrials = 100;
 grad = zeros(prob.numfeatures);
 eps = 10.0^(-6);
 for iteri = 1:numtrials
   s = sample(1:prob.numdata, options.batchsize, replace=false);
   x = rand(prob.numfeatures); # sample a anchor point of dimension d
   d = rand(prob.numfeatures); # sample a direction of dimension d
-  graestdd = (prob.f_eval(x + eps*d, s) - prob.f_eval(x, s))/eps;
+  gradd_est_finitediff = (prob.f_eval(x + eps*d, s) - prob.f_eval(x, s))/eps;
+  gradd_est_finitediff_sym = (prob.f_eval(x + eps*d, s) - prob.f_eval(x - eps*d, s))/(2*eps);
+
   gradd = prob.g_eval(x, s)'*d;
   gradd2 = prob.g_eval!(x, s, grad)'*d;
-  errorsacc += norm(graestdd - gradd);
-  errorinplace += norm(gradd2 - gradd);
+
+  errorsacc += norm(gradd_est_finitediff - gradd);
+  errorinplace += norm(gradd_est_finitediff - gradd2);
+
+  errorsacc_sym += norm(gradd_est_finitediff_sym - gradd);
+  errorinplace_sym += norm(gradd_est_finitediff_sym - gradd2);
 end
 errorsacc /= numtrials;
 errorinplace /= numtrials;
+errorsacc_sym /= numtrials;
+errorinplace_sym /= numtrials;
+println("--- One-side difference formula ---")
 println("average grad error: ", errorsacc)
 println("average grad inplace error: ", errorinplace)
+
+println("--- Symmetric difference formula ---")
+println("average grad error: ", errorsacc_sym)
+println("average grad inplace error: ", errorinplace_sym)
