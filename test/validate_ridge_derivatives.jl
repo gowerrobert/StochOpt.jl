@@ -28,7 +28,7 @@ errorsacc = 0;
 errorinplace = 0;
 errorsacc_sym = 0;
 errorinplace_sym = 0;
-numtrials = 100;
+numtrials = 1000;
 grad = zeros(prob.numfeatures);
 eps = 10.0^(-6);
 for iteri = 1:numtrials
@@ -41,11 +41,13 @@ for iteri = 1:numtrials
   gradd = prob.g_eval(x, s)'*d;
   gradd2 = prob.g_eval!(x, s, grad)'*d;
 
-  errorsacc += norm(gradd_est_finitediff - gradd);
-  errorinplace += norm(gradd_est_finitediff - gradd2);
+  ## The one_sided difference error should be of size eps
+  errorsacc += norm(gradd_est_finitediff - gradd)/norm(gradd_est_finitediff); # Compute relative error because we might have a function taking tiny values (TO BE CHECKED?)
+  errorinplace += norm(gradd_est_finitediff - gradd2)/norm(gradd_est_finitediff);
 
-  errorsacc_sym += norm(gradd_est_finitediff_sym - gradd);
-  errorinplace_sym += norm(gradd_est_finitediff_sym - gradd2);
+  ## The symmetric difference error should be of size eps^2
+  errorsacc_sym += norm(gradd_est_finitediff_sym - gradd)/norm(gradd_est_finitediff_sym);
+  errorinplace_sym += norm(gradd_est_finitediff_sym - gradd2)/norm(gradd_est_finitediff_sym); 
 end
 errorsacc /= numtrials;
 errorinplace /= numtrials;
