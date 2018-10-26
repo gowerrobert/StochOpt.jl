@@ -15,3 +15,6 @@ figures/*.pdf
 data/*
 !data/housing.jld
 !data/abalone.jld
+
+## Temporary codes for exploration
+tmp/test_linreg.jl
