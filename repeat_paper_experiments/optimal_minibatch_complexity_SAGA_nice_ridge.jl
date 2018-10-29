@@ -13,7 +13,7 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 probname = "lone_eig_val"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 5000;
+numdata = 100;
 numfeatures = 12; # useless for gen_diag_data
 
 println("--- Loading data ---");
@@ -297,10 +297,10 @@ end
 # taulist = [collect(1:6); 12; 24];
 
 ## For n=5000
-taulist = [1; 5; 10; 50; 100; 200; 1000; 5000];
+# taulist = [1; 5; 10; 50; 100; 200; 1000; 5000];
 
 # taulist = [1];
-# taulist = [1, 10, 50];
+taulist = [1, 10, 50];
 # taulist = [50, 10, 1];
 
 # taulist = [1, 5];
@@ -311,12 +311,13 @@ taulist = [1; 5; 10; 50; 100; 200; 1000; 5000];
 # srand(1234);
 
 tic();
-numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-tolerance = 10.0^(-3); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+numsimu = 5; # number of runs of mini-batch SAGA for averaging the empirical complexity
+tolerance = 10.0^(-2); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+skipped_errors = 5;
 options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=100,
                       initial_point="zeros", # fix initial point to zeros for a maybe fairer comparison? -> YES
                 #   repeat_stepsize_calculation=true,
-                      skip_error_calculation=100,
+                      skip_error_calculation=skipped_errors,
                       force_continue=false); # force continue if diverging or if tolerance reached
 itercomplex = zeros(length(taulist), 1); # List of saved outputs
 OUTPUTS = [];
@@ -356,58 +357,108 @@ if(numsimu==1)
     plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
 end
 
-rel_loss_avg = [];
+## Extracting the average iteration complexity through average angle between the tolerance horizontal line and a fitted linear curve 
+itercomplex2 = []
+betahat = [];
 for i=1:length(taulist)
-    rel_loss_array = [];
+    println("Tau: ", taulist[i]);
+    ## Fitting a line without the intercept term with OLS
+    ## https://en.wikipedia.org/wiki/Simple_linear_regression#Simple_linear_regression_without_the_intercept_term_(single_regressor)
+    tmp = [];
     for j=1:numsimu
-        # println("idx:", (i-1)*numsimu+j);
-        # println(OUTPUTS[(i-1)*numsimu+j].fs[1]);
-        rel_loss_array = [rel_loss_array; [(OUTPUTS[(i-1)*numsimu+j].fs'.-prob.fsol)./(OUTPUTS[(i-1)*numsimu+j].fs[1].-prob.fsol)]];
+        output = OUTPUTS[(i-1)*numsimu+j];
+        xout = skipped_errors.*[0:(length(output.fs)-1);];
+        logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+        tmp = [tmp; sum(xout.*logyout)/sum(xout.^2)];
     end
+    betahat = [betahat; tmp];
 
-    maxlength = maximum([length(rel_loss_array[j]) for j=1:numsimu]);
-    tmp = similar(rel_loss_array[1], maxlength, 0);
-    for j=1:numsimu
-        # resize vector Maybe 0 or NA instead of tolerance
-        tmp = hcat(tmp, vcat(rel_loss_array[j], fill(tolerance, maxlength-length(rel_loss_array[j]), 1)));
-    end
-    tmp = mean(tmp, 2);
-    rel_loss_avg = [rel_loss_avg; [tmp]];
+    ## Obtaining the average theta
+    thetahat = sum(atan.(tmp))/numsimu;
+    itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
 end
+println(itercomplex2);
+println(itercomplex);
 
-output = OUTPUTS[1];
-epocsperiters = [OUTPUTS[i].epocsperiter for i=1:numsimu:length(OUTPUTS)];
-lfs = [length(rel_loss_avg[i]) for i=1:length(rel_loss_avg)];
-iterations = lfs.-1;
-datapassbnds = iterations.*epocsperiters;
-x_val = datapassbnds.*([collect(1:lfs[i]) for i=1:length(taulist)])./lfs;
-x_val *= options.skip_error_calculation; # skipping error calculation changes the epochs scale
-
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename);
-fontsmll = 8; fontmed = 12; fontbig = 14;
+## Plotting the simualtions and the fitted lines for a selected tau
+tauidx = 3;
 pyplot()
-p = plot(x_val[1], rel_loss_avg[1],
-        # ylim = (minimum(collect(Iterators.flatten(rel_loss_avg))), 10*maximum(collect(Iterators.flatten(rel_loss_avg))));
-        xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
-        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
-        markersize=6, linewidth=4, marker=:auto, grid=false);
-for i=2:length(taulist)
-    println(i);
-    output = OUTPUTS[1+(i-1)*numsimu];
-    plot!(p, x_val[i], rel_loss_avg[i],
-        xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
-        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
-        markersize=6, linewidth=4, marker=:auto, grid=false)
+output = OUTPUTS[(tauidx-1)*numsimu+1];
+xout = skipped_errors.*[0:(length(output.fs)-1);];
+logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+p = plot(xout, betahat[(tauidx-1)*numsimu+1].*xout, marker=:auto, line=(4,:solid), 
+         xlabel="iterations", ylabel="log(residual)");
+plot!(p, xout, logyout, line=(2,:dash), marker=:auto);
+longetsxout = xout;
+for j=2:numsimu
+    println(j);
+    output = OUTPUTS[(tauidx-1)*numsimu+j];
+    xout = skipped_errors.*[0:(length(output.fs)-1);];
+    logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+    plot!(p, xout, betahat[(tauidx-1)*numsimu+j].*xout, marker=:auto, line=(4,:solid));
+    plot!(p, xout, logyout, line=(2,:dash), marker=:auto);
+    if xout[end] > longetsxout[end]
+        longetsxout = xout
+    end
 end
-display(p)
-savenameempcomplex = string(savenamecomp, "epoc-rel-loss-$(numsimu)-avg");
-savefig("./figures/$(savenameempcomplex).pdf");
+plot!(p, longetsxout, fill(log(tolerance), length(xout)), line=(2,:dot), label="tol");
+display(p);
 
+
+## --------------------- Averaging signals of different lengths ---------------------
+# rel_loss_avg = [];
+# for i=1:length(taulist)
+#     rel_loss_array = [];
+#     for j=1:numsimu
+#         # println("idx:", (i-1)*numsimu+j);
+#         # println(OUTPUTS[(i-1)*numsimu+j].fs[1]);
+#         rel_loss_array = [rel_loss_array; [(OUTPUTS[(i-1)*numsimu+j].fs'.-prob.fsol)./(OUTPUTS[(i-1)*numsimu+j].fs[1].-prob.fsol)]];
+#     end
+
+#     maxlength = maximum([length(rel_loss_array[j]) for j=1:numsimu]);
+#     tmp = similar(rel_loss_array[1], maxlength, 0);
+#     for j=1:numsimu
+#         # resize vector Maybe 0 or NA instead of tolerance
+#         tmp = hcat(tmp, vcat(rel_loss_array[j], fill(tolerance, maxlength-length(rel_loss_array[j]), 1)));
+#     end
+#     tmp = mean(tmp, 2);
+#     rel_loss_avg = [rel_loss_avg; [tmp]];
+# end
+
+# output = OUTPUTS[1];
+# epocsperiters = [OUTPUTS[i].epocsperiter for i=1:numsimu:length(OUTPUTS)];
+# lfs = [length(rel_loss_avg[i]) for i=1:length(rel_loss_avg)];
+# iterations = lfs.-1;
+# datapassbnds = iterations.*epocsperiters;
+# x_val = datapassbnds.*([collect(1:lfs[i]) for i=1:length(taulist)])./lfs;
+# x_val *= options.skip_error_calculation; # skipping error calculation changes the epochs scale
+
+# default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+# savenamecomp = string(savename);
+# fontsmll = 8; fontmed = 12; fontbig = 14;
+# pyplot()
+# p = plot(x_val[1], rel_loss_avg[1],
+#         # ylim = (minimum(collect(Iterators.flatten(rel_loss_avg))), 10*maximum(collect(Iterators.flatten(rel_loss_avg))));
+#         xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
+#         linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+#         markersize=6, linewidth=4, marker=:auto, grid=false); # getting error with "marker=:auto"
+# for i=2:length(taulist)
+#     println(i);
+#     output = OUTPUTS[1+(i-1)*numsimu];
+#     plot!(p, x_val[i], rel_loss_avg[i],
+#         xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
+#         linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+#         markersize=6, linewidth=4, grid=false)
+# end
+# display(p)
+# savenameempcomplex = string(savenamecomp, "epoc-rel-loss-$(numsimu)-avg");
+# savefig("./figures/$(savenameempcomplex).pdf");
+## ------------------------------------------------------------------------------------
 
 ## Computing the empirical complexity
 # itercomplex -= 1; #-> should we remove 1 from itercomplex?
 empcomplex = taulist.*itercomplex # tau times number of iterations
+# empcomplex = taulist.*itercomplex2 # average angle version
 
 # plotly()
 pyplot()
