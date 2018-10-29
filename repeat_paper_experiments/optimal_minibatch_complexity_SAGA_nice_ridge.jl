@@ -13,7 +13,7 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 probname = "lone_eig_val"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 100;
+numdata = 1000;
 numfeatures = 12; # useless for gen_diag_data
 
 println("--- Loading data ---");
@@ -311,8 +311,8 @@ taulist = [1, 10, 50];
 # srand(1234);
 
 tic();
-numsimu = 5; # number of runs of mini-batch SAGA for averaging the empirical complexity
-tolerance = 10.0^(-2); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
+numsimu = 20; # number of runs of mini-batch SAGA for averaging the empirical complexity
+tolerance = 10.0^(-3); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
 skipped_errors = 5;
 options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=100,
                       initial_point="zeros", # fix initial point to zeros for a maybe fairer comparison? -> YES
@@ -377,18 +377,18 @@ for i=1:length(taulist)
     thetahat = sum(atan.(tmp))/numsimu;
     itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
 end
-println(itercomplex2);
-println(itercomplex);
+println("Average angle complexity: ", itercomplex2);
+println("Classical average complexity: ", itercomplex);
 
 ## Plotting the simualtions and the fitted lines for a selected tau
-tauidx = 3;
+tauidx = 1;
 pyplot()
 output = OUTPUTS[(tauidx-1)*numsimu+1];
 xout = skipped_errors.*[0:(length(output.fs)-1);];
 logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
-p = plot(xout, betahat[(tauidx-1)*numsimu+1].*xout, marker=:auto, line=(4,:solid), 
-         xlabel="iterations", ylabel="log(residual)");
-plot!(p, xout, logyout, line=(2,:dash), marker=:auto);
+p = plot(xout, betahat[(tauidx-1)*numsimu+1].*xout, marker=:auto, line=(4,:solid), label="tol",
+         xlabel="iterations", ylabel="log(residual)", title=output.name);
+plot!(p, xout, logyout, line=(2,:dash));
 longetsxout = xout;
 for j=2:numsimu
     println(j);
@@ -396,7 +396,7 @@ for j=2:numsimu
     xout = skipped_errors.*[0:(length(output.fs)-1);];
     logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
     plot!(p, xout, betahat[(tauidx-1)*numsimu+j].*xout, marker=:auto, line=(4,:solid));
-    plot!(p, xout, logyout, line=(2,:dash), marker=:auto);
+    plot!(p, xout, logyout, line=(2,:dash));
     if xout[end] > longetsxout[end]
         longetsxout = xout
     end
