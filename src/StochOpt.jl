@@ -78,6 +78,7 @@ type Prob
     Hess_C2::Function
     lambda::Float64
     #    Hess_vv::Function  # Calculates the Hessian-vector-vector product v'Hv
+    ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method) 
 end
 
 type SAGAmethod
@@ -196,6 +197,7 @@ end
 include("descent_SAGApartition.jl")
 #Including utilities, plotting, data analysis
 include("plot_outputs_Plots.jl")
+include("plot_SAGA_nice_Plots.jl")
 include("get_saved_stepsize.jl");
 include("load_fsol.jl");
 include("../util/matrix_scaling.jl");

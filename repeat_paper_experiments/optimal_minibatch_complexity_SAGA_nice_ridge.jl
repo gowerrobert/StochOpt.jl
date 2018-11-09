@@ -10,24 +10,24 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
-probname = "lone_eig_val"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
+data = "gaussian"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
-numdata = 1000;
+numdata = 12;
 numfeatures = 12; # useless for gen_diag_data
 
 println("--- Loading data ---");
-probnames = ["abalone", "housing"];
+datasets = ["abalone", "housing"];
 #, "letter_scale", "heart", "phishing", "madelon", "a9a",
 # "mushrooms", "phishing", "w8a", "gisette_scale",
-if(probname == "gaussian")
+if(data == "gaussian")
     ## Load artificial data
     X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0, err=0.001);
-elseif(probname == "diagonal")
+elseif(data == "diagonal")
     X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100);
-elseif(probname == "lone_eig_val")
+elseif(data == "lone_eig_val")
     X, y, probname = gen_diag_lone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
-elseif(probname in probnames)
+elseif(data in datasets)
     ## Load truncated LIBSVM data
     X, y = loadDataset(probname);
     # X = X';
@@ -47,12 +47,16 @@ prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none")
 n = prob.numdata;
 d = prob.numfeatures;
 
+### PLOTTING SETTINGS ###
+println("\n--- Ploting upper bounds of the expected smoothness constant ---");
+default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+savenamecomp = string(savename);
+fontsmll = 8; fontmed = 14; fontbig = 14;
 
 ### COMPUTING THE SMOOTHNESS CONSTANTS ###
 # Compute the smoothness constants L, L_max, \cL, \bar{L}
 datathreshold = 24;
 if(n > datathreshold) # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
-    println("The number of data is to large to compute the expected smoothness constant exactly");
     computeexpsmooth = false;
 else
     computeexpsmooth = true;
@@ -67,8 +71,8 @@ Li_s = get_Li(prob);
 Lmax = maximum(Li_s);
 Lbar = mean(Li_s);
 
-
 ############################################ THEORETICAL COMPLEXITIES ############################################
+#region
 
 #===
 ### CREATING THE MINI-BATCH SIZE SEQUENCE ###
@@ -91,20 +95,19 @@ end
 println("\n--- Mini-batch sequence ---");
 println(tauseq);
 
-
 ### COMPUTE SAGA-NICE THEORETIDCAL COMPLEXITIES ###
 println("\n--- Compute SAGA-nice theoretical complexities (iteration and total) ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename,"-complexities-nidham");
+savenamecompperso = string(savename,"-complexities-nidham");
 itercomp = 0.0; Lsides = 0.0; Rsides = 0.0;
 try
-    itercomp, Lsides, Rsides = load("$(default_path)$(savenamecomp).jld", "itercomp", "Lsides", "Rsides");
-    println("found ", "$(default_path)$(savenamecomp).jld with itercomp\n", itercomp);
+    itercomp, Lsides, Rsides = load("$(default_path)$(savenamecompperso).jld", "itercomp", "Lsides", "Rsides");
+    println("found ", "$(default_path)$(savenamecompperso).jld with itercomp\n", itercomp);
 catch loaderror   # Calculate iteration complexity for all minibatchsizes
     println(loaderror);
     itercomp, Lsides, Rsides = calculate_complex_SAGA_nice(prob, options, tauseq);
     # L = eigmax(prob.X*prob.X')/prob.numdata+prob.lambda;
-    # save("$(default_path)$(savenamecomp).jld", "itercomp", itercomp, "Lsides", Lsides, "Rsides", Rsides);
+    # save("$(default_path)$(savenamecompperso).jld", "itercomp", itercomp, "Lsides", Lsides, "Rsides", Rsides);
 end
 
 println("Mini-batch size sequence:\n", tauseq)
@@ -122,161 +125,70 @@ plot(tauseq, [totcomp itercomp'], label=["total complex" "iter complex"],
     guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,
     grid=false, ylim=(0, maximum(totcomp)+minimum(itercomp)), xticks=tauseq)
    ylim=(minimum(itercomp), maximum(totcomp)+minimum(itercomp))
-# savefig("./figures/$(savenamecomp).pdf");
+# savefig("./figures/$(savenamecompperso).pdf");
 
 # Comparing only the iteration complexities
 ## WARNING: Lsides is not exactly the expected smoothness cosntant but 4*\cL/mu !!
 plot(tauseq, Lsides', ylabel="expected smoothness", xlabel="batchsize", tickfont=font(fontsmll),
     guidefont=font(fontbig), markersize=6, linewidth=4, marker=:auto, grid=false, legend=false,
     xticks=tauseq)
-savenameexpsmooth = string(savenamecomp, "-expsmooth");
+savenameexpsmooth = string(savenamecompperso, "-expsmooth");
 # savefig("./figures/$(savenameexpsmooth).pdf");
 ===#
-
+#endregion
 ##################################################################################################################
 
-
-################################################ EMPIRICAL BOUNDS ################################################
-
-### COMPUTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
-if(computeexpsmooth)
-    expsmoothcst = zeros(n, 1);
-end
-simplebound = zeros(n, 1);
-heuristicbound = zeros(n, 1);
-concentrationbound = zeros(n, 1);
-for tau = 1:n
-    print("Calculating bounds for tau = ", tau, "\n");
-    if(computeexpsmooth)
-        tic();
-        expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
-    end
-    leftcoeff = (n*(tau-1))/(tau*(n-1));
-    rightcoeff = (n-tau)/(tau*(n-1));
-    simplebound[tau] = leftcoeff*Lbar + rightcoeff*Lmax;
-    heuristicbound[tau] = leftcoeff*L + rightcoeff*Lmax;
-    concentrationbound[tau] = ((2*n*(tau-1))/(tau*(n-1)))*L + (1/tau)*(((n-tau)/(n-1)) + (4*log(d))/3)*Lmax;
-    concentrationbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax;
-    if(computeexpsmooth) toc(); end
-end
+########################### EMPIRICAL UPPER BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###########################
+#region
+### COMPUTING THE BOUNDS
+simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
 
 ### PLOTING ###
-println("\n--- Ploting upper bounds of the expected smoothness constant ---");
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename);
-fontsmll = 8; fontmed = 14; fontbig = 14;
-# plotly()
-pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
-if(computeexpsmooth)
-    plot(1:n, [heuristicbound simplebound concentrationbound expsmoothcst], label=["heuristic" "simple" "concentration" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n,
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
-    ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(expsmoothcst)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-else
-    plot(1:n, [heuristicbound simplebound concentrationbound], label=["heuristic" "simple" "concentration"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant",tickfont=font(fontsmll), # xticks=1:n,
-    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,
-    ylim=(0, max(maximum(simplebound),maximum(concentrationbound),maximum(heuristicbound))+minimum(heuristicbound)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-end
-savenameexpsmooth = string(savenamecomp, "-expsmoothbounds");
-savefig("./figures/$(savenameexpsmooth).pdf");
-
-# Zoom
-if(computeexpsmooth)
-    plot(1:n, [heuristicbound simplebound concentrationbound expsmoothcst], label=["heuristic" "simple" "concentration" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
-    ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
-else
-    plot(1:n, [heuristicbound simplebound concentrationbound], label=["heuristic" "simple" "concentration"],
-    linestyle=:auto, xlabel="batchsize", ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
-    guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
-    # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
-    ylim=(0.85*minimum(heuristicbound), 1.5*minimum(heuristicbound)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)," zoom"))
-end
-savenameexpsmoothzoom = string(savenameexpsmooth, "-zoom");
-savefig("./figures/$(savenameexpsmoothzoom).pdf");
+pyplot()
+plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
 # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
 # heuristicbound .== expsmoothcst
 # heuristicbound .> expsmoothcst
 # simplebound[end] - heuristicbound[end]
-# concentrationbound[end] - simplebound[end]
+# bernsteinbound[end] - simplebound[end]
+#endregion
+##################################################################################################################
 
-######################################## EMPIRICAL BOUNDS OF THE STEPSIZES #######################################
+##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
 
-#TO BE DONE : need to implement line-search (does is make sense for SGD?) to see how the computed stepsizes are far from our lower bounds
+# TO BE DONE: implement grid-search for the stepsizes, i.e.
+# 1) set a grid of stepsizes around 1/(4Lmax)
+# 2) run several SAGA_nice on the same problem with different stepsize (average?)
+# 3) pick the 'best' stepsize
 
 ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
-rho = ((n-(1:n) )./((1:n).*(n-1)));
-rightterm = (rho/n)*Lmax + (mu*n)/(4*(1:n)); # Right-hand side term in the max
-if(computeexpsmooth)
-    truestepsize = (1/4).*(1./max.(expsmoothcst, rightterm));
-end
-simplestepsize = (1/4).* (1./max.(simplebound, rightterm));
-concentrationstepsize = (1/4).* (1./max.(concentrationbound, rightterm));
-heuristicstepsize = (1/4).* (1./max.(heuristicbound, rightterm));
+simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
 ### PLOTING ###
 println("\n--- Ploting stepsizes ---");
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename);
-# plotly()
-pyplot()
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
-if(computeexpsmooth)
-    plot(1:n, [heuristicstepsize simplestepsize concentrationstepsize truestepsize], label=["heuristic" "simple" "concentration" "true"],
-    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
-    ylim=(0, maximum(truestepsize)+minimum(concentrationstepsize)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-else
-    plot(1:n, [heuristicstepsize simplestepsize concentrationstepsize], label=["heuristic" "simple" "concentration"],
-    linestyle=:auto, xlabel="batchsize", ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto,
-    ylim=(0, maximum(heuristicstepsize)+minimum(concentrationstepsize)),
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-end
-savenamestepsize = string(savenamecomp, "-stepsizes");
-savefig("./figures/$(savenamestepsize).pdf");
+pyplot()
+plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize)
 
-## Empirical stepsizes returned by optimal mini-batch SAGA with line searchs
-# WORK IN PROGRESS
 
 ##################################################################################################################
 
 ## Compute optimal tau
-tautheory = round(Int, 1 + (mu*(n-1))/(4*Lbar)) # One should not add again lambda since it is already taken into account in Lbar
-tauheuristic = round(Int, 1 + (mu*(n-1))/(4*L))
+tautheory = round(Int, 1 + (mu*(n-1))/(4*Lbar)); # One should not add again lambda since it is already taken into account in Lbar
+tauheuristic = round(Int, 1 + (mu*(n-1))/(4*L));
 
-println("\nPROBLEM DIMENSIONS:");
-println("   Number of datapoints", n); # n in the paper notation
-println("   Number of features", d); # d in the paper notation
-
-println("\nSMOOTHNESS CONSTANTS:");
-println("   Lmax : ", Lmax);
-println("   L : ", L);
-# println("Li_s : ", Li_s);
-println("   Lbar : ", Lbar);
-# sleep(3);
-
-println("\nTheoretical optimal tau = ", tautheory);
-println("Heuristic optimal tau = ", tauheuristic);
-
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename);
 savenamecst = string(savenamecomp, "-constants");
+## TO ADD: if data is generated then DO NOT SAVE the expected smoothness constant because it depends on the seed
 if(computeexpsmooth)
-    save("./figures/$(savenamecst)-with-true-expected-smoothness-cst.jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
-        "tautheory", tautheory, "tauheuristic", tauheuristic, "expsmoothcst", expsmoothcst);
+    save("./data/$(savenamecst)-with-true-expected-smoothness-cst.jld", "n", n, "d", d, "mu", mu,
+         "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,  "expsmoothcst", expsmoothcst,
+         "tautheory", tautheory, "tauheuristic", tauheuristic);
 else
-    save("./figures/$(savenamecst).jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s);
+    save("./data/$(savenamecst).jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s);
 end
+
 
 ######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
 
@@ -311,10 +223,10 @@ taulist = [1, 10, 50];
 # srand(1234);
 
 tic();
-numsimu = 20; # number of runs of mini-batch SAGA for averaging the empirical complexity
+numsimu = 4; # number of runs of mini-batch SAGA for averaging the empirical complexity
 tolerance = 10.0^(-3); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
-skipped_errors = 5;
-options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=100,
+skipped_errors = 50; # One could set it inside the loop skipped_errors = skipped_errors_base/tau
+options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=10000,
                       initial_point="zeros", # fix initial point to zeros for a maybe fairer comparison? -> YES
                 #   repeat_stepsize_calculation=true,
                       skip_error_calculation=skipped_errors,
@@ -364,44 +276,57 @@ for i=1:length(taulist)
     println("Tau: ", taulist[i]);
     ## Fitting a line without the intercept term with OLS
     ## https://en.wikipedia.org/wiki/Simple_linear_regression#Simple_linear_regression_without_the_intercept_term_(single_regressor)
-    tmp = [];
+    slope = [];
     for j=1:numsimu
         output = OUTPUTS[(i-1)*numsimu+j];
         xout = skipped_errors.*[0:(length(output.fs)-1);];
         logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
-        tmp = [tmp; sum(xout.*logyout)/sum(xout.^2)];
+        slope = [slope; sum(xout.*logyout)/sum(xout.^2)];
     end
-    betahat = [betahat; tmp];
+    ## Storring the average multiplicative coefficient (slope)
+    betahat = [betahat; slope];
 
-    ## Obtaining the average theta
-    thetahat = sum(atan.(tmp))/numsimu;
+    ## Obtaining the average theta (theta_i = tan(slope_i))
+    thetahat = sum(atan.(slope))/numsimu;
     itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
 end
+itercomplex2 = reshape(itercomplex2, (length(taulist), 1) );
 println("Average angle complexity: ", itercomplex2);
 println("Classical average complexity: ", itercomplex);
 
+############################### VISUALIZATION OF THE SIMULATIONS AND THEIR FITTING CURVES ###############################
 ## Plotting the simualtions and the fitted lines for a selected tau
 tauidx = 1;
+## FindinLongest simulation x-axis
+longetsxout = [0];
+for j=1:numsimu
+    output = OUTPUTS[(tauidx-1)*numsimu+j];
+    xout = skipped_errors.*[0:(length(output.fs)-1);];
+    if xout[end] > longetsxout[end]
+        longetsxout = xout
+    end
+end
 pyplot()
 output = OUTPUTS[(tauidx-1)*numsimu+1];
 xout = skipped_errors.*[0:(length(output.fs)-1);];
 logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
-p = plot(xout, betahat[(tauidx-1)*numsimu+1].*xout, marker=:auto, line=(4,:solid), label="tol",
-         xlabel="iterations", ylabel="log(residual)", title=output.name);
-plot!(p, xout, logyout, line=(2,:dash));
-longetsxout = xout;
+colorlist = distinguishable_colors(10);
+p = plot(xout, logyout, line=(2,:dash), label="simu #1", c=colorlist[1], legend=:topright);
+plot!(p, longetsxout, betahat[(tauidx-1)*numsimu+1].*longetsxout, line=(4,:solid), c=colorlist[1],
+      label="lin approx #1", xlabel="iterations", ylabel="log(residual)", title=output.name);
 for j=2:numsimu
     println(j);
     output = OUTPUTS[(tauidx-1)*numsimu+j];
     xout = skipped_errors.*[0:(length(output.fs)-1);];
     logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
-    plot!(p, xout, betahat[(tauidx-1)*numsimu+j].*xout, marker=:auto, line=(4,:solid));
-    plot!(p, xout, logyout, line=(2,:dash));
-    if xout[end] > longetsxout[end]
-        longetsxout = xout
-    end
+    ## Plotting the SAGA-nice simulation
+    plot!(p, xout, logyout, line=(2,:dash), c=colorlist[j], label=string("simu #", j));
+    ## Plotting the corresponding fitted line
+    plot!(p, longetsxout, betahat[(tauidx-1)*numsimu+j].*longetsxout, line=(4,:solid), c=colorlist[j], #marker=:auto, 
+          label=string("lin approx #", j));
 end
-plot!(p, longetsxout, fill(log(tolerance), length(xout)), line=(2,:dot), label="tol");
+plot!(p, longetsxout, fill(log(tolerance), length(xout)), line=(2,:dot), c=:black, label="tol");
+xlims!((0, 1.4*longetsxout[end]))
 display(p);
 
 
@@ -433,9 +358,6 @@ display(p);
 # x_val = datapassbnds.*([collect(1:lfs[i]) for i=1:length(taulist)])./lfs;
 # x_val *= options.skip_error_calculation; # skipping error calculation changes the epochs scale
 
-# default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-# savenamecomp = string(savename);
-# fontsmll = 8; fontmed = 12; fontbig = 14;
 # pyplot()
 # p = plot(x_val[1], rel_loss_avg[1],
 #         # ylim = (minimum(collect(Iterators.flatten(rel_loss_avg))), 10*maximum(collect(Iterators.flatten(rel_loss_avg))));
@@ -457,8 +379,8 @@ display(p);
 
 ## Computing the empirical complexity
 # itercomplex -= 1; #-> should we remove 1 from itercomplex?
-empcomplex = taulist.*itercomplex # tau times number of iterations
-# empcomplex = taulist.*itercomplex2 # average angle version
+# empcomplex = taulist.*itercomplex # tau times number of iterations
+empcomplex = taulist.*itercomplex2 # average angle version
 
 # plotly()
 pyplot()
@@ -470,7 +392,6 @@ plot(taulist, empcomplex, linestyle=:solid, xlabel="batchsize", ylabel="empirica
     # xticks=(taulist, ["1\n= tau_theory" "2" "3" "4" "n"]),
     legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
     title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-    savenamecomp = string(savename);
 savenameempcomplex = string(savenamecomp, "-empcomplex-$(numsimu)-avg");
 savefig("./figures/$(savenameempcomplex).pdf");
 fails

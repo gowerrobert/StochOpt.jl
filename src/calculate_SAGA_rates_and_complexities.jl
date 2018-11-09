@@ -129,3 +129,125 @@ end
 # Sampling with replacement
 # \frac{4}{\mu}\max \left\{ \overline{L}_{\cal G}, \,
 # \frac{n-\tau+1}{n\tau}L_{\max}    +\frac{\mu}{4} \frac{n}{\tau}\right\}.
+
+
+"""
+    get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24)
+
+Compute two upper-bounds of the expected smoothness constant (simple and Bernstein), 
+a heuristic estimation of it and its exact value (if there are few data points) for each mini-batch size ``τ`` from 1 to n.
+
+#INPUTS:\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
+    - **Int64** datathreshold: number of data below which exact smoothness constant is computed\\
+#OUTPUTS:\\
+    - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
+    - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
+    - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
+    - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant\\
+"""
+function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
+    n = prob.numdata;
+    d = prob.numfeatures;
+    
+    if(n <= datathreshold)
+        computeexpsmooth = true;
+        expsmoothcst = zeros(n, 1);
+    else # if n is too large we do not compute the exact expected smoothness constant
+        computeexpsmooth = false;
+        expsmoothcst = nothing; # equivalent of "None"
+        println("The number of data is to large to compute the exact expected smoothness constant");
+    end
+
+    ### COMPUTING DIVERSE SMOOTHNESS CONSTANTS ###
+    L = get_LC(prob, collect(1:n)); # WARNING: it should not be recomputed every time
+    Li_s = get_Li(prob);
+    Lmax = maximum(Li_s);
+    Lbar = mean(Li_s);
+
+    ### COMPUTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
+    simplebound = zeros(n, 1);
+    heuristicbound = zeros(n, 1);
+    bernsteinbound = zeros(n, 1);
+    for tau = 1:n
+        print("Calculating bounds for tau = ", tau, "\n");
+        if(n <= datathreshold)
+            expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
+        end
+        leftcoeff = (n*(tau-1))/(tau*(n-1));
+        rightcoeff = (n-tau)/(tau*(n-1));
+        simplebound[tau] = leftcoeff*Lbar + rightcoeff*Lmax;
+        heuristicbound[tau] = leftcoeff*L + rightcoeff*Lmax;
+        bernsteinbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax;
+    end
+
+    return simplebound, bernsteinbound, heuristicbound, expsmoothcst
+end
+
+"""
+    get_stepsize_bounds(prob::Prob, datathreshold::Int64=24)
+
+Compute upper bounds of the stepsize based on the simple bound, the Bernstein bound, our heuristic 
+and the exact expected smoothness constant for each mini-batch size ``τ`` from 1 to n.
+
+#INPUTS:\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
+    - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
+    - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
+    - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
+    - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant\\
+#OUTPUTS:\\
+    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to the simple upper bound\\
+    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to the Bernstein upper bound\\
+    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to the heuristic\\
+    - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact stepsize corresponding to the exact expected smoothness constant\\
+"""
+function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst)
+    n = prob.numdata;
+    mu = get_mu_str_conv(prob); # WARNING: this should not be recomputed every time
+    Li_s = get_Li(prob);
+    Lmax = maximum(Li_s);
+
+    rho_over_n = ( n - (1:n) ) ./ ( (1:n).*(n-1) ); # Sketch residual divided by n
+    rightterm = rho_over_n*Lmax + (mu*n)/(4*(1:n)); # Right-hand side term in the max
+    println("rightterm = ", rightterm);
+    if typeof(expsmoothcst)==Array{Float64,2}
+        expsmoothstepsize = 0.25 .* (1 ./ max.(expsmoothcst, rightterm) );
+    else
+        expsmoothstepsize = nothing;
+    end
+    simplestepsize = 0.25 .* (1 ./ max.(simplebound, rightterm) );
+    bernsteinstepsize = 0.25 .* (1 ./ max.(bernsteinbound, rightterm) );
+    heuristicstepsize = 0.25 .* (1 ./ max.(heuristicbound, rightterm) );
+
+    return simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize
+end
+
+# """
+#     save_SAGA_nice_constants()
+
+# Save upper bounds of the expected smoothness constant, 
+
+# #INPUTS:\\
+#     - 
+# #OUTPUTS:\\
+#     - 
+# """
+# function save_SAGA_nice_constants(prob, data, n, d, mu, L, Lmax, Lbar, Li_s, expsmoothcst, tautheory, tauheuristic)
+#     probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+#     default_path = "./data/";
+
+#     savename = "-constants";
+
+#     if data in ["gaussian", "diagonal", "lone_eig_val"]
+#         savename = string(savename, "-srand_1")
+#     end
+
+#     if typeof(expsmoothcst)==Array{Float64,2}
+#         save("$(default_path)$(savename).jld", "n", n, "d", d, "mu", mu,
+#              "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,  "expsmoothcst", expsmoothcst,
+#              "tautheory", tautheory, "tauheuristic", tauheuristic);
+#     else
+#         save("$(default_path)$(savename).jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s);
+#     end
+# end

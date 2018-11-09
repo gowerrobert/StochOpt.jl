@@ -9,7 +9,7 @@ Compute the descent direction (d)
     - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
     - **MyOptions** options: different options such as the mini-batch size, the stepsize_multiplier... (see src/StochOpt.jl)\\
     - **SAGA_nice_method** sg: method of SAGA for ``τ``--nice sampling\\
-    - **::Int64** iter: current iteration, _useless for SAGA nice_\\
+    - **Int64** iter: current iteration, _useless for SAGA nice_\\
     - **Array{Float64}** d: descent direction\\
 #OUTPUTS:\\
     - NONE
