@@ -135,10 +135,12 @@ end
     get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24)
 
 Compute two upper-bounds of the expected smoothness constant (simple and Bernstein), 
-a heuristic estimation of it and its exact value (if there are few data points) for each mini-batch size ``τ`` from 1 to n.
+a heuristic estimation of it and its exact value (if there are few data points) for 
+each mini-batch size ``τ`` from 1 to n.
 
 #INPUTS:\\
-    - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
+      (see src/StochOpt.jl)\\
     - **Int64** datathreshold: number of data below which exact smoothness constant is computed\\
 #OUTPUTS:\\
     - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
@@ -187,22 +189,30 @@ end
 """
     get_stepsize_bounds(prob::Prob, datathreshold::Int64=24)
 
-Compute upper bounds of the stepsize based on the simple bound, the Bernstein bound, our heuristic 
-and the exact expected smoothness constant for each mini-batch size ``τ`` from 1 to n.
+Compute upper bounds of the stepsize based on the simple bound, the Bernstein bound, 
+our heuristic and the exact expected smoothness constant for each mini-batch size 
+``τ`` from 1 to n.
 
 #INPUTS:\\
-    - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression... 
+      (see src/StochOpt.jl)\\
     - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
     - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
     - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant\\
 #OUTPUTS:\\
-    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to the simple upper bound\\
-    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to the Bernstein upper bound\\
-    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to the heuristic\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact stepsize corresponding to the exact expected smoothness constant\\
+    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to 
+      the simple upper bound\\
+    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to 
+      the Bernstein upper bound\\
+    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to 
+      the heuristic\\
+    - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact stepsize corresponding to 
+      the exact expected smoothness constant\\
 """
-function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst)
+function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64}, 
+                             bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, 
+                             expsmoothcst)
     n = prob.numdata;
     mu = get_mu_str_conv(prob); # WARNING: this should not be recomputed every time
     Li_s = get_Li(prob);
@@ -223,31 +233,73 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinb
     return simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize
 end
 
-# """
-#     save_SAGA_nice_constants()
+"""
+    save_SAGA_nice_constants(prob::Prob, data::String, 
+                             simplebound::Array{Float64}, bernsteinbound::Array{Float64}, 
+                             heuristicbound::Array{Float64}, expsmoothcst, 
+                             simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, 
+                             heuristicstepsize::Array{Float64}, expsmoothstepsize,
+                             opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64, 
+                             opt_minibatch_heuristic::Int64, opt_minibatch_exact::Int64)
 
-# Save upper bounds of the expected smoothness constant, 
+Saves the problem, caracteristic constants of the problem, the upper bounds of the expected 
+smoothness constant, and corresponding estimation of the optimal mini-batch size. 
+It also saves the exact expected smoothness constant and its corresponding 
+optimal mini-batch size (both are of type Void if not available).
 
-# #INPUTS:\\
-#     - 
-# #OUTPUTS:\\
-#     - 
-# """
-# function save_SAGA_nice_constants(prob, data, n, d, mu, L, Lmax, Lbar, Li_s, expsmoothcst, tautheory, tauheuristic)
-#     probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-#     default_path = "./data/";
+#INPUTS:\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression... 
+      (see src/StochOpt.jl)\\
+    - String data: selected data (artificially generated or dataset)\\
+    - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
+    - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
+    - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
+    - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant\\
+    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to 
+      the simple upper bound\\
+    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to 
+      the Bernstein upper bound\\
+    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to 
+      the heuristic\\
+    - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact stepsize corresponding to 
+      the exact expected smoothness constant\\
+#OUTPUTS:\\
+    - None
+"""
+function save_SAGA_nice_constants(prob::Prob, data::String, 
+                                  simplebound::Array{Float64}, bernsteinbound::Array{Float64}, 
+                                  heuristicbound::Array{Float64}, expsmoothcst, 
+                                  simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, 
+                                  heuristicstepsize::Array{Float64}, expsmoothstepsize,
+                                  opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64, 
+                                  opt_minibatch_heuristic::Int64, opt_minibatch_exact::Int64)
+    probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+    default_path = "./data/";
+    savename = "-cst";
 
-#     savename = "-constants";
+    n = prob.numdata;
+    d = prob.numfeatures;    
 
-#     if data in ["gaussian", "diagonal", "lone_eig_val"]
-#         savename = string(savename, "-srand_1")
-#     end
+    ## WARNING: this should not be recomputed every time
+    mu = get_mu_str_conv(prob); 
+    L = get_LC(prob, collect(1:n));
+    Li_s = get_Li(prob);
+    Lmax = maximum(Li_s);
+    Lbar = mean(Li_s);
 
-#     if typeof(expsmoothcst)==Array{Float64,2}
-#         save("$(default_path)$(savename).jld", "n", n, "d", d, "mu", mu,
-#              "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,  "expsmoothcst", expsmoothcst,
-#              "tautheory", tautheory, "tauheuristic", tauheuristic);
-#     else
-#         save("$(default_path)$(savename).jld", "n", n, "d", d, "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s);
-#     end
-# end
+    ## Saving the seed used to generate data
+    if data in ["gaussian", "diagonal", "lone_eig_val"]
+        currentseed = Base.Random.GLOBAL_RNG.seed[1];
+        savename = string(savename, "-seed_", currentseed);
+    end
+
+    ## Saving the problem and the related constants
+    save("$(default_path)$(probname)$(savename).jld", 
+         "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
+         "simplebound", simplebound, "bernsteinbound", bernsteinbound, 
+         "heuristicbound", heuristicbound, "expsmoothcst", expsmoothcst, 
+         "simplestepsize", simplestepsize, "bernsteinstepsize", bernsteinstepsize, 
+         "heuristicstepsize", heuristicstepsize, "expsmoothstepsize", expsmoothstepsize,
+         "opt_minibatch_simple", opt_minibatch_simple, "opt_minibatch_bernstein", opt_minibatch_bernstein, 
+         "opt_minibatch_heuristic", opt_minibatch_heuristic, "opt_minibatch_exact", opt_minibatch_exact);
+end
