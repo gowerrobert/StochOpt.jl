@@ -303,3 +303,76 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
          "opt_minibatch_simple", opt_minibatch_simple, "opt_minibatch_bernstein", opt_minibatch_bernstein, 
          "opt_minibatch_heuristic", opt_minibatch_heuristic, "opt_minibatch_exact", opt_minibatch_exact);
 end
+
+"""
+    simulate_SAGA_nice(prob, minibatchlist, numsimu=1, 
+                       tolerance=10.0^(-3), skipped_errors=1,
+                       max_iter=10^8, max_time=10000.0, max_epochs=10000)
+
+Runs several times (numsimu) mini-batch SAGA with nice sampling for each
+mini-batch size in the give list (minibatchlist) in order to evaluate the
+correpsonding average iteration complexity.
+
+#INPUTS:\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
+    - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
+    - **Int64** numsimu: number of runs of mini-batch SAGA\\
+    - **Float64** tolerance: relative error convergence threshold, at last iteration we have (f(x)-fsol)/(f0-fsol) < epsilon\\
+    - **Int64** skipped_errors: number iterations between two evaluations of the error\\
+    - **Int64** max_iter: maximum number of iterations\\
+    - **Float64** max_time: maximum run time\\
+    - **Int64** max_epochs: maximum number of epochs\\
+#OUTPUTS:\\
+    - OUTPUTS: output of each run, size length(minibatchlist)*numsimu\\
+    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
+"""
+function simulate_SAGA_nice(prob, minibatchlist, numsimu ;
+                            tolerance=10.0^(-3), skipped_errors=1,
+                            max_iter=10^8, max_time=3600.0, max_epochs=100)
+    ## Remarks
+    ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/tau
+    
+    probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+    default_path = "./data/";
+
+    options = set_options(tol=tolerance, max_iter=max_iter, max_time=max_time, max_epocs=max_epochs,
+                          initial_point="zeros", # is fixed not to add more randomness
+                    #   repeat_stepsize_calculation=true,
+                          skip_error_calculation=skipped_errors,
+                          force_continue=false); # force continue if diverging or if tolerance reached
+    itercomplex = zeros(length(minibatchlist), 1); # List of saved outputs
+    OUTPUTS = [];
+    # fail = true;
+    for idxtau in 1:length(minibatchlist) # 1:n
+        tau = minibatchlist[idxtau];
+        println("\nCurrent mini-batch size: ", tau);
+        options.batchsize = tau;
+        for i=1:numsimu
+            println("----- Simulation #", i, " -----");
+            # sg = initiate_SAGA(prob, options, minibatch_type="nice"); # Old and diverging implementation
+            sg = initiate_SAGA_nice(prob, options); # new separated implementation
+            # println("STEPSIZE OF sg: ", sg.stepsize);
+            output = minimizeFunc(prob, sg, options);
+            println("Output fail = ", output.fail, "\n");
+            # fail = !(output.fail == "tol-reached");
+            # while(fail)
+            #     println("ENTERING THE WHILE LOOP")
+            #     sg = initiate_SAGA(prob, options, minibatch_type="nice");
+            #     output = minimizeFunc(prob, sg, options);
+            #     println("Output fail = ", output.fail);
+            #     fail = !(output.fail == "tol-reached");
+            # end
+            itercomplex[idxtau] += output.iterations;
+            output.name = string("\\tau=", tau); # Tiny modification for smaller legend name / Latex symbols in strings
+            OUTPUTS = [OUTPUTS; output]; # Array{Any,1} or Array{Output,1}?
+        end
+    end
+    itercomplex = itercomplex ./ numsimu; # simply averaging the last iteration number
+    itercomplex = itercomplex[:];
+
+    ## Saving the result of the simulations
+    savename = "-empcomplex-$(numsimu)-avg";
+    save("$(default_path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS);
+
+    return OUTPUTS, itercomplex
+end
