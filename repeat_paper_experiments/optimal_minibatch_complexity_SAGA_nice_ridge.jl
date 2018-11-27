@@ -63,42 +63,45 @@ Li_s = get_Li(prob);
 Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
 Lbar = mean(Li_s);
 
-########################### EMPIRICAL UPPER BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###########################
-#region
-### COMPUTING THE BOUNDS
-simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
 
-### PLOTING ###
-println("\n--- Ploting upper bounds ---");
-# PROBLEM: there is still a problem of ticking non integer on the xaxis
-pyplot()
-plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+# ########################### EMPIRICAL UPPER BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###########################
+# #region
+# ### COMPUTING THE BOUNDS
+# simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
 
-# heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
-# heuristicbound .== expsmoothcst
-# heuristicbound .> expsmoothcst
-# simplebound[end] - heuristicbound[end]
-# bernsteinbound[end] - simplebound[end]
-#endregion
-##################################################################################################################
+# ### PLOTING ###
+# println("\n--- Ploting upper bounds ---");
+# # PROBLEM: there is still a problem of ticking non integer on the xaxis
+# pyplot()
+# plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
-#region
-# TO BE DONE: implement grid-search for the stepsizes, i.e.
-# 1) set a grid of stepsizes around 1/(4Lmax)
-# 2) run several SAGA_nice on the same problem with different stepsize (average?)
-# 3) pick the 'best' stepsize
+# # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
+# # heuristicbound .== expsmoothcst
+# # heuristicbound .> expsmoothcst
+# # simplebound[end] - heuristicbound[end]
+# # bernsteinbound[end] - simplebound[end]
+# #endregion
+# ##################################################################################################################
 
-### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
-simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-### PLOTING ###
-println("\n--- Ploting stepsizes ---");
-# PROBLEM: there is still a problem of ticking non integer on the xaxis
-pyplot()
-plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
-#endregion
-##################################################################################################################
+# ##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
+# #region
+# # TO BE DONE: implement grid-search for the stepsizes, i.e.
+# # 1) set a grid of stepsizes around 1/(4Lmax)
+# # 2) run several SAGA_nice on the same problem with different stepsize (average?)
+# # 3) pick the 'best' stepsize
+
+# ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
+# simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+
+# ### PLOTING ###
+# println("\n--- Ploting stepsizes ---");
+# # PROBLEM: there is still a problem of ticking non integer on the xaxis
+# pyplot()
+# plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
+# #endregion
+# ##################################################################################################################
+
 
 ###################################### THEORETICAL OPTIMAL MINI-BATCH SIZES ######################################
 #region
@@ -118,26 +121,28 @@ opt_minibatch_heuristic = round(Int, 1 + (mu*(n-1))/(4*L));
 #endregion
 ##################################################################################################################
 
-########################################### SAVNG RESULTS ########################################################
-save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
-                         simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
-                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
-                         opt_minibatch_exact);
-##################################################################################################################
+
+# ########################################### SAVNG RESULTS ########################################################
+# save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
+#                          simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
+#                          opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
+#                          opt_minibatch_exact);
+# ##################################################################################################################
+
 
 ######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
 ## Empirical stepsizes returned by optimal mini-batch SAGa with line searchs
-if(n <= datathreshold)
-    minibatchlist = 1:n;
-elseif(opt_minibatch_simple>2)
-    minibatchlist = [1; opt_minibatch_simple; opt_minibatch_heuristic; round(Int, (opt_minibatch_simple+n)/2); round(Int, sqrt(n)); n]#[collect(1:(opt_minibatch_simple+1)); n];
-else
-    minibatchlist = [collect(1:(opt_minibatch_heuristic+1)); round(Int, sqrt(n)); n];
-end
+# if(n <= datathreshold)
+#     minibatchlist = 1:n;
+# elseif(opt_minibatch_simple>2)
+#     minibatchlist = [1; opt_minibatch_simple; opt_minibatch_heuristic; round(Int, (opt_minibatch_simple+n)/2); round(Int, sqrt(n)); n]#[collect(1:(opt_minibatch_simple+1)); n];
+# else
+#     minibatchlist = [collect(1:(opt_minibatch_heuristic+1)); round(Int, sqrt(n)); n];
+# end
 
 ## For abalone dataset
-# minibatchlist = [collect(1:5); 50; 100];
-# minibatchlist = 1:8;
+# minibatchlist = [collect(1:10); 50; 100];
+# minibatchlist = collect(1:8);
 
 ## For n=24
 # minibatchlist = [collect(1:6); 12; 24];
@@ -145,56 +150,32 @@ end
 ## For n=5000
 # minibatchlist = [1; 5; 10; 50; 100; 200; 1000; 5000];
 
+## For n=500
+minibatchlist = collect(1:10);
+
 # minibatchlist = [1];
 # minibatchlist = [1, 10, 50];
 # minibatchlist = [50, 10, 1];
 
-minibatchlist = [1, 5];
+# minibatchlist = [1, 5];
 # minibatchlist = [5, 1];
 # minibatchlist = 5:-1:1;
 # minibatchlist = [1];
 
+
 # srand(1234);
 
+numsimu = 20; # number of runs of mini-batch SAGA for averaging the empirical complexity
+
 tic();
-numsimu = 5; # number of runs of mini-batch SAGA for averaging the empirical complexity
-tolerance = 10.0^(-3); # epsilon for which: (f(x)-fsol)/(f0-fsol) < epsilon
-skipped_errors = 1; # One could set it inside the loop skipped_errors = skipped_errors_base/tau
-options = set_options(tol=tolerance, max_iter=10^8, max_time=10000.0, max_epocs=10000,
-                      initial_point="zeros", # fix initial point to zeros for a maybe fairer comparison? -> YES
-                #   repeat_stepsize_calculation=true,
-                      skip_error_calculation=skipped_errors,
-                      force_continue=false); # force continue if diverging or if tolerance reached
-itercomplex = zeros(length(minibatchlist), 1); # List of saved outputs
-OUTPUTS = [];
-# fail = true;
-for idxtau in 1:length(minibatchlist) # 1:n
-    tau = minibatchlist[idxtau];
-    println("\nCurrent mini-batch size: ", tau);
-    options.batchsize = tau;
-    for i=1:numsimu
-        println("----- Simulation #", i, " -----");
-        # sg = initiate_SAGA(prob, options, minibatch_type="nice"); # Old and diverging implementation
-        sg = initiate_SAGA_nice(prob, options); # new separated implementation
-        # println("STEPSIZE OF sg: ", sg.stepsize);
-        output = minimizeFunc(prob, sg, options);
-        println("Output fail = ", output.fail, "\n");
-        # fail = !(output.fail == "tol-reached");
-        # while(fail)
-        #     println("ENTERING THE WHILE LOOP")
-        #     sg = initiate_SAGA(prob, options, minibatch_type="nice");
-        #     output = minimizeFunc(prob, sg, options);
-        #     println("Output fail = ", output.fail);
-        #     fail = !(output.fail == "tol-reached");
-        # end
-        itercomplex[idxtau] += output.iterations;
-        output.name = string("\\tau=", tau); # Tiny modification for smaller legend name / Latex symbols in strings
-        OUTPUTS = [OUTPUTS; output];
-    end
-end
-fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)];
-itercomplex = itercomplex ./ numsimu; # simply averaging the last iteration number
+OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-3), skipped_errors=5)
 toc();
+
+## Checking that all simulations reached tolerance
+fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)*numsimu];
+if all(s->(string(s)=="tol-reached"), fails)
+    println("Tolerance always reached")
+end
 
 ## Plotting one SAGA-nice simulation for each mini-batch size
 if(numsimu==1)
@@ -203,135 +184,15 @@ if(numsimu==1)
     plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
 end
 
-############################## AVERAGE ITERATION COMPLEXITIES THROUGH FITTING CURVES #############################
-#region Extracting the average iteration complexity through average angle between the tolerance horizontal line and a fitted affine curve
-withintercept = true; # if true, then an intercept is fitted, else, there it is set to 0 
-itercomplex2 = [];
-if withintercept
-    alphahat = []; # value of the intercept 
-else
-    alphahat = zeros(length(minibatchlist)*numsimu); # null intercept
-end
-betahat = [];
-# betahat = Array{Float64, 2}(length(minibatchlist), numsimu);
-for i=1:length(minibatchlist)
-    println("Tau: ", minibatchlist[i]);
-    intercept = [];
-    slope = [];
-    for j=1:numsimu
-        output = OUTPUTS[(i-1)*numsimu+j];
-        xout = skipped_errors.*[0:(length(output.fs)-1);];
-        logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
-        logyout = reshape(logyout, size(logyout, 1));
-        # slope = [slope; sum(xout.*logyout)/sum(xout.^2)];
-        if withintercept
-            a, b = linreg(xout, logyout); # Linear regresion using OLS : y = a + b*x
-            intercept = [intercept; a];
-            slope = [slope; b];
-        else
-            ## Fitting a line without the intercept term with OLS
-            ## https://en.wikipedia.org/wiki/Simple_linear_regression#Simple_linear_regression_without_the_intercept_term_(single_regressor)
-            slope = [slope; sum(xout.*logyout)/sum(xout.^2)];
-        end
-    end
-    ## Storring the list of the intercepts (if not null) and slopes
-    if withintercept
-        alphahat = [alphahat; intercept];
-        betahat = [betahat; slope];
-    else
-        betahat = [betahat; slope];
-    end
-    # betahat = [betahat; slope];
-
-    ## Estimation of the iteration complexity
-    if withintercept
-        alphaavg = mean(alphahat);
-        betaavg = mean(betahat);
-        itercomplex2 = [itercomplex2; ceil((log(tolerance)-alphaavg)/betaavg)];
-    else
-        thetahat = sum(atan.(slope))/numsimu; # Obtaining the average theta (theta_i = tan(slope_i))
-        itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
-    end
-    # thetahat = sum(atan.(slope))/numsimu;
-    # itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
-end
-itercomplex2 = reshape(itercomplex2, (length(minibatchlist), 1) );
-println("Fitted line complexity: ", itercomplex2);
-println("Classical average complexity: ", itercomplex);
-#endregion
-
-#region Plotting the simualtions and the fitted lines for a chosen mini-batch size
-tauidx = 1;
-## FindinLongest simulation x-axis
-longetsxout = [0];
-for j=1:numsimu
-    output = OUTPUTS[(tauidx-1)*numsimu+j];
-    xout = skipped_errors.*[0:(length(output.fs)-1);];
-    if xout[end] > longetsxout[end]
-        longetsxout = xout
-    end
-end
-pyplot()
-output = OUTPUTS[(tauidx-1)*numsimu+1];
-xout = skipped_errors.*[0:(length(output.fs)-1);];
-logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
-colorlist = distinguishable_colors(7);
-p = plot(xout, logyout, line=(2,:dash), label="simu #1", c=colorlist[1], legend=:topright);
-plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+1] + betahat[(tauidx-1)*numsimu+1].*longetsxout, 
-          line=(4,:solid), c=colorlist[1], label="lin approx #1", xlabel="iterations", 
-          ylabel="log(residual)", title=string("\$", output.name, "\$"));
-for j=2:numsimu
-    println(j);
-    output = OUTPUTS[(tauidx-1)*numsimu+j];
-    xout = skipped_errors.*[0:(length(output.fs)-1);];
-    logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
-    ## Plotting the SAGA-nice simulation
-    plot!(p, xout, logyout, line=(2,:dash), c=colorlist[j], label=string("simu #", j));
-    ## Plotting the corresponding fitted line
-    plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+j] + betahat[(tauidx-1)*numsimu+j].*longetsxout, 
-          line=(4,:solid), c=colorlist[j], label=string("lin approx #", j));
-end
-plot!(p, longetsxout, fill(log(tolerance), length(xout)), line=(2,:dot), c=:black, label="tol");
-xlims!((0, 1.4*longetsxout[end]));
-display(p);
-#endregion
-
 ## Computing the empirical complexity
 # itercomplex -= 1; #-> should we remove 1 from itercomplex?
-empcomplex = minibatchlist.*itercomplex # tau times number of iterations
-empcomplex2 = minibatchlist.*itercomplex2 # average angle version
+empcomplex = reshape(minibatchlist.*itercomplex, length(minibatchlist)); # tau times number of iterations
+opt_minibatch_emp = minibatchlist[indmin(empcomplex)];
 
-# plotly()
 pyplot()
-plot(minibatchlist, empcomplex, linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity 1",
-    # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
-    xticks=(minibatchlist, minibatchlist),
-    # xscale=:log10,
-    # yscale=:log10,
-    # xticks=(minibatchlist, ["1\n= tau_theory" "2" "3" "4" "n"]),
-    legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-# savenameempcomplex = string(savenamecomp, "-empcomplex-$(numsimu)-avg");
-# savefig("./figures/$(savenameempcomplex).pdf");
-
-# plotly()
-pyplot()
-plot(minibatchlist, empcomplex2, linestyle=:solid, xlabel="batchsize", ylabel="empirical complexity 2",
-    # ylim=(0, maximum(empcomplex)+minimum(empcomplex)),
-    xticks=(minibatchlist, minibatchlist),
-    # xscale=:log10,
-    # yscale=:log10,
-    # xticks=(minibatchlist, ["1\n= tau_theory" "2" "3" "4" "n"]),
-    legend=false, guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
-    title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-# savenameempcomplex = string(savenamecomp, "-empcomplex-$(numsimu)-avg");
-# savefig("./figures/$(savenameempcomplex).pdf");
-
-
-fails
-
-## Saving the result
-# save("$(default_path)$(savenameempcomplex).jld", "OUTPUTS", OUTPUTS);
+plot_empirical_complexity(prob, minibatchlist, empcomplex, 
+                          opt_minibatch_simple, opt_minibatch_bernstein, 
+                          opt_minibatch_heuristic, opt_minibatch_emp);
 
 
 ######################################### PRINTING CONSTANTS AND RESULTS #########################################
@@ -339,19 +200,28 @@ println("\nPROBLEM DIMENSIONS:");
 println("   Number of datapoints = ", n); # n in the paper notation
 println("   Number of features = ", d); # d in the paper notation
 
+println("\nSimple optimal tau = ", opt_minibatch_simple);
+println("Bernstein optimal tau = ", opt_minibatch_bernstein);
+println("Heuristic optimal tau = ", opt_minibatch_heuristic);
+println("The empirical optimal tau = ", opt_minibatch_emp);
+
+# println("List of mini-batch sizes = ", minibatchlist);
+println("\nEmpirical complexity = ", empcomplex);
+
 # println("\nSMOOTHNESS CONSTANTS:");
 # println("   Lmax = ", Lmax);
 # println("   L = ", L);
 # println("Li_s = ", Li_s);
 # println("   Lbar = ", Lbar);
-
-println("\nTheoretical optimal tau = ", opt_minibatch_simple);
-println("Heuristic optimal tau = ", opt_minibatch_heuristic);
-println("The empirical optimal tau = ", minibatchlist[indmin(empcomplex)]);
-
-# println("List of mini-batch sizes = ", minibatchlist);
-# println("\nEmpirical complexity = ", empcomplex);
 ##################################################################################################################
+
+
+
+
+
+
+
+
 
 
 
@@ -362,6 +232,105 @@ println("The empirical optimal tau = ", minibatchlist[indmin(empcomplex)]);
 
 
 ## DRAFTS ##
+
+############################## AVERAGE ITERATION COMPLEXITIES THROUGH FITTING CURVES #############################
+#region Extracting the average iteration complexity through average angle between the tolerance horizontal line and a fitted affine curve
+# withintercept = true; # if true, then an intercept is fitted, else, there it is set to 0 
+# itercomplex2 = [];
+# if withintercept
+#     alphahat = []; # value of the intercept 
+# else
+#     alphahat = zeros(length(minibatchlist)*numsimu); # null intercept
+# end
+# betahat = [];
+# # betahat = Array{Float64, 2}(length(minibatchlist), numsimu);
+# for i=1:length(minibatchlist)
+#     println("Tau: ", minibatchlist[i]);
+#     intercept = [];
+#     slope = [];
+#     for j=1:numsimu
+#         output = OUTPUTS[(i-1)*numsimu+j];
+#         xout = skipped_errors.*[0:(length(output.fs)-1);];
+#         logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+#         logyout = reshape(logyout, size(logyout, 1));
+#         # slope = [slope; sum(xout.*logyout)/sum(xout.^2)];
+#         if withintercept
+#             a, b = linreg(xout, logyout); # Linear regresion using OLS : y = a + b*x
+#             intercept = [intercept; a];
+#             slope = [slope; b];
+#         else
+#             ## Fitting a line without the intercept term with OLS
+#             ## https://en.wikipedia.org/wiki/Simple_linear_regression#Simple_linear_regression_without_the_intercept_term_(single_regressor)
+#             slope = [slope; sum(xout.*logyout)/sum(xout.^2)];
+#         end
+#     end
+#     ## Storring the list of the intercepts (if not null) and slopes
+#     if withintercept
+#         alphahat = [alphahat; intercept];
+#         betahat = [betahat; slope];
+#     else
+#         betahat = [betahat; slope];
+#     end
+#     # betahat = [betahat; slope];
+
+#     ## Estimation of the iteration complexity
+#     if withintercept
+#         alphaavg = mean(alphahat);
+#         betaavg = mean(betahat);
+#         itercomplex2 = [itercomplex2; ceil((log(tolerance)-alphaavg)/betaavg)];
+#     else
+#         thetahat = sum(atan.(slope))/numsimu; # Obtaining the average theta (theta_i = tan(slope_i))
+#         itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
+#     end
+#     # thetahat = sum(atan.(slope))/numsimu;
+#     # itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
+# end
+# itercomplex2 = reshape(itercomplex2, (length(minibatchlist), 1) );
+# println("Fitted line complexity: ", itercomplex2);
+# println("Classical average complexity: ", itercomplex);
+#endregion
+
+#region Plotting the simualtions and the fitted lines for a chosen mini-batch size
+# tauidx = 1;
+# ## FindinLongest simulation x-axis
+# longetsxout = [0];
+# for j=1:numsimu
+#     output = OUTPUTS[(tauidx-1)*numsimu+j];
+#     xout = skipped_errors.*[0:(length(output.fs)-1);];
+#     if xout[end] > longetsxout[end]
+#         longetsxout = xout
+#     end
+# end
+# pyplot()
+# output = OUTPUTS[(tauidx-1)*numsimu+1];
+# xout = skipped_errors.*[0:(length(output.fs)-1);];
+# logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+# colorlist = distinguishable_colors(7);
+# p = plot(xout, logyout, line=(2,:dash), label="simu #1", c=colorlist[1], legend=:topright);
+# plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+1] + betahat[(tauidx-1)*numsimu+1].*longetsxout, 
+#           line=(4,:solid), c=colorlist[1], label="lin approx #1", xlabel="iterations", 
+#           ylabel="log(residual)", title=string("\$", output.name, "\$"));
+# for j=2:numsimu
+#     println(j);
+#     output = OUTPUTS[(tauidx-1)*numsimu+j];
+#     xout = skipped_errors.*[0:(length(output.fs)-1);];
+#     logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+#     ## Plotting the SAGA-nice simulation
+#     plot!(p, xout, logyout, line=(2,:dash), c=colorlist[j], label=string("simu #", j));
+#     ## Plotting the corresponding fitted line
+#     plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+j] + betahat[(tauidx-1)*numsimu+j].*longetsxout, 
+#           line=(4,:solid), c=colorlist[j], label=string("lin approx #", j));
+# end
+# plot!(p, longetsxout, fill(log(tolerance), length(xout)), line=(2,:dot), c=:black, label="tol");
+# xlims!((0, 1.4*longetsxout[end]));
+# display(p);
+
+# empcomplex2 = minibatchlist.*itercomplex2; # average angle version
+#endregion
+##################################################################################################################
+
+
+
 ################ ITERATION COMPLEXITIES THROUGH AVERAGED SIGNALS OF DIFFERENT SIZE (PB: FLAT TAIL) ###############
 #region
 # rel_loss_avg = [];
