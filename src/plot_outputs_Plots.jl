@@ -15,31 +15,51 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
 
     # plotting epocs per iteration
     output = OUTPUTS[1];
-    # if (datapassbnd ==0) # Setting the datapassbnd to the number of datapasses available
-    datapassbnd = output.iterations*output.epocsperiter;
-    # end
-    rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
+
+    # Select the desired number of epochs if "datapassbnd" is gvien
+    truncatefigure = true;
+    if (datapassbnd == 0) # Setting the datapassbnd to the number of datapasses available
+        truncatefigure = false;
+        datapassbnd = output.iterations*output.epocsperiter;
+    end
+
+    numepochs = output.iterations*output.epocsperiter;
+    lf_all = length(output.fs);
+    epochs = (numepochs/(lf_all-1)).*(0:(lf_all-1));
+    
+    rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol); # the relative loss might be negative if we reach a better solution
     fs = output.fs[rel_loss.>0];
     lf = length(fs);
     bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
-    plot(output.epocsperiter*(1:bnd)*(output.iterations/lf), (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
-        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
+    plt = plot(epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), 
+               xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
+               linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+               markersize=6, linewidth=4, marker=:auto, grid=false)
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
-        datapassbnd = output.iterations*output.epocsperiter;
-        rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
+        if (!truncatefigure) # Setting the datapassbnd to the maximum number of epochs if no truncation is given
+            datapassbnd = output.iterations*output.epocsperiter;
+        end
+
+        numepochs = output.iterations*output.epocsperiter;
+        lf_all = length(output.fs);
+        epochs = (numepochs/(lf_all-1)).*(0:(lf_all-1));
+        
+        rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol); # the relative loss might be negative if we reach a better solution
         fs = output.fs[rel_loss.>0];
         lf = length(fs);
         bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
-        plot!(output.epocsperiter*(1:bnd)*(output.iterations/lf), (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
-            linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,  grid=false)
+        plot!(plt, epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), 
+              xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll), 
+              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,  grid=false)
     end
     println("./figures/$(probname)-epoc.pdf");
-    savefig("./figures/$(probname)-epoc.pdf");
-    #
-    #   # plotting times
+    savefig(plt, "./figures/$(probname)-epoc.pdf");
+    
+
+    # plotting times
     output = OUTPUTS[1];
-    datapassbnd = output.iterations*output.epocsperiter;
+    datapassbnd = output.iterations*output.epocsperiter; # no truncation option available for time
     rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
     fs = output.fs[rel_loss.>0];
     lf = length(fs);
