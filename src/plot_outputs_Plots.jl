@@ -1,7 +1,11 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
 function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) #, datapassbnd::Int64
     #Now in epocs X function values
-    probname = string(replace(prob.name, r"[\/].", "-"), "-", options.batchsize);
+    if(options.batchsize > 0)
+        probname = string(replace(prob.name, r"[\/].", "-"), "-", options.batchsize);
+    else
+        probname = string(replace(prob.name, r"[\/].", "-"));
+    end
     probname = replace(probname, ".", "_")
     if(options.precondition)
         probname = string(probname, "-precon")
@@ -78,7 +82,6 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2,output.stepsize_multiplier))
     end
-    println(probname)
     println("./figures/$(probname)-time.pdf");
     savefig("./figures/$(probname)-time.pdf");
     
