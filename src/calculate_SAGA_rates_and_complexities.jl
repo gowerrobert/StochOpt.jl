@@ -307,6 +307,31 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
 end
 
 """
+    compute_skip_error(n::Int64, minibatch_size::Int64, skip_multiplier::Float64=0.02)
+
+Compute the number of skipped iterations between two error estimation. 
+The computation rule is arbitrary, but depends on the dimension of the problem and on the mini-batch size.
+
+#INPUTS:\\
+    - **Int64** n: number of data samples\\
+    - **Int64** minibatch_size: size of the mini-batch\\
+    - **Float64** skip_multiplier: arbitrary multiplier\\
+#OUTPUTS:\\
+    - **Int64** skipped_errors: number iterations between two evaluations of the error\\
+"""
+function compute_skip_error(n::Int64, minibatch_size::Int64, skip_multiplier::Float64=0.015)
+    tmp = floor(skip_multiplier*n/minibatch_size);
+    skipped_errors = 1;
+    while(tmp > 1.0)
+        tmp /= 2;
+        skipped_errors *= 2;
+    end
+    skipped_errors = convert(Int64, skipped_errors); # Seems useless
+
+    return skipped_errors
+end
+
+"""
     simulate_SAGA_nice(prob, minibatchlist, numsimu=1, 
                        tolerance=10.0^(-3), skipped_errors=1,
                        max_iter=10^8, max_time=10000.0, max_epochs=10000)
@@ -320,7 +345,8 @@ correpsonding average iteration complexity.
     - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
     - **Int64** numsimu: number of runs of mini-batch SAGA\\
     - **Float64** tolerance: relative error convergence threshold, at last iteration we have (f(x)-fsol)/(f0-fsol) < epsilon\\
-    - **Int64** skipped_errors: number iterations between two evaluations of the error\\
+    - **Int64** skipped_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
+    - **Float64** skip_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
     - **Int64** max_iter: maximum number of iterations\\
     - **Float64** max_time: maximum run time\\
     - **Int64** max_epochs: maximum number of epochs\\
@@ -328,26 +354,34 @@ correpsonding average iteration complexity.
     - OUTPUTS: output of each run, size length(minibatchlist)*numsimu\\
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
 """
-function simulate_SAGA_nice(prob, minibatchlist, numsimu ;
-                            tolerance=10.0^(-3), skipped_errors=1,
-                            max_iter=10^8, max_time=3600.0, max_epochs=100)
+function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, numsimu::Int64 ;
+                            tolerance::Float64=10.0^(-3),
+                            skipped_errors::Int64=-1, skip_multiplier::Float64=0.02,
+                            max_iter::Int64=10^8, max_time::Float64=3600.0, max_epochs::Int64=100)
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/tau
     
     probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
     default_path = "./data/";
 
-    options = set_options(tol=tolerance, max_iter=max_iter, max_time=max_time, max_epocs=max_epochs,
-                          initial_point="zeros", # is fixed not to add more randomness
-                    #   repeat_stepsize_calculation=true,
-                          skip_error_calculation=skipped_errors,
-                          force_continue=false); # force continue if diverging or if tolerance reached
+    n = prob.numdata;
+
     itercomplex = zeros(length(minibatchlist), 1); # List of saved outputs
     OUTPUTS = [];
     # fail = true;
     for idxtau in 1:length(minibatchlist) # 1:n
         tau = minibatchlist[idxtau];
         println("\nCurrent mini-batch size: ", tau);
+
+        if(skipped_errors==-1)
+            skipped_errors = compute_skip_error(n, tau, skip_multiplier);
+            println("The variable skipped_errors has been automatically set to ", skipped_errors);
+        end
+        options = set_options(tol=tolerance, max_iter=max_iter, max_time=max_time, max_epocs=max_epochs,
+                              initial_point="zeros", # is fixed not to add more randomness
+                        #   repeat_stepsize_calculation=true,
+                              skip_error_calculation=skipped_errors,
+                              force_continue=false); # force continue if diverging or if tolerance reached
         options.batchsize = tau;
         for i=1:numsimu
             println("----- Simulation #", i, " -----");
