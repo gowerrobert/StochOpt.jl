@@ -10,14 +10,14 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
-data = "gaussian"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
+data = "YearPredictionMSD"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
 numdata = 500;
 numfeatures = 12; # useless for gen_diag_data
 
 println("--- Loading data ---");
-datasets = ["abalone", "housing"];
+datasets = ["YearPredictionMSD", "abalone", "housing"];
 #, "letter_scale", "heart", "phishing", "madelon", "a9a",
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 if(data == "gaussian")
@@ -28,6 +28,7 @@ elseif(data == "diagonal")
 elseif(data == "lone_eig_val")
     X, y, probname = gen_diag_lone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
 elseif(data in datasets)
+    probname = data;
     ## Load truncated LIBSVM data
     X, y = loadDataset(probname);
     # X = X';
@@ -64,43 +65,43 @@ Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
 Lbar = mean(Li_s);
 
 
-# ########################### EMPIRICAL UPPER BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###########################
-# #region
-# ### COMPUTING THE BOUNDS
-# simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
+########################### EMPIRICAL UPPER BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###########################
+#region
+### COMPUTING THE BOUNDS
+simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
 
-# ### PLOTING ###
-# println("\n--- Ploting upper bounds ---");
-# # PROBLEM: there is still a problem of ticking non integer on the xaxis
-# pyplot()
-# plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+### PLOTING ###
+println("\n--- Ploting upper bounds ---");
+# PROBLEM: there is still a problem of ticking non integer on the xaxis
+pyplot()
+plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-# # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
-# # heuristicbound .== expsmoothcst
-# # heuristicbound .> expsmoothcst
-# # simplebound[end] - heuristicbound[end]
-# # bernsteinbound[end] - simplebound[end]
-# #endregion
-# ##################################################################################################################
+# heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
+# heuristicbound .== expsmoothcst
+# heuristicbound .> expsmoothcst
+# simplebound[end] - heuristicbound[end]
+# bernsteinbound[end] - simplebound[end]
+#endregion
+##################################################################################################################
 
 
-# ##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
-# #region
-# # TO BE DONE: implement grid-search for the stepsizes, i.e.
-# # 1) set a grid of stepsizes around 1/(4Lmax)
-# # 2) run several SAGA_nice on the same problem with different stepsize (average?)
-# # 3) pick the 'best' stepsize
+##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
+#region
+# TO BE DONE: implement grid-search for the stepsizes, i.e.
+# 1) set a grid of stepsizes around 1/(4Lmax)
+# 2) run several SAGA_nice on the same problem with different stepsize (average?)
+# 3) pick the 'best' stepsize
 
-# ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
-# simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
+simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-# ### PLOTING ###
-# println("\n--- Ploting stepsizes ---");
-# # PROBLEM: there is still a problem of ticking non integer on the xaxis
-# pyplot()
-# plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
-# #endregion
-# ##################################################################################################################
+### PLOTING ###
+println("\n--- Ploting stepsizes ---");
+# PROBLEM: there is still a problem of ticking non integer on the xaxis
+pyplot()
+plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
+#endregion
+##################################################################################################################
 
 
 ###################################### THEORETICAL OPTIMAL MINI-BATCH SIZES ######################################
@@ -151,7 +152,10 @@ opt_minibatch_heuristic = round(Int, 1 + (mu*(n-1))/(4*L));
 # minibatchlist = [1; 5; 10; 50; 100; 200; 1000; 5000];
 
 ## For n=500
-minibatchlist = collect(1:10);
+# minibatchlist = collect(1:10);
+
+## For YearPredictionMSD
+minibatchlist = [1, 10, 50];
 
 # minibatchlist = [1];
 # minibatchlist = [1, 10, 50];
@@ -165,10 +169,10 @@ minibatchlist = collect(1:10);
 
 # srand(1234);
 
-numsimu = 20; # number of runs of mini-batch SAGA for averaging the empirical complexity
+numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
 
 tic();
-OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-3), skipped_errors=5)
+OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-1), skipped_errors=1000);
 toc();
 
 ## Checking that all simulations reached tolerance
