@@ -172,7 +172,9 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
     heuristicbound = zeros(n, 1);
     bernsteinbound = zeros(n, 1);
     for tau = 1:n
-        print("Calculating bounds for tau = ", tau, "\n");
+        if(tau % floor(Int64, (n/100)) == 1) # 100 messages for the whole data set
+            print("Calculating bounds for tau = ", tau, "\n");
+        end
         if(n <= datathreshold)
             expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
         end
@@ -220,7 +222,7 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
 
     rho_over_n = ( n - (1:n) ) ./ ( (1:n).*(n-1) ); # Sketch residual divided by n
     rightterm = rho_over_n*Lmax + (mu*n)/(4*(1:n)); # Right-hand side term in the max
-    println("rightterm = ", rightterm);
+    
     if typeof(expsmoothcst)==Array{Float64,2}
         expsmoothstepsize = 0.25 .* (1 ./ max.(expsmoothcst, rightterm) );
     else
