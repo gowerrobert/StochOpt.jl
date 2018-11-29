@@ -42,7 +42,7 @@ end
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the ridge regression problem ---");
 options = set_options(max_iter=10^8, max_time=10.0, max_epocs=1000, repeat_stepsize_calculation=true, skip_error_calculation=51,
-                      force_continue=true, initial_point="randn");
+                      force_continue=true, initial_point="randn", batchsize=0);
 prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none");  # Disabling scaling
 # QUESTION: how is lambda selected?
 n = prob.numdata;
@@ -155,13 +155,15 @@ opt_minibatch_heuristic = round(Int, 1 + (mu*(n-1))/(4*L));
 # minibatchlist = collect(1:10);
 
 ## For YearPredictionMSD
-minibatchlist = [1, 10, 50];
+minibatchlist = [1, 2, 3, 5, 10, 20, 50];
+# minibatchlist = [10, 50, 100, 1000];
 
-# minibatchlist = [1];
+
+# minibatchlist = [100];
 # minibatchlist = [1, 10, 50];
 # minibatchlist = [50, 10, 1];
 
-# minibatchlist = [1, 5];
+minibatchlist = [1];
 # minibatchlist = [5, 1];
 # minibatchlist = 5:-1:1;
 # minibatchlist = [1];
@@ -172,7 +174,7 @@ minibatchlist = [1, 10, 50];
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
 
 tic();
-OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-1), skipped_errors=1000);
+OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-1));
 toc();
 
 ## Checking that all simulations reached tolerance
