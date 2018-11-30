@@ -21,7 +21,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         if opts.regulatrizor_parameter == "1/num_data"
             lambda = 1/numdata;
         else
-            lambda = mean(sum(X.^2, 1))/numdata;
+            lambda = mean(sum(X.^2, 1))/numdata; # Lbar / n
             println("lambda = ", lambda);
             # display(lambda)
             #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
