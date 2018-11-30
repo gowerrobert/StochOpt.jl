@@ -48,16 +48,11 @@ prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none")
 n = prob.numdata;
 d = prob.numfeatures;
 
-### PLOTTING SETTINGS ###
-println("\n--- Ploting upper bounds of the expected smoothness constant ---");
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecomp = string(savename);
-fontsmll = 8; fontmed = 14; fontbig = 14;
-
 ### COMPUTING THE SMOOTHNESS CONSTANTS ###
 # Compute the smoothness constants L, L_max, \cL, \bar{L}
 datathreshold = 24; # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
 
+println("\n--- Computing smoothness constants ---");
 mu = get_mu_str_conv(prob); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
 L = get_LC(prob, collect(1:n)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
 Li_s = get_Li(prob);
@@ -67,20 +62,21 @@ Lbar = mean(Li_s);
 
 ########################### EMPIRICAL UPPER BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###########################
 #region
-### COMPUTING THE BOUNDS
-simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
+# ### COMPUTING THE BOUNDS ###
+# simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
 
-### PLOTING ###
-println("\n--- Ploting upper bounds ---");
-# PROBLEM: there is still a problem of ticking non integer on the xaxis
-pyplot()
-plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+# ### PLOTING ###
+# println("\n--- Ploting upper bounds ---");
+# # PROBLEM: there is still a problem of ticking non integer on the xaxis
+# pyplot()
+# plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-# heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
-# heuristicbound .== expsmoothcst
-# heuristicbound .> expsmoothcst
-# simplebound[end] - heuristicbound[end]
-# bernsteinbound[end] - simplebound[end]
+# # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
+# if(n<=datathreshold)
+#     println("Heuristic - expected smoothness gap", heuristicbound - expsmoothcst)
+#     println("Simple - heuristic gap", simplebound[end] - heuristicbound[end])
+#     println("Bernstein - simple gap", bernsteinbound[end] - simplebound[end])
+# end
 #endregion
 ##################################################################################################################
 
@@ -92,29 +88,30 @@ plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicboun
 # 2) run several SAGA_nice on the same problem with different stepsize (average?)
 # 3) pick the 'best' stepsize
 
-### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
-simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+# ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
+# simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-### PLOTING ###
-println("\n--- Ploting stepsizes ---");
-# PROBLEM: there is still a problem of ticking non integer on the xaxis
-pyplot()
-plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
+# ### PLOTING ###
+# println("\n--- Ploting stepsizes ---");
+# # PROBLEM: there is still a problem of ticking non integer on the xaxis
+# pyplot()
+# plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
 #endregion
 ##################################################################################################################
 
 
 ###################################### THEORETICAL OPTIMAL MINI-BATCH SIZES ######################################
 #region
-## Compute optimal mini-batch size
-if typeof(expsmoothcst)==Array{Float64,2}
-    LHS = 4*(1:n).*(expsmoothcst+prob.lambda)./mu;
-    RHS = n + (n-(1:n)) .* (4*(Lmax+prob.lambda)/((n-1)*mu));
-    exacttotalcplx = max.(LHS, RHS);
-    _, opt_minibatch_exact = findmin(exacttotalcplx);
-else
-    opt_minibatch_exact = nothing;
-end
+# ## Compute optimal mini-batch size
+# if typeof(expsmoothcst)==Array{Float64,2}
+#     LHS = 4*(1:n).*(expsmoothcst+prob.lambda)./mu;
+#     RHS = n + (n-(1:n)) .* (4*(Lmax+prob.lambda)/((n-1)*mu));
+#     exacttotalcplx = max.(LHS, RHS);
+#     _, opt_minibatch_exact = findmin(exacttotalcplx);
+# else
+#     opt_minibatch_exact = nothing;
+# end
+
 ## WARNING: Verify computations : should we add lambda????
 opt_minibatch_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar)); # One should not add again lambda since it is already taken into account in Lbar
 opt_minibatch_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L)) )); ## WARNING: Verify computations : should we add lambda????
@@ -163,7 +160,7 @@ minibatchlist = [1, 2, 3, 5, 10, 20, 50];
 # minibatchlist = [1, 10, 50];
 # minibatchlist = [50, 10, 1];
 
-minibatchlist = [1];
+# minibatchlist = [1];
 # minibatchlist = [5, 1];
 # minibatchlist = 5:-1:1;
 # minibatchlist = [1];
@@ -339,6 +336,12 @@ println("\nEmpirical complexity = ", empcomplex);
 
 ################ ITERATION COMPLEXITIES THROUGH AVERAGED SIGNALS OF DIFFERENT SIZE (PB: FLAT TAIL) ###############
 #region
+### PLOTTING SETTINGS ###
+# default_path = "./data/"; 
+# savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+# savenamecomp = string(savename);
+# fontsmll = 8; fontmed = 14; fontbig = 14;
+
 # rel_loss_avg = [];
 # for i=1:length(minibatchlist)
 #     rel_loss_array = [];
@@ -383,72 +386,5 @@ println("\nEmpirical complexity = ", empcomplex);
 # display(p)
 # savenameempcomplex = string(savenamecomp, "epoc-rel-loss-$(numsimu)-avg");
 # savefig("./figures/$(savenameempcomplex).pdf");
-#endregion
-##################################################################################################################
-
-############################################ THEORETICAL COMPLEXITIES ############################################
-#region
-
-#===
-### CREATING THE MINI-BATCH SIZE SEQUENCE ###
-# tauseq = collect(1:14);
-# tauseq = [1, 2, 3, 4, 5, 14];
-# tauseq = cat(1, 1:4, 14);
-# tauseq = [1, 2, 3, 3, 3, 4, 5, 5, 14]; # test uniqueness
-# tauseq = [1, 5, 4, 3, 2, 14]; # test sorting
-
-# tauseq = [1, 2, 3, numdata];
-tauseq = [1, 2, 3, 4, 5];
-
-# Sanity checks
-tauseq = unique(sort(tauseq));
-n = prob.numdata;
-numtau = length(tauseq);
-if(minimum(tauseq) < 1 || maximum(tauseq) > n)
-    error("values of tauseq are out of range.");
-end
-println("\n--- Mini-batch sequence ---");
-println(tauseq);
-
-### COMPUTE SAGA-NICE THEORETIDCAL COMPLEXITIES ###
-println("\n--- Compute SAGA-nice theoretical complexities (iteration and total) ---");
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecompperso = string(savename,"-complexities-nidham");
-itercomp = 0.0; Lsides = 0.0; Rsides = 0.0;
-try
-    itercomp, Lsides, Rsides = load("$(default_path)$(savenamecompperso).jld", "itercomp", "Lsides", "Rsides");
-    println("found ", "$(default_path)$(savenamecompperso).jld with itercomp\n", itercomp);
-catch loaderror   # Calculate iteration complexity for all minibatchsizes
-    println(loaderror);
-    itercomp, Lsides, Rsides = calculate_complex_SAGA_nice(prob, options, tauseq);
-    # L = eigmax(prob.X*prob.X')/prob.numdata+prob.lambda;
-    # save("$(default_path)$(savenamecompperso).jld", "itercomp", itercomp, "Lsides", Lsides, "Rsides", Rsides);
-end
-
-println("Mini-batch size sequence:\n", tauseq)
-
-## Total complexity equals the iteration complexity times the size of the batch
-# totcomp = (itercomp').*(1:prob.numdata);
-totcomp = (itercomp').*tauseq;
-
-### PLOTING ###
-println("\n--- Ploting complexities ??? ---");
-pyplot() # pyplot
-fontsmll = 8; fontmed = 14; fontbig = 14;
-plot(tauseq, [totcomp itercomp'], label=["total complex" "iter complex"],
-    linestyle=:auto, xlabel="batchsize", ylabel="complexity", tickfont=font(fontsmll),
-    guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,
-    grid=false, ylim=(0, maximum(totcomp)+minimum(itercomp)), xticks=tauseq)
-   ylim=(minimum(itercomp), maximum(totcomp)+minimum(itercomp))
-# savefig("./figures/$(savenamecompperso).pdf");
-
-# Comparing only the iteration complexities
-## WARNING: Lsides is not exactly the expected smoothness cosntant but 4*\cL/mu !!
-plot(tauseq, Lsides', ylabel="expected smoothness", xlabel="batchsize", tickfont=font(fontsmll),
-    guidefont=font(fontbig), markersize=6, linewidth=4, marker=:auto, grid=false, legend=false,
-    xticks=tauseq)
-savenameexpsmooth = string(savenamecompperso, "-expsmooth");
-# savefig("./figures/$(savenameexpsmooth).pdf");
-===#
 #endregion
 ##################################################################################################################
