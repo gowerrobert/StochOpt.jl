@@ -31,6 +31,9 @@ else
     error("unkown generation scheme.");
 end
 
+## Rotate diagonal matrices
+
+
 ## Saving the generated datasets with the corresponding seed
 probname = string(probname, seed);
-save("$(default_path)$(probname).jld", "X", X, "y", y);
+# save("$(default_path)$(probname).jld", "X", X, "y", y);
