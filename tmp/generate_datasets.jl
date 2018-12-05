@@ -14,7 +14,7 @@ seed = string(reinterpret(Int32, Base.Random.GLOBAL_RNG.seed[1]));
 seed = string("_seed-", seed);
 
 ### LOADING DATA ###
-data = "gaussian";
+data = "diagonal";
 # data = "diagonal";
 # data = "alone_eig_val";
 
