@@ -67,9 +67,9 @@ function double_diag_scaling(A; epsilon=10^(-3), maxiter=10)
     verr = zeros(maxiter);
     uerr = zeros(maxiter);
     while (i < maxiter) #  || matscale_error(A, colsum, rowsum) > epsilon
-        u[:] = 1./(sqrt(sum((A.*v).^2, 2)))';
+        u[:] = 1. /(sqrt(sum((A.*v).^2, 2)))'; # julia 0.7
         verr[i] = norm(v.* sqrt(sum((A'.*u).^2, 2))', 1);
-        v[:] = 1./sqrt(sum((A'.*u).^2, 2))';
+        v[:] = 1. /sqrt(sum((A'.*u).^2, 2))'; # julia 0.7
         uerr[i] = norm(u.* (sqrt(sum((A.*v).^2, 2)))', 1);
         i = i + 1;
     end

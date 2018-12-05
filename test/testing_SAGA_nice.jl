@@ -28,7 +28,7 @@ if(probname == "gaussian")
 elseif(probname == "diagonal")
     X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100);
 elseif(probname == "lone_eig_val")
-    X, y, probname = gen_diag_lone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
+    X, y, probname = gen_diag_alone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
 elseif(probname in probnames)
     ## Load truncated LIBSVM data
     X, y = loadDataset(probname);

@@ -60,8 +60,8 @@ Set the stepsize based on the smoothness constants of the problem stored in **SA
 #OUTPUTS:\\
     - SAGA_nice_method: SAGA mini-batch method for ``τ``--nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
 """
-# /!\ WARNING: this function modifies its own arguments (`method` and `options`) and returns method! Shouldn't we name it "boot_SAGA_nice!(...)" with an "!" ?
 function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
+    # /!\ WARNING: this function modifies its own arguments (`method` and `options`) and returns method! Shouldn't we name it "boot_SAGA_nice!(...)" with an "!" ?
     tau = options.batchsize;
     n = prob.numdata;
     leftcoeff = (n*(tau-1))/(tau*(n-1));

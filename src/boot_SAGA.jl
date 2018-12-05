@@ -143,7 +143,7 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
         probs[:] .= 1/numpartitions;
         stepsize = 1/(4*Lmax+numpartitions*mu);
     elseif(probability_type == "opt") # What is else for? I think it is "opt"
-        probs[:] = probs.*4.+numpartitions*mu;
+        probs[:] = probs.*4 .+numpartitions*mu; # julia 0.7
         stepsize = 1/(mean(probs));
         probs[:] = probs./sum(probs);
     else
@@ -196,7 +196,7 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
     elseif(probability_type == "uni")
         probs[:] .= 1/numpartitions;
     elseif(probability_type == "opt") # What is else for? I think it is "opt"
-        probs[:] = probs.*4.+numpartitions*mu;
+        probs[:] = probs.*4 .+numpartitions*mu; # julia 0.7
         probs[:] = probs./sum(probs);
     else
         error("unknown probability_type name (", probability_type, ").")

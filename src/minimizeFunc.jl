@@ -2,6 +2,7 @@
 # solving the empirical risk minimization problem - 2018 - Robert M. Gower
 # StochOpt Copyright (C) 2018, Robert Gower
 function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing)
+ 
     if(options.initial_point == "randn") # set initial point
         x = randn(prob.numfeatures);
     elseif(options.initial_point == "rand")

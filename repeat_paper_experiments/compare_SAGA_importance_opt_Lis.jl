@@ -14,7 +14,7 @@ numdata = 2000;
 numfeatures = numdata;
 lambda_input = 1/(numdata^2);
 a = 1./numdata;
-# X, y, probname = gen_diag_lone_eig_data(numfeatures, numdata, lambda = lambda_input, a =1/lambda_input );
+# X, y, probname = gen_diag_alone_eig_data(numfeatures, numdata, lambda = lambda_input, a =1/lambda_input );
 # X, y, probname = gen_gauss_data(numfeatures, numdata, lambda = lambda_input);
 X, y, probname = gen_gauss_scaled_data(numfeatures, numdata, lambda=lambda_input, Lmin=a, err=10.0^(-3));
 # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale

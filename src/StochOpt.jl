@@ -4,7 +4,9 @@
 #export pseudoinvert_matrix, uniform_mat_rank, uniform_sym_rank
 #export plot_outputs_Plots
 
-type MyOptions
+using SparseArrays # julia 0.7
+
+mutable struct MyOptions # julia 0.7
     tol::Float64
     aux::Float64
     max_iter::Int
@@ -46,14 +48,14 @@ function set_options(; tol::Float64 = 10.0^(-6.0),
         printiters, exacterror, repeat_stepsize_calculation, batchsize, "normalized", stepsize_multiplier, precondition, force_continue, rep_number, embeddim, initial_point)
 end
 
-type DataScaling
+mutable struct DataScaling # julia 0.7
     rowscaling::Array{Float64}
     colscaling::Array{Float64}
     colsmean::Array{Float64}
     name::AbstractString
 end
 
-type Prob
+mutable struct Prob # julia 0.7
     X  # why not a sparse array?
     y::Array{Float64}
     numfeatures::Int64
@@ -81,7 +83,7 @@ type Prob
     ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method) 
 end
 
-type SAGAmethod
+mutable struct SAGAmethod # julia 0.7
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -104,7 +106,7 @@ type SAGAmethod
     mu::Float64
 end
 
-type SAGA_nice_method
+mutable struct SAGA_nice_method # julia 0.7
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -126,7 +128,7 @@ type SAGA_nice_method
     mu::Float64
 end
 
-type SPIN
+mutable struct SPIN # julia 0.7
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -143,7 +145,7 @@ type SPIN
     sketchtype::AbstractString
 end
 
-type Method
+mutable struct Method # julia 0.7
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -165,7 +167,7 @@ type Method
     numinneriters::Int64
 end
 
-type Output
+mutable struct Output # julia 0.7
     name::AbstractString
     iterations::Int
     epocsperiter::Float64 #Array{Float64}

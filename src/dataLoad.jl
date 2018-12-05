@@ -63,6 +63,7 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
                 itm = split(itm, ":")
                 append!(Ir, [n])
                 append!(Jr, [parse(Int, strip(itm[1]))])
+                # append!(Jr, [Meta.parse(Int, strip(itm[1]))]) # julia 0.7
                 append!(Pr, [float(strip(itm[2]))])
             end
         end
@@ -72,7 +73,7 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
     if classification
         mb = mean(b)
         for i=1:length(b)
-            b[i] = (b[i] > mb)? 1. : -1.
+            b[i] = (b[i] > mb) ? 1. : -1. # julia 0.7
         end
     end
     A = sparse(round.(Integer, Ir), round.(Integer, Jr), Pr)

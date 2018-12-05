@@ -28,8 +28,8 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         end
     end
 
-    f_eval(x, S)                = ((1./length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2);
-    g_eval(x, S)                = ((1./length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x);
+    f_eval(x, S)                = ((1 ./ length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2); # julia 0.7
+    g_eval(x, S)                = ((1 ./ length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x); # julia 0.7
     g_eval!(x, S, g)            = ridge_grad!(X[:, S], y[S], x, lambda, length(S), g);
     Jac_eval!(x, S, Jac)        = ridge_Jac!(X[:, S], y[S], x, lambda, S, Jac);
     scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:, S], y[S], x);
