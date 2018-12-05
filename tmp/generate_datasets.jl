@@ -1,4 +1,4 @@
-srand(1234);
+#srand(1234);
 
 println("--- Loading packages ---")
 using JLD
@@ -6,12 +6,14 @@ using Plots
 using StatsBase
 using Match
 using Combinatorics
+using Random
 
-include("./src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl") # Be carefull about the path here
 
 
 println("--- Getting seed ---")
-seed = string(reinterpret(Int32, Base.Random.GLOBAL_RNG.seed[1]));
+Random.seed!(1234);
+seed = string(reinterpret(Int32, Random.GLOBAL_RNG.seed[1]));
 seed = string("_seed-", seed);
 
 ### LOADING DATA ###
