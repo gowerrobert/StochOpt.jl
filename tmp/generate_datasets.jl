@@ -1,5 +1,6 @@
 srand(1234);
 
+println("--- Loading packages ---")
 using JLD
 using Plots
 using StatsBase
@@ -9,7 +10,7 @@ using Combinatorics
 include("./src/StochOpt.jl") # Be carefull about the path here
 
 
-default_path = "./data/";
+println("--- Getting seed ---")
 seed = string(reinterpret(Int32, Base.Random.GLOBAL_RNG.seed[1]));
 seed = string("_seed-", seed);
 
@@ -21,6 +22,7 @@ data = "diagonal";
 numdata = 100;
 numfeatures = 12; # useless for gen_diag_data
 
+println("--- Generating data ---")
 if(data == "gaussian")
     X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0, err=0.001);
 elseif(data == "diagonal")
@@ -35,5 +37,7 @@ end
 
 
 ## Saving the generated datasets with the corresponding seed
+println("--- Saving the data set ---")
 probname = string(probname, seed);
-# save("$(default_path)$(probname).jld", "X", X, "y", y);
+default_path = "./data/";
+save("$(default_path)$(probname).jld", "X", X, "y", y);
