@@ -68,7 +68,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
     elseif(minibatch_type == "nice")
         println("\nFor nice minibatch: probability_type is useless\n");
         name = string(name, "-", minibatch_type);
-        L = eigmax(full(prob.X*prob.X'))/prob.numdata + prob.lambda;
+        L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
         Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
         Jac = zeros(prob.numfeatures, prob.numdata);     
     else
@@ -272,7 +272,7 @@ end
 #         descent_method = descent_SAGApartition;
 #     else
 #         name = string(name, "-", minibatch_type);
-#         L = eigmax(full(prob.X*prob.X'))/prob.numdata + prob.lambda;
+#         L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
 #         Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
 #         Jac = zeros(prob.numfeatures, prob.numdata);
 #     end

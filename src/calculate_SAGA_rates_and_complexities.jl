@@ -16,25 +16,25 @@ end
 
 function get_LC(prob::Prob, C)
     # println("full")
-    # full(prob.X[:, C]'*prob.X[:, C])
+    # Matrix(prob.X[:, C]'*prob.X[:, C])
     # println("Symmetric")
-    # Symmetric(full(prob.X[:, C]'*prob.X[:, C]))
+    # Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C]))
     # println("Eigmax")
-    # eigmax(Symmetric(full(prob.X[:, C]'*prob.X[:, C])))
+    # eigmax(Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C])))
     LC = 0;
     if(length(C) < prob.numfeatures)
         try
-            LC = eigmax(Symmetric(full(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
+            LC = eigmax(Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
         catch loaderror # Uses power iteration if eigmax fails
             # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
-            LC = power_iteration(Symmetric(full(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
+            LC = power_iteration(Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
         end
     else
         try
-            LC = eigmax(Symmetric(full(prob.X[:,C]*prob.X[:,C]')))/length(C) + prob.lambda;
+            LC = eigmax(Symmetric(Matrix(prob.X[:,C]*prob.X[:,C]')))/length(C) + prob.lambda;
         catch loaderror # Uses power iteration if eigmax fails
             # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
-            LC = power_iteration(Symmetric(full(prob.X[:, C]*prob.X[:, C]')))/length(C) + prob.lambda;
+            LC = power_iteration(Symmetric(Matrix(prob.X[:, C]*prob.X[:, C]')))/length(C) + prob.lambda;
         end
     end
     return LC
@@ -50,7 +50,7 @@ function get_expected_smoothness_cst(prob::Prob, tau::Int64)
     # It's another way of counting than in the definition of the expected smoothness constant
     # (first an iteration over the indices, then an iteration over the sets containing the picked index)
     for C in Csets
-        Ls[C] = Ls[C] + (1/c1)*get_LC(prob, C); # Implementation without inner loop
+        Ls[C] = Ls[C] .+ (1/c1)*get_LC(prob, C); # Implementation without inner loop
     end
     expsmoothcst = maximum(Ls);
     return expsmoothcst
@@ -116,9 +116,9 @@ end
 
 function get_mu_str_conv(prob::Prob)
     if(prob.numfeatures < prob.numdata)
-        mu = eigmin(full(prob.X*prob.X'))/prob.numdata + prob.lambda;
+        mu = eigmin(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7 'full(A)' has been deprecated
     else
-        mu = eigmin(full(prob.X'*prob.X))/prob.numdata + prob.lambda;
+        mu = eigmin(Matrix(prob.X'*prob.X))/prob.numdata + prob.lambda; # julia 0.7 'full(A)' has been deprecated
     end
     return mu
 end
@@ -172,7 +172,9 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
     heuristicbound = zeros(n, 1);
     bernsteinbound = zeros(n, 1);
     for tau = 1:n
-        if(tau % floor(Int64, (n/100)) == 1) # 100 messages for the whole data set
+        if(n<100)
+            print("Calculating bounds for tau = ", tau, "\n");
+        elseif((tau % floor(Int64, (n/100))) == 1) # 100 messages for the whole data set
             print("Calculating bounds for tau = ", tau, "\n");
         end
         if(n <= datathreshold)

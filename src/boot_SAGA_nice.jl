@@ -37,7 +37,7 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     probs = [];
     Z = 0.0;
 
-    L = eigmax(full(prob.X*prob.X'))/prob.numdata + prob.lambda; # Smoothness constant of the objective function f
+    L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # Smoothness constant of the objective function f # julia 0.7
     Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda; # Largest smoothness constant of the individual objective functions f_i
     Lis = get_Li(prob);
     Lbar = mean(Lis);

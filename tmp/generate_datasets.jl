@@ -6,7 +6,7 @@ using Match
 using Combinatorics
 using Random
 using Printf # julia 0.7
-using LinearAlgebra
+using LinearAlgebra # julia 0.7
 
 include("../src/StochOpt.jl") # Be carefull about the path here
 

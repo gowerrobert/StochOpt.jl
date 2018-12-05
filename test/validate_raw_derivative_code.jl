@@ -45,15 +45,15 @@ H = X*(t.*(1-t).*(X'))+speye(length(w));
 # errorsacc=0;
 # HD= diag(X*(t.*(1-t).*X'));
 # # for i =1:numfeatures # diagonal elemtn
-# #    #D[i] =(full(X[i,:])'*(t.*(1-t).*(X[i,:])))[1];
+# #    #D[i] =(Matrix(X[i,:])'*(t.*(1-t).*(X[i,:])))[1];
 # #    D[i]=sum((X[i,:].^2).*(t.*(1-t)));
 # # # works
 # # # Hv[:]=  X*(t.*(1-t).*(X[i,:]));
 # # # D[i] = Hv[i];
 # # # doesnt' work
-# #   #D= full(X[i,:])'*(diagm(t.*(1-t))*(X[i,:]));
-# #  #D= full(X[i,:])'*((X[i,:]).*(t.*(1-t)));
-# # # D=full(X[i,:].^2)'*(t.*(1-t));
+# #   #D= Matrix(X[i,:])'*(diagm(t.*(1-t))*(X[i,:]));
+# #  #D= Matrix(X[i,:])'*((X[i,:]).*(t.*(1-t)));
+# # # D=Matrix(X[i,:].^2)'*(t.*(1-t));
 # # end
 # D  =sum((X.^2)'.*(t.*(1-t)),1)';
 # display(norm(HD -D))

@@ -16,7 +16,7 @@ a heuristic estimation of it and its exact value (if there are few data points).
 function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst)
     # PROBLEM: there is still a problem of ticking non integer on the xaxis
 
-    probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./figures/";
     fontsmll = 8;
     fontmed = 12;
@@ -29,7 +29,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
     if typeof(expsmoothcst)==Array{Float64,2}
         plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst], label=["heuristic" "simple" "bernstein" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
+             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
              ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(expsmoothcst)),
              title=string(probname, ", n=", string(n), ", d=", string(d)));
     elseif typeof(expsmoothcst)==Void
@@ -48,7 +48,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
     if typeof(expsmoothcst)==Array{Float64,2}
         plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst], label=["heuristic" "simple" "bernstein" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
+             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
              ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
              title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
     elseif typeof(expsmoothcst)==Void
@@ -97,7 +97,7 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
     if typeof(expsmoothstepsize)==Array{Float64,2}
         plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize expsmoothstepsize], label=["heuristic" "simple" "bernstein" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false,
+             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # julia 0.7 'marker=:auto,'
              ylim=(0, maximum(expsmoothstepsize)+minimum(bernsteinstepsize)),
              # legend=:bottomright,
              title=string(probname, ", n=", string(n), ", d=", string(d)));

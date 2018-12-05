@@ -21,7 +21,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         if opts.regulatrizor_parameter == "1/num_data"
             lambda = 1/numdata;
         else
-            lambda = mean(sum(X.^2, 1))/numdata; # Lbar / n
+            lambda = mean(sum(X.^2, dims=1))/numdata; # Lbar / n # julia 0.7
             println("lambda = ", lambda);
             # display(lambda)
             #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
@@ -39,7 +39,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
                 x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda)
     # ((1/n)X X' +lambda I)w= Xy
     # xsol = ((1/n)X X' +lambda I) \ ( (1/n)*Xy)
-    xsol = (X*X' + numdata*lambda*eye(numfeatures)) \ (X*y);
+    xsol = (X*X' + numdata*lambda*Matrix(1.0I, numfeatures, numfeatures)) \ (X*y); # no more 'eye(numfeatures)' in julia 0.7
     prob.fsol = f_eval(xsol, 1:numdata);
 
     fsolfilename = get_fsol_filename(prob);

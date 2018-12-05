@@ -13,7 +13,7 @@ function load_fsol!(options, prob)
 end
 
 function get_fsol_filename(prob)
-    savename = string(replace(prob.name, r"[\/]", "-"), "-fsol");
+    savename = string(replace(prob.name, r"[\/]" => "-"), "-fsol"); # julia 0.7
     default_path = "./data/";
     return string(default_path, savename);
 end

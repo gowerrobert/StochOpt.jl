@@ -96,7 +96,7 @@ function local_pi_estimate!(w::Array{Float64}, prob::Prob, options::MyOptions, s
     sg.probs[:] = sg.phis.*vec(sum(prob.X.^2, 1)) + prob.lambda; # local Li constants
     # munew = mean(sg.probs)+prob.lambda;
     # println("with phi part: ", mean(sg.probs) )
-    # eigmax(Symmetric(full(prob.X[:,C]'*prob.X[:,C])))/length(C) +prob.lambda;
+    # eigmax(Symmetric(Matrix(prob.X[:,C]'*prob.X[:,C])))/length(C) +prob.lambda;
     sg.probs[:] = sg.probs*4 .+prob.numdata*sg.mu; # julia 0.7
     stepsizeinverse = mean(sg.probs);#*prob.numfeatures;
     sg.probs[:] = sg.probs./sum(sg.probs);
