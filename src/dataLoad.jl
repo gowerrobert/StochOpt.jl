@@ -33,10 +33,6 @@ function transformDataJLD(dataset, classification) # transforms LIBSVM to JLD fo
     X, y = readLIBSVM(string(default_path, "$(dataset)"), classification) # classification=false leads to regression
     save("$(default_path)$(dataset).jld", "X", X, "y", y)
     saveDetails(dataset, X)
-    # details = load("$(default_path)details.jld", "details")
-    # detail = Dict(:dims => size(X, 1), :n => size(X, 2), :sparsity => nnz(SparseMatrixCSC(X))/(size(X, 1)*size(X, 2)))
-    # details[dataset] = detail
-    # save("$(default_path)details.jld", "details", details)
 end
 
 function loadDataset(dataset) # once transformed, load the dataset using JLD
