@@ -15,7 +15,6 @@ figures/*.pdf
 data/*
 !data/housing.jld
 !data/abalone.jld
-!data/YearPredictionMSD.jld
 !data/australian.jld
 !data/leukemia.jld
 !data/gauss-50-24-0.0_seed-1.jld
