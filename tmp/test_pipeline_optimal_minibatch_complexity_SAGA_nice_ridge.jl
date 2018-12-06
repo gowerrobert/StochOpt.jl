@@ -11,29 +11,35 @@ using Base64 # julia 0.7
 
 include("./src/StochOpt.jl") # Be carefull about the path here
 
+default_path = "./data/";
+
 Random.seed!(1234);
 
 ### LOADING DATA ###
 println("--- Loading data ---");
 # Available datasets are in "./data/available_datasets.txt" 
-datasets = ["gauss-5-8-0.0_seed-1234", "YearPredictionMSD", "abalone", "housing"];
+# datasets = ["fff", "gauss-5-8-0.0_seed-1234", "YearPredictionMSD", "abalone", "housing"];
+datasets = readlines("$(default_path)available_datasets.txt");
 #, "letter_scale", "heart", "phishing", "madelon", "a9a",
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 
-## Only loading datasets, no generation
+## Only loading datasets, no data generation
 data = datasets[1];
-try
-    X, y = loadDataset(data);
-catch loaderror
-    println(loaderror);
-    println("Check the list of available datasets in: ./data/available_datasets.txt");
+
+let X = zeros(), y = zeros() # Way to avoid "WARNING: Deprecated syntax `implicit assignment to global variable `X``. Use `global X` instead."
+    try
+        X, y = loadDataset(data);
+    catch loaderror
+        println(loaderror);
+        error("Check the list of available datasets in: \"$(default_path)available_datasets.txt\"");
+    end
 end
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the ridge regression problem ---");
 options = set_options(max_iter=10^8, max_time=10.0, max_epocs=1000, repeat_stepsize_calculation=true, skip_error_calculation=51,
                       force_continue=true, initial_point="randn", batchsize=0);
-prob = load_ridge_regression(X, y, probname, options, lambda=-1, scaling="none");  # Disabling scaling
+prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="none");  # Disabling scaling
 # QUESTION: how is lambda selected?
 n = prob.numdata;
 d = prob.numfeatures;
