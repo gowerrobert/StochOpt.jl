@@ -222,8 +222,8 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
     Li_s = get_Li(prob);
     Lmax = maximum(Li_s);
 
-    rho_over_n = ( n - (1:n) ) ./ ( (1:n).*(n-1) ); # Sketch residual divided by n
-    rightterm = rho_over_n*Lmax + (mu*n)/(4*(1:n)); # Right-hand side term in the max
+    rho_over_n = ( n .- (1:n) ) ./ ( (1:n).*(n-1) ); # Sketch residual divided by n
+    rightterm = rho_over_n*Lmax + ((mu*n)/(4*(1:n)))'; # Right-hand side term in the max
     
     if typeof(expsmoothcst)==Array{Float64,2}
         expsmoothstepsize = 0.25 .* (1 ./ max.(expsmoothcst, rightterm) );
@@ -277,7 +277,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   heuristicstepsize::Array{Float64}, expsmoothstepsize,
                                   opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64, 
                                   opt_minibatch_heuristic::Int64, opt_minibatch_exact::Int64)
-    probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_"); # julia 0.7
     default_path = "./data/";
     savename = "-cst";
 
@@ -293,8 +293,9 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
 
     ## Saving the seed used to generate data
     if data in ["gaussian", "diagonal", "lone_eig_val"]
-        currentseed = Base.Random.GLOBAL_RNG.seed[1];
-        savename = string(savename, "-seed_", currentseed);
+        seed = string(reinterpret(Int32, Random.GLOBAL_RNG.seed[1]));
+        seed = string("_seed-", seed);
+        savename = string(seed, savename);
     end
 
     ## Saving the problem and the related constants

@@ -1,10 +1,26 @@
-
-include("dataLoad.jl")
+include("./dataLoad.jl")
 initDetails()
 
-datasets = ["housing"] #  w1a, SUSY, pendigits, heart
+default_path = "./data/"; 
+
+datasets = ["australian"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
+classification = true;
 for dataset in datasets
-    transformDataJLD(dataset, false) # 2nd arg = classification
-    X, y = loadDataset(dataset)
-    showDetails(dataset)
+    try
+        X, y = loadDataset(dataset);
+        saveDetails(dataset, X); # In case it was not previously done
+        println("The following data set already exists in: ", "$(default_path)$(dataset).jld");
+    catch loaderror
+        println(loaderror);
+        transformDataJLD(dataset, classification); # 2nd arg = classification
+        X, y = loadDataset(dataset);
+    end
+    lines = readlines("$(default_path)available_datasets.txt");
+    if !(dataset in lines)
+        open("$(default_path)available_datasets.txt", "a") do file
+            write(file, "$(dataset)\n");
+        end
+    end
+    showDetails(dataset);
 end
+load("$(default_path)details.jld")

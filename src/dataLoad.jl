@@ -17,6 +17,8 @@
 # 4) Enjoy.
 
 using JLD
+using SparseArrays # julia 0.7
+using Statistics # julia 0.7
 
 # this needs to be changed to your personal path.
 #default_path = "/local/rgower/git/online_saga/julia-online-SAGA/data/" #/local/rgower/libsvmdata/"
@@ -28,21 +30,29 @@ function initDetails() # creates a blank details dictionary
 end
 
 function transformDataJLD(dataset, classification) # transforms LIBSVM to JLD for faster loading
-    details = load("$(default_path)details.jld", "details")
     X, y = readLIBSVM(string(default_path, "$(dataset)"), classification) # classification=false leads to regression
     save("$(default_path)$(dataset).jld", "X", X, "y", y)
+    saveDetails(dataset, X)
+    # details = load("$(default_path)details.jld", "details")
+    # detail = Dict(:dims => size(X, 1), :n => size(X, 2), :sparsity => nnz(SparseMatrixCSC(X))/(size(X, 1)*size(X, 2)))
+    # details[dataset] = detail
+    # save("$(default_path)details.jld", "details", details)
+end
+
+function loadDataset(dataset) # once transformed, load the dataset using JLD
+    println("$(default_path)$(dataset).jld");
+    return load("$(default_path)$(dataset).jld", "X", "y")
+end
+
+function saveDetails(dataset::String, X::SparseMatrixCSC{Float64,Int64}) # saves the details of the dataset
+    details = load("$(default_path)details.jld", "details")
     detail = Dict(:dims => size(X, 1), :n => size(X, 2), :sparsity => nnz(X)/(size(X, 1)*size(X, 2)))
     details[dataset] = detail
     save("$(default_path)details.jld", "details", details)
 end
 
-function loadDataset(dataset) # once transformed, load the dataset using JLD
-    println("$(default_path)$(dataset).jld")
-    return load("$(default_path)$(dataset).jld", "X", "y")
-end
-
 function showDetails(dataset) # shows the details of the dataset
-    return load( "$(default_path)details.jld", "details")[dataset]
+    return load("$(default_path)details.jld", "details")[dataset]
 end
 
 function readLIBSVM(fname::AbstractString, classification::Bool) # the function to read the standard LIBSVM format
@@ -56,7 +66,7 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
     n = 1
     for line in eachline(fi)
         line = split(line, " ")
-        append!(b, [float(line[1])])
+        append!(b, [parse(Float64, line[1])]) # julia 0.7 `float(x::AbstractString)` is deprecated, use `parse(Float64, x)` instead.
         line = line[2:end]
         for itm in line
             if !(strip(itm) == "")
@@ -64,7 +74,7 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
                 append!(Ir, [n])
                 append!(Jr, [parse(Int, strip(itm[1]))])
                 # append!(Jr, [Meta.parse(Int, strip(itm[1]))]) # julia 0.7
-                append!(Pr, [float(strip(itm[2]))])
+                append!(Pr, [parse(Float64, strip(itm[2]))])
             end
         end
         n += 1
@@ -80,5 +90,5 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
     if size(A)[1] == length(b)
         A = A'
     end
-    return A, b
+    return SparseMatrixCSC(A), b
 end

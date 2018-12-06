@@ -9,38 +9,24 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("./src/StochOpt.jl") # Be carefull about the path here
 
 Random.seed!(1234);
 
 ### LOADING DATA ###
-data = "gaussian"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
-
-# If probname="artificial", precise the number of features and data
-numdata = 4;
-numfeatures = 5; # useless for gen_diag_data
-
 println("--- Loading data ---");
-datasets = ["YearPredictionMSD", "abalone", "housing"];
+# Available datasets are in "./data/available_datasets.txt" 
+datasets = ["gauss-5-8-0.0_seed-1234", "YearPredictionMSD", "abalone", "housing"];
 #, "letter_scale", "heart", "phishing", "madelon", "a9a",
 # "mushrooms", "phishing", "w8a", "gisette_scale",
-if(data == "gaussian")
-    ## Load artificial data
-    X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0, err=0.001);
-elseif(data == "diagonal")
-    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100);
-elseif(data == "lone_eig_val")
-    X, y, probname = gen_diag_alone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
-elseif(data in datasets)
-    probname = data;
-    ## Load truncated LIBSVM data
-    X, y = loadDataset(probname);
-    # X = X';
-    # numfeatures = size(X)[1];
-    # numdata = size(X)[2];
-    # y = convert(Array{Float64}, 1:1:size(X)[2]) ; # 14 data taken from X instead of 690
-else
-    error("unkown problem name.");
+
+## Only loading datasets, no generation
+data = datasets[1];
+try
+    X, y = loadDataset(data);
+catch loaderror
+    println(loaderror);
+    println("Check the list of available datasets in: ./data/available_datasets.txt");
 end
 
 ### SETTING UP THE PROBLEM ###
@@ -85,51 +71,51 @@ end
 ##################################################################################################################
 
 
-# ##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
-# #region
-# ## TO BE DONE: implement grid-search for the stepsizes, i.e.
-# ## 1) set a grid of stepsizes around 1/(4Lmax)
-# ## 2) run several SAGA_nice on the same problem with different stepsize (average?)
-# ## 3) pick the 'best' stepsize
+##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
+#region
+## TO BE DONE: implement grid-search for the stepsizes, i.e.
+## 1) set a grid of stepsizes around 1/(4Lmax)
+## 2) run several SAGA_nice on the same problem with different stepsize (average?)
+## 3) pick the 'best' stepsize
 
-# ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
-# simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
+simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-# ### PLOTING ###
-# println("\n--- Ploting stepsizes ---");
-# # PROBLEM: there is still a problem of ticking non integer on the xaxis
-# pyplot()
-# plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
-# #endregion
-# ##################################################################################################################
-
-
-# ###################################### THEORETICAL OPTIMAL MINI-BATCH SIZES ######################################
-# #region
-# ## Compute optimal mini-batch size
-# if typeof(expsmoothcst)==Array{Float64,2}
-#     LHS = 4*(1:n).*(expsmoothcst+prob.lambda)./mu;
-#     RHS = n + (n-(1:n)) .* (4*(Lmax+prob.lambda)/((n-1)*mu));
-#     exacttotalcplx = max.(LHS, RHS);
-#     _, opt_minibatch_exact = findmin(exacttotalcplx);
-# else
-#     opt_minibatch_exact = nothing;
-# end
-
-# ## WARNING: Verify computations : should we add lambda????
-# opt_minibatch_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar)); # One should not add again lambda since it is already taken into account in Lbar
-# opt_minibatch_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L)) )); ## WARNING: Verify computations : should we add lambda????
-# opt_minibatch_heuristic = round(Int, 1 + (mu*(n-1))/(4*L));
-# #endregion
-# ##################################################################################################################
+### PLOTING ###
+println("\n--- Ploting stepsizes ---");
+# PROBLEM: there is still a problem of ticking non integer on the xaxis
+pyplot()
+plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
+#endregion
+##################################################################################################################
 
 
-# ########################################### SAVNG RESULTS ########################################################
-# save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
-#                          simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
-#                          opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
-#                          opt_minibatch_exact);
-# ##################################################################################################################
+###################################### THEORETICAL OPTIMAL MINI-BATCH SIZES ######################################
+#region
+## Compute optimal mini-batch size
+if typeof(expsmoothcst)==Array{Float64,2}
+    LHS = 4*(1:n).*(expsmoothcst .+ prob.lambda)./mu;
+    RHS = n .+ (n .- (1:n)) .* (4*(Lmax+prob.lambda)/((n-1)*mu));
+    exacttotalcplx = reshape(max.(LHS, RHS), n);
+    opt_minibatch_exact = argmin(exacttotalcplx);
+else
+    opt_minibatch_exact = nothing;
+end
+
+## WARNING: Verify computations : should we add lambda????
+opt_minibatch_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar)); # One should not add again lambda since it is already taken into account in Lbar
+opt_minibatch_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L)) )); ## WARNING: Verify computations : should we add lambda????
+opt_minibatch_heuristic = round(Int, 1 + (mu*(n-1))/(4*L));
+#endregion
+##################################################################################################################
+
+
+########################################### SAVNG RESULTS ########################################################
+save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
+                         simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
+                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
+                         opt_minibatch_exact);
+##################################################################################################################
 
 
 # ######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################

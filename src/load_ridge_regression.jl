@@ -4,6 +4,8 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     #  f_i(w) =  1/2(X_{:i}^T w  -y_i)^2 + lambda/2 ||w||^2
     #  nabla f_i =  X_{:i}(X_{:i}^T w  -y_i)^2 + lambda w
 
+    name = string("ridge_", probname);
+
     ## standard normalization. Leave this for choosing X
     if(typeof(scaling) == String)
         datascaling = fit_apply_datascaling(X, scaling);

@@ -84,7 +84,7 @@ heuristic estimation and the exact expected smoothness constant (if there are fe
 function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, heuristicstepsize::Array{Float64}, expsmoothstepsize)
     # PROBLEM: there is still a problem of ticking non integer on the xaxis
 
-    probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./figures/";
     fontsmll = 8;
     fontmed = 12;
