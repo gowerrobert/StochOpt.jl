@@ -2,15 +2,15 @@
 function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) #, datapassbnd::Int64
     #Now in epocs X function values
     if(options.batchsize > 0)
-        probname = string(replace(prob.name, r"[\/].", "-"), "-", options.batchsize);
+        probname = string(replace(prob.name, r"[\/]." => "-"), "-", options.batchsize);
     else
-        probname = string(replace(prob.name, r"[\/].", "-"));
+        probname = string(replace(prob.name, r"[\/]." => "-"));
     end
-    probname = replace(probname, ".", "_")
+    probname = replace(probname, "." => "_")
     if(options.precondition)
         probname = string(probname, "-precon")
     end
-    default_path = "./data/";  # savename= string(replace(prob.name, r"[\/]", "-"),"-", options.batchsize);
+    default_path = "./data/";  # savename= string(replace(prob.name, r"[\/]" => "-"),"-", options.batchsize);
     save("$(default_path)$(probname).jld", "OUTPUTS", OUTPUTS);
     fontsmll = 8;
     fontmed = 14;

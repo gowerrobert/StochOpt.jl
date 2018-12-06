@@ -141,7 +141,7 @@ function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, em
                                    opt_minibatch_heuristic::Int64,
                                    opt_minibatch_emp::Int64)
 
-    probname = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./figures/";
     fontsmll = 8;
     fontmed = 12;

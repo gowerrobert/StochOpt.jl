@@ -38,7 +38,7 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     Z = 0.0;
 
     L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # Smoothness constant of the objective function f # julia 0.7
-    Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda; # Largest smoothness constant of the individual objective functions f_i
+    Lmax = maximum(sum(prob.X.^2, dims=1)) + prob.lambda; # Largest smoothness constant of the individual objective functions f_i
     Lis = get_Li(prob);
     Lbar = mean(Lis);
     mu = get_mu_str_conv(prob); # Strong convexity constant of the objective function f
@@ -71,7 +71,7 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     # println("----------------First expected smoothness estimation: ", Lexpected);
     # println("------------------Heuristic expected smoothness estimation : ", simplebound);
 
-    if(contains(prob.name, "lgstc"))
+    if(occursin("lgstc", prob.name)) # julia 0.7
         Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
     end
     rightterm = ((n-tau)/(tau*(n-1)))*method.Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator

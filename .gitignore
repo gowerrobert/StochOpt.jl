@@ -15,6 +15,13 @@ figures/*.pdf
 data/*
 !data/housing.jld
 !data/abalone.jld
+!data/YearPredictionMSD.jld
+!data/australian.jld
+!data/leukemia.jld
+!data/gauss-50-24-0.0_seed-1.jld
+!data/diagints-24-0.0-100_seed-1.jld
+!data/diagints-10-0.0-100_seed-1.jld
+!data/diagalone-24-0.0-100_seed-1.jld
 
 ## Temporary codes for exploration
 tmp/test_linreg.jl

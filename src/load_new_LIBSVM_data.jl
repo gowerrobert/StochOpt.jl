@@ -3,7 +3,8 @@ initDetails()
 
 default_path = "./data/"; 
 
-datasets = ["australian"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
+datasets = ["leukemia"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
+# leukemia is the concatenation of leu and leu.t (resp. training and test sets)
 classification = true;
 for dataset in datasets
     try
@@ -17,6 +18,7 @@ for dataset in datasets
     end
     lines = readlines("$(default_path)available_datasets.txt");
     if !(dataset in lines)
+        println("Writing its name in: ", "$(default_path)available_datasets.txt");
         open("$(default_path)available_datasets.txt", "a") do file
             write(file, "$(dataset)\n");
         end

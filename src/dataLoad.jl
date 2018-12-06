@@ -36,8 +36,14 @@ function transformDataJLD(dataset, classification) # transforms LIBSVM to JLD fo
 end
 
 function loadDataset(dataset) # once transformed, load the dataset using JLD
-    println("$(default_path)$(dataset).jld");
-    return load("$(default_path)$(dataset).jld", "X", "y")
+    try
+        X, y = load("$(default_path)$(dataset).jld", "X", "y");
+        println("$(default_path)$(dataset).jld");
+        return X, y
+    catch loaderror
+        println(loaderror);
+        error("Check the list of available datasets in: \"$(default_path)available_datasets.txt\"");
+    end
 end
 
 function saveDetails(dataset::String, X::SparseMatrixCSC{Float64,Int64}) # saves the details of the dataset

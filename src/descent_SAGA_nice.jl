@@ -18,9 +18,9 @@ function descent_SAGA_nice(x::Array{Float64}, prob::Prob, options::MyOptions, sg
     # /!\ WARNING: this function modifies its own arguments (d and sg) and return nothing! Shouldn't we name it "descent_SAGA_nice!(...)" with an "!" ?
     s = sample(1:prob.numdata, options.batchsize, replace=false);
     # Assign each gradient to a different column of Jac
-    sg.aux[:] = -sum(sg.Jac[:,s], 2); # Calculating the update vector aux = (DF^k-J^k) Proj 1 = sum_{i \in S_k} (\nabla f_i (x^k) - J_{:i}^k)
+    sg.aux[:] = -sum(sg.Jac[:,s], dims=2); # Calculating the update vector aux = (DF^k-J^k) Proj 1 = sum_{i \in S_k} (\nabla f_i (x^k) - J_{:i}^k)
     prob.Jac_eval!(x, s, sg.Jac); # Update of the Jacobian estimate
-    sg.aux[:] += sum(sg.Jac[:,s], 2);
+    sg.aux[:] += sum(sg.Jac[:,s], dims=2);
 
     # ## Using the scalar gradient trick for "linear models"
     # scalargrad = prob.scalar_grad_eval(x, s);

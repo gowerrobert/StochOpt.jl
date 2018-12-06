@@ -9,21 +9,21 @@ using Random
 using Printf # julia 0.7
 using LinearAlgebra # julia 0.7
 
-include("./src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl") # Be carefull about the path here
 
 
 println("--- Getting seed ---")
-Random.seed!(1234);
+Random.seed!(1);
 seed = string(reinterpret(Int32, Random.GLOBAL_RNG.seed[1]));
 seed = string("_seed-", seed);
 
 ### LOADING DATA ###
-data = "gaussian";
+# data = "gaussian";
 # data = "diagonal";
-# data = "alone_eig_val";
+data = "alone_eig_val";
 
-numdata = 8;
-numfeatures = 5; # useless for gen_diag_data
+numdata = 24;
+numfeatures = 50; # useless for gen_diag_*
 
 println("--- Generating data ---")
 # Add 'if not in available data sets'
