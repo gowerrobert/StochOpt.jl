@@ -267,6 +267,10 @@ optimal mini-batch size (both are of type Void if not available).
       the heuristic\\
     - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact stepsize corresponding to 
       the exact expected smoothness constant\\
+    - **Int64** opt\\_minibatch\\_simple: simple bound optimal mini-batch size estimate\\
+    - **Int64** opt\\_minibatch\\_bernstein: bernstein bound optimal mini-batch size estimate\\
+    - **Int64** opt\\_minibatch\\_heuristic: heuristic optimal mini-batch size estimate\\
+    - **Int64** opt\\_minibatch\\_exact: theoretical exact optimal mini-batch size\\
 #OUTPUTS:\\
     - None
 """
@@ -317,8 +321,8 @@ The computation rule is arbitrary, but depends on the dimension of the problem a
 
 #INPUTS:\\
     - **Int64** n: number of data samples\\
-    - **Int64** minibatch_size: size of the mini-batch\\
-    - **Float64** skip_multiplier: arbitrary multiplier\\
+    - **Int64** minibatch\\_size: size of the mini-batch\\
+    - **Float64** skip\\_multiplier: arbitrary multiplier\\
 #OUTPUTS:\\
     - **Int64** skipped_errors: number iterations between two evaluations of the error\\
 """
@@ -348,11 +352,11 @@ correpsonding average iteration complexity.
     - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
     - **Int64** numsimu: number of runs of mini-batch SAGA\\
     - **Float64** tolerance: relative error convergence threshold, at last iteration we have (f(x)-fsol)/(f0-fsol) < epsilon\\
-    - **Int64** skipped _ errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
-    - **Float64** skip _ multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
-    - **Int64** max _ iter: maximum number of iterations\\
-    - **Float64** max _ time: maximum run time\\
-    - **Int64** max _ epochs: maximum number of epochs\\
+    - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
+    - **Float64** skip\\_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
+    - **Int64** max\\_iter: maximum number of iterations\\
+    - **Float64** max\\_time: maximum run time\\
+    - **Int64** max\\_epochs: maximum number of epochs\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(minibatchlist)*numsimu\\
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
