@@ -9,7 +9,7 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("./src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl") # Be carefull about the path here
 
 default_path = "./data/";
 
@@ -29,11 +29,14 @@ data = datasets[4];
 X, y = loadDataset(data);
 
 ### SETTING UP THE PROBLEM ###
-println("\n--- Setting up the ridge regression problem ---");
+println("\n--- Setting up the selected problem ---");
 options = set_options(max_iter=10^8, max_time=10.0, max_epocs=1000, repeat_stepsize_calculation=true, skip_error_calculation=51,
                       force_continue=true, initial_point="randn", batchsize=0);
-# prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="none");  # Disabling scaling
-prob = load_logistic_from_matrices(X, y, data, options);  # Loads logisitc problem
+# => fixes lambda 
+# options.regularizor_parameter = "normalized";
+options.regularizor_parameter = "Lbar/n";
+# prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="column-scaling");  # No scaling, lambda = Lbar / n
+prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="column-scaling");  # scaling = centering and scaling, lambda = 1/(2.0*numdata)
 
 # QUESTION: how is lambda selected?
 
@@ -151,6 +154,9 @@ save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound
 # minibatchlist = [1, 2, 3, 5, 10, 20, 50];
 # minibatchlist = [10, 50, 100, 1000];
 
+## For australian (classification)
+# minibatchlist = [1, 2, 3, 5, 10];
+# minibatchlist = [1, 2, 3, 5, 10, 20, 50];
 
 # minibatchlist = [100];
 # minibatchlist = [1, 10, 50];
@@ -166,7 +172,8 @@ minibatchlist = [5, 1];
 
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
 
-@time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-1)); # julia 0.7
+@time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-2),
+                                                skipped_errors=100); # julia 0.7
 
 ## Checking that all simulations reached tolerance
 fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)*numsimu];
@@ -190,7 +197,6 @@ pyplot()
 plot_empirical_complexity(prob, minibatchlist, empcomplex, 
                           opt_minibatch_simple, opt_minibatch_bernstein, 
                           opt_minibatch_heuristic, opt_minibatch_emp);
-
 
 # ######################################### PRINTING CONSTANTS AND RESULTS #########################################
 println("\nPROBLEM DIMENSIONS:");

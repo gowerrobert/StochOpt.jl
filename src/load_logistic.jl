@@ -81,46 +81,64 @@ Load a logistic regression problem. The option input sets the regularization par
 #OUTPUTS:\\
     - **Prob** prob: considered problem, here logistic regression
 """
-function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString, opts::MyOptions; scaling="column-scaling")
+function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString, opts::MyOptions; lambda=-1, scaling="column-scaling")
     # Load logistic regression problem
-    #try
+
     name = string("lgstc_", name);
-
-    stdX = std(X, 2);
-    # Replace 0 in std by 1 incase there is a constant feature
-    ind = (0 .== stdX); # Testing for a zero std # julia 0.7
-    stdX[ind] = 1.0;
-    X[:, :] = (X.-mean(X,2))./stdX; # Centering and scaling the data.
-    X = [X; ones(size(X, 2))'];
-
-    # Under development: a Datascaling structure
+    
+    ## standard normalization. Leave this for choosing X
     datascaling = DataScaling([], [], [], "..");
-    # if(typeof(scaling) == String)
-    #   datascaling = fit_apply_datascaling(X, scaling);
-    # elseif(typeof(scaling) == DataScaling)
-    #   datascaling = scaling;
-    #   apply_datascaling(X, datascaling);
-    # end
-    # if(datascaling.name != "column-scaling")
-    #   name = string(name,"-",datascaling.name)
-    # end
+    if(typeof(scaling) == String)
+        datascaling = fit_apply_datascaling(X, scaling);
+    elseif(typeof(scaling) == DataScaling)
+        datascaling = scaling;
+        apply_datascaling(X, datascaling);
+    end
+    name = string(name, "-", datascaling.name)
+
+    # stdX = std(X, dims=2);
+    # # Replace 0 in std by 1 incase there is a constant feature
+    # ind = (0 .== stdX); # Testing for a zero std # julia 0.7
+    # stdX[ind] .= 1.0;
+    # X[:, :] = (X.-mean(X, dims=2))./stdX; # Centering and scaling the data.
+    # X = [X; ones(size(X, 2))'];
+
+    # # Under development: a Datascaling structure
+    # datascaling = DataScaling([], [], [], "..");
+    # # if(typeof(scaling) == String)
+    # #   datascaling = fit_apply_datascaling(X, scaling);
+    # # elseif(typeof(scaling) == DataScaling)
+    # #   datascaling = scaling;
+    # #   apply_datascaling(X, datascaling);
+    # # end
+    # # if(datascaling.name != "column-scaling")
+    # #   name = string(name,"-",datascaling.name)
+    # # end
 
     sX = size(X);
     numfeatures = sX[1];
     numdata = sX[2];
     #Transforming y to the binary to -1 and 1 representation
-    y[find(x->x==minimum(y), y)] = -1;
-    y[find(x->x==maximum(y), y)] = 1;
+    y[findall(x->x==minimum(y), y)] .= -1;
+    y[findall(x->x==maximum(y), y)] .= 1;
 
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
-    if opts.regularizor_parameter == "1/num_data"
-        lambda = 1/numdata;
-    elseif opts.regularizor_parameter == "normalized"
-        lambda = 1/(2.0*numdata) #maximum(sum(X.^2,1))/(4.0*numdata);
-        #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
-    else
-        lambda = opts.regularizor_parameter;
+    if(lambda == -1)
+        if(opts.regularizor_parameter == "1/num_data")
+            lambda = 1/numdata;
+        elseif(opts.regularizor_parameter == "normalized")
+            lambda = 1/(2.0*numdata) #maximum(sum(X.^2,1))/(4.0*numdata);
+            #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
+        elseif(opts.regularizor_parameter == "Lbar/n")
+            lambda = mean(sum(X.^2, dims=1))/numdata; # Lbar / n # julia 0.7
+            # display(lambda)
+            #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
+        else
+            error("Unknown regularizor_parameter option");
+        end
     end
+    println("lambda = ", lambda);
+
     # if opts.regularizor =="huber"
     #         f_eval(x,S) =  (1./length(S))*logistic_eval(Xt,y,x,S)+(reg)* huber_eval(x,opts.hubermu);
     #         g_eval(x,S) = ((1./length(S))*logistic_grad_sub(Xt,y,x,S)+(reg)*huber_grad(x,opts.hubermu));

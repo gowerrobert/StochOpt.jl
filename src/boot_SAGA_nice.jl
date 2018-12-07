@@ -67,12 +67,14 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     leftcoeff = (n*(tau-1))/(tau*(n-1));
     rightcoeff = (n-tau)/(tau*(n-1));
     simplebound = leftcoeff*method.Lbar + rightcoeff*method.Lmax;
+    Lheuristic = leftcoeff*method.L + rightcoeff*method.Lmax;
     # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*method.Lmax + ((tau - 1)/(n - 1))*method.L;
     # println("----------------First expected smoothness estimation: ", Lexpected);
     # println("------------------Heuristic expected smoothness estimation : ", simplebound);
 
     if(occursin("lgstc", prob.name)) # julia 0.7
-        Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
+        # Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
+        Lheuristic = Lheuristic/4;    #  correcting for logistic since phi'' <= 1/4 + using heuristic estimation
     end
     rightterm = ((n-tau)/(tau*(n-1)))*method.Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
     method.stepsize = 1.0/(4*max(simplebound, rightterm));

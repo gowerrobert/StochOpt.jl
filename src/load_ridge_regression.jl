@@ -19,16 +19,21 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     numdata = sX[2];
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
-    if(lambda ==-1)
-        if opts.regularizor_parameter == "1/num_data"
+    if(lambda == -1)
+        if(opts.regularizor_parameter == "1/num_data")
             lambda = 1/numdata;
-        else
+        elseif(opts.regularizor_parameter == "normalized")
+            lambda = 1/(2.0*numdata); #maximum(sum(X.^2,1))/(4.0*numdata);
+            #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
+        elseif(opts.regularizor_parameter == "Lbar/n")
             lambda = mean(sum(X.^2, dims=1))/numdata; # Lbar / n # julia 0.7
-            println("lambda = ", lambda);
             # display(lambda)
             #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
+        else
+            error("Unknown regularizor_parameter option");
         end
     end
+    println("lambda = ", lambda);
 
     f_eval(x, S)                = ((1 ./ length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2); # julia 0.7
     g_eval(x, S)                = ((1 ./ length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x); # julia 0.7

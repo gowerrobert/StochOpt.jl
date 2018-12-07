@@ -146,7 +146,7 @@ each mini-batch size ``τ`` from 1 to n.
     - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
     - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant\\
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothcst: exact expected smoothness constant\\
 """
 function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
     n = prob.numdata;
@@ -203,7 +203,7 @@ our heuristic and the exact expected smoothness constant for each mini-batch siz
     - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
     - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant\\
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothcst: exact expected smoothness constant\\
 #OUTPUTS:\\
     - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to 
       the simple upper bound\\
@@ -211,7 +211,7 @@ our heuristic and the exact expected smoothness constant for each mini-batch siz
       the Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to 
       the heuristic\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact stepsize corresponding to 
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact stepsize corresponding to 
       the exact expected smoothness constant\\
 """
 function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64}, 
@@ -238,18 +238,18 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
 end
 
 """
-    save_SAGA_nice_constants(prob::Prob, data::String, 
-                             simplebound::Array{Float64}, bernsteinbound::Array{Float64}, 
-                             heuristicbound::Array{Float64}, expsmoothcst, 
-                             simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, 
-                             heuristicstepsize::Array{Float64}, expsmoothstepsize,
-                             opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64, 
-                             opt_minibatch_heuristic::Int64, opt_minibatch_exact::Int64)
+    save_SAGA_nice_constants(prob, data, 
+                             simplebound, bernsteinbound, 
+                             heuristicbound, expsmoothcst, 
+                             simplestepsize, bernsteinstepsize, 
+                             heuristicstepsize, expsmoothstepsize,
+                             opt_minibatch_simple, opt_minibatch_bernstein, 
+                             opt_minibatch_heuristic, opt_minibatch_exact)
 
 Saves the problem, caracteristic constants of the problem, the upper bounds of the expected 
 smoothness constant, and corresponding estimation of the optimal mini-batch size. 
 It also saves the exact expected smoothness constant and its corresponding 
-optimal mini-batch size (both are of type Void if not available).
+optimal mini-batch size (both are of type Nothing if not available).
 
 #INPUTS:\\
     - **Prob** prob: considered problem, i.e. logistic regression, ridge regression... 
@@ -258,19 +258,19 @@ optimal mini-batch size (both are of type Void if not available).
     - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
     - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant\\
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothcst: exact expected smoothness constant\\
     - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to 
       the simple upper bound\\
     - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to 
       the Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to 
       the heuristic\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact stepsize corresponding to 
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact stepsize corresponding to 
       the exact expected smoothness constant\\
     - **Int64** opt\\_minibatch\\_simple: simple bound optimal mini-batch size estimate\\
     - **Int64** opt\\_minibatch\\_bernstein: bernstein bound optimal mini-batch size estimate\\
     - **Int64** opt\\_minibatch\\_heuristic: heuristic optimal mini-batch size estimate\\
-    - **Int64** opt\\_minibatch\\_exact: theoretical exact optimal mini-batch size\\
+    - opt\\_minibatch\\_exact: theoretical exact optimal mini-batch size\\
 #OUTPUTS:\\
     - None
 """
@@ -280,7 +280,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, 
                                   heuristicstepsize::Array{Float64}, expsmoothstepsize,
                                   opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64, 
-                                  opt_minibatch_heuristic::Int64, opt_minibatch_exact::Int64)
+                                  opt_minibatch_heuristic::Int64, opt_minibatch_exact)
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_"); # julia 0.7
     default_path = "./data/";
     savename = "-cst";

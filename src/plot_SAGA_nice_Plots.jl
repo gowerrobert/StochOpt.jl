@@ -9,7 +9,7 @@ a heuristic estimation of it and its exact value (if there are few data points).
     - nx1 **Array{Float64,2}** simplebound: simple bound of the expected smoothness constant for each mini-batch size ``τ`` from 1 to n\\
     - nx1 **Array{Float64,2}** bernsteinbound: Bernstein bound of the expected smoothness constant for each mini-batch size ``τ`` from 1 to n\\
     - nx1 **Array{Float64,2}** heuristic: heuristic estimation of the expected smoothness constant for each mini-batch size ``τ`` from 1 to n\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothcst: exact expected smoothness constant for each mini-batch size ``τ`` from 1 to n\\
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothcst: exact expected smoothness constant for each mini-batch size ``τ`` from 1 to n\\
 #OUTPUTS:\\
     - None
 """
@@ -32,7 +32,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
              ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(expsmoothcst)),
              title=string(probname, ", n=", string(n), ", d=", string(d)));
-    elseif typeof(expsmoothcst)==Void
+    elseif typeof(expsmoothcst)==Nothing
         plot(1:n, [heuristicbound simplebound bernsteinbound], label=["heuristic" "simple" "bernstein"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,
@@ -51,7 +51,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
              ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
              title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
-    elseif typeof(expsmoothcst)==Void
+    elseif typeof(expsmoothcst)==Nothing
         plot(1:n, [heuristicbound simplebound bernsteinbound], label=["heuristic" "simple" "bernstein"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
@@ -77,7 +77,7 @@ heuristic estimation and the exact expected smoothness constant (if there are fe
     - nx1 **Array{Float64,2}** simplestepsize: simple bound stepsizes\\
     - nx1 **Array{Float64,2}** bernsteinstepsize: Bernstein bound stepsizes\\
     - nx1 **Array{Float64,2}** heuristicstepsize: heuristic estimation stepsizes\\
-    - nx1 **Array{Float64,2}** or **Void** expsmoothstepsize: exact expected smoothness constant stepsize upper bound\\
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact expected smoothness constant stepsize upper bound\\
 #OUTPUTS:\\
     - None
 """
@@ -101,7 +101,7 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
              ylim=(0, maximum(expsmoothstepsize)+minimum(bernsteinstepsize)),
              # legend=:bottomright,
              title=string(probname, ", n=", string(n), ", d=", string(d)));
-    elseif typeof(expsmoothstepsize)==Void
+    elseif typeof(expsmoothstepsize)==Nothing
         plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize], label=["heuristic" "simple" "bernstein"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto,
@@ -160,7 +160,7 @@ function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, em
     vline!([opt_minibatch_emp+0.04], line=(:auto, 3), color=1, label="empirical");
     vline!([opt_minibatch_simple-0.04], line=(:auto, 3), color=:red, label="simple", legendtitle="Optimal mini-batch size");
     vline!([opt_minibatch_bernstein-0.02], line=(:auto, 3), color=:black, label="bernstein");
-    vline!([opt_minibatch_heuristic+0.02], line=(:auto, 3), color=:purple, label="heurstic");
+    vline!([opt_minibatch_heuristic+0.02], line=(:auto, 3), color=:purple, label="heuristic");
     savename = "-empcomplex-$(numsimu)-avg";
     savefig("$(default_path)$(probname)$(savename).pdf");
 end
