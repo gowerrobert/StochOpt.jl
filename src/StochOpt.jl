@@ -17,7 +17,7 @@ mutable struct MyOptions # julia 0.7
     exacterror::Bool
     repeat_stepsize_calculation::Bool
     batchsize
-    regulatrizor_parameter::AbstractString
+    regularizor_parameter::AbstractString
     stepsize_multiplier::Float64
     precondition::Bool
     force_continue::Bool
