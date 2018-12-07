@@ -20,7 +20,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
     if(lambda ==-1)
-        if opts.regulatrizor_parameter == "1/num_data"
+        if opts.regularizor_parameter == "1/num_data"
             lambda = 1/numdata;
         else
             lambda = mean(sum(X.^2, dims=1))/numdata; # Lbar / n # julia 0.7

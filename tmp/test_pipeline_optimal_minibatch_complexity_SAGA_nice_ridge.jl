@@ -24,7 +24,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 
 ## Only loading datasets, no data generation
-data = datasets[end];
+data = datasets[4];
 
 X, y = loadDataset(data);
 
@@ -32,7 +32,8 @@ X, y = loadDataset(data);
 println("\n--- Setting up the ridge regression problem ---");
 options = set_options(max_iter=10^8, max_time=10.0, max_epocs=1000, repeat_stepsize_calculation=true, skip_error_calculation=51,
                       force_continue=true, initial_point="randn", batchsize=0);
-prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="none");  # Disabling scaling
+# prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="none");  # Disabling scaling
+prob = load_logistic_from_matrices(X, y, data, options);  # Loads logisitc problem
 
 # QUESTION: how is lambda selected?
 
@@ -192,14 +193,14 @@ plot_empirical_complexity(prob, minibatchlist, empcomplex,
 
 
 # ######################################### PRINTING CONSTANTS AND RESULTS #########################################
-# println("\nPROBLEM DIMENSIONS:");
-# println("   Number of datapoints = ", n); # n in the paper notation
-# println("   Number of features = ", d); # d in the paper notation
+println("\nPROBLEM DIMENSIONS:");
+println("   Number of datapoints = ", n); # n in the paper notation
+println("   Number of features = ", d); # d in the paper notation
 
-# println("\nSimple optimal tau = ", opt_minibatch_simple);
-# println("Bernstein optimal tau = ", opt_minibatch_bernstein);
-# println("Heuristic optimal tau = ", opt_minibatch_heuristic);
-# println("The empirical optimal tau = ", opt_minibatch_emp);
+println("\nSimple optimal tau = ", opt_minibatch_simple);
+println("Bernstein optimal tau = ", opt_minibatch_bernstein);
+println("Heuristic optimal tau = ", opt_minibatch_heuristic);
+println("The empirical optimal tau = ", opt_minibatch_emp);
 
 # # println("List of mini-batch sizes = ", minibatchlist);
 # println("\nEmpirical complexity = ", empcomplex);
