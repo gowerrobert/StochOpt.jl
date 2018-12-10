@@ -78,11 +78,13 @@ heuristic estimation and the exact expected smoothness constant (if there are fe
     - nx1 **Array{Float64,2}** simplestepsize: simple bound stepsizes\\
     - nx1 **Array{Float64,2}** bernsteinstepsize: Bernstein bound stepsizes\\
     - nx1 **Array{Float64,2}** heuristicstepsize: heuristic estimation stepsizes\\
+    - nx1 **Array{Float64,2}** hofmannstepsize: optimal step size given by Hofmann et. al. 2015\\
     - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact expected smoothness constant stepsize upper bound\\
 #OUTPUTS:\\
     - None
 """
-function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, heuristicstepsize::Array{Float64}, expsmoothstepsize)
+function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, 
+                              heuristicstepsize::Array{Float64}, hofmannstepsize::Array{Float64}, expsmoothstepsize)
     # PROBLEM: there is still a problem of ticking non integer on the xaxis
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
@@ -96,14 +98,14 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
     d = prob.numfeatures;
 
     if typeof(expsmoothstepsize)==Array{Float64,2}
-        plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize expsmoothstepsize], label=["heuristic" "simple" "bernstein" "true"],
+        plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize hofmannstepsize expsmoothstepsize], label=["heuristic" "simple" "bernstein" "hofmann" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # julia 0.7 'marker=:auto,'
              ylim=(0, maximum(expsmoothstepsize)+minimum(bernsteinstepsize)),
              # legend=:bottomright,
              title=string(probname, ", n=", string(n), ", d=", string(d)));
     elseif typeof(expsmoothstepsize)==Nothing
-        plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize], label=["heuristic" "simple" "bernstein"],
+        plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize hofmannstepsize], label=["heuristic" "simple" "bernstein" "hofmann"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto,
              ylim=(0, maximum(heuristicstepsize)+minimum(bernsteinstepsize)),

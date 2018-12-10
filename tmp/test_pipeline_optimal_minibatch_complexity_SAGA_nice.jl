@@ -24,7 +24,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 
 ## Only loading datasets, no data generation
-data = datasets[1];
+data = datasets[10];
 
 X, y = loadDataset(data);
 
@@ -78,13 +78,13 @@ end
 ## 3) pick the 'best' stepsize
 
 ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
-simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
 ### PLOTING ###
 println("\n--- Ploting stepsizes ---");
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 pyplot()
-plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
+plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize);
 #endregion
 ##################################################################################################################
 

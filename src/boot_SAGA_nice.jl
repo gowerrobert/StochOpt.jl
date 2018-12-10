@@ -36,9 +36,7 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     stepsize = 0.0;
     probs = [];
     Z = 0.0;
-    
-    # return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice, minibatches, unbiased,
-    #     Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, prob.L, prob.Lmax, prob.Lbar, prob.mu); # csts -> prob
+
     return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice, minibatches, unbiased,
                             Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z);
 end
@@ -74,6 +72,8 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     end
     rightterm = ((n-tau)/(tau*(n-1)))*prob.Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
     method.stepsize = 1.0/(4*max(simplebound, rightterm));
+    # K = (4*tau*prob.Lmax)/(n*prob.mu);
+    # method.stepsize = K/(2*prob.Lmax*(1+K+sqrt(1+K^2))); # Hofmann
     # method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*probmu);
     # stepsize2 =  1.0/(4*max(simplebound, rightterm));
     # println("----------------First stepsize: ", method.stepsize);

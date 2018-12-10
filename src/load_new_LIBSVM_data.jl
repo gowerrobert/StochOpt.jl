@@ -1,11 +1,13 @@
-include("./dataLoad.jl")
+# include("./dataLoad.jl")
+include("./src/dataLoad.jl")
 initDetails()
 
-default_path = "./data/"; 
+default_path = "./data/";
 
-datasets = ["leukemia"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
+datasets = ["YearPredictionMSD_full"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
 # leukemia is the concatenation of leu and leu.t (resp. training and test sets)
-classification = true;
+classification = false; # Regression
+# classification = true; # Binary classification
 for dataset in datasets
     try
         X, y = loadDataset(dataset);

@@ -216,6 +216,7 @@ our heuristic and the exact expected smoothness constant for each mini-batch siz
       the Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to 
       the heuristic\\
+    - nx1 **Array{Float64,2}** hofmannstepsize: optimal step size given by Hofmann et. al. 2015\\
     - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact stepsize corresponding to 
       the exact expected smoothness constant\\
 """
@@ -235,7 +236,10 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
     bernsteinstepsize = 0.25 .* (1 ./ max.(bernsteinbound, rightterm) );
     heuristicstepsize = 0.25 .* (1 ./ max.(heuristicbound, rightterm) );
 
-    return simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize
+    K = (4*prob.Lmax*(1:n))/(n*prob.mu); # Hofmann
+    hofmannstepsize = K ./ (2*prob.Lmax*(1 .+ K .+ sqrt.(1 .+ K.^2)));
+
+    return simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize
 end
 
 """
