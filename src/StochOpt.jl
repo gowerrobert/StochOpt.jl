@@ -78,9 +78,13 @@ mutable struct Prob # julia 0.7
     Hess_C::Function   # Gets subset of the columns of Hessian
     Hess_C!::Function   # Gets subset of the columns of Hessian
     Hess_C2::Function
-    lambda::Float64
     #    Hess_vv::Function  # Calculates the Hessian-vector-vector product v'Hv
     ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method) 
+    lambda::Float64
+    mu::Float64 # Strong-convexity constant
+    L::Float64 # Smoothness constant of the whole objective function f
+    Lmax::Float64 # Max of the smoothness constant of the f_i functions
+    Lbar::Float64 # Average of the smoothness constant of the f_i functions
 end
 
 mutable struct SAGAmethod # julia 0.7
@@ -101,8 +105,8 @@ mutable struct SAGAmethod # julia 0.7
     probs::Array{Float64}  # Probability of selecting a coordinate or mini-batch
     probability_type::AbstractString # type of probabilities used, e.g., uniform, nonuniform, nonuniform_opt
     Z    # normalizing variable for probabilities
-    L::Float64  # An estimate of the smoothness constant
-    Lmax::Float64  # the max smoothness constant of the f_i functions
+    L::Float64 # Smoothness constant of the whole objective function f
+    Lmax::Float64 # Max of the smoothness constant of the f_i functions
     mu::Float64
 end
 
@@ -122,10 +126,10 @@ mutable struct SAGA_nice_method # julia 0.7
     stepsize::Float64     # The stepsize
     probs::Array{Float64}  # Probability of selecting a coordinate or mini-batch
     Z    # normalizing variable for probabilities
-    L::Float64  # An estimate of the smoothness constant
-    Lmax::Float64  # the max smoothness constant of the f_i functions
-    Lbar::Float64  # the average of the smoothness constant of the f_i functions
-    mu::Float64
+    # L::Float64 # Smoothness constant of the whole objective function f
+    # Lmax::Float64 # Max of the smoothness constant of the f_i functions
+    # Lbar::Float64 # Average of the smoothness constant of the f_i functions
+    # mu::Float64 # Strong-convexity constant
 end
 
 mutable struct SPIN # julia 0.7

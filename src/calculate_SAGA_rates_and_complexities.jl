@@ -4,37 +4,39 @@ function calculate_rate_SAGA_nice(prob::Prob, method, options::MyOptions)
 
 end
 
-function get_Li(prob::Prob)
+function get_Li(X, lambda::Float64)
     # Return an array of the Li_s
-    n = prob.numdata;
+    n = size(X, 2);
     Li_s = zeros(1, n);
     for i = 1:n
-        Li_s[i] = prob.X[:,i]'*prob.X[:,i] + prob.lambda;
+        Li_s[i] = X[:,i]'*X[:,i] + lambda;
     end
     return Li_s
 end
 
-function get_LC(prob::Prob, C)
+function get_LC(X, lambda::Float64, C)
     # println("full")
     # Matrix(prob.X[:, C]'*prob.X[:, C])
     # println("Symmetric")
     # Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C]))
     # println("Eigmax")
     # eigmax(Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C])))
+    numfeatures = size(X, 1);
+
     LC = 0;
-    if(length(C) < prob.numfeatures)
+    if(length(C) < numfeatures)
         try
-            LC = eigmax(Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
+            LC = eigmax(Symmetric(Matrix(X[:, C]'*X[:, C])))/length(C) + lambda;
         catch loaderror # Uses power iteration if eigmax fails
             # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
-            LC = power_iteration(Symmetric(Matrix(prob.X[:, C]'*prob.X[:, C])))/length(C) + prob.lambda;
+            LC = power_iteration(Symmetric(Matrix(X[:, C]'*X[:, C])))/length(C) + lambda;
         end
     else
         try
-            LC = eigmax(Symmetric(Matrix(prob.X[:,C]*prob.X[:,C]')))/length(C) + prob.lambda;
+            LC = eigmax(Symmetric(Matrix(X[:,C]*X[:,C]')))/length(C) + lambda;
         catch loaderror # Uses power iteration if eigmax fails
             # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
-            LC = power_iteration(Symmetric(Matrix(prob.X[:, C]*prob.X[:, C]')))/length(C) + prob.lambda;
+            LC = power_iteration(Symmetric(Matrix(X[:, C]*X[:, C]')))/length(C) + lambda;
         end
     end
     return LC
@@ -50,7 +52,7 @@ function get_expected_smoothness_cst(prob::Prob, tau::Int64)
     # It's another way of counting than in the definition of the expected smoothness constant
     # (first an iteration over the indices, then an iteration over the sets containing the picked index)
     for C in Csets
-        Ls[C] = Ls[C] .+ (1/c1)*get_LC(prob, C); # Implementation without inner loop
+        Ls[C] = Ls[C] .+ (1/c1)*get_LC(prob.X, prob.lambda, C); # Implementation without inner loop
     end
     expsmoothcst = maximum(Ls);
     return expsmoothcst
@@ -79,7 +81,7 @@ function calculate_complex_SAGA_nice(prob::Prob, options::MyOptions, tauseq::Vec
     Rsides = zeros(1, numtau);
 
     # Computing smallest and largest eigenvalues of the design matrix
-    mu = get_mu_str_conv(prob);
+    mu = get_mu_str_conv(X, n, prob.numfeatures, prob.lambda);
     Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
 
     # For each mini-batch size computing the expected smoothness constant and then the iteration complexity
@@ -104,7 +106,7 @@ end
 
 function calculate_complex_Hofmann(prob::Prob, options::MyOptions)
     n = prob.numdata;
-    mu = get_mu_str_conv(prob);
+    mu = get_mu_str_conv(X, n, prob.numfeatures, prob.lambda);
     Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
     itercomp = zeros(1, n);
     for tau = 1:n
@@ -114,11 +116,14 @@ function calculate_complex_Hofmann(prob::Prob, options::MyOptions)
     return itercomp
 end
 
-function get_mu_str_conv(prob::Prob)
-    if(prob.numfeatures < prob.numdata)
-        mu = eigmin(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7 'full(A)' has been deprecated
+function get_mu_str_conv(X, lambda::Float64)
+    sX = size(X);
+    numfeatures = sX[1];
+    numdata = sX[2];
+    if(numfeatures < numdata)
+        mu = eigmin(Matrix(X*X'))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
     else
-        mu = eigmin(Matrix(prob.X'*prob.X))/prob.numdata + prob.lambda; # julia 0.7 'full(A)' has been deprecated
+        mu = eigmin(Matrix(X'*X))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
     end
     return mu
 end
@@ -162,10 +167,10 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
     end
 
     ### COMPUTING DIVERSE SMOOTHNESS CONSTANTS ###
-    L = get_LC(prob, collect(1:n)); # WARNING: it should not be recomputed every time
-    Li_s = get_Li(prob);
-    Lmax = maximum(Li_s);
-    Lbar = mean(Li_s);
+    # L = get_LC(prob.X, prob.lambda, collect(1:n)); # WARNING: it should not be recomputed every time
+    # Li_s = get_Li(prob.X, prob.lambda);
+    # Lmax = maximum(Li_s);
+    # Lbar = mean(Li_s);
 
     ### COMPUTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
     simplebound = zeros(n, 1);
@@ -182,9 +187,9 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
         end
         leftcoeff = (n*(tau-1))/(tau*(n-1));
         rightcoeff = (n-tau)/(tau*(n-1));
-        simplebound[tau] = leftcoeff*Lbar + rightcoeff*Lmax;
-        heuristicbound[tau] = leftcoeff*L + rightcoeff*Lmax;
-        bernsteinbound[tau] = 2*leftcoeff*L + (rightcoeff + (4*log(d))/(3*tau))*Lmax;
+        simplebound[tau] = leftcoeff*prob.Lbar + rightcoeff*prob.Lmax;
+        heuristicbound[tau] = leftcoeff*prob.L + rightcoeff*prob.Lmax;
+        bernsteinbound[tau] = 2*leftcoeff*prob.L + (rightcoeff + (4*log(d))/(3*tau))*prob.Lmax;
     end
 
     return simplebound, bernsteinbound, heuristicbound, expsmoothcst
@@ -218,12 +223,8 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
                              bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, 
                              expsmoothcst)
     n = prob.numdata;
-    mu = get_mu_str_conv(prob); # WARNING: this should not be recomputed every time
-    Li_s = get_Li(prob);
-    Lmax = maximum(Li_s);
-
     rho_over_n = ( n .- (1:n) ) ./ ( (1:n).*(n-1) ); # Sketch residual divided by n
-    rightterm = rho_over_n*Lmax + ((mu*n)/(4*(1:n)))'; # Right-hand side term in the max
+    rightterm = rho_over_n*prob.Lmax + ((prob.mu*n)/(4*(1:n)))'; # Right-hand side term in the max
     
     if typeof(expsmoothcst)==Array{Float64,2}
         expsmoothstepsize = 0.25 .* (1 ./ max.(expsmoothcst, rightterm) );
@@ -286,14 +287,9 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
     savename = "-cst";
 
     n = prob.numdata;
-    d = prob.numfeatures;    
+    d = prob.numfeatures;
 
-    ## WARNING: this should not be recomputed every time
-    mu = get_mu_str_conv(prob); 
-    L = get_LC(prob, collect(1:n));
-    Li_s = get_Li(prob);
-    Lmax = maximum(Li_s);
-    Lbar = mean(Li_s);
+    Li_s = get_Li(prob.X, prob.lambda);
 
     ## Saving the seed used to generate data
     if data in ["gaussian", "diagonal", "lone_eig_val"]
@@ -304,7 +300,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
 
     ## Saving the problem and the related constants
     save("$(default_path)$(probname)$(savename).jld", 
-         "mu", mu, "L", L, "Lmax", Lmax, "Lbar", Lbar, "Li_s", Li_s,
+         "mu", prob.mu, "L", prob.L, "Lmax", prob.Lmax, "Lbar", prob.Lbar, "Li_s", Li_s,
          "simplebound", simplebound, "bernsteinbound", bernsteinbound, 
          "heuristicbound", heuristicbound, "expsmoothcst", expsmoothcst, 
          "simplestepsize", simplestepsize, "bernsteinstepsize", bernsteinstepsize, 
@@ -331,7 +327,7 @@ function compute_skip_error(n::Int64, minibatch_size::Int64, skip_multiplier::Fl
     skipped_errors = 1;
     while(tmp > 1.0)
         tmp /= 2;
-        skipped_errors *= 2;
+        skipped_errors *= 2^1;
     end
     skipped_errors = convert(Int64, skipped_errors); # Seems useless
 
@@ -361,10 +357,8 @@ correpsonding average iteration complexity.
     - OUTPUTS: output of each run, size length(minibatchlist)*numsimu\\
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
 """
-function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, numsimu::Int64 ;
-                            tolerance::Float64=10.0^(-3),
-                            skipped_errors::Int64=-1, skip_multiplier::Float64=0.02,
-                            max_iter::Int64=10^8, max_time::Float64=3600.0, max_epochs::Int64=100)
+function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::MyOptions, numsimu::Int64 ;
+                            skipped_errors::Int64=-1, skip_multiplier::Float64=0.02)
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/tau
     
@@ -380,31 +374,24 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, numsimu::
         tau = minibatchlist[idxtau];
         println("\nCurrent mini-batch size: ", tau);
 
-        if(skipped_errors==-1)
-            skipped_errors = compute_skip_error(n, tau, skip_multiplier);
-            println("The variable skipped_errors has been automatically set to ", skipped_errors);
+        if(skipped_errors<-1||skipped_errors==0)
+            error("skipped_errors has to be set to -1 (auto) or to a positive integer");
+        elseif(skipped_errors==-1)
+            options.skip_error_calculation = compute_skip_error(n, tau, skip_multiplier);
+            println("The number of skipped calculations of the error has been automatically set to ",
+                    options.skip_error_calculation);
+        else
+            options.skip_error_calculation = skipped_errors;
         end
-        options = set_options(tol=tolerance, max_iter=max_iter, max_time=max_time, max_epocs=max_epochs,
-                              initial_point="zeros", # is fixed not to add more randomness
-                        #   repeat_stepsize_calculation=true,
-                              skip_error_calculation=skipped_errors,
-                              force_continue=false); # force continue if diverging or if tolerance reached
+        
         options.batchsize = tau;
         for i=1:numsimu
             println("----- Simulation #", i, " -----");
             # sg = initiate_SAGA(prob, options, minibatch_type="nice"); # Old and diverging implementation
             sg = initiate_SAGA_nice(prob, options); # new separated implementation
-            # println("STEPSIZE OF sg: ", sg.stepsize);
+            println("Stepsize sg = ", sg.stepsize);
             output = minimizeFunc(prob, sg, options);
             println("Output fail = ", output.fail, "\n");
-            # fail = !(output.fail == "tol-reached");
-            # while(fail)
-            #     println("ENTERING THE WHILE LOOP")
-            #     sg = initiate_SAGA(prob, options, minibatch_type="nice");
-            #     output = minimizeFunc(prob, sg, options);
-            #     println("Output fail = ", output.fail);
-            #     fail = !(output.fail == "tol-reached");
-            # end
             itercomplex[idxtau] += output.iterations;
             output.name = string("\\tau=", tau); # Tiny modification for smaller legend name / Latex symbols in strings
             OUTPUTS = [OUTPUTS; output]; # Array{Any,1} or Array{Output,1}?

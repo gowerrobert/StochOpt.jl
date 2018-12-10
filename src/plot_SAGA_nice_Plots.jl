@@ -34,6 +34,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
              title=string(probname, ", n=", string(n), ", d=", string(d)));
     elseif typeof(expsmoothcst)==Nothing
         plot(1:n, [heuristicbound simplebound bernsteinbound], label=["heuristic" "simple" "bernstein"],
+            #  yscale=:log10, # bug in julia 0.7
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,
              ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(heuristicbound)),

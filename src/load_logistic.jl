@@ -36,6 +36,14 @@ function load_logistic(probname::AbstractString, datapath::AbstractString, opts:
     else
         lambda = opts.regularizor_parameter;
     end
+    println("lambda = ", lambda);
+
+    mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
+    L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
+    Li_s = get_Li(X, lambda);
+    Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
+    Lbar = mean(Li_s);
+
     # if opts.regularizor =="huber"
     #         f_eval(x,S) =  (1./length(S))*logistic_eval(Xt,y,x,S)+(reg)* huber_eval(x,opts.hubermu);
     #         g_eval(x,S) = ((1./length(S))*logistic_grad_sub(Xt,y,x,S)+(reg)*huber_grad(x,opts.hubermu));
@@ -63,7 +71,7 @@ function load_logistic(probname::AbstractString, datapath::AbstractString, opts:
     #end 
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
-        Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda)
+        Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
     return prob
 end
 
@@ -139,6 +147,12 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     end
     println("lambda = ", lambda);
 
+    mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
+    L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
+    Li_s = get_Li(X, lambda);
+    Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
+    Lbar = mean(Li_s);
+
     # if opts.regularizor =="huber"
     #         f_eval(x,S) =  (1./length(S))*logistic_eval(Xt,y,x,S)+(reg)* huber_eval(x,opts.hubermu);
     #         g_eval(x,S) = ((1./length(S))*logistic_grad_sub(Xt,y,x,S)+(reg)*huber_grad(x,opts.hubermu));
@@ -163,9 +177,9 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     #else
     #        println("Choose regularizor huber or L2");
     #        error("Unknown regularizor"+ opts.regularizor);
-    #end 
+    #end
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
-        Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda)
+        Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
     return prob
 end

@@ -35,6 +35,12 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     end
     println("lambda = ", lambda);
 
+    mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
+    L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
+    Li_s = get_Li(X, lambda);
+    Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
+    Lbar = mean(Li_s);
+
     f_eval(x, S)                = ((1 ./ length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2); # julia 0.7
     g_eval(x, S)                = ((1 ./ length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x); # julia 0.7
     g_eval!(x, S, g)            = ridge_grad!(X[:, S], y[S], x, lambda, length(S), g);
@@ -43,7 +49,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:, S], y[S], x);
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, 
-                x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda)
+                x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda, mu, L, Lmax, Lbar)
     # ((1/n)X X' +lambda I)w= Xy
     # xsol = ((1/n)X X' +lambda I) \ ( (1/n)*Xy)
     xsol = (X*X' + numdata*lambda*Matrix(1.0I, numfeatures, numfeatures)) \ (X*y); # no more 'eye(numfeatures)' in julia 0.7

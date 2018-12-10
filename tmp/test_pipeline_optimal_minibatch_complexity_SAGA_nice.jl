@@ -9,7 +9,7 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("./src/StochOpt.jl") # Be carefull about the path here
 
 default_path = "./data/";
 
@@ -24,21 +24,21 @@ datasets = readlines("$(default_path)available_datasets.txt");
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 
 ## Only loading datasets, no data generation
-data = datasets[4];
+data = datasets[1];
 
 X, y = loadDataset(data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
-options = set_options(max_iter=10^8, max_time=10.0, max_epocs=1000, repeat_stepsize_calculation=true, skip_error_calculation=51,
-                      force_continue=true, initial_point="randn", batchsize=0);
-# => fixes lambda 
-# options.regularizor_parameter = "normalized";
-options.regularizor_parameter = "Lbar/n";
-# prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="column-scaling");  # No scaling, lambda = Lbar / n
-prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="column-scaling");  # scaling = centering and scaling, lambda = 1/(2.0*numdata)
-
-# QUESTION: how is lambda selected?
+options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=10^8,
+                    #   regularizor_parameter = "1/num_data", # fixes lambda
+                      regularizor_parameter = "normalized",
+                    #   regularizor_parameter = "Lbar/n",
+                    #   repeat_stepsize_calculation=true, # used in minimizeFunc_grid_stepsize
+                      initial_point="zeros", # is fixed not to add more randomness 
+                      force_continue=false); # force continue if diverging or if tolerance reached
+prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="column-scaling");
+# prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="column-scaling");  # scaling = centering and scaling
 
 n = prob.numdata;
 d = prob.numfeatures;
@@ -46,13 +46,6 @@ d = prob.numfeatures;
 ### COMPUTING THE SMOOTHNESS CONSTANTS ###
 # Compute the smoothness constants L, L_max, \cL, \bar{L}
 datathreshold = 24; # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
-
-println("\n--- Computing smoothness constants ---");
-mu = get_mu_str_conv(prob); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
-L = get_LC(prob, collect(1:n)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
-Li_s = get_Li(prob);
-Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
-Lbar = mean(Li_s);
 
 expsmoothcst = nothing;
 
@@ -100,8 +93,8 @@ plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize,
 #region
 ## Compute optimal mini-batch size
 if typeof(expsmoothcst)==Array{Float64,2}
-    LHS = 4*(1:n).*(expsmoothcst .+ prob.lambda)./mu;
-    RHS = n .+ (n .- (1:n)) .* (4*(Lmax+prob.lambda)/((n-1)*mu));
+    LHS = 4*(1:n).*(expsmoothcst .+ prob.lambda)./prob.mu;
+    RHS = n .+ (n .- (1:n)) .* (4*(prob.Lmax+prob.lambda)/((n-1)*prob.mu));
     exacttotalcplx = reshape(max.(LHS, RHS), n);
     opt_minibatch_exact = argmin(exacttotalcplx);
 else
@@ -109,9 +102,9 @@ else
 end
 
 ## WARNING: Verify computations : should we add lambda????
-opt_minibatch_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar)); # One should not add again lambda since it is already taken into account in Lbar
-opt_minibatch_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L)) )); ## WARNING: Verify computations : should we add lambda????
-opt_minibatch_heuristic = round(Int, 1 + (mu*(n-1))/(4*L));
+opt_minibatch_simple = round(Int, 1 + (prob.mu*(n-1))/(4*prob.Lbar)); # One should not add again lambda since it is already taken into account in Lbar
+opt_minibatch_bernstein = max(1, round(Int, 1 + (prob.mu*(n-1))/(8*prob.L) - (4/3)*log(d)*((n-1)/n)*(prob.Lmax/(2*prob.L)) )); ## WARNING: Verify computations : should we add lambda????
+opt_minibatch_heuristic = round(Int, 1 + (prob.mu*(n-1))/(4*prob.L));
 #endregion
 ##################################################################################################################
 
@@ -158,12 +151,16 @@ save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound
 # minibatchlist = [1, 2, 3, 5, 10];
 # minibatchlist = [1, 2, 3, 5, 10, 20, 50];
 
-# minibatchlist = [100];
+
+# minibatchlist = 2.^collect(1:10);
+
+
+# minibatchlist = [1000];
 # minibatchlist = [1, 10, 50];
 # minibatchlist = [50, 10, 1];
 
 # minibatchlist = [1];
-minibatchlist = [5, 1];
+minibatchlist = [5, 1, n];
 # minibatchlist = 5:-1:1;
 # minibatchlist = [1];
 
@@ -172,17 +169,21 @@ minibatchlist = [5, 1];
 
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
 
-@time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, numsimu, tolerance=10.0^(-2),
-                                                skipped_errors=100); # julia 0.7
+minibatchlist = sort(minibatchlist);
+@time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, options, numsimu,
+                                                skipped_errors=1000, skip_multiplier=10.0);
 
 ## Checking that all simulations reached tolerance
 fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)*numsimu];
 if all(s->(string(s)=="tol-reached"), fails)
-    println("Tolerance always reached")
+    println("Tolerance always reached");
+else
+    println("Tolerance not always reached");
 end
 
 ## Plotting one SAGA-nice simulation for each mini-batch size
 if(numsimu==1)
+    options.batchsize = 0;
     gr()
     # pyplot()
     plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
@@ -211,9 +212,9 @@ println("The empirical optimal tau = ", opt_minibatch_emp);
 # # println("List of mini-batch sizes = ", minibatchlist);
 # println("\nEmpirical complexity = ", empcomplex);
 
-# # println("\nSMOOTHNESS CONSTANTS:");
-# # println("   Lmax = ", Lmax);
-# # println("   L = ", L);
-# # println("Li_s = ", Li_s);
-# # println("   Lbar = ", Lbar);
+println("\nSMOOTHNESS CONSTANTS:");
+println("   mu   = ", prob.mu);
+println("   L    = ", prob.L);
+println("   Lmax = ", prob.Lmax);
+println("   Lbar = ", prob.Lbar);
 # ##################################################################################################################

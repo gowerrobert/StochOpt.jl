@@ -36,15 +36,11 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     stepsize = 0.0;
     probs = [];
     Z = 0.0;
-
-    L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # Smoothness constant of the objective function f # julia 0.7
-    Lmax = maximum(sum(prob.X.^2, dims=1)) + prob.lambda; # Largest smoothness constant of the individual objective functions f_i
-    Lis = get_Li(prob);
-    Lbar = mean(Lis);
-    mu = get_mu_str_conv(prob); # Strong convexity constant of the objective function f
     
+    # return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice, minibatches, unbiased,
+    #     Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, prob.L, prob.Lmax, prob.Lbar, prob.mu); # csts -> prob
     return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice, minibatches, unbiased,
-        Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, L, Lmax, Lbar, mu);
+                            Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z);
 end
 
 
@@ -54,7 +50,7 @@ end
 Set the stepsize based on the smoothness constants of the problem stored in **SAGA_nice_method**.
 
 #INPUTS:\\
-    - prob: considered problem (i.e. logistic regression, ridge ression...) of the type **Prob** (see src/StochOpt.jl)\\
+    - prob: considered problem (i.e. logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
     - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
     - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
 #OUTPUTS:\\
@@ -66,9 +62,9 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     n = prob.numdata;
     leftcoeff = (n*(tau-1))/(tau*(n-1));
     rightcoeff = (n-tau)/(tau*(n-1));
-    simplebound = leftcoeff*method.Lbar + rightcoeff*method.Lmax;
-    Lheuristic = leftcoeff*method.L + rightcoeff*method.Lmax;
-    # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*method.Lmax + ((tau - 1)/(n - 1))*method.L;
+    simplebound = leftcoeff*prob.Lbar + rightcoeff*prob.Lmax;
+    Lheuristic = leftcoeff*prob.L + rightcoeff*prob.Lmax;
+    # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*probLmax + ((tau - 1)/(n - 1))*probL;
     # println("----------------First expected smoothness estimation: ", Lexpected);
     # println("------------------Heuristic expected smoothness estimation : ", simplebound);
 
@@ -76,9 +72,9 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
         # Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
         Lheuristic = Lheuristic/4;    #  correcting for logistic since phi'' <= 1/4 + using heuristic estimation
     end
-    rightterm = ((n-tau)/(tau*(n-1)))*method.Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
+    rightterm = ((n-tau)/(tau*(n-1)))*prob.Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
     method.stepsize = 1.0/(4*max(simplebound, rightterm));
-    # method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*method.mu);
+    # method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*probmu);
     # stepsize2 =  1.0/(4*max(simplebound, rightterm));
     # println("----------------First stepsize: ", method.stepsize);
     # println("------------------Heuristic stepsize: ", stepsize2);

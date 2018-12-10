@@ -18,7 +18,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
     aux = zeros(prob.numfeatures);
     descent_method = descent_SAGA;
     probs = []; Z = 0.0; stepsize = 0.0;
-    mu = get_mu_str_conv(prob);
+    mu = prob.mu;
 
     if(minibatch_type == "partition")
         # L = mean(sum(prob.X.^2,1));
@@ -90,7 +90,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
             Lexpected = method.L;
         end
     else # nice sampling     # interpolate Lmax and L
-        Li_s = get_Li(prob);
+        Li_s = get_Li(prob.X, prob.lambda);
         Lbar = mean(Li_s);
         leftcoeff = (n*(tau-1))/(tau*(n-1));
         rightcoeff = (n-tau)/(tau*(n-1));
@@ -131,7 +131,7 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
     # name = string(name, "-", probability_type);
     name = string(name, "-partition-", probability_type);
     for i = 1:numpartitions # Calculating the Li's assumming it's a phi'' < 1. Remember for logistic fuction phi'' <1/4
-        probs[i] = get_LC(prob, minibatches[i, :]);
+        probs[i] = get_LC(prob.X, prob.lambda, minibatches[i, :]);
         # probs[i] = eigmax(Symmetric(prob.X[:,minibatches[i,:]]'*prob.X[:,minibatches[i,:]]))/options.batchsize +prob.lambda;
     end
     Lmax = maximum(probs);
@@ -166,8 +166,8 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
     ## Setting the probabilities
     probs = zeros(1,numpartitions);
     Lis = zeros(prob.numdata);
-    for i =1:prob.numdata      # Calculating the Li's assumming it's a phi'' < 1
-        Lis[i] = get_LC(prob, [i]);
+    for i=1:prob.numdata      # Calculating the Li's assumming it's a phi'' < 1
+        Lis[i] = get_LC(prob.X, prob.lambda, [i]);
     end
     sortindices = sortperm(Lis);
     addonend = numpartitions*options.batchsize - prob.numdata;
@@ -186,7 +186,7 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
         if(parti == numpartitions) layernum = layernum + 1; end
     end
     for i = 1:numpartitions      # Calculating the Li's assumming it's a phi'' < 1. Remember for logistic fuction phi'' <1/4
-        probs[i] = get_LC(prob, minibatches[i, :]);
+        probs[i] = get_LC(prob.X, prob.lambda, minibatches[i, :]);
         # probs[i] = eigmax(Symmetric(prob.X[:,minibatches[i,:]]'*prob.X[:,minibatches[i,:]]))/options.batchsize +prob.lambda;
     end
     Lmax = maximum(probs);

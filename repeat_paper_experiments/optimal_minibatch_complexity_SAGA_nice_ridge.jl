@@ -53,9 +53,9 @@ d = prob.numfeatures;
 datathreshold = 24; # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
 
 println("\n--- Computing smoothness constants ---");
-mu = get_mu_str_conv(prob); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
-L = get_LC(prob, collect(1:n)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
-Li_s = get_Li(prob);
+mu = get_mu_str_conv(X, n, d, prob.lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
+L = get_LC(prob.X, prob.lambda, collect(1:n)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
+Li_s = get_Li(prob.X, prob.lambda);
 Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
 Lbar = mean(Li_s);
 
