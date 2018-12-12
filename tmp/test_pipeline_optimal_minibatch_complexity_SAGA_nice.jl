@@ -1,13 +1,14 @@
 using JLD
 using Plots
-using StatsBase
-using Match
-using Combinatorics
-using Random # julia 0.7
 using Printf # julia 0.7
+using Match
 using LinearAlgebra # julia 0.7
-using Statistics # julia 0.7
-using Base64 # julia 0.7
+using Random # julia 0.7
+using Combinatorics
+using StatsBase
+
+# using Statistics # julia 0.7
+# using Base64 # julia 0.7
 
 include("./src/StochOpt.jl") # Be carefull about the path here
 
@@ -24,13 +25,13 @@ datasets = readlines("$(default_path)available_datasets.txt");
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 
 ## Only loading datasets, no data generation
-data = datasets[8];
+data = datasets[9];
 
 X, y = loadDataset(data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
-options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=10^8,
+options = set_options(tol=10.0^(-3), max_iter=10^8, max_time=10.0^2, max_epocs=10^8,
                     #   regularizor_parameter = "1/num_data", # fixes lambda
                       regularizor_parameter = "normalized",
                     #   regularizor_parameter = "Lbar/n",
@@ -171,7 +172,7 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 
 minibatchlist = sort(minibatchlist);
 @time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, options, numsimu,
-                                                skipped_errors=1000, skip_multiplier=10.0);
+                                                skipped_errors=10, skip_multiplier=10.0);
 
 ## Checking that all simulations reached tolerance
 fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)*numsimu];
