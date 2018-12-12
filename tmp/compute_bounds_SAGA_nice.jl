@@ -9,7 +9,7 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("./src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl") # Be carefull about the path here
 
 default_path = "./data/";
 
@@ -24,7 +24,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 
 ## Only loading datasets, no data generation
-data = datasets[8];
+data = datasets[6];
 
 X, y = loadDataset(data);
 
@@ -37,8 +37,8 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
                     #   repeat_stepsize_calculation=true, # used in minimizeFunc_grid_stepsize
                       initial_point="zeros", # is fixed not to add more randomness 
                       force_continue=false); # force continue if diverging or if tolerance reached
-prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="column-scaling");
-# prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="column-scaling");  # scaling = centering and scaling
+# prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="column-scaling");
+prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");  # scaling = centering and scaling
 
 n = prob.numdata;
 d = prob.numfeatures;
@@ -117,104 +117,3 @@ save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound
                          opt_minibatch_exact);
 #endregion
 ##################################################################################################################
-
-
-######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
-## Empirical stepsizes returned by optimal mini-batch SAGa with line searchs
-# if(n <= datathreshold)
-#     minibatchlist = 1:n;
-# elseif(opt_minibatch_simple>2)
-#     minibatchlist = [1; opt_minibatch_simple; opt_minibatch_heuristic; round(Int, (opt_minibatch_simple+n)/2); round(Int, sqrt(n)); n]#[collect(1:(opt_minibatch_simple+1)); n];
-# else
-#     minibatchlist = [collect(1:(opt_minibatch_heuristic+1)); round(Int, sqrt(n)); n];
-# end
-
-## For abalone dataset
-# minibatchlist = [collect(1:10); 50; 100];
-# minibatchlist = collect(1:8);
-
-## For n=24
-# minibatchlist = [collect(1:6); 12; 24];
-
-## For n=5000
-# minibatchlist = [1; 5; 10; 50; 100; 200; 1000; 5000];
-
-## For n=500
-# minibatchlist = collect(1:10);
-
-## For YearPredictionMSD
-# minibatchlist = [1, 2, 3, 5];
-# minibatchlist = [1, 2, 3, 5, 10, 20, 50];
-# minibatchlist = [10, 50, 100, 1000];
-
-## For australian (classification)
-# minibatchlist = [1, 2, 3, 5, 10];
-# minibatchlist = [1, 2, 3, 5, 10, 20, 50];
-
-
-# minibatchlist = 2.^collect(1:10);
-
-
-# minibatchlist = [1000];
-# minibatchlist = [1, 10, 50];
-# minibatchlist = [50, 10, 1];
-
-# minibatchlist = [1];
-minibatchlist = [5, 1, n];
-# minibatchlist = 5:-1:1;
-# minibatchlist = [1];
-
-
-# srand(1234);
-
-numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-
-minibatchlist = sort(minibatchlist);
-@time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, options, numsimu,
-                                                skipped_errors=1000, skip_multiplier=10.0);
-
-## Checking that all simulations reached tolerance
-fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)*numsimu];
-if all(s->(string(s)=="tol-reached"), fails)
-    println("Tolerance always reached");
-else
-    println("Tolerance not always reached");
-end
-
-## Plotting one SAGA-nice simulation for each mini-batch size
-if(numsimu==1)
-    options.batchsize = 0;
-    gr()
-    # pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
-end
-
-## Computing the empirical complexity
-# itercomplex -= 1; #-> should we remove 1 from itercomplex?
-empcomplex = reshape(minibatchlist.*itercomplex, length(minibatchlist)); # tau times number of iterations
-opt_minibatch_emp = minibatchlist[argmin(empcomplex)]; # julia 0.7
-
-pyplot()
-plot_empirical_complexity(prob, minibatchlist, empcomplex, 
-                          opt_minibatch_simple, opt_minibatch_bernstein, 
-                          opt_minibatch_heuristic, opt_minibatch_emp);
-
-# ######################################### PRINTING CONSTANTS AND RESULTS #########################################
-println("\nPROBLEM DIMENSIONS:");
-println("   Number of datapoints = ", n); # n in the paper notation
-println("   Number of features = ", d); # d in the paper notation
-
-println("\nSimple optimal tau = ", opt_minibatch_simple);
-println("Bernstein optimal tau = ", opt_minibatch_bernstein);
-println("Heuristic optimal tau = ", opt_minibatch_heuristic);
-println("The empirical optimal tau = ", opt_minibatch_emp);
-
-# # println("List of mini-batch sizes = ", minibatchlist);
-# println("\nEmpirical complexity = ", empcomplex);
-
-println("\nSMOOTHNESS CONSTANTS:");
-println("   mu   = ", prob.mu);
-println("   L    = ", prob.L);
-println("   Lmax = ", prob.Lmax);
-println("   Lbar = ", prob.Lbar);
-# ##################################################################################################################
