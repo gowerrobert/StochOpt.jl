@@ -50,13 +50,17 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, 
                 x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda, mu, L, Lmax, Lbar)
-    # ((1/n)X X' +lambda I)w= Xy
-    # xsol = ((1/n)X X' +lambda I) \ ( (1/n)*Xy)
-    xsol = (X*X' + numdata*lambda*Matrix(1.0I, numfeatures, numfeatures)) \ (X*y); # no more 'eye(numfeatures)' in julia 0.7
-    prob.fsol = f_eval(xsol, 1:numdata);
+  
+    ## Try to load the solution of the problem, if already computed
+    load_fsol!(opts, prob);
+    
+    if prob.fsol == 0.0
+        println("Computing and saving the exact solution of the problem")
+        get_fsol_ridge!(prob); ## getting and saving approximation of the solution fsol
+    end
 
-    fsolfilename = get_fsol_filename(prob);
-    save("$(fsolfilename).jld", "fsol", prob.fsol)
+    # fsolfilename = get_fsol_filename(prob);
+    # save("$(fsolfilename).jld", "fsol", prob.fsol)
     return prob
 end
 
@@ -89,4 +93,26 @@ function ridge_Jac!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, S:
 
     ## Why not ?
     # Jac[:, S] = X.*((X'*w - y)') .+ lambda*w;
+end
+
+"""
+    get_fsol_ridge!(prob)
+
+Compute and save the exact solution of the given ridge regression problem. The solution is obtained by computing:\\
+xsol = ( (1/n)X X' + lambda I )^(-1) Xy
+
+#INPUTS:\\
+    - **Prob** prob: ridge regression problem\\
+#OUTPUTS:\\
+"""
+function get_fsol_ridge!(prob)
+    # ((1/n)X X' + lambda I) w = Xy
+    # xsol = ( (1/n)X X' + lambda I ) \ Xy 
+
+    ## Computation of fsol
+    xsol = (prob.X*prob.X' + prob.numdata*prob.lambda*Matrix(1.0I, prob.numfeatures, prob.numfeatures)) \ (prob.X*prob.y); # no more 'eye(numfeatures)' in julia 0.7
+    prob.fsol = prob.f_eval(xsol, 1:prob.numdata);
+    ## Saving fsol
+    fsolfilename = get_fsol_filename(prob);
+    save("$(fsolfilename).jld", "fsol", prob.fsol)
 end

@@ -50,14 +50,14 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
         plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst], label=["heuristic" "simple" "bernstein" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
-             ylim=(0.85*minimum(expsmoothcst), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
+             ylim=(0.85*min(minimum(expsmoothcst), minimum(heuristicbound)), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])),
              title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
     elseif typeof(expsmoothcst)==Nothing
         plot(1:n, [heuristicbound simplebound bernsteinbound], label=["heuristic" "simple" "bernstein"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
-             # ylim=(0.85*minimum(heuristicbound), 1.2*max(maximum(simplebound), maximum(heuristicbound))),
-             ylim=(0.85*minimum(heuristicbound), 1.5*minimum(heuristicbound)),
+            #  ylim=(0.85*minimum(heuristicbound), 1.5*minimum(heuristicbound)),
+             ylim=(0.85*minimum(heuristicbound), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])),
              title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
     else
         error("Wrong type of expsmoothcst");

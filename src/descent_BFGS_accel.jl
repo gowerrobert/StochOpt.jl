@@ -29,7 +29,7 @@ function descent_BFGS_accel(x::Array{Float64}, prob::Prob, options::MyOptions, m
         mth.S[:] = mth.grad - mth.gradsamp; # updating the difference between gradients
         mth.diffpnt[:] = x - mth.prevx;
         mth.HSi[:] = mth.aux[1]* mth.SHS + (1-mth.aux[1])*mth.H; # Y_k =  \alpha V_k+(1- \alpha)X_k
-        dx_dy = vecdot(mth.diffpnt, mth.S);
+        dx_dy = dot(mth.diffpnt, mth.S);
         mth.HS[:] = mth.HSi*mth.S;  # storing the Y dy product;
         # println("H before :", mth.H)
         BFGS_update!(mth.H, mth.HSi, mth, dx_dy); # X_k =   BFGS_update(Y_k)

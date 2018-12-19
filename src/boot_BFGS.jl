@@ -3,7 +3,7 @@ function boot_BFGS(prob::Prob,method::Method, options::MyOptions)
     method.prevx = zeros(prob.numfeatures);
     method.gradsamp = zeros(prob.numfeatures); # storing the previous gradient
     # method.prevx = zeros(prob.numfeatures,embeddim+1);# 1st position contain previous outer iterate, the 2:embedded contain the previous embedding matrix
-    method.H = eye(prob.numfeatures);  # Store inverse Hessian approximation
+    method.H = Matrix{Float64}(I, prob.numfeatures, prob.numfeatures);  # Store inverse Hessian approximation
     method.S = zeros(prob.numfeatures);  # Stores the difference between gradients
     method.HS = zeros(prob.numfeatures);  # Stores product of H*dy difference between gradients
     method.name = string("BFGS");#-",options.batchsize);

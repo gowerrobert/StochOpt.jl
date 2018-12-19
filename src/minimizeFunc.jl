@@ -65,6 +65,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                 testerrors = [testerrors testerror(testprob, x)];
             end
             times = [times timeaccum];
+            # println("fsol : ", prob.fsol)
             if(options.printiters)   ## printing iterations info
                 @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
             end

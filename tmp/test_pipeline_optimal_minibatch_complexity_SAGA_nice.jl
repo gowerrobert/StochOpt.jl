@@ -21,13 +21,15 @@ println("--- Loading data ---");
 # Available datasets are in "./data/available_datasets.txt" 
 # datasets = ["fff", "gauss-5-8-0.0_seed-1234", "YearPredictionMSD", "abalone", "housing"];
 datasets = readlines("$(default_path)available_datasets.txt");
-#, "letter_scale", "heart", "phishing", "madelon", "a9a",
-# "mushrooms", "phishing", "w8a", "gisette_scale",
+for i in 1:length(datasets) println(i, ": ", datasets[i]) end
 
 ## Only loading datasets, no data generation
-data = datasets[9];
+data = datasets[1];
 
 X, y = loadDataset(data);
+
+scaling_rule = "none";
+# scaling_rule = "column-scaling";
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
@@ -38,8 +40,16 @@ options = set_options(tol=10.0^(-3), max_iter=10^8, max_time=10.0^2, max_epocs=1
                     #   repeat_stepsize_calculation=true, # used in minimizeFunc_grid_stepsize
                       initial_point="zeros", # is fixed not to add more randomness 
                       force_continue=false); # force continue if diverging or if tolerance reached
-prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="column-scaling");
-# prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="column-scaling");  # scaling = centering and scaling
+u = unique(y);
+if length(u) < 2
+    error("Wrong number of possible outputs")
+elseif length(u) == 2
+    println("Binary output detected: the problem is set to logistic regression")
+    prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling=scaling_rule);  # scaling = centering and scaling
+else
+    println("More than three modalities in the outputs: the problem is set to ridge regression")
+    prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling=scaling_rule);
+end
 
 n = prob.numdata;
 d = prob.numfeatures;
@@ -150,7 +160,7 @@ save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound
 
 ## For australian (classification)
 # minibatchlist = [1, 2, 3, 5, 10];
-# minibatchlist = [1, 2, 3, 5, 10, 20, 50];
+minibatchlist = [1, 2, 3, 5, 10, 20, 50];
 
 
 # minibatchlist = 2.^collect(1:10);
@@ -161,18 +171,18 @@ save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound
 # minibatchlist = [50, 10, 1];
 
 # minibatchlist = [1];
-minibatchlist = [5, 1, n];
+# minibatchlist = [5, 1, n];
 # minibatchlist = 5:-1:1;
 # minibatchlist = [1];
 
 
 # srand(1234);
 
-numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
+numsimu = 5; # number of runs of mini-batch SAGA for averaging the empirical complexity
 
 minibatchlist = sort(minibatchlist);
 @time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, options, numsimu,
-                                                skipped_errors=10, skip_multiplier=10.0);
+                                                skipped_errors=2000, skip_multiplier=10.0);
 
 ## Checking that all simulations reached tolerance
 fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)*numsimu];

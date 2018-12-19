@@ -1,10 +1,10 @@
 # include("./dataLoad.jl")
-include("./src/dataLoad.jl")
+include("../src/dataLoad.jl")
 initDetails()
 
 default_path = "./data/";
 
-datasets = ["YearPredictionMSD_full"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
+datasets = ["housing"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
 # leukemia is the concatenation of leu and leu.t (resp. training and test sets)
 classification = false; # Regression
 # classification = true; # Binary classification

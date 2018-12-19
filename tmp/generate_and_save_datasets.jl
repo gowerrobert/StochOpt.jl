@@ -1,4 +1,4 @@
-# Huge problem in this code: we generate data before checking if a corresponding file already exists.
+# HUGE PROBLEM IN THIS: we generate data before checking if a corresponding file already exists.
 println("--- Loading packages ---")
 using JLD
 using Plots
@@ -9,7 +9,7 @@ using Random
 using Printf # julia 0.7
 using LinearAlgebra # julia 0.7
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 println("--- Getting seed ---")
@@ -19,26 +19,24 @@ seed = string("_seed-", seed);
 
 ### LOADING DATA ###
 # data = "gaussian";
-# data = "diagonal";
-data = "alone_eig_val";
+data = "diagonal";
+# data = "alone_eig_val";
 
-numdata = 24;
+numdata = 10;
 numfeatures = 50; # useless for gen_diag_*
 
+rotate = true; # keeping same eigenvalues, but removing the diagonal structure of X
+
 println("--- Generating data ---")
-# Add 'if not in available data sets'
 if(data == "gaussian")
     X, y, probname = gen_gauss_data(numfeatures, numdata, lambda=0.0, err=0.001);
 elseif(data == "diagonal")
-    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100);
+    X, y, probname = gen_diag_data(numdata, lambda=0.0, Lmax=100, rotate=rotate);
 elseif(data == "alone_eig_val")
-    X, y, probname = gen_diag_alone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
+    X, y, probname = gen_diag_alone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001, rotate=rotate);
 else
     error("unkown generation scheme.");
 end
-
-## Rotate diagonal matrices
-
 
 ## Saving the generated datasets with the corresponding seed
 println("--- Saving the data set ---")

@@ -1,7 +1,7 @@
 function boot_method(method_name::AbstractString, prob::Prob, options::MyOptions)
     ## Loading an empty method class with standard boot options
-    Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda; # Estimate stepsize using Lmax estimate
-    Lmean = mean(sum(prob.X.^2,1)) + prob.lambda;
+    Lmax = maximum(sum(prob.X.^2, dims=1)) + prob.lambda; # Estimate stepsize using Lmax estimate
+    Lmean = mean(sum(prob.X.^2, dims=1)) + prob.lambda;
     if(options.batchsize == "onep")
         options.batchsize = convert(Int64, ceil(prob.numdata/100.0));
     end
@@ -12,7 +12,7 @@ function boot_method(method_name::AbstractString, prob::Prob, options::MyOptions
     end
     println("Skipping ", options.skip_error_calculation, " iterations per epoch")
 #   Setting the embedding dimension
-    if(contains(method_name, "AM") || contains(method_name, "CM") )
+    if( occursin("AM", method_name) || occursin("CM", method_name) )
         if(options.embeddim == 0)
             options.aux = convert(Int64, min(20, ceil(prob.numfeatures/2)));
         elseif (0 < options.embeddim < 1.0)

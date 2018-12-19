@@ -181,5 +181,49 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
         Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
+
+    ## Try to load the solution of the problem, if already computed
+    load_fsol!(opts, prob);
+    
+    if prob.fsol == 0.0
+        println("Computing and saving the solution of the problem using BFGS")
+        get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
+    end
+    
     return prob
+end
+
+"""
+    get_fsol_logistic!(prob)
+
+Compute and save an approximation of the solution of the given logistic regression problem.
+The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
+
+#INPUTS:\\
+    - **Prob** prob: logistic regression problem\\
+#OUTPUTS:\\
+"""
+function get_fsol_logistic!(prob)
+    options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
+        max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+    
+    options.batchsize = prob.numdata;
+    method_name = "BFGS";
+    output = minimizeFunc_grid_stepsize(prob, method_name, options);
+
+    ## Running accelerated BFGS
+    options.embeddim = [prob.numdata, 0.01];  #[0.9, 5];
+    method_name = "BFGS_accel";
+    output1 = minimizeFunc_grid_stepsize(prob, method_name, options);
+    OUTPUTS = [output; output1];
+
+    ## Ploting the two solutions
+    gr()# gr() pyplot() # pgfplots() #plotly()
+    plot_outputs_Plots(OUTPUTS, prob, options);
+
+    ## Setting the true solution as the smallest of both
+    fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
+
+    fsolfilename = get_fsol_filename(prob);
+    save("$(fsolfilename).jld", "fsol", fsol)
 end

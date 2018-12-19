@@ -12,7 +12,8 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     beststep, savename = get_saved_stepsize(prob.name, method_name, options);
     if(beststep == 0.0 ||  options.repeat_stepsize_calculation == true)
         options.force_continue = false;
-        stepsizes = [2.0^(21) 2.0^(17) 2.0^(15) 2.0^(13) 2.0^(11) 2.0^(9) 2.0^(7) 2.0^(5)  2.0^(3) 2.0^(1) 2.0^(-1) 2.0^(-3)  2.0^(-5) 2.0^(-7) 2.0^(-9)  2.0^(-11)];
+        stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
+                     2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
         bestindx = length(stepsizes);
         beststeps_found = zeros(options.rep_number);
         start_step = 1;
@@ -28,7 +29,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
                     #println("found a better stepsize: ",beststep, " because ",minfval, " > ", output.fs[end], )
                     minfval = output.fs[end];
                     beststep = step;
-                    bestindx = findfirst(stepsizes, step);
+                    bestindx = something(findfirst(isequal(step), stepsizes), 0);
                     thelastonebetter = 1.0;
                 elseif(thelastonebetter == 1.0)
                     #  println("the last one was better because ",minfval, " < ", output.fs[end], "= output.fs[end]" )
@@ -40,7 +41,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
                 #iteratesp = iteratesp+1;
             end
             beststeps_found[expnum] = beststep;
-            start_step = max(bestindx-4, 1);
+            start_step = max(bestindx - 4, 1);
         end
         # Get the median over experiments as the best step size
         println("best steps:")

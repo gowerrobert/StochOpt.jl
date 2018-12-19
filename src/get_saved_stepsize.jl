@@ -1,12 +1,12 @@
 function get_saved_stepsize(probname::AbstractString, method_name::AbstractString, options)
     default_path = "./data/";
-    savename = replace(probname, r"[\/]", "-");
+    savename = replace(probname, r"[\/]" => "-");
     if(method_name!="SVRG2")
-        method_name_temp = replace(method_name, r"6", "");
+        method_name_temp = replace(method_name, r"6" => "");
     else
         method_name_temp = method_name;
     end
-    if(contains(method_name_temp, "CM") || contains(method_name_temp, "AM"))
+    if(occursin("CM", method_name_temp) || occursin("AM", method_name_temp))
         savename = string(savename, '-', method_name_temp, "-", options.batchsize, "-", options.embeddim, "-stepsize") ;
     else
         savename = string(savename, '-', method_name_temp, "-", options.batchsize, "-stepsize") ;
