@@ -10,7 +10,7 @@ using Statistics # julia 0.7
 using Base64 # julia 0.7
 
 using Distributed
-# addprocs(4)
+addprocs(4)
 
 include("../src/StochOpt.jl") # Be carefull about the path here
 
