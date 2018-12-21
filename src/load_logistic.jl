@@ -147,7 +147,8 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     end
     println("lambda = ", lambda);
 
-    mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
+    # mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
+    mu = get_approx_mu_str_conv(X, lambda); # using power iteration
     L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
     Li_s = get_Li(X, lambda);
     Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;

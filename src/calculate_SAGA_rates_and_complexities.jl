@@ -120,10 +120,35 @@ function get_mu_str_conv(X, lambda::Float64)
     sX = size(X);
     numfeatures = sX[1];
     numdata = sX[2];
-    if(numfeatures < numdata)
+    if numfeatures < numdata
         mu = eigmin(Matrix(X*X'))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
     else
         mu = eigmin(Matrix(X'*X))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+    end
+    return mu
+end
+
+
+"""
+    get_approx_mu_str_conv(X, lambda::Float64)
+
+Compute the strong convexity parameter using a power iteration algorithm applied on the
+inverse of the X^T X or X X^T (depending on the dimension).
+
+#INPUTS:\\
+    - X: transpose of the design matrix\\
+    - **Float64** lambda: regularization parameter\\
+#OUTPUTS:\\
+    - **Float64** mu: approximation of the strong convexity parameter of the objective function\\
+"""
+function get_approx_mu_str_conv(X, lambda::Float64)
+    sX = size(X);
+    numfeatures = sX[1];
+    numdata = sX[2];
+    if numfeatures < numdata
+        mu = (1/power_iteration(inv(Matrix(X*X'))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+    else
+        mu = (1/power_iteration(inv(Matrix(X'*X))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
     end
     return mu
 end
