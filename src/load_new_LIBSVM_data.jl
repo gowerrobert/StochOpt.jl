@@ -4,10 +4,10 @@ initDetails()
 
 default_path = "./data/";
 
-datasets = ["housing"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD
+datasets = ["news20.binary"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD_full
 # leukemia is the concatenation of leu and leu.t (resp. training and test sets)
-classification = false; # Regression
-# classification = true; # Binary classification
+# classification = false; # Regression
+classification = true; # Binary classification
 for dataset in datasets
     try
         X, y = loadDataset(dataset);

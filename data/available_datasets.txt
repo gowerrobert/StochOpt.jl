@@ -1,6 +1,5 @@
 housing
 abalone
-YearPredictionMSD
 YearPredictionMSD_full
 australian
 leukemia
@@ -11,3 +10,5 @@ diagalone-24-0.0-100_seed-1
 diagalone-24-0.0-100-rotated_seed-1
 diagints-24-0.0-100-rotated_seed-1
 diagints-10-0.0-100-rotated_seed-1
+SUSY
+news20.binary

@@ -27,8 +27,8 @@ datasets = readlines("$(default_path)available_datasets.txt");
 # "mushrooms", "phishing", "w8a", "gisette_scale",
 
 ## Only loading datasets, no data generation
-@distributed for idx in 7:13
-# @time for idx in 7:13
+# @distributed for idx in 7:13
+@time for idx in 7:14
     data = datasets[idx];
 
     X, y = loadDataset(data);
