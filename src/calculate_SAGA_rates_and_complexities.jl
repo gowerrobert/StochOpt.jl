@@ -24,21 +24,27 @@ function get_LC(X, lambda::Float64, C)
     numfeatures = size(X, 1);
 
     LC = 0;
-    if(length(C) < numfeatures)
-        try
-            LC = eigmax(Symmetric(Matrix(X[:, C]'*X[:, C])))/length(C) + lambda;
-        catch loaderror # Uses power iteration if eigmax fails
-            # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
-            LC = power_iteration(Symmetric(Matrix(X[:, C]'*X[:, C])))/length(C) + lambda;
-        end
+    if length(C) < numfeatures
+        LC = Symmetric_power_iteration(Symmetric(Matrix(X[:, C]'*X[:, C])))/length(C) + lambda;
     else
-        try
-            LC = eigmax(Symmetric(Matrix(X[:,C]*X[:,C]')))/length(C) + lambda;
-        catch loaderror # Uses power iteration if eigmax fails
-            # println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
-            LC = power_iteration(Symmetric(Matrix(X[:, C]*X[:, C]')))/length(C) + lambda;
-        end
+        LC = Symmetric_power_iteration(Symmetric(Matrix(X[:, C]*X[:, C]')))/length(C) + lambda;
     end
+
+    # if length(C) < numfeatures
+    #     try
+    #         LC = eigmax(Symmetric(Matrix(X[:, C]'*X[:, C])))/length(C) + lambda;
+    #     catch loaderror # Uses power iteration if eigmax fails
+    #         println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
+    #         LC = power_iteration(Symmetric(Matrix(X[:, C]'*X[:, C])))/length(C) + lambda;
+    #     end
+    # else
+    #     try
+    #         LC = eigmax(Symmetric(Matrix(X[:,C]*X[:,C]')))/length(C) + lambda;
+    #     catch loaderror # Uses power iteration if eigmax fails
+    #         println("Using power iteration instead of eigmax which returns the following error: ", loaderror);
+    #         LC = power_iteration(Symmetric(Matrix(X[:, C]*X[:, C]')))/length(C) + lambda;
+    #     end
+    # end
     return LC
 end
 
@@ -129,29 +135,29 @@ function get_mu_str_conv(X, lambda::Float64)
 end
 
 
-"""
-    get_approx_mu_str_conv(X, lambda::Float64)
+# """
+#     get_approx_mu_str_conv(X, lambda::Float64)
 
-Compute the strong convexity parameter using a power iteration algorithm applied on the
-inverse of the X^T X or X X^T (depending on the dimension).
+# Compute the strong convexity parameter using a power iteration algorithm applied on the
+# inverse of the X^T X or X X^T (depending on the dimension).
 
-#INPUTS:\\
-    - X: transpose of the design matrix\\
-    - **Float64** lambda: regularization parameter\\
-#OUTPUTS:\\
-    - **Float64** mu: approximation of the strong convexity parameter of the objective function\\
-"""
-function get_approx_mu_str_conv(X, lambda::Float64)
-    sX = size(X);
-    numfeatures = sX[1];
-    numdata = sX[2];
-    if numfeatures < numdata
-        mu = (1/power_iteration(inv(Matrix(X*X'))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
-    else
-        mu = (1/power_iteration(inv(Matrix(X'*X))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
-    end
-    return mu
-end
+# #INPUTS:\\
+#     - X: transpose of the design matrix\\
+#     - **Float64** lambda: regularization parameter\\
+# #OUTPUTS:\\
+#     - **Float64** mu: approximation of the strong convexity parameter of the objective function\\
+# """
+# function get_approx_mu_str_conv(X, lambda::Float64)
+#     sX = size(X);
+#     numfeatures = sX[1];
+#     numdata = sX[2];
+#     if numfeatures < numdata
+#         mu = (1/power_iteration(inv(Matrix(X*X'))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+#     else
+#         mu = (1/power_iteration(inv(Matrix(X'*X))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+#     end
+#     return mu
+# end
 
 # Sampling over a partition
 # \frac{n}{\tau}+4\frac{ \max_{C \in \mathcal{G}} L_{C}}{\mu}  \right)  .
