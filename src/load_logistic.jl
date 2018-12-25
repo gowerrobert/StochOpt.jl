@@ -192,7 +192,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     
     if prob.fsol == 0.0
         println("Computing and saving the solution of the problem using BFGS")
-        get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
+        # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
     end
     
     return prob
