@@ -53,7 +53,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     options.force_continue = true;
     options.stepsize_multiplier = beststep;
 
-    options.skip_error_calculation *= 10;
+    # options.skip_error_calculation *= 10;
     options.max_epocs *= 10;
 
     println("Best step: ", beststep);

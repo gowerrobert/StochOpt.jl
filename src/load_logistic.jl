@@ -209,13 +209,13 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 #OUTPUTS:\\
 """
 function get_fsol_logistic!(prob)
-    if prob.numdata < 10000 || prob.numfeatures < 10000 # WARNING: symbols inverted
-        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^4, exacterror=false, max_iter=10^8, 
-                              max_time=60.0*60.0*3.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=2);
+    if prob.numdata > 10000 || prob.numfeatures > 10000 # WARNING: symbols inverted
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8, 
+                              max_time=60.0*60.0*3.0, max_epocs=1, repeat_stepsize_calculation=true, rep_number=2);
         println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
         ## Running SVRG
-        # options.batchsize = 1;
-        options.batchsize = prob.numdata;
+        options.batchsize = 1; # fsol = 0.3654322413779342
+        # options.batchsize = prob.numdata; # 0.39...
         method_name = "SVRG";
         output = minimizeFunc_grid_stepsize(prob, method_name, options);
 
@@ -223,7 +223,7 @@ function get_fsol_logistic!(prob)
         prob.fsol = minimum(output.fs);
     else
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
-                              max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+                              max_time=50.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
         ## Running BFGS
         options.batchsize = prob.numdata;
         method_name = "BFGS";
