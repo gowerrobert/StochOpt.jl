@@ -163,22 +163,22 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     #         g_eval(x,S) = ((1./length(S))*logistic_grad_sub(Xt,y,x,S)+(reg)*huber_grad(x,opts.hubermu));
     #         Hess_opt(x,S,v) = ((1./length(S))*logistic_hessv_sub(Xt,y,x,S,v)+(reg)*bsxfun(@times, huber_hess_kimon(x,opts.hubermu), v) );
     #if opts.regularizor =="L2"# is the default
-    f_eval(x, S) = ((1. / length(S))*logistic_eval(X[:,S],y[S],x)+(lambda)*(0.5)* norm(x)^2); # julia 0.7
-    g_eval(x, S) = ((1. / length(S))*logistic_grad(X[:,S],y[S],x).+(lambda).*x); # julia 0.7
-    g_eval!(x, S, g) =              logistic_grad!(X[:,S],y[S],x, lambda,length(S),g);
-    Jac_eval!(x, S, Jac) =           logistic_Jac!(X[:,S],y[S],x, lambda,S, Jac);
-    scalar_grad_eval(x, S) = logistic_scalar_grad(X[:,S],y[S],x)
-    scalar_grad_hess_eval(x, S) = logistic_scalar_grad_hess(X[:,S],y[S],x)
-    Hess_eval(x, S) = ((1 ./ length(S))*logistic_hess(X[:,S],y[S],x).+ (lambda).*eye(numfeatures)); # julia 0.7
-    Hess_eval!(x, S, g, H) =              logistic_hess!(X[:,S],y[S],x,lambda,length(S),g,H) ;
-    Hess_C(x, S, C) =                  logistic_hessC(X[:,S],y[S],x,C,lambda,length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
-    Hess_C!(x, S, C, g, HC) = logistic_hessC!(X[:,S],y[S],x,C,lambda,length(S),g,HC);
-    Hess_C2(x, S, C) = logistic_hessC(X[:,S],y[S],x,C,lambda,length(S));
-    Hess_opt(x, S, v)     = ( (1 ./ length(S))*logistic_hessv(X[:,S],y[S],x,v).+ (lambda).*v); # julia 0.7
-    Hess_opt!(x, S, v, g, Hv) =                  logistic_hessv!(X[:,S],y[S],x,v,lambda,length(S),g,Hv);
-    Hess_D(x, S) = ((1 ./ length(S))*logistic_hessD(X[:,S],y[S],x).+ (lambda).*ones(numfeatures)); # julia 0.7
-    Hess_D!(x, S, g, D) =              logistic_hessD!(X[:,S],y[S],x,lambda,length(S),g,D);
-    #Hess_vv(x, S, v) = ((1./length(S))*logistic_hessvv(X[:,S],y[S],x,v).+ (lambda).*v'*v);
+    f_eval(x, S)                = ((1. / length(S))*logistic_eval(X[:,S], y[S], x) + (lambda)*(0.5)*norm(x)^2); # julia 0.7
+    g_eval(x, S)                = ((1. / length(S))*logistic_grad(X[:,S], y[S], x) .+ (lambda).*x); # julia 0.7
+    g_eval!(x, S, g)            = logistic_grad!(X[:,S], y[S], x, lambda, length(S), g);
+    Jac_eval!(x, S, Jac)        = logistic_Jac!(X[:,S], y[S], x, lambda, S, Jac);
+    scalar_grad_eval(x, S)      = logistic_scalar_grad(X[:,S], y[S], x)
+    scalar_grad_hess_eval(x, S) = logistic_scalar_grad_hess(X[:,S], y[S], x)
+    Hess_eval(x, S)             = ((1 ./ length(S))*logistic_hess(X[:,S], y[S], x).+ (lambda).*eye(numfeatures)); # julia 0.7
+    Hess_eval!(x, S, g, H)      = logistic_hess!(X[:,S], y[S], x, lambda, length(S), g, H) ;
+    Hess_C(x, S, C)             = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
+    Hess_C!(x, S, C, g, HC)     = logistic_hessC!(X[:,S], y[S], x, C, lambda, length(S), g, HC);
+    Hess_C2(x, S, C)            = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S));
+    Hess_opt(x, S, v)           = ((1 ./ length(S))*logistic_hessv(X[:,S], y[S], x, v) .+ (lambda).*v); # julia 0.7
+    Hess_opt!(x, S, v, g, Hv)   = logistic_hessv!(X[:,S], y[S], x, v, lambda, length(S), g, Hv);
+    Hess_D(x, S)                = ((1 ./ length(S))*logistic_hessD(X[:,S], y[S], x) .+ (lambda).*ones(numfeatures)); # julia 0.7
+    Hess_D!(x, S, g, D)         = logistic_hessD!(X[:,S], y[S], x, lambda, length(S), g, D);
+    # Hess_vv(x, S, v)            = ((1./length(S))*logistic_hessvv(X[:,S], y[S], x, v) .+ (lambda).*v'*v);
     #else
     #        println("Choose regularizor huber or L2");
     #        error("Unknown regularizor"+ opts.regularizor);
@@ -209,18 +209,29 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 #OUTPUTS:\\
 """
 function get_fsol_logistic!(prob)
-    options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
-        max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
-    
-    options.batchsize = prob.numdata;
-    method_name = "BFGS";
-    output = minimizeFunc_grid_stepsize(prob, method_name, options);
+    if prob.numdata > 10000 || prob.numfeatures > 10000
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=100, exacterror=false, max_iter=10^8, 
+                              max_time=60.0*60.0*3.0, max_epocs=1000, repeat_stepsize_calculation=true, rep_number=2);
+        println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
+        ## Running SVRG
+        options.batchsize = 1;
+        # options.batchsize = prob.numdata;
+        method_name = "SVRG";
+        output = minimizeFunc_grid_stepsize(prob, method_name, options);
+    else
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
+                              max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+        ## Running BFGS
+        options.batchsize = prob.numdata;
+        method_name = "BFGS";
+        output = minimizeFunc_grid_stepsize(prob, method_name, options);
 
-    ## Running accelerated BFGS
-    options.embeddim = [prob.numdata, 0.01];  #[0.9, 5];
-    method_name = "BFGS_accel";
-    output1 = minimizeFunc_grid_stepsize(prob, method_name, options);
-    OUTPUTS = [output; output1];
+        ## Running accelerated BFGS
+        options.embeddim = [prob.numdata, 0.01];  #[0.9, 5];
+        method_name = "BFGS_accel";
+        output1 = minimizeFunc_grid_stepsize(prob, method_name, options);
+        OUTPUTS = [output; output1];
+    end
 
     ## Ploting the two solutions
     gr()# gr() pyplot() # pgfplots() #plotly()

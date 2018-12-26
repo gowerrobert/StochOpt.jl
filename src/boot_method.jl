@@ -1,7 +1,10 @@
 function boot_method(method_name::AbstractString, prob::Prob, options::MyOptions)
     ## Loading an empty method class with standard boot options
-    Lmax = maximum(sum(prob.X.^2, dims=1)) + prob.lambda; # Estimate stepsize using Lmax estimate
-    Lmean = mean(sum(prob.X.^2, dims=1)) + prob.lambda;
+    # Lmax = maximum(sum(prob.X.^2, dims=1)) + prob.lambda; # Estimate stepsize using Lmax estimate
+    # Lmean = mean(sum(prob.X.^2, dims=1)) + prob.lambda;
+    Lmax = prob.Lmax;
+    Lmean = prob.Lbar;
+
     if(options.batchsize == "onep")
         options.batchsize = convert(Int64, ceil(prob.numdata/100.0));
     end
@@ -27,6 +30,7 @@ function boot_method(method_name::AbstractString, prob::Prob, options::MyOptions
     else
         stepsize = (options.stepsize_multiplier/(prob.numdata-1))*( options.batchsize*(1.0/Lmean-1.0/Lmax) + prob.numdata/Lmax-1/Lmean);
     end
+    # println("---> Stepsize set")
 
     #  end
     # Setting up parameters of class Method
@@ -35,7 +39,17 @@ function boot_method(method_name::AbstractString, prob::Prob, options::MyOptions
     diffpnt = [0.0]; Sold = [0.0];
     ind = zeros(options.batchsize); aux = [0.0]
     gradsamp = [0];
-    grad = prob.g_eval(prevx, 1:prob.numdata); # Reference gradient
+
+    # grad = prob.g_eval(prevx, 1:prob.numdata); # Reference gradient # Out of memory error() when numdata or numfeatures are too large
+    if prob.numdata > 10000 || prob.numfeatures > 10000 
+        println("Dimensions are too large too compute the full gradient")
+        s = sample(1:prob.numdata, 100, replace=false);
+        grad = prob.g_eval(prevx, s); # Stochastic reference gradient
+    else
+        grad = prob.g_eval(prevx, 1:prob.numdata); # Reference gradient
+    end
+    println("---> Reference gradient set")
+    
     epocsperiter = options.batchsize/prob.numdata + 1.0/numinneriters; #The average number of data passes der iteration
     if(numinneriters == 1 && options.batchsize/prob.numdata == 1) epocsperiter = 1; end
     gradsperiter = 2.0*options.batchsize+prob.numdata/numinneriters;

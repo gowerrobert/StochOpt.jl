@@ -12,6 +12,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     else
         x = zeros(prob.numfeatures); #
     end
+    # println("---> Initial point set")
 
     if(typeof(method_input) == String)
         method = boot_method(method_input, prob, options);
@@ -26,13 +27,17 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         # method = method.bootmethod(prob, method, options, x);
     end
     println(method.name);
+    # println("---> Method set")
+
     times = [0];
     ##
     if(options.exacterror == false)
         prob.fsol = 0.0; # Using suboptimality as a measure of error
     else
-        load_fsol!(options, prob);
+        load_fsol!(options, prob); # already loaded in load_logistic.jl
     end
+    println("---> fsol set (", prob.fsol, ")")
+
     # load a pre-calculated best  solution
     # println("size of X: ", size(X), " ", "prob.numdata ",prob.numdata, " length(1:prob.numdata): ",length(1:prob.numdata) )
     f0 = prob.f_eval(x, 1:prob.numdata)
