@@ -21,8 +21,8 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             minfval = 1.0; thelastonebetter = 0;
             beststep = 0.0; #iteratesp = 1;
             for stepind = start_step:length(stepsizes)
-                #  println("Trying stepsize ", step);
                 step = stepsizes[stepind];
+                println("\nTrying stepsize ", step);
                 options.stepsize_multiplier = step
                 output = minimizeFunc(prob, method_input, options);
                 if(output.fs[end] < minfval && (output.fail == "max_time" || output.fail == "max_epocs" || output.fail == "tol-reached"))
@@ -52,6 +52,11 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     end
     options.force_continue = true;
     options.stepsize_multiplier = beststep;
+
+    options.skip_error_calculation *= 10;
+    options.max_epocs *= 10;
+
+    println("Best step: ", beststep);
     outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
     # for expnum =2: options.rep_number
     #   outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling

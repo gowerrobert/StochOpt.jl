@@ -36,7 +36,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     else
         load_fsol!(options, prob); # already loaded in load_logistic.jl
     end
-    println("---> fsol set (", prob.fsol, ")")
+    # println("---> fsol set (", prob.fsol, ")")
 
     # load a pre-calculated best  solution
     # println("size of X: ", size(X), " ", "prob.numdata ",prob.numdata, " length(1:prob.numdata): ",length(1:prob.numdata) )
@@ -52,11 +52,22 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     local timeaccum = 0;
     iterations = 0;
     fail = "failed";
-    ## Print heard
+    ## Print head
+    # if(options.printiters)
+    #     println("------------------------------------------------------------------")
+    #     println("      It    | 100*(f(x)-fsol)/(f0-fsol) |   epochs  |     Time   |")
+    #     println("------------------------------------------------------------------")
+    # end
     if(options.printiters)
-        println("------------------------------------------------------------------")
-        println("      It    | 100*(f(x)-fsol)/(f0-fsol) |   epochs  |     Time   |") # why "datap" and not "epoch"? 
-        println("------------------------------------------------------------------")
+        if(options.exacterror == false)
+            println("----------------------------------------------------------------------")
+            println("      It    |                 f(x)          |   epochs  |     Time   |")
+            println("----------------------------------------------------------------------")            
+        else
+            println("------------------------------------------------------------------")
+            println("      It    | 100*(f(x)-fsol)/(f0-fsol) |   epochs  |     Time   |")
+            println("------------------------------------------------------------------")
+        end
     end
     for iter = 1:options.max_iter
         time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
@@ -71,8 +82,15 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             end
             times = [times timeaccum];
             # println("fsol : ", prob.fsol)
-            if(options.printiters)   ## printing iterations info
-                @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+            # if(options.printiters)   ## printing iterations info
+            #     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+            # end
+            if(options.printiters)
+                if(options.exacterror == false)
+                    @printf "  %8.0d  |           %5.7f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                else
+                    @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                end
             end
             if(options.force_continue == false)
                 if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
@@ -119,8 +137,15 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                 testerrors = [testerrors testerror(testprob, x)];
             end
             times = [times timeaccum];
+            # if(options.printiters)
+            #     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+            # end
             if(options.printiters)
-                @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                if(options.exacterror == false)
+                    @printf "  %8.0d  |           %5.7f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                else
+                    @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                end
             end
             break;
         end
