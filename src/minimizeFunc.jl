@@ -74,7 +74,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         x[:] = x + method.stepsize * d;
         # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));
-        timeaccum = timeaccum +  time_elapsed; # Keeps track of time accumulated at every iteration
+        timeaccum = timeaccum + time_elapsed; # Keeps track of time accumulated at every iteration
         if(mod(iter, options.skip_error_calculation) == 0)
             fs = [fs prob.f_eval(x, 1:prob.numdata)];
             if(testprob != nothing) # calculating the test error

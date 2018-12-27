@@ -42,13 +42,13 @@ function boot_method(method_name::AbstractString, prob::Prob, options::MyOptions
 
     # grad = prob.g_eval(prevx, 1:prob.numdata); # Reference gradient # Out of memory error() when numdata or numfeatures are too large
     if prob.numdata > 10000 || prob.numfeatures > 10000 
-        println("Dimensions are too large too compute the full gradient")
+        # println("Dimensions are too large too compute the full gradient")
         s = sample(1:prob.numdata, 100, replace=false);
         grad = prob.g_eval(prevx, s); # Stochastic reference gradient
     else
         grad = prob.g_eval(prevx, 1:prob.numdata); # Reference gradient
     end
-    println("---> Reference gradient set")
+    # println("---> Reference gradient set")
     
     epocsperiter = options.batchsize/prob.numdata + 1.0/numinneriters; #The average number of data passes der iteration
     if(numinneriters == 1 && options.batchsize/prob.numdata == 1) epocsperiter = 1; end

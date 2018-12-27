@@ -230,26 +230,30 @@ function get_fsol_logistic!(prob)
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
     else
-        options = set_options(tol=10.0^(-16.0), skip_error_calculation=100, exacterror=false, max_iter=10^8, 
-                              max_time=60.0*60.0*3.0, max_epocs=1.6, repeat_stepsize_calculation=true, rep_number=2);
-        println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
+                              max_time=60.0*20.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+        # println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
         ## Running SVRG
-        options.batchsize = 1; # fsol = 0.3654322413779342
-        # options.batchsize = prob.numdata; # 0.39...
+        # options.batchsize = 1;
+        options.batchsize = 100;
+        # options.batchsize = prob.numdata;
         method_input = "SVRG";
-        # output = minimizeFunc_grid_stepsize(prob, method_input, options);
+        output = minimizeFunc_grid_stepsize(prob, method_input, options);
 
         ## Step size setp by hand after a 120s gridsearch attempt
-        options.force_continue = true;
-        options.stepsize_multiplier = 0.5; # for news20.binary
-        output = minimizeFunc(prob, method_input, options);
+        # options.force_continue = true;
+        # options.stepsize_multiplier = 0.5; # for news20.binary
+        # output = minimizeFunc(prob, method_input, options);
 
-        default_path = "./data/";
-        _, savename = get_saved_stepsize(prob.name, method_input, options)
-        save("$(default_path)$(savename).jld", "output", output)
+        # default_path = "./data/";
+        # _, savename = get_saved_stepsize(prob.name, method_input, options)
+        # save("$(default_path)$(savename).jld", "output", output)
 
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum(output.fs);
+        println("\n----------------------------------------------------------------------")
+        @printf "For %s, fsol = %f\n" prob.name prob.fsol
+        println("----------------------------------------------------------------------\n")
     end
 
     ## Saving the solution in a JLD file

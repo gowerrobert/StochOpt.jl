@@ -55,6 +55,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
 
     # options.skip_error_calculation *= 10;
     # options.max_epocs *= 10;
+    options.max_time = 60.0*60.0
 
     println("Best step: ", beststep);
     outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
