@@ -41,6 +41,9 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
 
 @time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");  # scaling = centering and scaling
 
+get_fsol_logistic!(prob)
+
+
 # # varinfo(r"(X|y|prob)")
 
 # X = nothing; # available in prob.X

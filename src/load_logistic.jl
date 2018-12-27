@@ -192,7 +192,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     
     if prob.fsol == 0.0
         println("Computing and saving the solution of the problem")
-        get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
+        # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
     end
     
     return prob
@@ -209,30 +209,18 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 #OUTPUTS:\\
 """
 function get_fsol_logistic!(prob)
-    if prob.numdata > 10000 || prob.numfeatures > 10000 # WARNING: symbols inverted
-        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8, 
-                              max_time=60.0*60.0*3.0, max_epocs=1, repeat_stepsize_calculation=true, rep_number=2);
-        println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
-        ## Running SVRG
-        options.batchsize = 1; # fsol = 0.3654322413779342
-        # options.batchsize = prob.numdata; # 0.39...
-        method_name = "SVRG";
-        output = minimizeFunc_grid_stepsize(prob, method_name, options);
-
-        ## Setting the true solution as the smallest of both
-        prob.fsol = minimum(output.fs);
-    else
+    if prob.numdata < 10000 || prob.numfeatures < 10000
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
-                              max_time=50.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+                              max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
         ## Running BFGS
         options.batchsize = prob.numdata;
-        method_name = "BFGS";
-        output = minimizeFunc_grid_stepsize(prob, method_name, options);
+        method_input = "BFGS";
+        output = minimizeFunc_grid_stepsize(prob, method_input, options);
 
         ## Running accelerated BFGS
         options.embeddim = [prob.numdata, 0.01];  #[0.9, 5];
-        method_name = "BFGS_accel";
-        output1 = minimizeFunc_grid_stepsize(prob, method_name, options);
+        method_input = "BFGS_accel";
+        output1 = minimizeFunc_grid_stepsize(prob, method_input, options);
         OUTPUTS = [output; output1];
 
         ## Ploting the two solutions
@@ -241,9 +229,30 @@ function get_fsol_logistic!(prob)
 
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
+    else
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=100, exacterror=false, max_iter=10^8, 
+                              max_time=60.0*60.0*3.0, max_epocs=1.6, repeat_stepsize_calculation=true, rep_number=2);
+        println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
+        ## Running SVRG
+        options.batchsize = 1; # fsol = 0.3654322413779342
+        # options.batchsize = prob.numdata; # 0.39...
+        method_input = "SVRG";
+        # output = minimizeFunc_grid_stepsize(prob, method_input, options);
+
+        ## Step size setp by hand after a 120s gridsearch attempt
+        options.force_continue = true;
+        options.stepsize_multiplier = 0.5; # for news20.binary
+        output = minimizeFunc(prob, method_input, options);
+
+        default_path = "./data/";
+        _, savename = get_saved_stepsize(prob.name, method_input, options)
+        save("$(default_path)$(savename).jld", "output", output)
+
+        ## Setting the true solution as the smallest of both
+        prob.fsol = minimum(output.fs);
     end
 
     ## Saving the solution in a JLD file
-    # fsolfilename = get_fsol_filename(prob);
-    # save("$(fsolfilename).jld", "fsol", prob.fsol)
+    fsolfilename = get_fsol_filename(prob); # not coherent with get_saved_stepsize output
+    save("$(fsolfilename).jld", "fsol", prob.fsol)
 end
