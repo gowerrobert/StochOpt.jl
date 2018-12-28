@@ -20,8 +20,6 @@ println("--- Loading data ---");
 datasets = readlines("$(default_path)available_datasets.txt");
 
 ## Only loading datasets, no data generation
-# idx = 4; # australian
-# idx = 14; # news20.binary
 idx = 5; # leukemia_full
 data = datasets[idx];
 
