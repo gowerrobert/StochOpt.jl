@@ -87,7 +87,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # end
             if(options.printiters)
                 if(options.exacterror == false)
-                    @printf "  %8.0d  |           %5.7f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                    @printf "  %8.0d  |           %5.12f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
                 else
                     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
                 end
@@ -143,7 +143,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # end
             if(options.printiters)
                 if(options.exacterror == false)
-                    @printf "  %8.0d  |           %5.7f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                    @printf "  %8.0d  |           %5.12f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
                 else
                     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
                 end

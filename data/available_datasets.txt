@@ -2,7 +2,7 @@ housing
 abalone
 YearPredictionMSD_full
 australian
-leukemia
+leukemia_full
 gauss-50-24-0.0_seed-1
 diagints-24-0.0-100_seed-1
 diagints-10-0.0-100_seed-1
