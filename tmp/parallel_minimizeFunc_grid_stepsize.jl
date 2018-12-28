@@ -1,35 +1,59 @@
 
+function parallel_toy_1(n::Int64, m::Int64)
+    println("i,j")
+    array_val = SharedArray{Float64}(n, m);
+    @sync @distributed for idx = 1:n*m
+    # for idx = 1:n*m
+        i, j = divrem(idx-1, m) .+ (1,1);
+        println(i, ",", j, "  ");
+        sleep(1);
+        array_val[i,j] = idx;
+    end
+end
+
+## Usefull trick to avoid having two nested for loop 
+function parallel_toy_2(n::Int64, m::Int64)
+    println("i,j")
+    @sync @distributed for ii = 1:n*m
+    # for ii = 1:n*m
+        i, j = divrem(ii-1, m) .+ (1,1);
+        println(i, ",", j, "  ")
+    end
+end
+
+
 function parallel_toy_grid_search(prob::Prob, method_input, options::MyOptions; testprob=nothing)
 
-    stepsizes = [2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1)];
+    stepsizes = [2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9)];
     array_val = SharedArray{Float64}(options.rep_number, length(stepsizes));
 
     @sync @distributed for expnum = 1:options.rep_number
         @sync @distributed for stepind = 1:length(stepsizes)
             step = stepsizes[stepind];
-            println("\nBefore options.stepsize_multiplier: ", options.stepsize_multiplier);
+            # println("\nBefore options.stepsize_multiplier: ", options.stepsize_multiplier);
             options.stepsize_multiplier *= 2;
-            println("\nAfter options.stepsize_multiplier: ", options.stepsize_multiplier);
+            # println("\nAfter options.stepsize_multiplier: ", options.stepsize_multiplier);
             println("\nTrying stepsize ", step);
-            val = 1/step + rand();
-            println("Val ", val);
+            # val = 1/step + rand();
+            val = step;
+            # println("Val ", val);
             array_val[expnum, stepind] = val;
         end
     end
     println("\nGrid of stepsizes\n", stepsizes)
     println("\nArray of values\n", array_val)
-    println("\nArray of medians\n", median(array_val, dims=1))
+    # println("\nArray of medians\n", median(array_val, dims=1))
 
     ## Get the median over experiments as the best step size
     minval, bestidx = findmin(median(array_val, dims=1)[1,:])
     beststep = stepsizes[bestidx]
     
-    @printf "\nMinimum %5.5f reached for step = %f (idx=%d)\n\n" minval beststep bestidx
+    # @printf "\nMinimum %5.5f reached for step = %f (idx=%d)\n\n" minval beststep bestidx
 end
 
 
 function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing)
-    options.printiters = true;
+    options.printiters = false;
 
     default_path = "./data/";
 
@@ -77,6 +101,7 @@ function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::
     options.printiters = true;
     options.force_continue = true;
     options.stepsize_multiplier = beststep;
+    # options.max_time = 60.0*60.0;
 
     println("Best step: ", beststep);
     outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
@@ -85,5 +110,3 @@ function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::
     
     return outputfirst
 end
-
-

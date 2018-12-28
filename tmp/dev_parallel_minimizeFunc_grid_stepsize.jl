@@ -1,6 +1,6 @@
 using Distributed
 
-addprocs(3)
+addprocs(4)
 
 @everywhere begin # this part will be available on all CPUs
     using JLD
@@ -16,8 +16,12 @@ addprocs(3)
     
     using SharedArrays
 
-    include("./src/StochOpt.jl") # Be carefull about the path here
+    # include("./src/StochOpt.jl") # Be carefull about the path here
+    # include("./tmp/parallel_minimizeFunc_grid_stepsize.jl")
 end
+
+@everywhere include("./src/StochOpt.jl")
+@everywhere include("./tmp/parallel_minimizeFunc_grid_stepsize.jl");
 
 ########################################### Exploring parallelization ###########################################
 #region
@@ -76,17 +80,23 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
 
 @time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");
 
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8, 
-                      max_time=60.0*2.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
+                      max_time=60.0*1.0, max_epocs=1, repeat_stepsize_calculation=true, rep_number=3);
 options.batchsize = 100;
 method_input = "SVRG";
 
-@everywhere include("./tmp/parallel_minimizeFunc_grid_stepsize.jl")
+# @time parallel_toy_grid_search(prob, method_input, options);
 
-# parallel_toy_grid_search(prob, method_input, options);
+# n=10;
+# m=20;
+# @time parallel_toy_2(n, m);
 
-@time output = parallel_minimizeFunc_grid_stepsize(prob, method_input, options);
+Random.seed!(1);
+@time output1 = parallel_minimizeFunc_grid_stepsize(prob, method_input, options); # 470 seconds
+println("fs1 = ", output1.fs)
 
-# minimizeFunc_grid_stepsize(prob, method_input, options);
+Random.seed!(1);
+@time output2 = minimizeFunc_grid_stepsize(prob, method_input, options); # 626 seconds
+println("fs2 = ", output2.fs)
 
 #################################################################################################################
