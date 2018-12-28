@@ -47,4 +47,4 @@ X = nothing; # available in prob.X
 y = nothing; # available in prob.y
 # # varinfo(r"(X|y|prob)")
 
-get_fsol_logistic!(prob)
+@time get_fsol_logistic!(prob)

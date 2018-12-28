@@ -29,7 +29,7 @@ end
 
 
 function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing)
-    options.printiters = false;
+    options.printiters = true;
 
     default_path = "./data/";
 
