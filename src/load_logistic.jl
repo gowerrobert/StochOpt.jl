@@ -68,7 +68,7 @@ function load_logistic(probname::AbstractString, datapath::AbstractString, opts:
     #else
     #        println("Choose regularizor huber or L2");
     #        error("Unknown regularizor"+ opts.regularizor);
-    #end 
+    #end
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
         Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
@@ -93,7 +93,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     # Load logistic regression problem
 
     name = string("lgstc_", name);
-    
+
     ## standard normalization. Leave this for choosing X
     datascaling = DataScaling([], [], [], "..");
     if(typeof(scaling) == String)
@@ -189,12 +189,12 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
 
     ## Try to load the solution of the problem, if already computed
     load_fsol!(opts, prob);
-    
+
     if prob.fsol == 0.0
         println("Computing and saving the solution of the problem")
         # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
     end
-    
+
     return prob
 end
 
@@ -210,7 +210,7 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 """
 function get_fsol_logistic!(prob)
     if prob.numdata < 10000 || prob.numfeatures < 10000
-        options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8,
                               max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
         ## Running BFGS
         options.batchsize = prob.numdata;
@@ -230,7 +230,7 @@ function get_fsol_logistic!(prob)
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
     else
-        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
                               max_time=60.0*20.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
         # println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
         ## Running SVRG

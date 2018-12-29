@@ -79,7 +79,7 @@ mutable struct Prob # julia 0.7
     Hess_C!::Function   # Gets subset of the columns of Hessian
     Hess_C2::Function
     #    Hess_vv::Function  # Calculates the Hessian-vector-vector product v'Hv
-    ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method) 
+    ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method)
     lambda::Float64
     mu::Float64 # Strong-convexity constant
     L::Float64 # Smoothness constant of the whole objective function f
@@ -213,4 +213,3 @@ include("../util/power_iteration.jl");
 include("BFGS_update!.jl")
 include("calculate_SAGA_rates_and_complexities.jl")
 include("../util/matrix_rotation.jl");
-
