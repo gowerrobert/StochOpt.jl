@@ -5,7 +5,8 @@
 #export plot_outputs_Plots
 
 using SparseArrays # julia 0.7
-
+using LinearAlgebra
+using Printf
 mutable struct MyOptions # julia 0.7
     tol::Float64
     aux::Float64

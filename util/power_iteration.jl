@@ -1,3 +1,4 @@
+
 """
     power_iteration(A ; b, numsim)
 
@@ -57,6 +58,8 @@ Computes the approximation largest eigenvalue of a symmetric matrix using the po
 #OUTPUTS:\\
     - **Float64** maxeig: approximation of the largest eigenvalue\\
 """
+
+
 function Symmetric_power_iteration(A::Symmetric{Float64,Array{Float64,2}} ; b::Array{Float64}=rand(size(A,1),1), numsim::Int64=10)
     for i = 1:numsim
         b = A*b;
