@@ -191,7 +191,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     load_fsol!(opts, prob);
 
     if prob.fsol == 0.0
-        println("Computing and saving the solution of the problem")
+        println("Need to compute the solution of the problem")
         # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
     end
 
@@ -209,9 +209,9 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 #OUTPUTS:\\
 """
 function get_fsol_logistic!(prob)
-    if prob.numdata < 10000 || prob.numfeatures < 10000
-        options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8,
-                              max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+    if prob.numfeatures < 10000
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
+                              max_time=60.0*60.0*3.0, max_epocs=200, repeat_stepsize_calculation=true, rep_number=2);
         ## Running BFGS
         options.batchsize = prob.numdata;
         method_input = "BFGS";
@@ -230,8 +230,13 @@ function get_fsol_logistic!(prob)
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
     else
+<<<<<<< HEAD
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
                               max_time=60.0*20.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+=======
+        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
+                              max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
+>>>>>>> 6e83cc0b676a81251319a82edf505127079aa16d
         # println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
         ## Running SVRG
         # options.batchsize = 1;

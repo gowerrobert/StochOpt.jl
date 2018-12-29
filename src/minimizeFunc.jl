@@ -87,38 +87,39 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # end
             if(options.printiters)
                 if(options.exacterror == false)
-                    @printf "  %8.0d  |           %5.7f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                    @printf "  %8.0d  |           %5.12f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
                 else
                     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
                 end
             end
             if(options.force_continue == false)
                 if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
-                    fail = "tol-reached"; iterations = iter;
+                    fail = "tol-reached";
+                    iterations = iter;
                     break;
                 end
                 # testing if method gone wild
-                # if(fs[end]/f0 > 1.10 || (fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1 || fs[end]/fs[end-1] > 1.5 || (fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 1.15) # testing if method gone wild
-                #     fail = "diverging"; iterations = iter;
-                #     break;
-                # end
-                # if(fs[end]/f0 > 1.10)
-                #     println("DIV 1");
-                #     fail = "diverging"; iterations = iter;
-                #     break;
-                # elseif((fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1)
-                #     println("DIV 2");
-                #     fail = "diverging"; iterations = iter;
-                #     break;
-                # elseif(fs[end]/fs[end-1] > 1.5)
-                #     println("DIV 3");
-                #     fail = "diverging"; iterations = iter;
-                #     break;
-                # elseif((fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 10^2) # previous threshold at 1.15
-                #     println("DIV 4");
-                #     fail = "diverging"; iterations = iter;
-                #     break;
-                # end
+                if(fs[end]/f0 > 1.10 || (fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1 || fs[end]/fs[end-1] > 1.5 || (fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 1.15) # testing if method gone wild
+                    fail = "diverging"; iterations = iter;
+                    break;
+                end
+                if(fs[end]/f0 > 1.10)
+                    println("DIV 1");
+                    fail = "diverging"; iterations = iter;
+                    break;
+                elseif((fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1)
+                    println("DIV 2");
+                    fail = "diverging"; iterations = iter;
+                    break;
+                elseif(fs[end]/fs[end-1] > 1.5)
+                    println("DIV 3");
+                    fail = "diverging"; iterations = iter;
+                    break;
+                elseif((fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 10^2) # previous threshold at 1.15
+                    println("DIV 4");
+                    fail = "diverging"; iterations = iter;
+                    break;
+                end
             end
             if(isnan(sum(x)) || isnan(fs[end]) || isinf(fs[end]))
                 fail = "nan";  iterations = iter;
@@ -142,7 +143,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # end
             if(options.printiters)
                 if(options.exacterror == false)
-                    @printf "  %8.0d  |           %5.7f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                    @printf "  %8.0d  |           %5.12f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
                 else
                     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
                 end

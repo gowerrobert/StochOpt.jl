@@ -1,7 +1,7 @@
 function descent_SVRG(x::Array{Float64}, prob::Prob, options::MyOptions, method::Method, N::Int64, d::Array{Float64})
     # SVRG outerloop
     if(N%method.numinneriters == 1 || method.numinneriters == 1)# Reset reference point, grad estimate and Hessian estimate
-        println("SVRG outer loop at iteration: ", N)
+        # println("SVRG outer loop at iteration: ", N)
         method.prevx[:] = x;
 
         # method.grad[:] = prob.g_eval(x, 1:prob.numdata); # Out of memory error() when numdata or numfeatures are too large
