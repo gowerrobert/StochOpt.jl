@@ -230,13 +230,8 @@ function get_fsol_logistic!(prob)
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
     else
-<<<<<<< HEAD
-        options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
-                              max_time=60.0*20.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
-=======
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
                               max_time=60.0*60.0*3.0, max_epocs=500, repeat_stepsize_calculation=true, rep_number=2);
->>>>>>> 6e83cc0b676a81251319a82edf505127079aa16d
         # println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
         ## Running SVRG
         # options.batchsize = 1;
