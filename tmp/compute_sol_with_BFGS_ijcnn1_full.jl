@@ -9,7 +9,7 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("./src/StochOpt.jl") # Be carefull about the path here
 
 default_path = "./data/";
 
@@ -20,7 +20,7 @@ println("--- Loading data ---");
 datasets = readlines("$(default_path)available_datasets.txt");
 
 ## Only loading datasets, no data generation
-idx = 14; # news20.binary
+idx = 16; # news20.binary
 data = datasets[idx];
 
 @time X, y = loadDataset(data);
@@ -44,34 +44,9 @@ y = nothing; # available in prob.y
 ########################################### news20.binary ############################################
 #region
 ## Computing the solution with a serial gridsearch
-# @time get_fsol_logistic!(prob)
-## ---> First gridsearch on news20.binary of 1 hour led us to fsol = 0.429724 
-## (for SVRG, beststep = 2.0 and batchsize = 100)
-
-## By hand, let us try another single run of 3 hours with step = 2.0 on news20.binary
-method_input = "SVRG";
-
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
-                      max_time=60.0*60.0*3.0, max_epocs=70, force_continue=true);
-options.batchsize = 100;
-options.stepsize_multiplier = 2.0; # beststep = 2.0 for batchsize = 100
-
-## Saving the optimization output in a JLD file
-output = minimizeFunc(prob, method_input, options);
-
-## Saving the optimization output in a JLD file
-a, savename = get_saved_stepsize(prob.name, method_input, options);
-a = nothing;
-save("$(default_path)$(savename)_try_2.jld", "output", output)
-
-## Setting the true solution as the smallest of both
-prob.fsol = minimum(output.fs);
-println("\n----------------------------------------------------------------------")
-@printf "For %s, fsol = %f\n" prob.name prob.fsol
-println("----------------------------------------------------------------------\n")
-
-## Saving the solution in a JLD file
-fsolfilename = get_fsol_filename(prob); # not coherent with get_saved_stepsize output
-save("$(fsolfilename)_try_2.jld", "fsol", prob.fsol)
+@time get_fsol_logistic!(prob)
+## BFGS, step = 2.0^(-1.0), 200 epochs
+## BFGS-a-141691.0-0.01: step = 2^1.0, 200 epochs
+## fsol = 0.19496891145648523
 #endregion
 ######################################################################################################
