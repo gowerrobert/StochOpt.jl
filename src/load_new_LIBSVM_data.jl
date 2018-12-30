@@ -4,8 +4,10 @@ initDetails()
 
 default_path = "./data/";
 
-datasets = ["news20.binary"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD_full
-# leukemia is the concatenation of leu and leu.t (resp. training and test sets)
+datasets = ["covtype.binary", "ijcnn1_full"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD_full, leukemia_full, news20.binary
+# leukemia_full is the concatenation of leu and leu.t (resp. training and test sets)
+
+## WARNING: be careful and select properly the following setting!
 # classification = false; # Regression
 classification = true; # Binary classification
 for dataset in datasets

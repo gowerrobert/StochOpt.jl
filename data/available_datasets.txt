@@ -12,3 +12,5 @@ diagints-24-0.0-100-rotated_seed-1
 diagints-10-0.0-100-rotated_seed-1
 SUSY
 news20.binary
+covtype.binary
+ijcnn1_full
