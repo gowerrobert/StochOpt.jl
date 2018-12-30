@@ -103,7 +103,8 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
         apply_datascaling(X, datascaling);
     end
     name = string(name, "-", datascaling.name)
-
+    println("Scaling finished")
+    
     # stdX = std(X, dims=2);
     # # Replace 0 in std by 1 incase there is a constant feature
     # ind = (0 .== stdX); # Testing for a zero std # julia 0.7
@@ -127,8 +128,9 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     numfeatures = sX[1];
     numdata = sX[2];
     #Transforming y to the binary to -1 and 1 representation
-    y[findall(x->x==minimum(y), y)] .= -1;
-    y[findall(x->x==maximum(y), y)] .= 1;
+    miny = minimum(y); # Way faster implementation
+    y[findall(x->x==miny, y)] .= -1;
+    y[findall(x->x==miny, y)] .= 1;
 
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
     if(lambda == -1)
