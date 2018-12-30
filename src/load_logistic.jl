@@ -103,7 +103,6 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
         apply_datascaling(X, datascaling);
     end
     name = string(name, "-", datascaling.name)
-    println("Scaling finished")
     
     # stdX = std(X, dims=2);
     # # Replace 0 in std by 1 incase there is a constant feature

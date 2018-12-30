@@ -9,7 +9,7 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("./src/StochOpt.jl") # Be carefull about the path here
 
 default_path = "./data/";
 
@@ -20,7 +20,7 @@ println("--- Loading data ---");
 datasets = readlines("$(default_path)available_datasets.txt");
 
 ## Only loading datasets, no data generation
-idx = 5; # leukemia_full
+idx = 15; # covtype.binary
 data = datasets[idx];
 
 @time X, y = loadDataset(data);
@@ -34,19 +34,21 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
                       initial_point="zeros", # is fixed not to add more randomness 
                       force_continue=false); # force continue if diverging or if tolerance reached
 
-@time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");  # scaling = centering and scaling
+@time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");
 
-########################################### leukemia_full ############################################
+########################################### covtype.binary ############################################
 #region
 ## Computing the solution with a serial gridsearch
-# @time get_fsol_logistic!(prob)
-##  0.002187786371    /   200 epochs  /  beststep = 2048.0
+@time get_fsol_logistic!(prob)
 
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
+## BFGS, step = 2^21.0 , 200  epochs
+## BFGS-a-581012.0-0.01: step = 2^21.0 , 200  epochs
+## fsol = 4.9156389085785536e-11
+
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
                       max_time=60.0*60.0, max_epocs=300, force_continue=true);
 ## Running BFGS
-options.stepsize_multiplier = 2^(11.0); # beststep = 2^(11.0) for batchsize = prob.numdata
-
+options.stepsize_multiplier = 2^(21.0);
 options.batchsize = prob.numdata;
 method_input = "BFGS";
 output = minimizeFunc(prob, method_input, options);
@@ -64,6 +66,6 @@ println("----------------------------------------------------------------------\
 
 ## Saving the solution in a JLD file
 fsolfilename = get_fsol_filename(prob); # not coherent with get_saved_stepsize output
-save("$(fsolfilename).jld", "fsol", prob.fsol)
+save("$(fsolfilename).jld", "fsol", prob.fsol);
 #endregion
-#####################################################################################################
+######################################################################################################
