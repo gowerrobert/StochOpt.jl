@@ -97,7 +97,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     ## standard normalization. Leave this for choosing X
     datascaling = DataScaling([], [], [], "..");
     if(typeof(scaling) == String)
-        datascaling = fit_apply_datascaling(X, scaling);
+        X, datascaling = fit_apply_datascaling(X, scaling);
     elseif(typeof(scaling) == DataScaling)
         datascaling = scaling;
         apply_datascaling(X, datascaling);

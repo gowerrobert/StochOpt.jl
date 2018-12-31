@@ -33,7 +33,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 
 ## Only loading datasets, no data generation
 # @distributed for idx in 7:13
-@time for idx in 14:14
+@time for idx in 17:17
     data = datasets[idx];
 
     X, y = loadDataset(data);
@@ -52,10 +52,10 @@ datasets = readlines("$(default_path)available_datasets.txt");
         error("Wrong number of possible outputs")
     elseif length(u) == 2
         println("Binary output detected: the problem is set to logistic regression")
-        prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");  # scaling = centering and scaling
+        prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");  
     else
         println("More than three modalities in the outputs: the problem is set to ridge regression")
-        prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="none"); #column-scaling
+        prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling="column-scaling"); #column-scaling
     end
 
     n = prob.numdata;

@@ -6,14 +6,26 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
 
     name = string("ridge_", name);
 
+    ## Removng constant features if scaling features
+    # To put in preprocessing
+    # if scaling == "column-scaling"
+    #     stdX = std(X, dims=2);
+    #     if any(stdX .== 0)
+    #         X = remove_constant_features(X);
+    #         println("new shape X 0: ", size(X));
+    #     end
+    # end
+    println("new shape X -1: ", size(X));
+
     ## standard normalization. Leave this for choosing X
     if(typeof(scaling) == String)
-        datascaling = fit_apply_datascaling(X, scaling);
+        X, datascaling = fit_apply_datascaling(X, scaling);
     elseif(typeof(scaling) == DataScaling)
         datascaling = scaling;
         apply_datascaling(X, datascaling);
     end
     name = string(name, "-", datascaling.name)
+    println("new shape X 2: ", size(X));
     sX = size(X);
     numfeatures = sX[1];
     numdata = sX[2];

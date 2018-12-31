@@ -4,12 +4,12 @@ initDetails()
 
 default_path = "./data/";
 
-datasets = ["covtype.binary", "ijcnn1_full"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD_full, leukemia_full, news20.binary
+datasets = ["slice"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD_full, leukemia_full, news20.binary, covtype.binary, ijcnn1_full
 # leukemia_full is the concatenation of leu and leu.t (resp. training and test sets)
 
 ## WARNING: be careful and select properly the following setting!
-# classification = false; # Regression
-classification = true; # Binary classification
+classification = false; # Regression
+# classification = true; # Binary classification
 for dataset in datasets
     try
         X, y = loadDataset(dataset);

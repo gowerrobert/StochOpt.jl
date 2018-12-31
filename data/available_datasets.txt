@@ -14,3 +14,4 @@ SUSY
 news20.binary
 covtype.binary
 ijcnn1_full
+slice
