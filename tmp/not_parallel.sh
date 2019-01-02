@@ -5,7 +5,7 @@ START_TIME=$SECONDS
 for var in "$@"
 do
   printf "Dataset: $var\n"
-  julia ./tmp/script_args.jl $var
+  julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice.jl $var
 done
 
 ELAPSED_TIME=$(($SECONDS - $START_TIME))

@@ -4,16 +4,18 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     # savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
 
     if(typeof(method_input) == String)
-      method_name = method_input;
+        method_name = method_input;
     else
-      method_name = method_input.name;
+        method_name = method_input.name;
     end
     
     beststep, savename = get_saved_stepsize(prob.name, method_name, options);
-    if(beststep == 0.0 ||  options.repeat_stepsize_calculation == true)
+    if(beststep == 0.0 || options.repeat_stepsize_calculation == true)
         options.force_continue = false;
-        stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
-                     2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
+        # stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
+        #              2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
+        stepsizes = [2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15),
+                     2.0^(-17), 2.0^(-21)];
         bestindx = length(stepsizes);
         beststeps_found = zeros(options.rep_number);
         start_step = 1;

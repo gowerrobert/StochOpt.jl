@@ -11,6 +11,7 @@ using Printf # julia 0.7
 using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
+using Dates
 
 include("../src/StochOpt.jl") # Be carefull about the path here
 
@@ -25,6 +26,7 @@ X, y = loadDataset(data);
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
 scaling = "none";
+# scaling = "column-scaling";
 options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=10^8,
                     #   regularizor_parameter = "1/num_data", # fixes lambda
                       regularizor_parameter = "normalized",
@@ -120,3 +122,5 @@ save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound
                          opt_minibatch_exact);
 #endregion
 ##################################################################################################################
+
+println("\n--- Script end date ----\n", Dates.now(), "\n------------------------")

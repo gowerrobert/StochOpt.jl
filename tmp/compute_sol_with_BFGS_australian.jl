@@ -9,7 +9,7 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("./src/StochOpt.jl") # Be carefull about the path here
 
 default_path = "./data/";
 
@@ -51,7 +51,7 @@ y = nothing; # available in prob.y
 ## 0.49591251564486827  /   100 000 epochs  /  beststep = 2^7.0
 ## 0.3378005242384954   / 1 000 000 epochs  /  beststep = 2^7.0
 
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^5, exacterror=false, max_iter=10^8, 
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
                       max_time=60.0*60.0*3.0, max_epocs=10^7, force_continue=true);
 ## Running BFGS
 options.stepsize_multiplier = 2^(7.0); # beststep = 2^(7.0) for batchsize = prob.numdata

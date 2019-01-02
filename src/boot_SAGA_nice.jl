@@ -58,26 +58,46 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     # /!\ WARNING: this function modifies its own arguments (`method` and `options`) and returns method! Shouldn't we name it "boot_SAGA_nice!(...)" with an "!" ?
     tau = options.batchsize;
     n = prob.numdata;
-    leftcoeff = (n*(tau-1))/(tau*(n-1));
-    rightcoeff = (n-tau)/(tau*(n-1));
-    simplebound = leftcoeff*prob.Lbar + rightcoeff*prob.Lmax;
-    Lheuristic = leftcoeff*prob.L + rightcoeff*prob.Lmax;
-    # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*probLmax + ((tau - 1)/(n - 1))*probL;
-    # println("----------------First expected smoothness estimation: ", Lexpected);
-    # println("------------------Heuristic expected smoothness estimation : ", simplebound);
+    L = prob.L;
+    Lmax = prob.Lmax;
+    Lbar = prob.Lbar;
 
     if(occursin("lgstc", prob.name)) # julia 0.7
-        # Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
-        Lheuristic = Lheuristic/4;    #  correcting for logistic since phi'' <= 1/4 + using heuristic estimation
+        ## Correcting for logistic since phi'' <= 1/4
+        # Lexpected = Lexpected/4;
+        L /= 4;
+        Lmax /= 4;
+        Lbar /= 4;
     end
-    rightterm = ((n-tau)/(tau*(n-1)))*prob.Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
-    method.stepsize = 1.0/(4*max(simplebound, rightterm));
-    # K = (4*tau*prob.Lmax)/(n*prob.mu);
-    # method.stepsize = K/(2*prob.Lmax*(1+K+sqrt(1+K^2))); # Hofmann
-    # method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*probmu);
-    # stepsize2 =  1.0/(4*max(simplebound, rightterm));
-    # println("----------------First stepsize: ", method.stepsize);
-    # println("------------------Heuristic stepsize: ", stepsize2);
+    leftcoeff = (n*(tau-1))/(tau*(n-1));
+    rightcoeff = (n-tau)/(tau*(n-1));
+    Lheuristic = leftcoeff*L + rightcoeff*Lmax;
+    Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;
+    Lbernstein = 2*leftcoeff*L + (1/tau)*((n-tau)/(n-1) + (4/3)*log(d))*Lmax;
+    rightterm = ((n-tau)/(tau*(n-1)))*Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
+
+    if options.stepsize_multiplier == -1.0
+        ## Heuristic
+        println("Heuristic step size");
+        sleep(2);
+        method.stepsize = 1.0/(4.0*max(Lheuristic, rightterm));
+    elseif options.stepsize_multiplier == -2.0
+        ## Simple bound
+        println("Simple step size");
+        sleep(2);
+        method.stepsize = 1.0/(4.0*max(Lsimple, rightterm));
+    elseif options.stepsize_multiplier == -3.0
+        ## Bernstein bound
+        println("Bernstein step size");
+        sleep(2);
+        method.stepsize =  1.0/(4.0*max(Lbernstein, rightterm));
+    elseif options.stepsize_multiplier > 0.0
+        println("Manually set step size");
+        sleep(2);
+        method.stepsize = options.stepsize_multiplier;
+    else
+        error("Invalid options.stepsize_multiplier");
+    end
 
     # WARNING: The following if statement does not seem to modify the method that is returned afterwards...
     if(options.skip_error_calculation == 0.0)

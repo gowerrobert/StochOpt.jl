@@ -26,3 +26,6 @@ data/*
 ## Temporary codes for exploration
 tmp/test_linreg.jl
 tpm/test_open.jl
+
+## Monitoring outputs
+nohups/*

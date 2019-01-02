@@ -5,7 +5,7 @@ START_TIME=$SECONDS
 task () {
     local var=$1
     printf "Dataset: $var\n"
-    gnome-terminal -- sh -c "julia ./tmp/script_args.jl $var; exec bash"
+    gnome-terminal -- sh -c "julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice.jl $var; exec bash"
 }
 
 while read var; 

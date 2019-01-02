@@ -252,10 +252,10 @@ function get_fsol_logistic!(prob)
 
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum(output.fs);
-        println("\n----------------------------------------------------------------------")
-        @printf "For %s, fsol = %f\n" prob.name prob.fsol
-        println("----------------------------------------------------------------------\n")
     end
+    println("\n----------------------------------------------------------------------")
+    @printf "For %s, fsol = %f\n" prob.name prob.fsol
+    println("----------------------------------------------------------------------\n")
 
     ## Saving the solution in a JLD file
     fsolfilename = get_fsol_filename(prob); # not coherent with get_saved_stepsize output
