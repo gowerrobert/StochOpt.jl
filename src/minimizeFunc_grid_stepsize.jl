@@ -1,4 +1,4 @@
-function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing)
+function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing, grid::Array{Float64,1}=[0.0])
     default_path = "./data/";
     # savename = string(replace(prob.name, r"[\/]", "-"),'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
     # savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
@@ -12,23 +12,40 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     beststep, savename = get_saved_stepsize(prob.name, method_name, options);
     if(beststep == 0.0 || options.repeat_stepsize_calculation == true)
         options.force_continue = false;
-        # stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
-        #              2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
-        stepsizes = [2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15),
-                     2.0^(-17), 2.0^(-21)];
+        if grid == [0.0]
+            stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
+                         2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
+        else
+            stepsizes = grid;
+        end
         bestindx = length(stepsizes);
         beststeps_found = zeros(options.rep_number);
         start_step = 1;
         for expnum = 1:options.rep_number
-            minfval = 1.0; thelastonebetter = 0;
+            println("\n----------------> Experiment # ", expnum);
+            # minfval = 1.0; # Makes no sense, completely arabitrary value..
+            minfval = Inf;
+            thelastonebetter = 0;
             beststep = 0.0; #iteratesp = 1;
             for stepind = start_step:length(stepsizes)
+                println("--------------------------------> minfval = ", minfval);
+                ## Reset the method
+                # println("\n\nMONITORING => ", method_input.SAGgrad, "\n\n")
+                # if typeof(method_input) != String
+                #     if typeof(method_input) == SAGA_nice_method
+                #         method_input = method_input.reset(); # SAGA_nice = initiate_SAGA_nice(prob, options);
+                #     else
+                #         error("WARNING: you may need to reset your method here or in `minimizeFunc`");
+                #     end
+                # end
+
                 step = stepsizes[stepind];
                 println("\nTrying stepsize ", step);
                 options.stepsize_multiplier = step
                 output = minimizeFunc(prob, method_input, options);
-                if(output.fs[end] < minfval && (output.fail == "max_time" || output.fail == "max_epocs" || output.fail == "tol-reached"))
-                    #println("found a better stepsize: ",beststep, " because ",minfval, " > ", output.fs[end], )
+                println("---> Fail = ", output.fail);
+                if((output.fs[end] < minfval) && (output.fail == "max_time" || output.fail == "max_epocs" || output.fail == "tol-reached"))
+                    println("found a better stepsize: ", beststep, " because ", minfval, " > ", output.fs[end])
                     minfval = output.fs[end];
                     beststep = step;
                     bestindx = something(findfirst(isequal(step), stepsizes), 0);
@@ -60,6 +77,6 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     # for expnum =2: options.rep_number
     #   outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling
     # end
-    save("$(default_path)$(savename).jld", "output", outputfirst)
+    # save("$(default_path)$(savename).jld", "output", outputfirst)
     return outputfirst
 end
