@@ -38,7 +38,7 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     Z = 0.0;
 
     return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice, minibatches, unbiased,
-                            Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z);
+                            Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, reset_SAGA_nice);
 end
 
 
@@ -73,7 +73,7 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     rightcoeff = (n-tau)/(tau*(n-1));
     Lheuristic = leftcoeff*L + rightcoeff*Lmax;
     Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;
-    Lbernstein = 2*leftcoeff*L + (1/tau)*((n-tau)/(n-1) + (4/3)*log(d))*Lmax;
+    Lbernstein = 2*leftcoeff*L + (1/tau)*((n-tau)/(n-1) + (4/3)*log(prob.numfeatures))*Lmax;
     rightterm = ((n-tau)/(tau*(n-1)))*Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
 
     if options.stepsize_multiplier == -1.0
@@ -92,8 +92,7 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
         sleep(2);
         method.stepsize =  1.0/(4.0*max(Lbernstein, rightterm));
     elseif options.stepsize_multiplier > 0.0
-        println("Manually set step size");
-        sleep(2);
+        # println("Manually set step size");
         method.stepsize = options.stepsize_multiplier;
     else
         error("Invalid options.stepsize_multiplier");
@@ -106,4 +105,50 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     end
     println("Skipping ", options.skip_error_calculation, " iterations per epoch")
     return method;
+end
+
+
+
+
+
+
+"""
+    reset_SAGA_nice(prob::Prob, method, options::MyOptions)
+
+Reset the SAGA method with  ``τ``--nice sampling, especially the step size, the gradient and the Jacobian estimates.
+
+#INPUTS:\\
+    - prob: considered problem (i.e. logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
+    - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
+    - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
+#OUTPUTS:\\
+    - SAGA_nice_method: SAGA mini-batch method for ``τ``--nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
+"""
+function reset_SAGA_nice(prob::Prob, method, options::MyOptions; unbiased=true)
+    println("\n---- RESET SAGA NICE ----\n");
+
+    # method.epocsperiter = options.batchsize/prob.numdata;
+    # method.gradsperiter = options.batchsize;
+    # method.unbiased = unbiased;
+    # if unbiased
+    #     name = "SAGA"
+    # else
+    #     name = "SAG"
+    # end
+    # if(options.batchsize > 1)
+    #     name = string(name, "-", options.batchsize);
+    # end
+    # method.name = string(name, "-nice");
+
+    method.minibatches = [];
+    method.Jac = zeros(prob.numfeatures, prob.numdata); # Jacobian of size d x n
+    method.Jacsp = spzeros(1);
+    method.SAGgrad = zeros(prob.numfeatures);
+    method.gi = zeros(prob.numfeatures);
+    method.aux = zeros(prob.numfeatures);
+    method.stepsize = 0.0;
+    method.probs = [];
+    method.Z = 0.0;
+
+    return method
 end

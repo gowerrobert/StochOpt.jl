@@ -127,6 +127,7 @@ mutable struct SAGA_nice_method # julia 0.7
     stepsize::Float64     # The stepsize
     probs::Array{Float64}  # Probability of selecting a coordinate or mini-batch
     Z    # normalizing variable for probabilities
+    reset::Function # reset the parameters of the method like after initiate_SAGA_nice_method
     # L::Float64 # Smoothness constant of the whole objective function f
     # Lmax::Float64 # Max of the smoothness constant of the f_i functions
     # Lbar::Float64 # Average of the smoothness constant of the f_i functions
@@ -211,6 +212,8 @@ include("../util/matrix_scaling.jl");
 include("../util/preprocessing.jl");
 include("../util/power_iteration.jl");
 #Additional
-include("BFGS_update!.jl")
-include("calculate_SAGA_rates_and_complexities.jl")
+include("BFGS_update!.jl");
+include("calculate_SAGA_rates_and_complexities.jl");
 include("../util/matrix_rotation.jl");
+include("get_saved_stepsize.jl");
+# include("../tmp/parallel_minimizeFunc_grid_stepsize.jl")

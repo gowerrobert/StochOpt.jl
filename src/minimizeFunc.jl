@@ -1,7 +1,7 @@
 # A wrapper function for testing and timing iterative methods for
 # solving the empirical risk minimization problem - 2018 - Robert M. Gower
 # StochOpt Copyright (C) 2018, Robert Gower
-function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing)
+function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing, stop_at_tol::Bool=false)
  
     if(options.initial_point == "randn") # set initial point
         x = randn(prob.numfeatures);
@@ -23,6 +23,13 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     else
         # println("\n---Method is not a String---\n") # To try if this else is for SAGA
         method = method_input;
+        if typeof(method) == SAGA_nice_method
+            # println("\n\nMONITORING BEFORE RESET => ", method.SAGgrad, "\n\n")
+            method = method.reset(prob, method, options); # SAGA_nice = initiate_SAGA_nice(prob, options);
+            # println("\n\nMONITORING AFTER RESET  => ", method.SAGgrad, "\n\n")
+        else
+            error("WARNING: you may need to reset your method here");
+        end
         method = method.bootmethod(prob, method, options); # Previous code
         # method = method.bootmethod(prob, method, options, x);
     end
@@ -64,9 +71,9 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             println("      It    |                 f(x)          |   epochs  |     Time   |")
             println("----------------------------------------------------------------------")            
         else
-            println("------------------------------------------------------------------")
-            println("      It    | 100*(f(x)-fsol)/(f0-fsol) |   epochs  |     Time   |")
-            println("------------------------------------------------------------------")
+            println("--------------------------------------------------------------------------------------")
+            println("      It    |           100*(f(x)-fsol)/(f0-fsol)           |   epochs  |     Time   |")
+            println("--------------------------------------------------------------------------------------")
         end
     end
     for iter = 1:options.max_iter
@@ -77,6 +84,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         timeaccum = timeaccum + time_elapsed; # Keeps track of time accumulated at every iteration
         if(mod(iter, options.skip_error_calculation) == 0)
             fs = [fs prob.f_eval(x, 1:prob.numdata)];
+            println("fs[end] = ", fs[end]);
             if(testprob != nothing) # calculating the test error
                 testerrors = [testerrors testerror(testprob, x)];
             end
@@ -87,39 +95,48 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # end
             if(options.printiters)
                 if(options.exacterror == false)
-                    @printf "  %8.0d  |           %5.9f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
                 else
-                    @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
                 end
             end
-            if(options.force_continue == false)
+            if options.force_continue == false || stop_at_tol == true
                 if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
                     fail = "tol-reached";
                     iterations = iter;
                     break;
                 end
+            end
+            if(options.force_continue == false)
+                # if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
+                #     fail = "tol-reached";
+                #     iterations = iter;
+                #     break;
+                # end
                 # testing if method gone wild
-                if(fs[end]/f0 > 1.10 || (fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1 || fs[end]/fs[end-1] > 1.5 || (fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 1.15) # testing if method gone wild
-                    fail = "diverging"; iterations = iter;
-                    break;
-                end
-                if(fs[end]/f0 > 1.10)
-                    println("DIV 1");
-                    fail = "diverging"; iterations = iter;
-                    break;
-                elseif((fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1)
-                    println("DIV 2");
-                    fail = "diverging"; iterations = iter;
-                    break;
-                elseif(fs[end]/fs[end-1] > 1.5)
-                    println("DIV 3");
-                    fail = "diverging"; iterations = iter;
-                    break;
-                elseif((fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 10^2) # previous threshold at 1.15
-                    println("DIV 4");
-                    fail = "diverging"; iterations = iter;
-                    break;
-                end
+                # if(fs[end]/f0 > 1.10 || (fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1 || fs[end]/fs[end-1] > 1.5 || (fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 1.15) # testing if method gone wild
+                #     println("DIV 0");
+                #     fail = "diverging";
+                #     iterations = iter;
+                #     break;
+                # end
+                # if(fs[end]/f0 > 1.10)
+                #     println("DIV 1");
+                #     fail = "diverging"; iterations = iter;
+                #     break;
+                # elseif((fs[end]-prob.fsol)/(f0-prob.fsol) > 1.1)
+                #     println("DIV 2");
+                #     fail = "diverging"; iterations = iter;
+                #     break;
+                # elseif(fs[end]/fs[end-1] > 1.5)
+                #     println("DIV 3");
+                #     fail = "diverging"; iterations = iter;
+                #     break;
+                # elseif((fs[end]-prob.fsol)/(fs[end-1]-prob.fsol) > 10^2) # previous threshold at 1.15
+                #     println("DIV 4");
+                #     fail = "diverging"; iterations = iter;
+                #     break;
+                # end
             end
             if(isnan(sum(x)) || isnan(fs[end]) || isinf(fs[end]))
                 fail = "nan";  iterations = iter;
@@ -143,9 +160,9 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # end
             if(options.printiters)
                 if(options.exacterror == false)
-                    @printf "  %8.0d  |           %5.9f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];      
                 else
-                    @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
                 end
             end
             break;
