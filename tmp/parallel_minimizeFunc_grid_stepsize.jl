@@ -1,4 +1,3 @@
-
 function parallel_toy_1(n::Int64, m::Int64)
     println("i,j")
     array_val = SharedArray{Float64}(n, m);
@@ -24,12 +23,12 @@ end
 
 function parallel_toy_grid_search(prob::Prob, method_input, options::MyOptions; testprob=nothing)
 
-    stepsizes = [2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9)];
-    array_val = SharedArray{Float64}(options.rep_number, length(stepsizes));
+    stepsizes_grid = [2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9)];
+    array_val = SharedArray{Float64}(options.rep_number, length(stepsizes_grid));
 
     @sync @distributed for expnum = 1:options.rep_number
-        @sync @distributed for stepind = 1:length(stepsizes)
-            step = stepsizes[stepind];
+        @sync @distributed for stepind = 1:length(stepsizes_grid)
+            step = stepsizes_grid[stepind];
             # println("\nBefore options.stepsize_multiplier: ", options.stepsize_multiplier);
             options.stepsize_multiplier *= 2;
             # println("\nAfter options.stepsize_multiplier: ", options.stepsize_multiplier);
@@ -40,20 +39,20 @@ function parallel_toy_grid_search(prob::Prob, method_input, options::MyOptions; 
             array_val[expnum, stepind] = val;
         end
     end
-    println("\nGrid of stepsizes\n", stepsizes)
+    println("\nGrid of stepsizes\n", stepsizes_grid)
     println("\nArray of values\n", array_val)
     # println("\nArray of medians\n", median(array_val, dims=1))
 
     ## Get the median over experiments as the best step size
     minval, bestidx = findmin(median(array_val, dims=1)[1,:])
-    beststep = stepsizes[bestidx]
+    beststep = stepsizes_grid[bestidx]
     
     # @printf "\nMinimum %5.5f reached for step = %f (idx=%d)\n\n" minval beststep bestidx
 end
 
 
-function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing)
-    options.printiters = false;
+function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing, grid::Array{Float64,1}=[0.0])
+    options.printiters = true;
 
     default_path = "./data/";
 
@@ -67,14 +66,17 @@ function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::
 
     if beststep == 0.0 || options.repeat_stepsize_calculation == true
         options.force_continue = false;
-
-        stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
-                     2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
-        array_minval = SharedArray{Float64}(options.rep_number, length(stepsizes));
+        if grid == [0.0]
+            stepsizes_grid = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
+                              2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
+        else
+            stepsizes_grid = grid;
+        end
+        array_minval = SharedArray{Float64}(options.rep_number, length(stepsizes_grid));
 
         @sync @distributed for expnum = 1:options.rep_number
-            @sync @distributed for stepind = 1:length(stepsizes)
-                step = stepsizes[stepind];
+            @sync @distributed for stepind = 1:length(stepsizes_grid)
+                step = stepsizes_grid[stepind];
                 println("\nTrying stepsize ", step);
                 
                 options.stepsize_multiplier = step;
@@ -84,7 +86,7 @@ function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::
             end
         end
 
-        println("\nGrid of stepsizes\n", stepsizes)
+        println("\nGrid of stepsizes\n", stepsizes_grid)
         println("Array of values\n")
         for i=1:options.rep_number
             println(array_minval[i,:])
@@ -93,7 +95,7 @@ function parallel_minimizeFunc_grid_stepsize(prob::Prob, method_input, options::
     
         ## Get the median over experiments as the best step size
         minval, bestidx = findmin(median(array_minval, dims=1)[1,:])
-        beststep = stepsizes[bestidx]
+        beststep = stepsizes_grid[bestidx]
         
         @printf "\nMinimum %5.5f reached for step = %f (idx=%d)\n\n" minval beststep bestidx
     end
