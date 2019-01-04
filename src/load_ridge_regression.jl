@@ -44,7 +44,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
     Li_s = get_Li(X, lambda);
     Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
-    Lbar = mean(Li_s);
+    Lbar = mean(Li_s); # = mean(sum(X.^2, dims=1))
 
     f_eval(x, S)                = ((1 ./ length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2); # julia 0.7
     g_eval(x, S)                = ((1 ./ length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x); # julia 0.7
