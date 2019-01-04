@@ -12,7 +12,7 @@ It uniformly picks ``τ`` data points out of ``n`` at each iteration to build an
     - SAGA_nice_method: SAGA mini-batch method for ``τ``--nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
 """
 function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
-    options.stepsize_multiplier = 1;
+    # options.stepsize_multiplier = 1; # WHY ?!
     epocsperiter = options.batchsize/prob.numdata;
     gradsperiter = options.batchsize;
     if(unbiased)
@@ -91,8 +91,8 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
         println("Bernstein step size");
         sleep(2);
         method.stepsize =  1.0/(4.0*max(Lbernstein, rightterm));
-    elseif options.stepsize_multiplier > 0.0
-        # println("Manually set step size");
+    elseif options.stepsize_multiplier > 0.0 # Put it first and do computations only if necessary
+        println("Manually set step size");
         method.stepsize = options.stepsize_multiplier;
     else
         error("Invalid options.stepsize_multiplier");
