@@ -29,19 +29,17 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             beststep = 0.0; #iteratesp = 1;
             for stepind = start_step:length(stepsizes)
                 println("--------------------------------> minfval = ", minfval);
-                ## Reset the method
-                # println("\n\nMONITORING => ", method_input.SAGgrad, "\n\n")
-                # if typeof(method_input) != String
-                #     if typeof(method_input) == SAGA_nice_method
-                #         method_input = method_input.reset(); # SAGA_nice = initiate_SAGA_nice(prob, options);
-                #     else
-                #         error("WARNING: you may need to reset your method here or in `minimizeFunc`");
-                #     end
-                # end
-
+                if typeof(method_input) == SAGA_nice_method
+                    # println("\n\nMONITORING BEFORE RESET => ", method_input.SAGgrad, "\n\n")
+                    method_input = method_input.reset(prob, method_input, options); # SAGA_nice = initiate_SAGA_nice(prob, options);
+                    # println("\n\nMONITORING AFTER RESET  => ", method_input.SAGgrad, "\n\n")
+                else
+                    error("WARNING: you may need to reset your method here");
+                end
                 step = stepsizes[stepind];
                 println("\nTrying stepsize ", step);
-                options.stepsize_multiplier = step
+                options.stepsize_multiplier = step;
+                
                 output = minimizeFunc(prob, method_input, options);
                 println("---> Fail = ", output.fail);
                 if((output.fs[end] < minfval) && (output.fail == "max_time" || output.fail == "max_epocs" || output.fail == "tol-reached"))
@@ -51,10 +49,10 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
                     bestindx = something(findfirst(isequal(step), stepsizes), 0);
                     thelastonebetter = 1.0;
                 elseif(thelastonebetter == 1.0)
-                    #  println("the last one was better because ",minfval, " < ", output.fs[end], "= output.fs[end]" )
+                    println("the last one was better because ", minfval, " < ", output.fs[end], " = output.fs[end]")
                     break; #It's only getting worst by decreasing the stepsize.
                 else
-                    #  println("not better because ",minfval, " < ", output.fs[end], "= output.fs[end]" )
+                    println("not better because ",minfval, " < ", output.fs[end], " = output.fs[end]" )
                     thelastonebetter = 0.0;
                 end
                 #iteratesp = iteratesp+1;
@@ -63,20 +61,26 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             start_step = max(bestindx - 4, 1);
         end
         # Get the median over experiments as the best step size
-        println("best steps:")
-        println(beststeps_found)
+        # println("\nbest steps:")
+        # println(beststeps_found)
         beststep = mode(beststeps_found);
-        println("mode best step:")
-        println(beststep)
+        # println("mode best step:")
+        # println(beststep)
     end
     options.force_continue = true;
     options.stepsize_multiplier = beststep;
 
-    println("Best step: ", beststep);
+    println("\n=> Best step: ", beststep);
     outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
     # for expnum =2: options.rep_number
     #   outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling
     # end
-    # save("$(default_path)$(savename).jld", "output", outputfirst)
+
+    save("$(default_path)$(savename).jld", "output", outputfirst)
+    println("\nbest steps:");
+    println(beststeps_found);
+    println("mode best step:");
+    println(beststep);
+
     return outputfirst
 end
