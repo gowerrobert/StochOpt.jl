@@ -56,6 +56,7 @@ if occursin("lgstc", prob.name) # julia 0.7
 end
 
 ### I) tau = 1 ###
+#region
 ##---------- Computing step sizes ----------
 step_defazio = 1.0 / (3.0*(Lmax + n*mu))
 K = (4.0*Lmax) / (n*mu);
@@ -181,7 +182,7 @@ if numsimu == 1
     # pyplot()
     plot_outputs_Plots(OUTPUTS, prob, options); # Plot and save output
 end
-
+#endregion
 
 ### II) tau = tau* ###
 # Hofmann : tau = 20, gamma = gamma(20)
@@ -194,6 +195,8 @@ K = (4.0*mini_batch_hofmann*Lmax) / (n*mu);
 step_hofmann = K / (2*Lmax*(1+K+sqrt(1+K^2)));
 
 ## IS our optimal tau always one???
+## YearPredictionMSD scaled + mu = 10^(-3) => 13
+## YearPredictionMSD scaled + mu = 10^(-1) => 1245
 tau_heuristic = round(Int, 1 + ( mu*(n-1) ) / ( 4*L ) );
 rho = ( n*(n - tau_heuristic) ) / ( tau_heuristic*(n-1) ); # Sketch residual
 rightterm = (rho / n)*Lmax + ( (mu*n) / (4*tau_heuristic) ); # Right-hand side term in the max
