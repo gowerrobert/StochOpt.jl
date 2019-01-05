@@ -77,6 +77,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     # end
 
     save("$(default_path)$(savename).jld", "output", outputfirst)
+    
     println("\nbest steps:");
     println(beststeps_found);
     println("mode best step:");

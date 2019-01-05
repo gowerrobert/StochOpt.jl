@@ -419,12 +419,38 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
             options.skip_error_calculation = skipped_errors;
         end
         
+        n = prob.numdata;
+        L = prob.L;
+        Lmax = prob.Lmax;
+        Lbar = prob.Lbar;
+
+        if(occursin("lgstc", prob.name)) # julia 0.7
+            ## Correcting for logistic since phi'' <= 1/4
+            L /= 4;
+            Lmax /= 4;
+            Lbar /= 4;
+        end
+        leftcoeff = (n*(tau-1))/(tau*(n-1));
+        rightcoeff = (n-tau)/(tau*(n-1));
+        Lheuristic = leftcoeff*L + rightcoeff*Lmax;
+        # Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;
+        # Lbernstein = 2*leftcoeff*L + (1/tau)*((n-tau)/(n-1) + (4/3)*log(prob.numfeatures))*Lmax;
+        rightterm = ((n-tau)/(tau*(n-1)))*Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
+
         options.batchsize = tau;
         for i=1:numsimu
             println("----- Simulation #", i, " -----");
             # sg = initiate_SAGA(prob, options, minibatch_type="nice"); # Old and diverging implementation
             sg = initiate_SAGA_nice(prob, options); # new separated implementation
-            println("Stepsize sg = ", sg.stepsize);
+            ## Heuristic
+            println("Heuristic step size");
+            options.stepsize_multiplier = 1.0/(4.0*max(Lheuristic, rightterm));
+            ## Simple bound
+            # println("Simple step size");
+            # options.stepsize_multiplier = 1.0/(4.0*max(Lsimple, rightterm));
+            ## Bernstein bound
+            # println("Bernstein step size");
+            # options.stepsize_multiplier =  1.0/(4.0*max(Lbernstein, rightterm));
             output = minimizeFunc(prob, sg, options);
             println("Output fail = ", output.fail, "\n");
             itercomplex[idxtau] += output.iterations;
@@ -436,7 +462,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
     itercomplex = itercomplex[:];
 
     ## Saving the result of the simulations
-    savename = "-empcomplex-$(numsimu)-avg";
+    savename = "-exp4_1-empcomplex-$(numsimu)-avg";
     save("$(default_path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS);
 
     return OUTPUTS, itercomplex

@@ -164,6 +164,6 @@ function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, em
     vline!([opt_minibatch_simple-0.04], line=(:auto, 3), color=:red, label="simple", legendtitle="Optimal mini-batch size");
     vline!([opt_minibatch_bernstein-0.02], line=(:auto, 3), color=:black, label="bernstein");
     vline!([opt_minibatch_heuristic+0.02], line=(:auto, 3), color=:purple, label="heuristic");
-    savename = "-empcomplex-$(numsimu)-avg";
+    savename = "-exp4_1-empcomplex-$(numsimu)-avg";
     savefig("$(default_path)$(probname)$(savename).pdf");
 end

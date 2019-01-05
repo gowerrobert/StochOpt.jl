@@ -1,7 +1,9 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
-function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) #, datapassbnd::Int64
+function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, suffix::AbstractString="") #, datapassbnd::Int64
     #Now in epocs X function values
-    if(options.batchsize > 0)
+    if length(suffix) > 0
+        probname = string(replace(prob.name, r"[\/]." => "-"), suffix);
+    elseif options.batchsize > 0
         probname = string(replace(prob.name, r"[\/]." => "-"), "-", options.batchsize);
     else
         probname = string(replace(prob.name, r"[\/]." => "-"));
@@ -12,7 +14,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
     end
     default_path = "./data/";  # savename= string(replace(prob.name, r"[\/]" => "-"),"-", options.batchsize);
     save("$(default_path)$(probname).jld", "OUTPUTS", OUTPUTS);
-    fontsmll = 8;
+    fontsmll = 7;
     fontmed = 14;
     fontbig = 14;
     xlabeltxt = "epochs";
@@ -37,7 +39,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
     bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
     plt = plot(epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), 
                xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
-               linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+               linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontsmll), 
                markersize=6, linewidth=4, marker=:auto, grid=false)
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
@@ -55,7 +57,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
         plot!(plt, epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), 
               xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll), 
-              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,  grid=false)
+              guidefont=font(fontbig), legendfont=font(fontsmll), markersize=6, linewidth=4, marker=:auto,  grid=false)
     end
     println("./figures/$(probname)-epoc.pdf");
     savefig(plt, "./figures/$(probname)-epoc.pdf");
@@ -69,7 +71,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
     lf = length(fs);
     bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
     plot(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
-        guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
+        guidefont=font(fontbig), legendfont=font(fontsmll), markersize=6, linewidth=4, marker=:auto, grid=false)
     println(output.name, ": 2^", log(2, output.stepsize_multiplier))
     for jiter=2:length(OUTPUTS)
         output = OUTPUTS[jiter];
@@ -79,7 +81,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         lf = length(fs);
         bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
         plot!(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
-            guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
+            guidefont=font(fontbig), legendfont=font(fontsmll), markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2,output.stepsize_multiplier))
     end
     println("./figures/$(probname)-time.pdf");
@@ -92,7 +94,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
         lf = length(output.testerrors);
         bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
         plot(output.times[1:bnd], output.testerrors[1:bnd], xlabel="time", ylabel="residual", label=string(output.name, "-t"), linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig),
-            legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
+            legendfont=font(fontsmll), markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2, output.stepsize_multiplier))
         println(output.testerrors[1:bnd])
         for jiter=2:length(OUTPUTS)
@@ -101,7 +103,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options, datapassbnd::Int64=0) 
             lf = length(output.testerrors);
             bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
             plot!(output.times[1:bnd], output.testerrors[1:bnd], xlabel="time", ylabel="residual", label=string(output.name, "-t"), linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig),
-                legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
+                legendfont=font(fontsmll), markersize=6, linewidth=4, marker=:auto, grid=false)
             println(output.testerrors[1:bnd])
             println(output.name, ": 2^", log(2, output.stepsize_multiplier))
         end
