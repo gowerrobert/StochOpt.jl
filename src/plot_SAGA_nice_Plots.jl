@@ -42,7 +42,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
     else
         error("Wrong type of expsmoothcst");
     end
-    savename = "-expsmoothbounds";
+    savename = "-exp1-expsmoothbounds";
     savefig("$(default_path)$(probname)$(savename).pdf");
 
     # Zoom
@@ -113,7 +113,7 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
     else
         error("Wrong type of expsmoothstepsize");
     end
-    savename = "-stepsizes";
+    savename = "-exp2-stepsizes";
     savefig("$(default_path)$(probname)$(savename).pdf");
 end
 
