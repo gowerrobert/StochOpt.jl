@@ -319,7 +319,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   opt_minibatch_heuristic::Int64, opt_minibatch_exact)
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_"); # julia 0.7
     default_path = "./data/";
-    savename = "-cst";
+    savename = "-exp1-cst";
 
     n = prob.numdata;
     d = prob.numfeatures;
@@ -371,8 +371,7 @@ end
 
 """
     simulate_SAGA_nice(prob, minibatchlist, numsimu=1, 
-                       tolerance=10.0^(-3), skipped_errors=1,
-                       max_iter=10^8, max_time=10000.0, max_epochs=10000)
+                       skipped_errors=1, skip_multiplier=0.02)
 
 Runs several times (numsimu) mini-batch SAGA with nice sampling for each
 mini-batch size in the give list (minibatchlist) in order to evaluate the
@@ -382,12 +381,8 @@ correpsonding average iteration complexity.
     - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
     - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
     - **Int64** numsimu: number of runs of mini-batch SAGA\\
-    - **Float64** tolerance: relative error convergence threshold, at last iteration we have (f(x)-fsol)/(f0-fsol) < epsilon\\
     - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
     - **Float64** skip\\_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
-    - **Int64** max\\_iter: maximum number of iterations\\
-    - **Float64** max\\_time: maximum run time\\
-    - **Int64** max\\_epochs: maximum number of epochs\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(minibatchlist)*numsimu\\
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
