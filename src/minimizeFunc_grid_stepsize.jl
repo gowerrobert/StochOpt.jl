@@ -33,8 +33,6 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
                     # println("\n\nMONITORING BEFORE RESET => ", method_input.SAGgrad, "\n\n")
                     method_input = method_input.reset(prob, method_input, options); # SAGA_nice = initiate_SAGA_nice(prob, options);
                     # println("\n\nMONITORING AFTER RESET  => ", method_input.SAGgrad, "\n\n")
-                else
-                    error("WARNING: you may need to reset your method here");
                 end
                 step = stepsizes[stepind];
                 println("\nTrying stepsize ", step);
