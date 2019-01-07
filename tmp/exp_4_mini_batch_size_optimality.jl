@@ -1,6 +1,7 @@
-## EXPERIMENT 4
+### EXPERIMENT 4
 
 ## Testing the optimality of our tau* for the same gamma = gamma_heuristic
+
 using JLD
 using Plots
 using StatsBase
@@ -11,23 +12,34 @@ using Printf # julia 0.7
 using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
+
+## Bash inputs
+# include("../src/StochOpt.jl") # Be carefull about the path here
+# data = ARGS[1];
+# scaling = ARGS[2];
+# lambda = parse(Float64, ARGS[3]);
+# println("Inputs: ", data, " + ", scaling, " + ",  lambda, "\n");
+
+## Manual inputs
 include("./src/StochOpt.jl") # Be carefull about the path here
+default_path = "./data/";
+datasets = readlines("$(default_path)available_datasets.txt");
+idx = 3; # YearPredictionMSD
+data = datasets[idx];
+# scaling = "none";
+scaling = "column-scaling";
+# lambda = -1;
+lambda = 10^(-3);
 
 Random.seed!(1);
 
 ### LOADING THE DATA ###
 println("--- Loading data ---");
-default_path = "./data/";
-datasets = readlines("$(default_path)available_datasets.txt");
-idx = 3; # YearPredictionMSD
-data = datasets[idx];
 X, y = loadDataset(data);
 
 ######################################## SETTING UP THE PROBLEM ########################################
 println("\n--- Setting up the selected problem ---");
-# scaling = "none";
-scaling = "column-scaling";
-options = set_options(tol=10.0^(-1), max_iter=10^8, max_epocs=10^8,
+options = set_options(tol=10.0^(-6), max_iter=10^8, max_epocs=10^8,
                       max_time=60.0,
                       skip_error_calculation=10^4,
                       batchsize=1,
@@ -39,10 +51,10 @@ if length(u) < 2
     error("Wrong number of possible outputs")
 elseif length(u) == 2
     println("Binary output detected: the problem is set to logistic regression")
-    prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling=scaling);
+    prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);
 else
     println("More than three modalities in the outputs: the problem is set to ridge regression")
-    prob = load_ridge_regression(X, y, data, options, lambda=-1, scaling=scaling); #column-scaling
+    prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling); #column-scaling
 end
 
 n = prob.numdata;
@@ -99,6 +111,8 @@ minibatchlist = [1, 2, 3, 5, 10, 20, 50];
 # minibatchlist = 5:-1:1;
 # minibatchlist = [1];
 
+# minibatchlist = [2^i for i in 0:9]
+
 numsimu = 5; # number of runs of mini-batch SAGA for averaging the empirical complexity
 @time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, options, numsimu);
 
@@ -109,7 +123,7 @@ if all(s->(string(s)=="tol-reached"), fails)
 end
 
 ## Plotting one SAGA-nice simulation for each mini-batch size
-if(numsimu==1)
+if numsimu == 1
     gr()
     # pyplot()
     plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp4.1"); # Plot and save output
