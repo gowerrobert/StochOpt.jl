@@ -131,7 +131,6 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     y[findall(x->x==miny, y)] .= -1;
     y[findall(x->x==miny, y)] .= 1;
 
-    println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
     if(lambda == -1)
         if(opts.regularizor_parameter == "1/num_data")
             lambda = 1/numdata;
@@ -145,8 +144,14 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
         else
             error("Unknown regularizor_parameter option");
         end
+        name = string(name, "-regularizor-",  replace(opts.regularizor_parameter, r"[\/]" => "_"));
+    elseif lambda > 0.0
+        name = string(name, "-regularizor-", replace(@sprintf("%.0e", lambda), "." => "_"));
+    else
+        error("lambda cannot be nonpositive (except -1)");
     end
     println("lambda = ", lambda, "\n");
+    println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
     ## To avoid very long computations when dimensions are large mu is approximated by lambda
     if numdata > 10000 || numfeatures > 10000

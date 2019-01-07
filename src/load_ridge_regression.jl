@@ -13,13 +13,12 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         datascaling = scaling;
         apply_datascaling(X, datascaling);
     end
-    name = string(name, "-", datascaling.name)
+    name = string(name, "-", datascaling.name);
     sX = size(X);
     numfeatures = sX[1];
     numdata = sX[2];
-    println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
-
-    if(lambda == -1)
+    
+    if lambda == -1
         if(opts.regularizor_parameter == "1/num_data")
             lambda = 1/numdata;
         elseif(opts.regularizor_parameter == "normalized")
@@ -32,8 +31,14 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         else
             error("Unknown regularizor_parameter option");
         end
+        name = string(name, "-regularizor-",  replace(opts.regularizor_parameter, r"[\/]" => "_"));
+    elseif lambda > 0.0
+        name = string(name, "-regularizor-", replace(@sprintf("%.0e", lambda), "." => "_"));
+    else
+        error("lambda cannot be nonpositive (except -1)");
     end
     println("lambda = ", lambda);
+    println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
     ## To avoid very long computations when dimensions are large mu is approximated by lambda
     if numdata > 10000 || numfeatures > 10000
