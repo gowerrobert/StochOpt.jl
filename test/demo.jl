@@ -6,10 +6,10 @@ include("../src/StochOpt.jl")
 options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=50, force_continue=true, initial_point="randn"); #repeat_stepsize_calculation =true, rep_number =10
 options.batchsize = 100;
 ## load problem
-datapath = ""
+datapath = "./data/"
 probname = "mushrooms"; # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
 ## Loads logisitc problem
-prob = load_logistic(probname, datapath, options);
+prob = load_logistic(datapath, probname, options);
 
 ## Running methods
 OUTPUTS = [];  # List of saved outputs

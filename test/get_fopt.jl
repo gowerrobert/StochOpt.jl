@@ -26,7 +26,7 @@ default_path = "./data/";
 problemnames = ["a9a"] #,  ["a9a", "madelon", "phishing", "covtype", "gisette_scale", "w8a"]
 
 for probname in problemnames
-    prob = load_logistic(probname, datapath, options);  # Loads logisitc
+    prob = load_logistic(datapath, probname, options);  # Loads logisitc
     options.batchsize = prob.numdata; ## load problem
     # prob.fsol = 0.0;
     method_name = "BFGS";

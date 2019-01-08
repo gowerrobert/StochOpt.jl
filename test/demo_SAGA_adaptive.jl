@@ -9,9 +9,9 @@ options = set_options(max_iter=10^8, max_time=3000.0, max_epocs=10, force_contin
 options.batchsize = 1;
 options.stepsize_multiplier = 1;
 ## load problem
-datapath = ""
+datapath = "./data/";
 probname = "w8a"; # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 ## Running methods
 OUTPUTS = []; # List of saved outputs
 

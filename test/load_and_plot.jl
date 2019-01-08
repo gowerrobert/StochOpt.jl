@@ -9,14 +9,14 @@ include("../src/StochOpt.jl")
 options = set_options();
 
 ## load problem
-datapath = ""
+datapath = "./data/"
 # probnames = ["phishing", "madelon",  "a9a",  "mushrooms", "phishing", "w8a", "gisette_scale"  ,"covtype"]#  rcv1_train  liver-disorders_scale
 probname = "gisette_scale";
 # for probname in probnames
   # probname = "madelon";
   # name = string("lgstc_",  probname);
   # beststep, savename = get_saved_stepsize(prob.name, method_name,options);
-   prob = load_logistic(probname, datapath, options);
+   prob = load_logistic(datapath, probname, options);
    options.batchsize = prob.numdata;
    load_fsol!(options, prob);  # load a pre-calculated best  solution
    default_path = "./data/"; loadname = replace(prob.name, r"[\/]", "-");

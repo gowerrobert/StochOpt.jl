@@ -1,5 +1,5 @@
 function fit_apply_datascaling(X, scaling::AbstractString)
-    ## WARNING: mutating function without "!" in its name 
+    ## WARNING: mutating function without "!" in its name
     # centering
     rowscaling = [];
     colscaling =[];
@@ -8,14 +8,14 @@ function fit_apply_datascaling(X, scaling::AbstractString)
         stdX = std(X, dims=2);
         if any(stdX .== 0)
             X = remove_constant_features(X);
-            stdX = std(X, dims=2); 
+            stdX = std(X, dims=2);
         end
     #   ind = (0. == stdX);
         ind = findall((in)(stdX), 0.); # Reparing the error
         stdX[ind] .= 1.0; # replace 0 in std by 1 in case there is a constant feature
         colsmean = mean(X, dims=2);
-        X = (X .- colsmean);
-        X = X ./ stdX; # Centering and scaling the data.
+        X = (X .- colsmean); # centering
+        X = X ./ stdX; # scaling the data.
         colscaling = stdX.^(-1);
     elseif(scaling == "column-row-scaling")
         rowscaling, colscaling = knight_scaling(X);

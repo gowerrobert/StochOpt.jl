@@ -22,20 +22,20 @@ using Statistics # julia 0.7
 
 # this needs to be changed to your personal path.
 #default_path = "/local/rgower/git/online_saga/julia-online-SAGA/data/" #/local/rgower/libsvmdata/"
-default_path = "./data/"; #"/home/robert/git/online_saga/julia-online-SAGA/data/"
+# default_path = "./data/"; #"/home/robert/git/online_saga/julia-online-SAGA/data/"
 
-function initDetails() # creates a blank details dictionary
+function initDetails(default_path::AbstractString) # creates a blank details dictionary
     details = Dict();
     save("$(default_path)details.jld", "details", details)
 end
 
-function transformDataJLD(dataset, classification) # transforms LIBSVM to JLD for faster loading
+function transformDataJLD(default_path::AbstractString, dataset, classification) # transforms LIBSVM to JLD for faster loading
     X, y = readLIBSVM(string(default_path, "$(dataset)"), classification) # classification=false leads to regression
     save("$(default_path)$(dataset).jld", "X", X, "y", y)
-    saveDetails(dataset, X)
+    saveDetails(default_path, dataset, X)
 end
 
-function loadDataset(dataset) # once transformed, load the dataset using JLD
+function loadDataset(default_path::AbstractString, dataset) # once transformed, load the dataset using JLD
     try
         X, y = load("$(default_path)$(dataset).jld", "X", "y");
         println("$(default_path)$(dataset).jld");
@@ -46,14 +46,14 @@ function loadDataset(dataset) # once transformed, load the dataset using JLD
     end
 end
 
-function saveDetails(dataset::String, X::SparseMatrixCSC{Float64,Int64}) # saves the details of the dataset
+function saveDetails(default_path::AbstractString, dataset::String, X::SparseMatrixCSC{Float64,Int64}) # saves the details of the dataset
     details = load("$(default_path)details.jld", "details")
     detail = Dict(:dims => size(X, 1), :n => size(X, 2), :sparsity => nnz(X)/(size(X, 1)*size(X, 2)))
     details[dataset] = detail
     save("$(default_path)details.jld", "details", details)
 end
 
-function showDetails(dataset) # shows the details of the dataset
+function showDetails(default_path::AbstractString, dataset) # shows the details of the dataset
     return load("$(default_path)details.jld", "details")[dataset]
 end
 

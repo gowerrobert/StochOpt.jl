@@ -14,8 +14,9 @@ include("../src/StochOpt.jl")
 options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=150, force_continue=true, initial_point="zeros");
 options.batchsize = 10;
 ## load problem
+datapath = "./data/";
 data = "australian";
-X, y = loadDataset(data);
+X, y = loadDataset(datapath,data);
 prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-1, scaling="column-scaling");
 ## Running methods
 OUTPUTS = [];  # List of saved outputs

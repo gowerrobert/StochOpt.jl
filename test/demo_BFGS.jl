@@ -8,9 +8,10 @@ include("../src/StochOpt.jl")
 ## Basic parameters
 options = set_options(max_iter=10^6, skip_error_calculation=5, max_time=500.0, max_epocs=250, repeat_stepsize_calculation=false, rep_number=2);
 ## load problem
-datapath = ""#
-probname = "mushrooms";   # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+datapath = "./data/";
+probname = "mushrooms";   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
+X, y = loadDataset(datapath,probname);
+prob = load_logistic_from_matrices(X, y, probname, options, lambda=1e-1, scaling="none");
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -28,4 +29,5 @@ output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 
 gr() # pgfplots
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs) # Plot and save output # max_epocs
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs) # Plot and save output # max_epocs
+# OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, suffix::AbstractString=""
