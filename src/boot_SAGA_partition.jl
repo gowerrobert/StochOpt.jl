@@ -38,7 +38,7 @@ function initiate_SAGA_partition(prob::Prob, options::MyOptions; minibatch_type=
         probs = logistic_phi(yXx) ;
         probs[:] = probs .*(1 .- probs);
         probs[:] = max.(probs, 0.25/8.0); ## IMPORTANT: this establishes a minimum value for phi''
-        probs[:] = probs .* vec(sum((prob.X).^ 2,1)) + prob.lambda;
+        probs[:] = probs .* vec(sum(prob.X.^ 2, dims = 1)) .+ prob.lambda;
         Lmax = maximum(probs);
         L = mean(probs);
         probs[:] = probs.*4 .+ prob.numdata*mu;

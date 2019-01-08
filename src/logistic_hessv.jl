@@ -5,7 +5,7 @@ function  logistic_hessv(X, y::Array{Float64}, w::Array{Float64}, v::Array{Float
     yXx = y.*Xx;
     t = logistic_phi(yXx) ;
     # t = logistic_phi(y.*(X'*w));
-    return X*(t.*(1-t).*(X'*v));
+    return X*(t.*(1 .- t).*(X'*v));
 end
 
 function  logistic_hessv!(X, y::Array{Float64}, w::Array{Float64}, v::Array{Float64},lambda::Float64,batch::Int64, g::Array{Float64}, Hv::Array{Float64})
@@ -25,7 +25,7 @@ function  logistic_hessvv(X, y::Array{Float64}, w::Array{Float64}, v::Array{Floa
     Xx  = X'*w;
     yXx = y.*Xx;
     t = logistic_phi(yXx) ;
-    return ((t.*(1-t))'*((X'*v).^2));
+    return ((t.*(1 .- t))'*((X'*v).^2));
 end
 
 function  logistic_hessD(X, y::Array{Float64}, w::Array{Float64})
@@ -34,7 +34,7 @@ function  logistic_hessD(X, y::Array{Float64}, w::Array{Float64})
     yXx = y.*Xx;
     t = logistic_phi(yXx);
     #return (X.^2)*(t.*(1-t));
-    return sum((X.^2)'.*(t.*(1-t)),1)';
+    return sum((X.^2)'.*(t.*(1 .- t)),dims = 1)';
 end
 
 function  logistic_hessD!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, batch::Int64, g::Array{Float64}, D::Array{Float64})
@@ -45,5 +45,5 @@ function  logistic_hessD!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float
     g[:] = (1/batch)*X*(y.*(t .- 1)).+(lambda).*w;
     # t = logistic_phi(y.*(X'*w));
     #return (X.^2)*(t.*(1-t));
-    D[:] = (1/batch)*sum((X.^2)'.*(t.*(1-t)),1)' .+ (lambda).*ones(length(w));
+    D[:] = (1/batch)*sum((X.^2)'.*(t.*(1 .- t)),1)' .+ (lambda).*ones(length(w));
 end

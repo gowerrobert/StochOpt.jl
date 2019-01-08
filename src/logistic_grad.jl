@@ -19,7 +19,7 @@ function logistic_scalar_grad_hess(X, y::Array{Float64}, w::Array{Float64})
     Xx  = X'*w;
     yXx = y.*Xx;
     t = logistic_phi(yXx) ;
-    return  y.*(t .- 1), t.*(1-t);
+    return  y.*(t .- 1), t.*(1 .- t);
 end
 
 function logistic_Jac!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64, S::Array{Int64}, Jac::Array{Float64})

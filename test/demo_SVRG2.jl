@@ -14,7 +14,7 @@ probname = "mushrooms"; # Data tested in paper: gisette_scale   madelon  a9a  ph
 prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 ## Running methods
 # # #
-method_names = ["AMprev", "SVRG", "2Dsec", "AMgauss"]  # Curvature matching methods: CMgauss,  CMprev
+method_names = ["AMprev", "SVRG", "2Dsec", "AMgauss", "SVRG2"]  # Curvature matching methods: CMgauss,  CMprev
 global OUTPUTS =[];  # List of saved outputs
 for method_name in method_names
     output = minimizeFunc_grid_stepsize(prob, method_name, options);
