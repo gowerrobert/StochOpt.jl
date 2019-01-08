@@ -10,7 +10,7 @@ options = set_options(tol=10.0^(-16.0), skip_error_calculation=5, max_iter=10^6,
         max_epocs=200, repeat_stepsize_calculation=false, rep_number=2);
 
 ## load problem
-datapath = ""
+datapath = "./data/"
 gr() # gr()
 # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
 
@@ -22,7 +22,7 @@ gr() # gr()
 ## splice problem
 ##################
 probname = "splice";
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -35,13 +35,13 @@ method_name = "BFGS_accel";
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs)
 
 ##################
 ## australian problem
 ##################
 probname = "australian";
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -54,13 +54,13 @@ method_name = "BFGS_accel";
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs)
 
 ##################
 ##  phishing problem
 ##################
 probname = "phishing";
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -73,13 +73,13 @@ method_name = "BFGS_accel";
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs)
 
 ##################
 ##  mushrooms problem
 ##################
 probname = "mushrooms";
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -92,13 +92,13 @@ method_name = "BFGS_accel";
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs)
 
 ##################
 ## Madelon problem
 ##################
 probname = "madelon";
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -111,13 +111,13 @@ method_name = "BFGS_accel";
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs) # Plot and save output # max_epocs
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs) # Plot and save output # max_epocs
 
 ##################
 ## a9a problem
 ##################
 probname = "a9a";
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -130,13 +130,13 @@ options.embeddim = [prob.numdata, 0.01];  # = [mu, nu]
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs) # Plot and save output # max_epocs
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs) # Plot and save output # max_epocs
 
 #################
 # w8a problem
 ##################
 probname = "w8a";   # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
-prob =  load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob =  load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -149,13 +149,13 @@ method_name = "BFGS_accel";
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 # ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs) # Plot and save output # max_epocs
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs) # Plot and save output # max_epocs
 
 ##################
 ## covtype problem
 ##################
 probname = "covtype";   # Data tested in paper: australian gisette_scale  w8a  madelon  a9a  phishing  covtype mushrooms  rcv1_train  liver-disorders
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 options.batchsize = prob.numdata;  # full batch
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -168,4 +168,4 @@ method_name = "BFGS_accel";
 output3 = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output3];
 ### plotting and saving
-plot_outputs_Plots(OUTPUTS, prob, options, options.max_epocs)
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = options.max_epocs)

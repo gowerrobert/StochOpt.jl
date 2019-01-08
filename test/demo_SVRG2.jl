@@ -27,7 +27,8 @@ method_name = "grad";
 output = minimizeFunc_grid_stepsize(prob, method_name, options);
 OUTPUTS = [OUTPUTS; output];
 
-default_path = "./data/"; savename = replace(prob.name, r"[\/]", "-");
+default_path = "./data/";
+savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
 gr()# gr() pyplot() # pgfplots() #plotly()

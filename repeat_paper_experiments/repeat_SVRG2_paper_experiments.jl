@@ -12,12 +12,12 @@ include("../src/StochOpt.jl")
 options = set_options(max_iter=10^8, max_time=350.0, max_epocs=30, repeat_stepsize_calculation=false, rep_number=10);
 options.batchsize = 100;
 options.embeddim = 10; #percentage of featurenum
-datapath = ""#
+datapath = "./data/"#
 probnames = ["phishing", "a9a", "mushrooms", "splice", "w8a", "madelon", "gisette_scale", "covtype", "rcv1_train"];
 for probname in probnames
     options.batchsize = 100;
     options.skip_error_calculation = 0;   # number of iterations where error is not calculated (to save time!)
-    prob = load_logistic(probname, datapath, options);  # Loads logisitc
+    prob = load_logistic(datapath, probname, options);  # Loads logisitc
     ## Running methods
     OUTPUTS = [];
     method_names = ["SVRG", "2D", "2Dsec", "CMprev", "CMgauss", "AMgauss", "AMprev"];  # Curvature matching methods: CMgauss,  CMprev
@@ -33,11 +33,11 @@ for probname in probnames
     options.skip_error_calculation = 1;
     method_name = "grad";
     output = minimizeFunc_grid_stepsize(prob, method_name, options);
-    OUTPUTS = [OUTPUTS; output];   
-    default_path = "./data/";   savename = replace(prob.name, r"[\/]", "-");
+    OUTPUTS = [OUTPUTS; output];
+    default_path = "./data/";
+    savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
-    savename = string(replace(prob.name, r"[\/]", "-")) ;
     gr()
 #  gr()# gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options,20)
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd = 20)
 end

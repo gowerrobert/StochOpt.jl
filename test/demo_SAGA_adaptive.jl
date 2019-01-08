@@ -33,7 +33,8 @@ OUTPUTS = [OUTPUTS; output];
 # output3= minimizeFunc_grid_stepsize(prob, "SVRG", options);
 # OUTPUTS = [OUTPUTS ; output3];
 # #
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+default_path = "./data/";
+savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 gr()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS, prob, options) # Plot and save output

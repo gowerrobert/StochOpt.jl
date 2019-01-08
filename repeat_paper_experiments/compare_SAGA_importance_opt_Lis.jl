@@ -31,7 +31,7 @@ SAGA_li = initiate_SAGA(prob, options, minibatch_type="partition", probability_t
 output = minimizeFunc(prob, SAGA_li, options);
 OUTPUTS = [OUTPUTS; output];
 # # #####
-SAGA_opt = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="opt") 
+SAGA_opt = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="opt")
 output = minimizeFunc(prob, SAGA_opt, options);
 OUTPUTS = [OUTPUTS; output];
 # # #####
@@ -43,7 +43,8 @@ OUTPUTS = [OUTPUTS; output];
 # output1= minimizeFunc_grid_stepsize(prob, method_name, options);
 # OUTPUTS = [OUTPUTS ; output1];
 # # #
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+default_path = "./data/"; 
+savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
 gr()# gr() pyplot() # pgfplots() #plotly()

@@ -36,7 +36,8 @@ options.skip_error_calculation = 1.0
 output3 = minimizeFunc_grid_stepsize(prob, "grad", options);
 OUTPUTS = [OUTPUTS; output3];
 # #
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
+default_path = "./data/";
+savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
 gr()# gr() pyplot() # pgfplots() #plotly()

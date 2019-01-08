@@ -29,7 +29,8 @@ prob = load_ridge_regression(X, y, probname, options, lambda=-1);  # Loads logis
 
 ### COMPUTE SAGA-NICE COMPLEXITIES ###
 println("\n--- Compute SAGA-nice complexities (iteration, total and iteration by Hofman et al.) ---");
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+default_path = "./data/";
+savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 savenamesmooth = string(savename,"-smoothnesconsts");
 itercomp = 0.0; Lsides = 0.0; Rsides = 0.0;
 try

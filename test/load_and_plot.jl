@@ -19,7 +19,8 @@ probname = "gisette_scale";
    prob = load_logistic(datapath, probname, options);
    options.batchsize = prob.numdata;
    load_fsol!(options, prob);  # load a pre-calculated best  solution
-   default_path = "./data/"; loadname = replace(prob.name, r"[\/]", "-");
+   default_path = "./data/";
+   loadname =  replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
    OUTPUTS = load("$(default_path)$(loadname).jld", "OUTPUTS");
 ##  Some code for editing which methods are plotted
       OUTPUTNEW = OUTPUTS[1:end-2];

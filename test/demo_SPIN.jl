@@ -48,7 +48,8 @@ OUTPUTS = [OUTPUTS; output];
 
 
 # saving the data for later
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+default_path = "./data/";
+savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
 #plot and save graphs
