@@ -16,16 +16,16 @@ prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 OUTPUTS = []; # List of saved outputs
 
 #######
-sg = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="uni")
+sg = initiate_SAGA_partition(prob, options, minibatch_type="partition", probability_type="uni")
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 #####
-sg = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="opt")
+sg = initiate_SAGA_partition(prob, options, minibatch_type="partition", probability_type="opt")
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 #######
 options.stepsize_multiplier = 1;
-sg = initiate_SAGA(prob, options, minibatch_type="partition", probability_type="ada")
+sg = initiate_SAGA_partition(prob, options, minibatch_type="partition", probability_type="ada")
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 

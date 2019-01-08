@@ -1,4 +1,4 @@
-function descent_SAGApartition(x::Array{Float64}, prob::Prob, options::MyOptions, sg::SAGAmethod, N::Int64, d::Array{Float64})
+function descent_SAGA_partition(x::Array{Float64}, prob::Prob, options::MyOptions, sg::SAGAmethod, N::Int64, d::Array{Float64})
     Smini = size(sg.minibatches);
     if(sg.probability_type == "")
         i = sample(1:Smini[1], 1, replace=false);
@@ -44,7 +44,7 @@ function descent_SAGA_adapt(x::Array{Float64}, prob::Prob, options::MyOptions, s
        local_pi_estimate!(x, prob, options, sg);
        ## Update stepsize
     end
-    descent_SAGApartition(x, prob, options, sg, N, d);
+    descent_SAGA_partition(x, prob, options, sg, N, d);
 end
 
 function descent_SAGA_adapt2(x::Array{Float64}, prob::Prob, options::MyOptions, sg::SAGAmethod, N::Int64, d::Array{Float64})
