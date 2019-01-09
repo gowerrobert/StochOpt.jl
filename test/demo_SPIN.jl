@@ -7,14 +7,14 @@ include("../src/StochOpt.jl")
 ## Basic parameters and options for solvers
 options = set_options(max_iter=10^8, max_time=3.0, max_epocs=2000, force_continue=true, initial_point="randn"); #repeat_stepsize_calculation =true, rep_number =10
 ## load problem
-datapath = ""
+datapath = "./data/"
 probname = "splice"; # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
 ## Loads logisitc problem
 # numdata = 1000;
 # numfeatures =10;
 #  X, y, probname = gen_gauss_data(numfeatures, numdata);
 # prob =  load_ridge_regression(X,y,probname,options);
-prob = load_logistic(probname, datapath, options);
+prob = load_logistic(datapath, probname, datapath, options);
 options.batchsize = prob.numdata;
 options.skip_error_calculation = 10;
 ## Running methods

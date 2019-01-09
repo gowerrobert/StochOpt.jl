@@ -12,6 +12,7 @@ include("./src/StochOpt.jl") # Be carefull about the path here
 
 
 ### LOADING DATA ###
+datapath = "./data/";
 probname = "diagonal"; # libsvm regression dataset | "gaussian", "diagonal" or "lone_eig_val" for artificaly generated data
 
 # If probname="artificial", precise the number of features and data
@@ -31,7 +32,7 @@ elseif(probname == "lone_eig_val")
     X, y, probname = gen_diag_alone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001);
 elseif(probname in probnames)
     ## Load truncated LIBSVM data
-    X, y = loadDataset(probname);
+    X, y = loadDataset(datapath,probname);
     # X = X';
     # numfeatures = size(X)[1];
     # numdata = size(X)[2];
@@ -51,12 +52,12 @@ d = prob.numfeatures;
 
 ######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
 
-default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
+savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename);
 fontsmll = 8; fontmed = 14; fontbig = 14;
 
 
-## Select the list of mini-batch sizes 
+## Select the list of mini-batch sizes
 # taulist = [1, 5];
 # taulist = [5, 1];
 # taulist = 1:3:10;
@@ -120,14 +121,14 @@ x_val = datapassbnds.*([collect(1:lfs[i]) for i=1:length(taulist)])./lfs;
 pyplot()
 p = plot(x_val[1], rel_loss_avg[1],
         xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
-        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed),
         markersize=6, linewidth=4, marker=:auto, grid=false);
 for i=2:length(taulist)
     println(i);
     output = OUTPUTS[1+(i-1)*numsimu];
     plot!(p, x_val[i], rel_loss_avg[i],
         xlabel="epochs", ylabel="residual", yscale=:log10, label=output.name,
-        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+        linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed),
         markersize=6, linewidth=4, marker=:auto, grid=false)
 end
 display(p)

@@ -56,6 +56,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
             # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
             # exit(1);
         end
+    ### End partition
     elseif(minibatch_type == "Li_order_partition")
         if(probability_type == "uni"||probability_type == "Li"||probability_type == "opt") # adding "Li" and "opt" cases
             Jac, minibatches, probs, name, L, Lmax = boot_SAGA_Li_order_partition(prob, options, probability_type, name, mu); # Does "ada" exist for "Li_order_partition"?
@@ -65,12 +66,12 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
             # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
             # exit(1);
         end
-    elseif(minibatch_type == "nice")
-        println("\nFor nice minibatch: probability_type is useless\n");
-        name = string(name, "-", minibatch_type);
-        L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
-        Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
-        Jac = zeros(prob.numfeatures, prob.numdata);     
+    # elseif(minibatch_type == "nice")
+    #     println("\nFor nice minibatch: probability_type is useless\n");
+    #     name = string(name, "-", minibatch_type);
+    #     L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
+    #     Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
+    #     Jac = zeros(prob.numfeatures, prob.numdata);
     else
         error("unknown minibatch_type name (", minibatch_type, ").")
         # println("\nFAIL: unknown minibatch_type name (", minibatch_type, ")\n");
@@ -97,10 +98,11 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
         simplebound = leftcoeff*Lbar + rightcoeff*method.Lmax;
         # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*method.Lmax + ((tau - 1)/(n - 1))*method.L;
     end
-    if(contains(prob.name, "lgstc"))
+    if(occursin(prob.name, "lgstc"))
         Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
     end
     rightterm = ((n-tau)/(tau*(n-1)))*method.Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
+    ### Broken code: how is this possible? simplebound not defined depending on execution
     method.stepsize = 1.0/(4*max(simplebound, rightterm));
     # method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*method.mu);
 
@@ -239,7 +241,7 @@ end
 #     descent_method = descent_SAGA;
 #     probs = []; Z =0.0; stepsize =0.0
 #     mu = get_mu_str_conv(prob);
-  
+
 #     if(minibatch_type =="partition")
 #         # L = mean(sum(prob.X.^2,1));
 #         if(probability_type == "ada")

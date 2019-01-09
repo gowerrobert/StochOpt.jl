@@ -7,6 +7,7 @@
 using SparseArrays # julia 0.7
 using LinearAlgebra
 using Printf
+using Random
 mutable struct MyOptions # julia 0.7
     tol::Float64
     aux::Float64

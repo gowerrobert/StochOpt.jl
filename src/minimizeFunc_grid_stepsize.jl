@@ -8,12 +8,12 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     else
         method_name = method_input.name;
     end
-    
+
     beststep, savename = get_saved_stepsize(prob.name, method_name, options);
     if(beststep == 0.0 || options.repeat_stepsize_calculation == true)
         options.force_continue = false;
         if grid == [0.0]
-            stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5), 
+            stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5),
                          2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
         else
             stepsizes = grid;
@@ -37,7 +37,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
                 step = stepsizes[stepind];
                 println("\nTrying stepsize ", step);
                 options.stepsize_multiplier = step;
-                
+
                 output = minimizeFunc(prob, method_input, options);
                 println("---> Fail = ", output.fail);
                 if((output.fs[end] < minfval) && (output.fail == "max_time" || output.fail == "max_epocs" || output.fail == "tol-reached"))
@@ -75,9 +75,9 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     # end
 
     save("$(default_path)$(savename).jld", "output", outputfirst)
-    
-    println("\nbest steps:");
-    println(beststeps_found);
+
+    # println("\nbest steps:");
+    # println(beststeps_found);
     println("mode best step:");
     println(beststep);
 

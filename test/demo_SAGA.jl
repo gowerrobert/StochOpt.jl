@@ -8,9 +8,9 @@ include("../src/StochOpt.jl")
 options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=150, force_continue=true, initial_point="randn"); #,repeat_stepsize_calculation =true, rep_number =10
 options.batchsize = 100;
 ## load problem
-datapath = ""
+datapath = "./data/";
 probname = "splice";   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
-prob = load_logistic(probname, datapath, options);  # Loads logisitc problem
+prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
 #######
@@ -24,8 +24,8 @@ sg.name = "SAG-100-opt";
 output = minimizeFunc(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 ######
-sg = initiate_SAGA(prob, options, minibatch_type="nice")
-output = minimizeFunc(prob, sg, options);
+SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
+output = minimizeFunc(prob, SAGA_nice, options);
 OUTPUTS = [OUTPUTS; output];
 #######
 output3 = minimizeFunc_grid_stepsize(prob, "SVRG", options);
