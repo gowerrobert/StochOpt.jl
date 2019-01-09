@@ -1,17 +1,21 @@
 #!/bin/sh
 
-START_TIME=$SECONDS
+#START_TIME=$SECONDS
 
 task () {
-    local var=$1
-    # echo >> $var.text
-    printf "Dataset: $var\n"
-    nohup julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice.jl $var &> ./nohups/nohup_exp_1_2_$var.out &
+    local dataset=$1
+    local scaling=$2
+    local lambda=$3
+    # echo >> $dataset.text
+    printf "Dataset: $dataset\n"
+    nohup julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice_2.jl $dataset $scaling $lambda &> ./nohups/nohup_exp_1_2_${dataset}_${scaling}_${lambda}.out &
+    # julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice_2.jl $dataset $scaling $lambda
 }
 
-while read var; 
+while read dataset;
 do
-    task "$var" & 
+    #task "$dataset" &
+    task "$dataset" $2 $3 &
 done <$1
 
 wait

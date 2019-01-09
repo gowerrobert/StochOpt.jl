@@ -45,14 +45,9 @@ X, y = loadDataset(data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
-# scaling = "none";
-scaling = "column-scaling";
-# lambda = -1;
-lambda = 10^(-1);
-# lambda = 10^(-3);
 options = set_options(tol=10.0^(-6), max_iter=10^8, max_epocs=10^8,
-                      max_time=60.0,
-                      skip_error_calculation=10^4,
+                      max_time=120.0,
+                      skip_error_calculation=10^5,
                       batchsize=1,
                       regularizor_parameter = "normalized",
                       initial_point="zeros", # is fixed not to add more randomness
@@ -127,7 +122,7 @@ end
             2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5),
             2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
             2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
-    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=10^3, max_time=10.0,
+    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=10^5, max_time=10.0,
                                                rep_number=3, batchsize=1, grid=grid);
 
     step_gridsearch, = get_saved_stepsize(prob.name, "SAGA-nice", options);
@@ -139,7 +134,7 @@ stepsizes = [step_gridsearch, step_defazio, step_hofmann, step_heuristic];
 
 ##---------- SAGA_nice-1 runs ----------
 # options = set_options(tol=10.0^(-6), max_iter=10^8, max_epocs=10^8,
-#                       max_time=60.0,
+#                       max_time=120.0,
 #                       skip_error_calculation=10^4,
 #                       batchsize=1,
 #                       regularizor_parameter = "normalized",
@@ -163,9 +158,8 @@ function calculate_skip_error(stepsize)
 end
 # skip_error = calculate_skip_error.(stepsizes);
 # skip_error = [10^2, 10^3, 10^3, 10^3];
-skip_error = [10^3, 10^4, 10^4, 10^4];
+skip_error = [10^5, 10^5, 10^5, 10^5];
 numsimu = 1;
-probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 itercomplex = zeros(length(stepsizes), 1);
 OUTPUTS = [];
 for idxstep in 1:length(stepsizes)
@@ -186,6 +180,7 @@ itercomplex = itercomplex ./ numsimu; # simply averaging the last iteration numb
 itercomplex = itercomplex[:];
 
 ## Saving the result of the simulations
+probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 savename = string(probname, "-exp3_1-empcomplex-", numsimu, "-avg");
 save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS,
      "method_names", method_names,"stepsizes", stepsizes);
@@ -239,8 +234,8 @@ step_heuristic = 0.25 / max(heuristicbound, rightterm);
 options = set_options(tol=10.0^(-6), 
                       max_iter=10^8, 
                       max_epocs=10^8, 
-                      max_time=60.0, 
-                      skip_error_calculation=10^4,
+                      max_time=120.0, 
+                      skip_error_calculation=10^5,
                       regularizor_parameter = "normalized", 
                       initial_point="zeros", 
                       force_continue=false,
@@ -258,8 +253,8 @@ end
             2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5),
             2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
             2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
-    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=10^2, max_time=1.0,
-                                               rep_number=3, batchsize=tau_heuristic, grid=grid);
+    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=10^1, max_time=120.0,
+                                               rep_number=5, batchsize=tau_heuristic, grid=grid);
     step_heuristic_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
 # end
 
@@ -272,15 +267,17 @@ stepsizes = [step_heuristic_gridsearch, step_defazio, step_hofmann, step_hofmann
 
 ##---------- SAGA_nice-1 runs ----------
 # options = set_options(tol=10.0^(-6), 
-#                       max_time=60.0, 
+#                       max_time=120.0, 
 #                       skip_error_calculation=10^3,                      
 #                       max_iter=10^8, 
 #                       max_epocs=10^8, 
 #                       regularizor_parameter="normalized", initial_point="zeros", force_continue=true);
 # skip_error = [10^2, 10^3, 10^3, 10^3];
-skip_error = [10^3, 10^4, 10^4, 10^4, 10^4];
+# skip_error = [10^1, 10^4, 10^3, 10^3, 10^1]; # skip = n/(tau*10) approx 10 pass for 1 epoch
+skip_error = closest_power_of_ten.(round.(Int, n ./ (10*mini_batch_sizes))) # 5 points per epoch
 numsimu = 1;
-probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
+array_val = SharedArray{Float64}(n, m);
+    @sync @distributed for idx = 1:n*m
 itercomplex = zeros(length(stepsizes), 1);
 OUTPUTS = [];
 for idxmethod in 1:length(stepsizes)
@@ -295,7 +292,7 @@ for idxmethod in 1:length(stepsizes)
         output = minimizeFunc(prob, SAGA_nice, options, stop_at_tol=true);
         println("---> Output fail = ", output.fail, "\n");
         itercomplex[idxmethod] += output.iterations;
-        println("name = ", output.name)
+        # println("name = ", output.name)
         output.name = string(method_names[idxmethod]);
         global OUTPUTS = [OUTPUTS; output];
     end
@@ -305,10 +302,12 @@ itercomplex = itercomplex[:];
 empcomplex = mini_batch_sizes .* itercomplex;
 
 ## Saving the result of the simulations
+probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 savename = string(probname, "-exp3_2-empcomplex-", numsimu, "-avg");
 save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS,
-     "method_names", method_names,"stepsizes", stepsizes,
-     "mini_batch_sizes", mini_batch_sizes, "empcomplex", empcomplex);
+     "method_names", method_names, "skip_error", skip_error,
+     "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes, 
+     "empcomplex", empcomplex);
 
 ## Checking that all simulations reached tolerance
 fails = [OUTPUTS[i].fail for i=1:length(stepsizes)*numsimu];
@@ -320,7 +319,7 @@ end
 if numsimu == 1
     gr()
     # pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3.2"); # Plot and save output
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3.2_test"); # Plot and save output
 end
 
 # @printf "\nmethod name      | %s |     %s     |    %s    |  %s   |\n" method_names[1] method_names[2] method_names[3] method_names[4]
@@ -328,7 +327,42 @@ end
 # @printf "step size        |       %e      | %e | %e | %e |\n\n" stepsizes[1] stepsizes[2] stepsizes[3] stepsizes[4]
 # @printf "total complexity |       %s        |   %s  |  %s  |  %s |\n\n" format(empcomplex[1], commas=true) format(empcomplex[2], commas=true) format(empcomplex[3], commas=true) format(empcomplex[4], commas=true)
 
-@printf "\nmethod name      | %s |     %s     |    %s    |  %s   |\n" method_names[1] method_names[2] method_names[3] method_names[4] method_names[5]
-@printf "mini-batch size  |            %d           |       %d      |      %d      |      %d      |\n\n" mini_batch_sizes[1] mini_batch_sizes[2] mini_batch_sizes[3] mini_batch_sizes[4] mini_batch_sizes[5]
-@printf "step size        |       %e      | %e | %e | %e |\n\n" stepsizes[1] stepsizes[2] stepsizes[3] stepsizes[4] stepsizes[5]
-@printf "total complexity |       %s        |   %s  |  %s  |  %s |\n\n" format(empcomplex[1], commas=true) format(empcomplex[2], commas=true) format(empcomplex[3], commas=true) format(empcomplex[4], commas=true) format(empcomplex[5], commas=true)
+@printf "\nmethod name      | %s |     %s     |    %s    |  %s   |  %s   |\n" method_names[1] method_names[2] method_names[3] method_names[4] method_names[5]
+@printf "mini-batch size  |            %d           |       %d      |      %d      |      %d      |      %d      |\n" mini_batch_sizes[1] mini_batch_sizes[2] mini_batch_sizes[3] mini_batch_sizes[4] mini_batch_sizes[5]
+@printf "step size        |       %e      | %e | %e | %e | %e |\n" stepsizes[1] stepsizes[2] stepsizes[3] stepsizes[4] stepsizes[5]
+@printf "total complexity |       %s        |   %s  |  %s  |  %s |  %s |\n\n" format(empcomplex[1], commas=true) format(empcomplex[2], commas=true) format(empcomplex[3], commas=true) format(empcomplex[4], commas=true) format(empcomplex[5], commas=true)
+
+
+## for the skip_error parameter:
+"""
+    closest_power_of_ten(integer::Int64)
+
+    Compute the closest power of ten of an integer.
+
+#INPUTS:\\
+    - **Int64** integer: integer\\
+#OUTPUTS:\\
+    - **Int64** or **Float64** closest_power: closest power of ten of the input
+
+# Examples
+```jldoctest
+julia> closest_power(0)
+1
+julia> closest_power(9)
+1
+julia> closest_power(204)
+100
+```
+"""
+function closest_power_of_ten(integer::Int64)
+    if integer < 0
+        closest_power = 10.0 ^ (1 - length(string(integer)));
+    else 
+        closest_power = 10 ^ (length(string(integer)) - 1);
+    end
+    return closest_power
+end
+
+typeof(closest_power_of_ten(4))
+closest_power_of_ten(409)
+typeof(closest_power_of_ten(-11))

@@ -133,16 +133,30 @@ end
 # itercomplex -= 1; #-> should we remove 1 from itercomplex?
 empcomplex = reshape(minibatchlist.*itercomplex, length(minibatchlist)); # tau times number of iterations
 min_empcomplex, idx_min = findmin(empcomplex);
-tau_emp = minibatchlist[idx_min];
+best_tau = minibatchlist[idx_min];
+
+## Saving the result of the simulations
+probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
+savename = string(probname, "-exp4-optimality-", numsimu, "-avg");
+if numsimu == 1
+    save("$(default_path)$(savename).jld", 
+    "options", options, "minibatchlist", minibatchlist, 
+    "itercomplex", itercomplex, "empcomplex", empcomplex,
+    "best_tau", best_tau);
+else
+    save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS,
+    );
+end
+
+
+
+# Remove other estimation of the best tau for bernstein and simple
 
 pyplot()
 plot_empirical_complexity(prob, minibatchlist, empcomplex, 
                           tau_simple, tau_bernstein, 
-                          tau_heuristic, tau_emp);
+                          tau_heuristic, best_tau);
 println("\nSimple optimal tau = ", tau_simple);
 println("Bernstein optimal tau = ", tau_bernstein);
 println("Heuristic optimal tau = ", tau_heuristic);
-println("The empirical optimal tau = ", tau_emp);
-
-
-### Plot of of run for which our tau* is faster ###
+println("The empirical optimal tau = ", best_tau);
