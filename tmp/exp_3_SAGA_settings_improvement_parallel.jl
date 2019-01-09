@@ -23,7 +23,6 @@ using Distributed
     using Formatting
     using SharedArrays
 
-
     include("/home/nidham/phd/moving2julia7/StochOpt.jl/src/StochOpt.jl") # Be carefull about the path here
 end
 
@@ -74,8 +73,8 @@ println("Inputs: ", data, " + ", scaling, " + ",  lambda, "\n");
 ## Manual inputs
 # include("./src/StochOpt.jl") # Be carefull about the path here
 default_path = "./data/";
-# datasets = readlines("$(default_path)available_datasets.txt");
-# idx = 3; # YearPredictionMSD
+datasets = readlines("$(default_path)available_datasets.txt");
+idx = 3; # YearPredictionMSD
 # data = datasets[idx];
 # scaling = "none";
 # scaling = "column-scaling";
@@ -165,8 +164,8 @@ function calculate_best_stepsize_SAGA_nice(prob, options ; skip, max_time, rep_n
 end
 
 # Warning SAGA-nice too look for step size but method is called SAGA_nice
-# step_gridsearch, = get_saved_stepsize(prob.name, "SAGA-nice", options)
-# if step_gridsearch == 0.0
+step_gridsearch, = get_saved_stepsize(prob.name, "SAGA-nice", options)
+if step_gridsearch == 0.0
     grid = [2.0^(25), 2.0^(23), 2.0^(21), 2.0^(19), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11),
             2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5),
             2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
@@ -175,7 +174,7 @@ end
     output = calculate_best_stepsize_SAGA_nice(prob, options, skip=skip, max_time=180.0,
                                                rep_number=5, batchsize=1, grid=grid);
     step_gridsearch, = get_saved_stepsize(prob.name, "SAGA-nice", options);
-# end
+end
 
 # method_names = ["Grid_search", "Defazio_et_al", "Hofmann_et_al", "Heuristic"];
 method_names = ["SAGA + grid search", "SAGA", "SAGA (Hofmann)", "SAGA heuristic"];
@@ -191,32 +190,36 @@ stepsizes = [step_gridsearch, step_defazio, step_hofmann, step_heuristic];
 #                       force_continue=false); # force continue if diverging or if tolerance reached
 # skip_error = [10^2, 10^3, 10^3, 10^3];
 # skip_error = [10^5, 10^5, 10^5, 10^5];
-skip_error = closest_power_of_ten.(round.(Int, n ./ 10)) # around 10 points per epoch
-numsimu = 10;
-itercomplex = zeros(length(stepsizes), 1);
+skip_error = fill(closest_power_of_ten.(round.(Int, n ./ 10)), length(stepsizes)) # around 10 points per epoch
+numsimu = 2;
+# itercomplex = zeros(length(stepsizes), 1);
+itercomplex = zeros(length(stepsizes), numsimu);
 OUTPUTS = [];
 for idxstep in 1:length(stepsizes)
     options.stepsize_multiplier = stepsizes[idxstep];
-    for i=1:numsimu
-        println("\n----- Simulation #", i, " -----");
+    for idxsimu=1:numsimu
+        println("\n----- Simulation #", idxsimu, " -----");
         options.skip_error_calculation = skip_error[idxstep]; # compute a skip error for each step size
         SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
         println("Current step size: ", method_names[idxstep], " = ", stepsizes[idxstep]);
         output = minimizeFunc(prob, SAGA_nice, options, stop_at_tol=true);
         println("---> Output fail = ", output.fail, "\n");
-        itercomplex[idxstep] += output.iterations;
+        # itercomplex[idxstep] += output.iterations;
+        itercomplex[idxstep, idxsimu] = output.iterations;
         output.name = string(method_names[idxstep]);
         global OUTPUTS = [OUTPUTS; output];
     end
 end
-itercomplex = itercomplex ./ numsimu; # simply averaging the last iteration number
-itercomplex = itercomplex[:];
+itercomplex = mean(itercomplex, dims=2);
+std_itercomplex = std(itercomplex, dims=2);
+# itercomplex = itercomplex ./ numsimu; # simply averaging the last iteration number
+# itercomplex = itercomplex[:];
 
 ## Saving the result of the simulations
 probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 savename = string(probname, "-exp3_1-empcomplex-", numsimu, "-avg");
-save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS,
-     "method_names", method_names, "stepsizes", stepsizes);
+save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "std_itercomplex", std_itercomplex,
+     "OUTPUTS", OUTPUTS, "method_names", method_names, "stepsizes", stepsizes);
 
 ## Checking that all simulations reached tolerance
 fails = [OUTPUTS[i].fail for i=1:length(stepsizes)*numsimu];
@@ -234,6 +237,7 @@ end
 @printf "\n|  %s  | %s | %s |  %s   |\n" method_names[1] method_names[2] method_names[3] method_names[4]
 @printf "| %e  | %e  | %e  | %e |\n\n" stepsizes[1] stepsizes[2] stepsizes[3] stepsizes[4]
 @printf "| %d  | %d  | %d  | %d |\n\n" itercomplex[1] itercomplex[2] itercomplex[3] itercomplex[4]
+@printf "| %d  | %d  | %d  | %d |\n\n" std_itercomplex[1] std_itercomplex[2] std_itercomplex[3] std_itercomplex[4]
 
 #endregion
 
