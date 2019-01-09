@@ -13,7 +13,6 @@ figures/*.pdf
 
 ## Data
 data/*
-!available_datasets.txt
 !data/housing.jld
 !data/abalone.jld
 !data/australian.jld
