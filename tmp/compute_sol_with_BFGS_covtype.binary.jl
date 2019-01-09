@@ -23,7 +23,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 idx = 15; # covtype.binary
 data = datasets[idx];
 
-@time X, y = loadDataset(data);
+@time X, y = loadDataset(default_path, data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");

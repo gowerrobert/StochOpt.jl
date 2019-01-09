@@ -49,7 +49,7 @@ println("--- Loading data ---");
 @time for idx in 3:3
     data = datasets[idx];
 
-    X, y = loadDataset(data);
+    X, y = loadDataset(default_path, data);
 
     ### SETTING UP THE PROBLEM ###
     println("\n--- Setting up the selected problem ---");

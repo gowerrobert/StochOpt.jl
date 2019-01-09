@@ -26,7 +26,7 @@ for i in 1:length(datasets) println(i, ": ", datasets[i]) end
 ## Only loading datasets, no data generation
 data = datasets[1];
 
-X, y = loadDataset(data);
+X, y = loadDataset(default_path, data);
 
 scaling_rule = "none";
 # scaling_rule = "column-scaling";

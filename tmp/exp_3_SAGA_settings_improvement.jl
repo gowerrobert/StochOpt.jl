@@ -41,7 +41,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 # idx = 4; # australian
 idx = 3; # YearPredictionMSD
 data = datasets[idx];
-X, y = loadDataset(data);
+X, y = loadDataset(default_path, data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");

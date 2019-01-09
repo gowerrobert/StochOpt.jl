@@ -37,7 +37,7 @@ Random.seed!(1);
 ### LOADING DATA ###
 println("--- Loading data ---");
 ## Only loading datasets, no data generation
-X, y = loadDataset(data);
+X, y = loadDataset(default_path, data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");

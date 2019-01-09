@@ -23,7 +23,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 idx = 14; # news20.binary
 data = datasets[idx];
 
-@time X, y = loadDataset(data);
+@time X, y = loadDataset(default_path, data);
 
 # varinfo(r"(X|y|prob)")
 

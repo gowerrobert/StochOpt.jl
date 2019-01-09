@@ -23,7 +23,7 @@ datasets = readlines("$(default_path)available_datasets.txt");
 idx = 13; # SUSY
 data = datasets[idx];
 
-@time X, y = loadDataset(data);
+@time X, y = loadDataset(default_path, data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");

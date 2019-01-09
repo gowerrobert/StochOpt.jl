@@ -23,6 +23,7 @@ using Distributed
     using Formatting
     using SharedArrays
 
+
     include("/home/nidham/phd/moving2julia7/StochOpt.jl/src/StochOpt.jl") # Be carefull about the path here
 end
 
@@ -86,7 +87,7 @@ Random.seed!(1);
 
 ### LOADING THE DATA ###
 println("--- Loading data ---");
-X, y = loadDataset(data);
+X, y = loadDataset(default_path, data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
