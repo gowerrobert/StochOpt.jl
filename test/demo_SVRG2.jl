@@ -15,10 +15,10 @@ prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 ## Running methods
 # # #
 method_names = ["AMprev", "SVRG", "2Dsec", "AMgauss", "SVRG2"]  # Curvature matching methods: CMgauss,  CMprev
-global OUTPUTS =[];  # List of saved outputs
+OUTPUTS =[];  # List of saved outputs
 for method_name in method_names
     output = minimizeFunc_grid_stepsize(prob, method_name, options);
-    OUTPUTS = [OUTPUTS; output];
+    global OUTPUTS = [OUTPUTS; output];
 end
 ### Gradient with fixed step
 options.batchsize = prob.numdata;
@@ -32,4 +32,4 @@ savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
 gr()# gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options, 20) # Plot and save output
+plot_outputs_Plots(OUTPUTS, prob, options, datapassbnd=20) # Plot and save output

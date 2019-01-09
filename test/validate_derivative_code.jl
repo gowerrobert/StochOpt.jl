@@ -22,52 +22,53 @@ x = rand(numfeatures);
 V = X.*((X'*x -y)');
 
 probname = string("gauss-", numfeatures, "-", numdata);   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
-prob = load_ridge_regression(X, y, probname, options, lambda=10.0);
+prob = load_logistic_from_matrices(X, y, probname, options, lambda=1e-1, scaling="column-scaling");
+
 ## Testing and benchmarking Jacobian code
-Jac = zeros(prob.numfeatures, prob.numdata);#zeros(prob.numfeatures,prob.numfeatures);
-Jac2 = zeros(prob.numfeatures, prob.numdata);
-timeinplace = 0.0; time1 = 0.0; errorsacc = 0.0;
-numtrials = 5;
-for iteri = 1:numtrials
-    x = rand(prob.numfeatures);
-    s = sample(1:prob.numdata, options.batchsize, replace=false);
-    tic();
-    prob.Jac_eval!(x, s, Jac);
-    time1 += toc();
-    tic();
-    for i in s
-        Jac2[:, i] =  prob.g_eval(x, [i]);
-    end
-    timeinplace += toc();
-    # S = eye(prob.numfeatures)[:, C];
-    # HS[:] = prob.Hess_opt(x, 1:prob.numdata, S);
-    errorsacc += norm(Jac-Jac2)/numtrials;
-    Jac2[:] .= 0.0;
-    Jac[:] .= 0.0;
-end
-println("timeinplace: ", timeinplace, "  time1: ", time1)
-println("average Jacobian error: ", errorsacc)
+# Jac = zeros(prob.numfeatures, prob.numdata);#zeros(prob.numfeatures,prob.numfeatures);
+# Jac2 = zeros(prob.numfeatures, prob.numdata);
+# timeinplace = 0.0; time1 = 0.0; errorsacc = 0.0;
+# numtrials = 5;
+# for iteri = 1:numtrials
+#     x = rand(prob.numfeatures);
+#     s = sample(1:prob.numdata, options.batchsize, replace=false);
+#     tic();
+#     prob.Jac_eval!(x, s, Jac);
+#     time1 += toc();
+#     tic();
+#     for i in s
+#         Jac2[:, i] =  prob.g_eval(x, [i]);
+#     end
+#     timeinplace += toc();
+#     # S = eye(prob.numfeatures)[:, C];
+#     # HS[:] = prob.Hess_opt(x, 1:prob.numdata, S);
+#     errorsacc += norm(Jac-Jac2)/numtrials;
+#     Jac2[:] .= 0.0;
+#     Jac[:] .= 0.0;
+# end
+# println("timeinplace: ", timeinplace, "  time1: ", time1)
+# println("average Jacobian error: ", errorsacc)
 
 ## Benchmarking Hess_opt against Hess_opt!
-# time1 = 0.0; time2 =0.0; errorsacc=0.0;
-# numtrials = 10; batchsize= 1:prob.numdata; tau = 50;
-# Hd = zeros(prob.numfeatures,tau);
-# Hd1 = zeros(prob.numfeatures,tau);
-# for iteri = 1:numtrials
-#   s = 1:prob.numdata;#sample(1:prob.numdata,batchsize,replace=false);
-#   w = rand(prob.numfeatures);
-#   d = rand(prob.numfeatures,tau);
-#   tic();
-#   prob.Hess_opt!(w,s,d,Hd);
-#   time2+= toc();
-#   tic();
-#   Hd1[:]=prob.Hess_opt(w,s,d);
-#   time1+= toc();
-#   errorsacc+= norm(Hd-Hd1)/numtrials;
-# end
-# #errorsacc = errorsacc/numtrials;
-# println("Time1: ", time1, "  Timenew: ", time2)
-# println("average error: ", errorsacc)
+time1 = 0.0; time2 =0.0; errorsacc=0.0;
+numtrials = 10; batchsize= 1:prob.numdata; tau = 50;
+Hd = zeros(prob.numfeatures,tau);
+Hd1 = zeros(prob.numfeatures,tau);
+for iteri = 1:numtrials
+  s = 1:prob.numdata;#sample(1:prob.numdata,batchsize,replace=false);
+  w = rand(prob.numfeatures);
+  d = rand(prob.numfeatures,tau);
+  g = rand(prob.numfeatures);
+  t1 = @elapsed prob.Hess_opt!(w,s,d, g, Hd);
+  global time2+= t1;
+
+  t1 = @elapsed Hd1[:]=prob.Hess_opt(w,s,d);
+  global time1+= t1;
+  global errorsacc+= norm(Hd-Hd1)/numtrials;
+end
+#errorsacc = errorsacc/numtrials;
+println("Time1: ", time1, "  Timenew: ", time2)
+println("average error: ", errorsacc)
 
 ## Benchmarknig  Hess_C against Hess_C!
 # println("average Hess-C subselection error: ")
@@ -171,40 +172,42 @@ println("average Jacobian error: ", errorsacc)
 #
 #
 ##Testing full Hessian code
-# errorsacc = 0;
-# numtrials = 100;
-# H = zeros(prob.numfeatures,prob.numfeatures)
-# for iteri = 1:numtrials
-#   s = sample(1:prob.numdata,5,replace=false);
-#   w = rand(prob.numfeatures);
-#   d = rand(prob.numfeatures);
-#   eps = 10.0^(-6);
-#   Hdest= (prob.g_eval(w+eps.*d,s) - prob.g_eval(w,s))./eps;
-#   Hd = prob.Hess_eval!(w,s,H)*d;
-#   errorsacc+=norm(Hdest-Hd)./prob.numfeatures
-# end
-# errorsacc = errorsacc/numtrials;
-# println("average Hess error: ", errorsacc)
+errorsacc = 0;
+numtrials = 100;
+H = spzeros(prob.numfeatures,prob.numfeatures)
+for iteri = 1:numtrials
+  s = sample(1:prob.numdata,5,replace=false);
+  w = rand(prob.numfeatures);
+  d = rand(prob.numfeatures);
+  g = rand(prob.numfeatures);
+  eps = 10.0^(-6);
+  Hdest= (prob.g_eval(w+eps.*d,s) - prob.g_eval(w,s))./eps;
+  Hd = prob.Hess_eval!(w,s, g, H)*d;
+  global errorsacc+=norm(Hdest-Hd)./prob.numfeatures
+end
+errorsacc = errorsacc/numtrials;
+println("average Hess error: ", errorsacc)
 # #
 # # #Testing Hessian-vector product code
-# errorsacc = 0;
-# numtrials = 100; batchsize= 10;
-# Hd = zeros(prob.numfeatures);
-# Hd1 = zeros(prob.numfeatures);
-# Hdest= zeros(prob.numfeatures);
-# for iteri = 1:numtrials
-#   s = sample(1:prob.numdata,batchsize,replace=false);
-#   w = rand(prob.numfeatures);
-#   d = rand(prob.numfeatures);
-#   Hd[:] = zeros(prob.numfeatures);
-#   eps = 10.0^(-7);
-#   Hdest[:]= (prob.g_eval(w+eps.*d,s) - prob.g_eval(w,s))./eps;
-# #  Hd1[:]=prob.Hess_opt(w,s,d);
-#   prob.Hess_opt!(w,s,d,Hd);
-#   errorsacc+=norm(Hdest-Hd)./prob.numfeatures
-# end
-# #errorsacc = errorsacc/numtrials;
-# println("average Hess-vec error: ", errorsacc)
+errorsacc = 0;
+numtrials = 100; batchsize= 10;
+Hd = zeros(prob.numfeatures);
+Hd1 = zeros(prob.numfeatures);
+Hdest= zeros(prob.numfeatures);
+for iteri = 1:numtrials
+  s = sample(1:prob.numdata,batchsize,replace=false);
+  w = rand(prob.numfeatures);
+  d = rand(prob.numfeatures);
+  g = rand(prob.numfeatures);
+  Hd[:] = zeros(prob.numfeatures);
+  eps = 10.0^(-7);
+  Hdest[:]= (prob.g_eval(w+eps.*d,s) - prob.g_eval(w,s))./eps;
+  Hd1[:]=prob.Hess_opt(w,s,d);
+  # prob.Hess_opt!(w,s,d,g, Hd);
+  global errorsacc+=norm(Hdest-Hd)./prob.numfeatures
+end
+#errorsacc = errorsacc/numtrials;
+println("average Hess-vec error: ", errorsacc)
 
 #
 ## Testing Hessian-opt against Hessian diagonal product

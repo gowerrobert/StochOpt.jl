@@ -15,17 +15,17 @@ prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 OUTPUTS = [];  # List of saved outputs
 #######
 options.stepsize_multiplier = 10;
-sg = initiate_SAGA_partition(prob, options, minibatch_type="partition", probability_type="ada")
-output = minimizeFunc(prob, sg, options);
+sg = initiate_SAGA_partition(prob, options, minibatch_type="partition", probability_type="uni")
+output = minimizeFunc_grid_stepsize(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 # #
 # sg.unbiased = false;
 sg = initiate_SAGA_partition(prob, options, minibatch_type="partition", probability_type="opt")
-output = minimizeFunc(prob, sg, options);
+output = minimizeFunc_grid_stepsize(prob, sg, options);
 OUTPUTS = [OUTPUTS; output];
 ######
 SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
-output = minimizeFunc(prob, SAGA_nice, options);
+output = minimizeFunc_grid_stepsize(prob, SAGA_nice, options);
 OUTPUTS = [OUTPUTS; output];
 #######
 output3 = minimizeFunc_grid_stepsize(prob, "SVRG", options);
