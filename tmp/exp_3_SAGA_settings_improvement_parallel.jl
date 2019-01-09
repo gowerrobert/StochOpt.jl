@@ -23,10 +23,10 @@ using Distributed
     using Formatting
     using SharedArrays
 
-    # include("../src/StochOpt.jl") # Be carefull about the path here
+    include("/home/nidham/phd/moving2julia7/StochOpt.jl/src/StochOpt.jl") # Be carefull about the path here
 end
 
-@everywhere include("../src/StochOpt.jl")
+# @everywhere include("./src/StochOpt.jl")
 
 ## for the skip_error parameter:
 #region
