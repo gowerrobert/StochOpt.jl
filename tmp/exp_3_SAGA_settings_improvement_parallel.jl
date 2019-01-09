@@ -7,7 +7,7 @@
 
 using Distributed
 
-addprocs(4)
+# addprocs(4)
 
 @everywhere begin # this part will be available on all CPUs
     using JLD
@@ -23,10 +23,10 @@ addprocs(4)
     using Formatting
     using SharedArrays
 
-    # include("./src/StochOpt.jl") # Be carefull about the path here
+    # include("../src/StochOpt.jl") # Be carefull about the path here
 end
 
-@everywhere include("./src/StochOpt.jl")
+@everywhere include("../src/StochOpt.jl")
 
 ## for the skip_error parameter:
 #region
@@ -65,38 +65,33 @@ end
 
 ## Bash inputs
 # include("../src/StochOpt.jl") # Be carefull about the path here
-# data = ARGS[1];
-# scaling = ARGS[2];
-# lambda = parse(Float64, ARGS[3]);
-# println("Inputs: ", data, " + ", scaling, " + ",  lambda, "\n");
+data = ARGS[1];
+scaling = ARGS[2];
+lambda = parse(Float64, ARGS[3]);
+println("Inputs: ", data, " + ", scaling, " + ",  lambda, "\n");
 
 ## Manual inputs
-include("./src/StochOpt.jl") # Be carefull about the path here
+# include("./src/StochOpt.jl") # Be carefull about the path here
 default_path = "./data/";
-datasets = readlines("$(default_path)available_datasets.txt");
-idx = 3; # YearPredictionMSD
-data = datasets[idx];
+# datasets = readlines("$(default_path)available_datasets.txt");
+# idx = 3; # YearPredictionMSD
+# data = datasets[idx];
 # scaling = "none";
-scaling = "column-scaling";
+# scaling = "column-scaling";
 # lambda = -1;
 # lambda = 10^(-3);
-lambda = 10^(-1);
+# lambda = 10^(-1);
 
 Random.seed!(1);
 
 ### LOADING THE DATA ###
 println("--- Loading data ---");
-default_path = "./data/";
-datasets = readlines("$(default_path)available_datasets.txt");
-# idx = 4; # australian
-idx = 3; # YearPredictionMSD
-data = datasets[idx];
 X, y = loadDataset(data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
 options = set_options(tol=10.0^(-6), max_iter=10^8, max_epocs=10^8,
-                      max_time=120.0,
+                      max_time=10.0^4,
                       skip_error_calculation=10^5,
                       batchsize=1,
                       regularizor_parameter = "normalized",
@@ -176,8 +171,8 @@ end
             2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
             2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
     skip = closest_power_of_ten(round.(Int, n / (10)));
-    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=skip, max_time=60.0,
-                                               rep_number=3, batchsize=1, grid=grid);
+    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=skip, max_time=180.0,
+                                               rep_number=5, batchsize=1, grid=grid);
     step_gridsearch, = get_saved_stepsize(prob.name, "SAGA-nice", options);
 # end
 
@@ -187,7 +182,7 @@ stepsizes = [step_gridsearch, step_defazio, step_hofmann, step_heuristic];
 
 ##---------- SAGA_nice-1 runs ----------
 # options = set_options(tol=10.0^(-6), max_iter=10^8, max_epocs=10^8,
-#                       max_time=120.0,
+#                       max_time=10.0^4,
 #                       skip_error_calculation=10^4,
 #                       batchsize=1,
 #                       regularizor_parameter = "normalized",
@@ -196,7 +191,7 @@ stepsizes = [step_gridsearch, step_defazio, step_hofmann, step_heuristic];
 # skip_error = [10^2, 10^3, 10^3, 10^3];
 # skip_error = [10^5, 10^5, 10^5, 10^5];
 skip_error = closest_power_of_ten.(round.(Int, n ./ 10)) # around 10 points per epoch
-numsimu = 1;
+numsimu = 10;
 itercomplex = zeros(length(stepsizes), 1);
 OUTPUTS = [];
 for idxstep in 1:length(stepsizes)
@@ -274,7 +269,7 @@ step_heuristic = 0.25 / max(heuristicbound, rightterm);
 options = set_options(tol=10.0^(-6), 
                       max_iter=10^8, 
                       max_epocs=10^8, 
-                      max_time=120.0, 
+                      max_time=10.0^4, 
                       skip_error_calculation=10^5,
                       regularizor_parameter = "normalized", 
                       initial_point="zeros", 
@@ -287,17 +282,17 @@ elseif options.batchsize > 1
 else
     error("Invalid batch size");
 end
-step_heuristic_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
-if step_heuristic_gridsearch == 0.0
+# step_heuristic_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
+# if step_heuristic_gridsearch == 0.0
     grid = [2.0^(25), 2.0^(23), 2.0^(21), 2.0^(19), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11),
             2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5),
             2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
             2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
     skip = closest_power_of_ten(round.(Int, n / (10*tau_heuristic)));
-    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=skip, max_time=120.0,
+    output = calculate_best_stepsize_SAGA_nice(prob, options, skip=skip, max_time=180.0,
                                                rep_number=5, batchsize=tau_heuristic, grid=grid);
     step_heuristic_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
-end
+# end
 
 # method_names = ["heuristic + grid search", "SAGA", "SAGA-20", "heuristic"];
 # mini_batch_sizes = [tau_heuristic, tau_defazio, tau_hofmann, tau_heuristic];
@@ -314,11 +309,12 @@ stepsizes = convert(SharedArray, stepsizes);
 # skip_error = [10^1, 10^4, 10^3, 10^3, 10^1]; # skip = n/(tau*10) approx 10 pass for 1 epoch
 skip_error = closest_power_of_ten.(round.(Int, n ./ (10*mini_batch_sizes))); # 5 points per epoch
 skip_error = convert(SharedArray, skip_error);
-numsimu = 3; # to test with several simulations
+
+numsimu = 10; # to test with several simulations
 itercomplex = SharedArray{Float64}(length(method_names), numsimu);
+elapsedtime = SharedArray{Float64}(length(method_names), numsimu);
 
-@everywhere procs_outputs = [];
-
+# @everywhere procs_outputs = [];
 # @fetchfrom 1 InteractiveUtils.varinfo(r"(procs_outputs)")
 # @fetchfrom 2 InteractiveUtils.varinfo(r"(procs_outputs)")
 # @fetchfrom 3 InteractiveUtils.varinfo(r"(procs_outputs)")
@@ -327,15 +323,15 @@ itercomplex = SharedArray{Float64}(length(method_names), numsimu);
 
 @sync @distributed for idxmethod in 1:length(stepsizes)
     @sync @distributed for idxsimu=1:numsimu
-        options = set_options(tol=10.0^(-3), 
-                      max_time=120.0,
+        options = set_options(tol=10.0^(-6), 
+                      max_time=10.0^4,
                       stepsize_multiplier=fetch(stepsizes[idxmethod]),
                       skip_error_calculation=fetch(skip_error[idxmethod]), # compute a skip error for each step size
                       batchsize=fetch(mini_batch_sizes[idxmethod]),
                       max_iter=10^8, 
-                      max_epocs=10^8, 
-                      regularizor_parameter="normalized", initial_point="zeros", force_continue=true);
-        println("\n----- Simulation #", idxsimu, " -----");
+                      max_epocs=10^8,
+                      regularizor_parameter="normalized", initial_point="zeros", force_continue=true, printiters=false);
+        println("\n----- Method #", idxmethod, ", ----- Simulation #", idxsimu, " -----");
         SAGA_nice = initiate_SAGA_nice(prob, options);
         println("1) Current method: ", method_names[idxmethod], ", mini-batch size = ", mini_batch_sizes[idxmethod],
                 ", step size = ", stepsizes[idxmethod]);
@@ -344,61 +340,64 @@ itercomplex = SharedArray{Float64}(length(method_names), numsimu);
         output = minimizeFunc(prob, SAGA_nice, options, stop_at_tol=true);
         println("---> Output fail = ", output.fail, "\n");
         itercomplex[idxmethod, idxsimu] = output.iterations;
-        output.name = string(method_names[idxmethod]);
-        global procs_outputs = [procs_outputs; output];
+        elapsedtime[idxmethod, idxsimu] = output.times[end];
+        # output.name = string(method_names[idxmethod], "_simu_", idxsimu);
+        # global procs_outputs = [procs_outputs; output];
     end
 end
+# itercomplex
+# elapsedtime
 
-@fetchfrom 1 InteractiveUtils.varinfo(r"(procs_outputs)")
-@fetchfrom 2 InteractiveUtils.varinfo(r"(procs_outputs)")
-@fetchfrom 3 InteractiveUtils.varinfo(r"(procs_outputs)")
-@fetchfrom 4 InteractiveUtils.varinfo(r"(procs_outputs)")
-@fetchfrom 5 InteractiveUtils.varinfo(r"(procs_outputs)")
+# unsorted_OUTPUTS = [];
+# found_names = [];
+# for proc in 1:nprocs()
+#     println("Processor: ", proc);
+#     output = @fetchfrom proc procs_outputs;
+#     for i=1:length(output)
+#         println("-------", output[i].name, " ", output[i].times[end]);
+#         if output[i].name in found_names
+#             println("Already stored");
+#         else
+#             global found_names = [found_names ; output[i].name];
+#             output[i].name, = split(output[i].name, "_simu_");
+#             global unsorted_OUTPUTS = [unsorted_OUTPUTS ; output[i]];
+#         end
+#     end
+# end
+# unsorted_OUTPUTS
 
-unsorted_OUTPUTS = [];
-found_names = [];
-for proc in 1:nprocs()
-    println("Processor: ", proc);
-    output = @fetchfrom proc procs_outputs;
-    for i=1:length(output)
-        println("-------", output[i].name);
-        if output[i].name in found_names
-            println("Already stored");
-        else
-            global found_names = [found_names ; output[i].name];
-            global unsorted_OUTPUTS = [unsorted_OUTPUTS ; output[i]];
-        end
-    end
-end
-unsorted_OUTPUTS
-
-OUTPUTS = [];
-mask = [unsorted_OUTPUTS[i].name .== method_names for i=1:length(unsorted_OUTPUTS)]
-for i=1:length(unsorted_OUTPUTS)
-    global OUTPUTS = [OUTPUTS ; unsorted_OUTPUTS[findfirst(mask[i])]]
-end
+# OUTPUTS = [];
+# mask = [unsorted_OUTPUTS[i].name .== method_names for i=1:length(unsorted_OUTPUTS)]
+# for i=1:length(unsorted_OUTPUTS)
+#     global OUTPUTS = [OUTPUTS ; unsorted_OUTPUTS[findfirst(mask[i])]]
+# end
 # unsorted_OUTPUTS = nothing;
 
-
-# itercomplex = itercomplex ./ numsimu; # simply averaging the last iteration number
-# itercomplex = itercomplex[:];
-itercomplex = mean(itercomplex, dims=2);
-empcomplex = mini_batch_sizes .* itercomplex;
+# itercomplex = mean(itercomplex, dims=2);
+empcomplex = mini_batch_sizes .* mean(itercomplex, dims=2);
 
 ## Saving the result of the simulations
 probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 savename = string(probname, "-exp3_2-empcomplex-", numsimu, "-avg");
-# save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS,
-#      "method_names", method_names, "skip_error", skip_error,
-#      "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes, 
-#      "empcomplex", empcomplex);
+if numsimu == 1
+    save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS,
+         "method_names", method_names, "skip_error", skip_error,
+        "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes, 
+        "empcomplex", empcomplex);
+else
+    save("$(default_path)$(savename).jld", "method_names", method_names, "skip_error", skip_error,
+         "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes, 
+         "itercomplex", itercomplex, "empcomplex", empcomplex);
+end
 
 ## Checking that all simulations reached tolerance
-fails = [OUTPUTS[i].fail for i=1:length(stepsizes)*numsimu];
-if all(s->(string(s)=="tol-reached"), fails)
-    println("Tolerance always reached");
-else 
-    error("Tolerance should be reached for all simulations");
+if numsimu == 1
+    fails = [OUTPUTS[i].fail for i=1:length(stepsizes)*numsimu];
+    if all(s->(string(s)=="tol-reached"), fails)
+        println("Tolerance always reached");
+    else 
+        error("Tolerance should be reached for all simulations");
+    end
 end
 
 ## Plotting one SAGA-nice simulation for each mini-batch size
@@ -419,3 +418,98 @@ end
 @printf "total complexity |       %s        |   %s  |  %s  |  %s |  %s |\n\n" format(empcomplex[1], commas=true) format(empcomplex[2], commas=true) format(empcomplex[3], commas=true) format(empcomplex[4], commas=true) format(empcomplex[5], commas=true)
 
 
+# ############################## AVERAGE ITERATION COMPLEXITIES THROUGH FITTING CURVES #############################
+# # region Extracting the average iteration complexity through average angle between the tolerance horizontal line and a fitted affine curve
+# withintercept = true; # if true, then an intercept is fitted, else, there it is set to 0 
+# itercomplex2 = [];
+# if withintercept
+#     alphahat = []; # value of the intercept 
+# else
+#     alphahat = zeros(length(method_names)*numsimu); # null intercept
+# end
+# betahat = [];
+# # betahat = Array{Float64, 2}(length(method_names), numsimu);
+# for i=1:length(method_names)
+#     println("Tau: ", method_names[i]);
+#     intercept = [];
+#     slope = [];
+#     for j=1:numsimu
+#         output = OUTPUTS[(i-1)*numsimu+j];
+#         xout = skip_error .* [0:(length(output.fs)-1);];
+#         logyout = log.( (output.fs' .- prob.fsol)./(output.fs[1] .- prob.fsol) );
+#         logyout = reshape(logyout, size(logyout, 1));
+#         # slope = [slope; sum(xout.*logyout)/sum(xout.^2)];
+#         if withintercept
+#             a, b = linreg(xout, logyout); # Linear regresion using OLS : y = a + b*x
+#             intercept = [intercept; a];
+#             slope = [slope; b];
+#         else
+#             ## Fitting a line without the intercept term with OLS
+#             ## https://en.wikipedia.org/wiki/Simple_linear_regression#Simple_linear_regression_without_the_intercept_term_(single_regressor)
+#             slope = [slope; sum(xout.*logyout)/sum(xout.^2)];
+#         end
+#     end
+#     ## Storring the list of the intercepts (if not null) and slopes
+#     if withintercept
+#         alphahat = [alphahat; intercept];
+#         betahat = [betahat; slope];
+#     else
+#         betahat = [betahat; slope];
+#     end
+#     # betahat = [betahat; slope];
+
+#     ## Estimation of the iteration complexity
+#     if withintercept
+#         alphaavg = mean(alphahat);
+#         betaavg = mean(betahat);
+#         itercomplex2 = [itercomplex2; ceil((log(tolerance)-alphaavg)/betaavg)];
+#     else
+#         thetahat = sum(atan.(slope))/numsimu; # Obtaining the average theta (theta_i = tan(slope_i))
+#         itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
+#     end
+#     # thetahat = sum(atan.(slope))/numsimu;
+#     # itercomplex2 = [itercomplex2; ceil(log(tolerance)/tan(thetahat))];
+# end
+# itercomplex2 = reshape(itercomplex2, (length(method_names), 1) );
+# println("Fitted line complexity: ", itercomplex2);
+# println("Classical average complexity: ", itercomplex);
+# #endregion
+
+# #region Plotting the simualtions and the fitted lines for a chosen mini-batch size
+# # tauidx = 1;
+# # ## FindinLongest simulation x-axis
+# # longetsxout = [0];
+# # for j=1:numsimu
+# #     output = OUTPUTS[(tauidx-1)*numsimu+j];
+# #     xout = skipped_errors.*[0:(length(output.fs)-1);];
+# #     if xout[end] > longetsxout[end]
+# #         longetsxout = xout
+# #     end
+# # end
+# # pyplot()
+# # output = OUTPUTS[(tauidx-1)*numsimu+1];
+# # xout = skipped_errors.*[0:(length(output.fs)-1);];
+# # logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+# # colorlist = distinguishable_colors(7);
+# # p = plot(xout, logyout, line=(2,:dash), label="simu #1", c=colorlist[1], legend=:topright);
+# # plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+1] + betahat[(tauidx-1)*numsimu+1].*longetsxout, 
+# #           line=(4,:solid), c=colorlist[1], label="lin approx #1", xlabel="iterations", 
+# #           ylabel="log(residual)", title=string("\$", output.name, "\$"));
+# # for j=2:numsimu
+# #     println(j);
+# #     output = OUTPUTS[(tauidx-1)*numsimu+j];
+# #     xout = skipped_errors.*[0:(length(output.fs)-1);];
+# #     logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
+# #     ## Plotting the SAGA-nice simulation
+# #     plot!(p, xout, logyout, line=(2,:dash), c=colorlist[j], label=string("simu #", j));
+# #     ## Plotting the corresponding fitted line
+# #     plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+j] + betahat[(tauidx-1)*numsimu+j].*longetsxout, 
+# #           line=(4,:solid), c=colorlist[j], label=string("lin approx #", j));
+# # end
+# # plot!(p, longetsxout, fill(log(tolerance), length(xout)), line=(2,:dot), c=:black, label="tol");
+# # xlims!((0, 1.4*longetsxout[end]));
+# # display(p);
+
+# # empcomplex2 = minibatchlist.*itercomplex2; # average angle version
+# #endregion
+# ##################################################################################################################
