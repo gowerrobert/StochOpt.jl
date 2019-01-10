@@ -10,23 +10,23 @@ include("../src/StochOpt.jl")
 options = set_options(tol=10.0^(-6.0), max_iter=10^8, max_time=300.0, max_epocs=30, rep_number=5);
 options.batchsize = 5;
 ## load problem
-# datapath = "./data/";   # THIS RELATIVE PATH ONLY WORKS IF YOU ARE IN THE ROOT FOLDER !
-# probname = "phishing";
-# prob =  load_logistic(datapath, probname,options);  # Loads logisitc
-numdata = 100;
-numfeatures = 6;
-X = rand(numfeatures, numdata);
-y = rand(numdata);
-y = convert.(Float64, rand(Bool, numdata));
-miny = minimum(y); # Way faster implementation
-maxy = maximum(y);
-y[findall(x->x==miny, y)] .= -1;
-y[findall(x->x==maxy, y)] .= 1;
-x = rand(numfeatures);
-# V = X.*((X'*x -y)');
-#
-probname = string("gauss-", numfeatures, "-", numdata);   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
-prob = load_logistic_from_matrices(X, y, probname, options, lambda=1e0, scaling="column-scaling");
+datapath = "./data/";   # THIS RELATIVE PATH ONLY WORKS IF YOU ARE IN THE ROOT FOLDER !
+probname = "phishing";
+prob =  load_logistic(datapath, probname,options);  # Loads logisitc
+# numdata = 100;
+# numfeatures = 6;
+# X = rand(numfeatures, numdata);
+# y = rand(numdata);
+# y = convert.(Float64, rand(Bool, numdata));
+# miny = minimum(y); # Way faster implementation
+# maxy = maximum(y);
+# y[findall(x->x==miny, y)] .= -1;
+# y[findall(x->x==maxy, y)] .= 1;
+# x = rand(numfeatures);
+# # V = X.*((X'*x -y)');
+# #
+# probname = string("gauss-", numfeatures, "-", numdata);   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
+prob = load_logistic_from_matrices(X, y, probname, options, lambda=1e9, scaling="column-scaling");
 
 
 ## Benchmarking Hess_opt against Hess_opt!

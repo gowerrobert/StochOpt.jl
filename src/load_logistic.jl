@@ -127,12 +127,12 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
         Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
 
     ## Try to load the solution of the problem, if already computed
-    load_fsol!(opts, prob);
-
-    if prob.fsol == 0.0
-        println("Need to compute the solution of the problem")
-        get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
-    end
+    # load_fsol!(opts, prob);
+    #
+    # if prob.fsol == 0.0
+    #     println("Need to compute the solution of the problem")
+    #     get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
+    # end
 
     return prob
 end

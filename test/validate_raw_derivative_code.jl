@@ -14,7 +14,7 @@ numfeatures = 4;
 X = rand(numfeatures, numdata);
 y = convert.(Float64, rand(Bool, numdata));
 miny = minimum(y);
-y[findall(x->x==miny, y)] .= -1;
+y[findall(x->x==miny, y)]  .= -1;
 y[findall(x->x > miny, y)] .= 1;
 x = rand(numfeatures);
 
