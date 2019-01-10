@@ -59,8 +59,10 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     numfeatures = sX[1];
     numdata = sX[2];
     #Transforming y to the binary to -1 and 1 representation
-    y[findall(x->x==minimum(y), y)] .= -1;
-    y[findall(x->x==maximum(y), y)] .= 1;
+    miny = minimum(y);
+    y[findall(x->x > miny, y)] .= 1;
+    y[findall(x->x==miny, y)] .= -1;
+
 
     if(lambda == -1)
         if(opts.regularizor_parameter == "1/num_data")

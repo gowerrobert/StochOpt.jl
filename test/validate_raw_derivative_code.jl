@@ -3,7 +3,7 @@ using Plots
 using StatsBase
 using Match
 include("../src/StochOpt.jl")
-# 
+#
 # probname = "australian"
 # datapath = "./data/"
 # name = string("lgstc_", probname);  # maybe add different regularizor later opts.regularizor
@@ -13,10 +13,9 @@ numdata = 100;
 numfeatures = 4;
 X = rand(numfeatures, numdata);
 y = convert.(Float64, rand(Bool, numdata));
-miny = minimum(y); # Way faster implementation
-maxy = maximum(y);
+miny = minimum(y);
 y[findall(x->x==miny, y)] .= -1;
-y[findall(x->x==maxy, y)] .= 1;
+y[findall(x->x > miny, y)] .= 1;
 x = rand(numfeatures);
 
 probname = string("gauss-", numfeatures, "-", numdata);

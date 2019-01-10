@@ -26,7 +26,7 @@ x = rand(numfeatures);
 # V = X.*((X'*x -y)');
 #
 probname = string("gauss-", numfeatures, "-", numdata);   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
-prob = load_logistic_from_matrices(X, y, probname, options, lambda=1e4, scaling="column-scaling");
+prob = load_logistic_from_matrices(X, y, probname, options, lambda=1e0, scaling="column-scaling");
 
 
 ## Benchmarking Hess_opt against Hess_opt!
@@ -120,8 +120,8 @@ for iteri = 1:numtrials
   # ff2 = d'*prob.Hess_eval(w,s)*d;
   # global errorsacc+=norm(ff1-ff2);
   Hdest= (prob.g_eval(w+eps.*d,s) - prob.g_eval(w,s))./(eps);
-  Hd = prob.Hess_eval(w,s)*d;
-  # Hd = prob.Hess_eval!(w,s, g, H)*d;
+  # Hd = prob.Hess_eval(w,s)*d;
+  Hd = prob.Hess_eval!(w,s, g, H)*d;
   global errorsacc+=norm(Hdest-Hd)./prob.numfeatures
 end
 errorsacc = errorsacc/numtrials;
@@ -142,8 +142,8 @@ for iteri = 1:numtrials
   Hd[:] = zeros(prob.numfeatures);
   eps = 10.0^(-7);
   Hdest[:]= (prob.g_eval(w+eps.*d,s) - prob.g_eval(w,s))./eps;
-  Hd[:]=prob.Hess_opt(w,s,d);
-  # prob.Hess_opt!(w,s,d,g, Hd);
+  # Hd[:]=prob.Hess_opt(w,s,d);
+  prob.Hess_opt!(w,s,d,g, Hd);
   global errorsacc+=norm(Hdest-Hd)./prob.numfeatures
 end
 errorsacc = errorsacc/numtrials;
