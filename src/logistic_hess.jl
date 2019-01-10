@@ -4,7 +4,7 @@ function logistic_hess(X, y::Array{Float64}, w::Array{Float64})
     Xx  = X'*w;
     yXx = y.*Xx;
     t = logistic_phi(yXx) ;
-    return X*(t .*(1 .- t) .*X');
+    return X*( (t .*(1 .- t)) .*X');
     #Hv = X*bsxfun(@times, t.*(1-t),X'*v);
 end
 
@@ -17,9 +17,9 @@ function logistic_hess!(X, y::Array{Float64}, w::Array{Float64}, lambda::Float64
     # t = logistic_phi( y.*X'*w) ;
     g[:] = (1/batch)*X*(y.*(t .- 1)) .+ (lambda).*w;
     if(issparse(prob.X))
-        H[:] =  (1/batch)*X*(t.*(1 .- t).*X') .+ lambda* sparse(I, length(w), length(w));
+        H[:] =  (1/batch)*X*((t.*(1 .- t)).*X') + lambda* sparse(I, length(w), length(w));
     else
-        H[:] =  (1/batch)*X*(t.*(1 .- t).*X') .+ lambda* Matrix{Float64}(I, length(w), length(w));
+        H[:] =  (1/batch)*X*((t.*(1 .- t)).*X') + lambda* Matrix{Float64}(I, length(w), length(w));
     end
     #diag(H) += (lambda);
 end

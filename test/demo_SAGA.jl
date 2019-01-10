@@ -5,11 +5,11 @@ using Match
 include("../src/StochOpt.jl")
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=150, force_continue=true, initial_point="randn"); #,repeat_stepsize_calculation =true, rep_number =10
+options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=150, force_continue=true,  repeat_stepsize_calculation=false, initial_point="randn"); #,repeat_stepsize_calculation =true, rep_number =10
 options.batchsize = 100;
 ## load problem
 datapath = "./data/";
-probname = "splice";   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
+probname = "mushrooms";   # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
 prob = load_logistic(datapath, probname, options);  # Loads logisitc problem
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
