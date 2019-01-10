@@ -30,3 +30,5 @@ tpm/test_open.jl
 nohups/*
 
 figures/\.directory
+
+\.directory
