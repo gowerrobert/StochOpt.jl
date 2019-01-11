@@ -59,9 +59,10 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     numfeatures = sX[1];
     numdata = sX[2];
     #Transforming y to the binary to -1 and 1 representation
-    miny = minimum(y); # Way faster implementation
+    miny = minimum(y);
+    maxy = maximum(y);
     y[findall(x->x==miny, y)] .= -1;
-    y[findall(x->x==miny, y)] .= 1;
+    y[findall(x->x==maxy, y)] .= 1;
 
     if(lambda == -1)
         if(opts.regularizor_parameter == "1/num_data")
@@ -149,7 +150,7 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 function get_fsol_logistic!(prob)
     if prob.numfeatures < 10000
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8,
-                              max_time=60.0*60.0*3.0, max_epocs=10^3, repeat_stepsize_calculation=true, rep_number=3);
+                              max_time=60.0*60.0*3.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=3);
         ## Running BFGS
         options.batchsize = prob.numdata;
         method_input = "BFGS";
@@ -169,7 +170,7 @@ function get_fsol_logistic!(prob)
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
     else
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8,
-                              max_time=60.0*60.0*3.0, max_epocs=10^3, repeat_stepsize_calculation=true, rep_number=3);
+                              max_time=60.0*60.0*3.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=3);
         # println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
         ## Running SVRG
         # options.batchsize = 1;
