@@ -78,7 +78,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
             error("Unknown regularizor_parameter option");
         end
         name = string(name, "-regularizor-",  replace(opts.regularizor_parameter, r"[\/]" => "_"));
-    elseif lambda > 0.0
+    elseif lambda >= 0.0
         name = string(name, "-regularizor-", replace(@sprintf("%.0e", lambda), "." => "_"));
     else
         error("lambda cannot be nonpositive (except -1)");
