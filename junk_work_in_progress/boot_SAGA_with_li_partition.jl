@@ -1,4 +1,4 @@
-function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", probability_type="uni", unbiased=true)
+function initiate_SAGA_partition(prob::Prob, options::MyOptions; minibatch_type="nice", probability_type="uni", unbiased=true)
     # function for setting the parameters and initiating the SAGA method (and all it's variants)
     options.stepsize_multiplier = 1;
     epocsperiter = options.batchsize/prob.numdata;
@@ -16,7 +16,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
     SAGgrad = zeros(prob.numfeatures);
     gi = zeros(prob.numfeatures);
     aux = zeros(prob.numfeatures);
-    descent_method = descent_SAGA;
+    descent_method = descent_SAGA_partition;
     probs = []; Z = 0.0; stepsize = 0.0;
     mu = prob.mu;
 
@@ -50,7 +50,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
             descent_method = descent_SAGA_adapt2;#descent_SAGA_adapt;
         elseif(probability_type == "uni"||probability_type == "Li"||probability_type == "opt") # adding "Li" and "opt" cases
             Jac, minibatches, probs, name, L, Lmax, stepsize = boot_SAGA_partition(prob, options, probability_type, name, mu); # Does "ada" exist for "partition"?
-            descent_method = descent_SAGApartition;
+            descent_method = descent_SAGA_partition;
         else
             error("unknown probability_type name (", probability_type, ").");
             # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
@@ -60,18 +60,12 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
     elseif(minibatch_type == "Li_order_partition")
         if(probability_type == "uni"||probability_type == "Li"||probability_type == "opt") # adding "Li" and "opt" cases
             Jac, minibatches, probs, name, L, Lmax = boot_SAGA_Li_order_partition(prob, options, probability_type, name, mu); # Does "ada" exist for "Li_order_partition"?
-            descent_method = descent_SAGApartition;
+            descent_method = descent_SAGA_partition;
         else
             error("unknown probability_type name (", probability_type, ").");
             # println("\nFAIL: unknown probability_type name (", probability_type, ")\n");
             # exit(1);
         end
-    # elseif(minibatch_type == "nice")
-    #     println("\nFor nice minibatch: probability_type is useless\n");
-    #     name = string(name, "-", minibatch_type);
-    #     L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
-    #     Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
-    #     Jac = zeros(prob.numfeatures, prob.numdata);
     else
         error("unknown minibatch_type name (", minibatch_type, ").")
         # println("\nFAIL: unknown minibatch_type name (", minibatch_type, ")\n");
@@ -157,6 +151,8 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
     return Jac, minibatches, vec(probs), name, L, Lmax, stepsize
 end
 
+
+
 function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probability_type::AbstractString, name::AbstractString, mu::Float64)
     ## This is a partition mini-batching that groups mini-batches together based on the sum_i L_i.
     ## Setting up a partition mini-batch
@@ -215,69 +211,3 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
     # probs[ = vec(probs);
     return Jac, minibatches, vec(probs), name, L, Lmax
 end
-
-
-
-### PREVIOUS initiate_SAGA implementation ###
-
-# function initiate_SAGA( prob::Prob, options::MyOptions, x::Array{Float64} ; minibatch_type="nice", probability_type = "", unbiased = true)
-#     # function for setting the parameters and initiating the SAGA method (and all it's variants)
-#     options.stepsize_multiplier =1;
-#     epocsperiter = options.batchsize/prob.numdata;
-#     gradsperiter = options.batchsize;
-#     if(unbiased)
-#         name = "SAGA"
-#     else
-#         name = "SAG"
-#     end
-#     if(options.batchsize>1)
-#         name = string(name,"-",options.batchsize);
-#     end
-#     minibatches =[];
-#     Jacsp = spzeros(1);#spzeros(prob.numfeatures,prob.numdata);
-#     SAGgrad = zeros(prob.numfeatures);
-#     gi = zeros(prob.numfeatures);
-#     aux = zeros(prob.numfeatures);
-#     descent_method = descent_SAGA;
-#     probs = []; Z =0.0; stepsize =0.0
-#     mu = get_mu_str_conv(prob);
-
-#     if(minibatch_type =="partition")
-#         # L = mean(sum(prob.X.^2,1));
-#         if(probability_type == "ada")
-#             if(options.initial_point == "zeros")
-#                 println("adaSAGA doesn't work well with zeros initial point! Existing")
-#                 return [];
-#             end
-#             Jac= zeros(prob.numdata);
-#             # Jac= zeros(prob.numfeatures, prob.numdata);
-#             name = string(name,"-",probability_type);
-#             yXx = prob.y.*(prob.X'*x); # initial random guess
-#             probs = logistic_phi(yXx) ;
-#             probs[:] = probs.*(1-probs);
-#             probs[:] = max.(probs, 0.25/8.0); ## IMPORTANT: this establishes a minimum value for phi''
-#             probs[:] = probs.*vec(sum(prob.X.^2,1))+prob.lambda;
-#             Lmax = maximum(probs);
-#             L = mean(probs);
-#             probs[:] = probs.*4 + prob.numdata*mu;
-#             Z = sum(probs);
-#             probs[:] = probs/Z;
-#             stepsize = prob.numdata/Z;
-#             descent_method =  descent_SAGA_adapt2;#descent_SAGA_adapt;
-#         else
-#             Jac, minibatches, probs, name, L, Lmax, stepsize = boot_SAGA_partition(prob,options,probability_type,name,mu);
-#             descent_method = descent_SAGApartition;
-#         end
-#         # elseif(minibatch_type =="Li_order_partition")
-#     elseif(minibatch_type == "Li_order_partition")
-#         Jac, minibatches, probs, name, L, Lmax = boot_SAGA_Li_order_partition(prob,options,probability_type,name,mu);
-#         descent_method = descent_SAGApartition;
-#     else
-#         name = string(name, "-", minibatch_type);
-#         L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
-#         Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
-#         Jac = zeros(prob.numfeatures, prob.numdata);
-#     end
-#     return SAGAmethod(epocsperiter, gradsperiter,name, descent_method, boot_SAGA, minibatches, minibatch_type, unbiased,
-#     Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, probability_type, Z, L, Lmax, mu);
-# end

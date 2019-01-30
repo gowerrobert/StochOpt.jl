@@ -103,19 +103,19 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     #         Hess_opt(x,S,v) = ((1./length(S))*logistic_hessv_sub(Xt,y,x,S,v)+(reg)*bsxfun(@times, huber_hess_kimon(x,opts.hubermu), v) );
     #if opts.regularizor =="L2"# is the default
     f_eval(x, S)                = ((1. / length(S))*logistic_eval(X[:,S], y[S], x) + (lambda)*(0.5)*norm(x)^2); # julia 0.7
-    g_eval(x, S)                = ((1. / length(S))*logistic_grad(X[:,S], y[S], x) .+ (lambda).*x); # julia 0.7
+    g_eval(x, S)                = ((1. / length(S))*logistic_grad(X[:,S], y[S], x) + (lambda).*x); # julia 0.7
     g_eval!(x, S, g)            = logistic_grad!(X[:,S], y[S], x, lambda, length(S), g);
     Jac_eval!(x, S, Jac)        = logistic_Jac!(X[:,S], y[S], x, lambda, S, Jac);
     scalar_grad_eval(x, S)      = logistic_scalar_grad(X[:,S], y[S], x)
     scalar_grad_hess_eval(x, S) = logistic_scalar_grad_hess(X[:,S], y[S], x)
-    Hess_eval(x, S)             = ((1 ./ length(S))*logistic_hess(X[:,S], y[S], x).+ (lambda).*eye(numfeatures)); # julia 0.7
+    Hess_eval(x, S)             = ((1 ./ length(S)) .*logistic_hess(X[:,S], y[S], x) + (lambda).*sparse(I, numfeatures, numfeatures)); # julia 0.7
     Hess_eval!(x, S, g, H)      = logistic_hess!(X[:,S], y[S], x, lambda, length(S), g, H) ;
     Hess_C(x, S, C)             = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
     Hess_C!(x, S, C, g, HC)     = logistic_hessC!(X[:,S], y[S], x, C, lambda, length(S), g, HC);
     Hess_C2(x, S, C)            = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S));
-    Hess_opt(x, S, v)           = ((1 ./ length(S))*logistic_hessv(X[:,S], y[S], x, v) .+ (lambda).*v); # julia 0.7
+    Hess_opt(x, S, v)           = ((1 ./ length(S)) .*logistic_hessv(X[:,S], y[S], x, v) + (lambda).*v); # julia 0.7
     Hess_opt!(x, S, v, g, Hv)   = logistic_hessv!(X[:,S], y[S], x, v, lambda, length(S), g, Hv);
-    Hess_D(x, S)                = ((1 ./ length(S))*logistic_hessD(X[:,S], y[S], x) .+ (lambda).*ones(numfeatures)); # julia 0.7
+    Hess_D(x, S)                = ((1 ./ length(S)) .*logistic_hessD(X[:,S], y[S], x) .+ (lambda).*ones(numfeatures)); # julia 0.7
     Hess_D!(x, S, g, D)         = logistic_hessD!(X[:,S], y[S], x, lambda, length(S), g, D);
     # Hess_vv(x, S, v)            = ((1./length(S))*logistic_hessvv(X[:,S], y[S], x, v) .+ (lambda).*v'*v);
     #else
@@ -127,12 +127,12 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
         Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
 
     ## Try to load the solution of the problem, if already computed
-    load_fsol!(opts, prob);
-
-    if prob.fsol == 0.0
-        println("Need to compute the solution of the problem")
-        get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
-    end
+    # load_fsol!(opts, prob);
+    #
+    # if prob.fsol == 0.0
+    #     println("Need to compute the solution of the problem")
+    #     get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
+    # end
 
     return prob
 end

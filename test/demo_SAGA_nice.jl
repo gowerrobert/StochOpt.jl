@@ -21,7 +21,7 @@ prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-1, scaling="co
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
 #######
-options.stepsize_multiplier = 1e-3;
+options.stepsize_multiplier = 1e-3; #TODO Why is this necessary? 
 options.batchsize = 1;
 options.skip_error_calculation = 5000;
 SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
