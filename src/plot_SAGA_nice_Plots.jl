@@ -1,7 +1,7 @@
 """
     plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst)
 
-Plots two upper-bounds of the expected smoothness constant (simple and Bernstein), 
+Plots two upper-bounds of the expected smoothness constant (simple and Bernstein),
 a heuristic estimation of it and its exact value (if there are few data points).
 
 #INPUTS:\\
@@ -23,6 +23,9 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
     fontbig = 14;
     xlabeltxt = "batchsize";
 
+    colorlist = [:blue :orange :green :red :purple];
+    markerlist = [:rect :circle :star5 :diamond :utriangle];
+
     n = prob.numdata;
     d = prob.numfeatures;
 
@@ -30,6 +33,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
         plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst], label=["heuristic" "simple" "bernstein" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
+             marker=reshape(markerlist[1:4], 1, :), color=reshape(colorlist[1:4], 1, :),
              ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(expsmoothcst)),
              title=string(probname, ", n=", string(n), ", d=", string(d)));
     elseif typeof(expsmoothcst)==Nothing
@@ -37,6 +41,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
             #  yscale=:log10, # bug in julia 0.7
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,
+             marker=reshape(markerlist[1:3], 1, :), color=reshape(colorlist[1:3], 1, :),
              ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(heuristicbound)),
              title=string(probname, ", n=", string(n), ", d=", string(d)));
     else
@@ -50,12 +55,14 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
         plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst], label=["heuristic" "simple" "bernstein" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
+             marker=reshape(markerlist[1:4], 1, :), color=reshape(colorlist[1:4], 1, :),
              ylim=(0.85*min(minimum(expsmoothcst), minimum(heuristicbound)), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])),
              title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
     elseif typeof(expsmoothcst)==Nothing
         plot(1:n, [heuristicbound simplebound bernsteinbound], label=["heuristic" "simple" "bernstein"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
+             marker=reshape(markerlist[1:3], 1, :), color=reshape(colorlist[1:3], 1, :),
             #  ylim=(0.85*minimum(heuristicbound), 1.5*minimum(heuristicbound)),
              ylim=(0.85*minimum(heuristicbound), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])),
              title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
@@ -70,7 +77,7 @@ end
 """
     plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, heuristicstepsize::Array{Float64}, expsmoothstepsize)
 
-Plots upper bounds of the stepsizes corresponding to the simple and Bernstein upper bounds, 
+Plots upper bounds of the stepsizes corresponding to the simple and Bernstein upper bounds,
 heuristic estimation and the exact expected smoothness constant (if there are few data points).
 
 #INPUTS:\\
@@ -83,7 +90,7 @@ heuristic estimation and the exact expected smoothness constant (if there are fe
 #OUTPUTS:\\
     - None
 """
-function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, 
+function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64},
                               heuristicstepsize::Array{Float64}, hofmannstepsize::Array{Float64}, expsmoothstepsize)
     # PROBLEM: there is still a problem of ticking non integer on the xaxis
 
@@ -93,7 +100,11 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
     fontmed = 12;
     fontbig = 14;
     xlabeltxt = "batchsize";
-    
+
+    colorlist = [:blue :orange :green :red :purple];
+    markerlist = [:rect :circle :star5 :diamond :utriangle];
+    # linestylelist = [:solid :dash :dot :dashdot :dashdotdot];
+
     n = prob.numdata;
     d = prob.numfeatures;
 
@@ -101,6 +112,7 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
         plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize hofmannstepsize expsmoothstepsize], label=["heuristic" "simple" "bernstein" "hofmann" "true"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # julia 0.7 'marker=:auto,'
+             marker=markerlist, color=colorlist,
              ylim=(0, maximum(expsmoothstepsize)+minimum(bernsteinstepsize)),
              # legend=:bottomright,
              title=string(probname, ", n=", string(n), ", d=", string(d)));
@@ -108,6 +120,7 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
         plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize hofmannstepsize], label=["heuristic" "simple" "bernstein" "hofmann"],
              linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
              guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto,
+             marker=reshape([markerlist[1:3]; markerlist[end]], 1, :), color=reshape([colorlist[1:3]; colorlist[end]], 1, :),
              ylim=(0, maximum(heuristicstepsize)+minimum(bernsteinstepsize)),
              title=string(probname, ", n=", string(n), ", d=", string(d)));
     else
@@ -118,18 +131,18 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
 end
 
 """
-    plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, empcomplex::Array{Float64,1}, 
+    plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, empcomplex::Array{Float64,1},
                               opt_minibatch_simple::Int64,
                               opt_minibatch_bernstein::Int64,
                               opt_minibatch_heuristic::Int64,
                               opt_minibatch_emp::Int64)
 
-Saves the plot of the empirical total complexity. 
+Saves the plot of the empirical total complexity.
 
 #INPUTS:\\
     - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
     - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
-    - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity) 
+    - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity)
       for each of the mini-batch size (tau) over numsimu samples\\
     - **Int64** opt_minibatch_simple: simple bound optimal mini-batch size\\
     - **Int64** opt_minibatch_bernstein: Bernstein bound optimal mini-batch size\\
@@ -138,7 +151,7 @@ Saves the plot of the empirical total complexity.
 #OUTPUTS:\\
     - None
 """
-function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, empcomplex::Array{Float64,1}, 
+function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, empcomplex::Array{Float64,1},
                                    opt_minibatch_simple::Int64,
                                    opt_minibatch_bernstein::Int64,
                                    opt_minibatch_heuristic::Int64,
@@ -154,8 +167,8 @@ function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, em
 
     n = prob.numdata;
     d = prob.numfeatures;
-    
-    plot(minibatchlist, empcomplex, linestyle=:solid, 
+
+    plot(minibatchlist, empcomplex, linestyle=:solid,
          xlabel=xlabeltxt, ylabel=ylabeltxt, label="",
          xticks=(minibatchlist, minibatchlist),
          guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,

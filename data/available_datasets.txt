@@ -15,11 +15,4 @@ news20.binary
 covtype.binary
 ijcnn1_full
 slice
-mushrooms
-madelon
-w8a
-phishing
-splice
-gisette_scale
-rcv1_train
-a9a
+breast-cancer

@@ -1,17 +1,3 @@
-housing
 abalone
 YearPredictionMSD_full
 australian
-leukemia_full
-gauss-50-24-0.0_seed-1
-diagints-24-0.0-100_seed-1
-diagints-10-0.0-100_seed-1
-diagalone-24-0.0-100_seed-1
-diagalone-24-0.0-100-rotated_seed-1
-diagints-24-0.0-100-rotated_seed-1
-diagints-10-0.0-100-rotated_seed-1
-SUSY
-news20.binary
-covtype.binary
-ijcnn1_full
-slice

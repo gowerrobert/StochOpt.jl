@@ -1,6 +1,6 @@
 ### EXPERIMENT 1 & 2
 
-## Computing the upper-bounds of the expected smoothness constant (exp. 1) 
+## Computing the upper-bounds of the expected smoothness constant (exp. 1)
 ## and our step sizes (exp. 2)
 
 using JLD
@@ -16,6 +16,7 @@ using Base64 # julia 0.7
 
 ## Bash inputs
 include("../src/StochOpt.jl") # Be carefull about the path here
+default_path = "./data/";
 data = ARGS[1];
 scaling = ARGS[2];
 lambda = parse(Float64, ARGS[3]);
@@ -25,12 +26,13 @@ println("Inputs: ", data, " + ", scaling, " + ",  lambda, "\n");
 # include("./src/StochOpt.jl") # Be carefull about the path here
 # default_path = "./data/";
 # datasets = readlines("$(default_path)available_datasets.txt");
-# idx = 3; # YearPredictionMSD
+# idx = 7; # YearPredictionMSD
 # data = datasets[idx];
-# # scaling = "none";
-# scaling = "column-scaling";
-# # lambda = -1;
+# scaling = "none";
+# # scaling = "column-scaling";
+# # # lambda = -1;
 # lambda = 10^(-3);
+# # lambda = 10^(-1);
 
 Random.seed!(1);
 
@@ -46,14 +48,14 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
                       regularizor_parameter = "normalized",
                     #   regularizor_parameter = "Lbar/n",
                     #   repeat_stepsize_calculation=true, # used in minimizeFunc_grid_stepsize
-                      initial_point="zeros", # is fixed not to add more randomness 
+                      initial_point="zeros", # is fixed not to add more randomness
                       force_continue=false); # force continue if diverging or if tolerance reached
 u = unique(y);
 if length(u) < 2
     error("Wrong number of possible outputs")
 elseif length(u) == 2
     println("Binary output detected: the problem is set to logistic regression")
-    prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);  
+    prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);
 else
     println("More than three modalities in the outputs: the problem is set to ridge regression")
     prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling);
@@ -130,9 +132,9 @@ opt_minibatch_heuristic = round(Int, 1 + (prob.mu*(n-1))/(4*prob.L));
 
 ########################################### SAVNG RESULTS ########################################################
 #region
-save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
+save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst,
                          simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
-                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
+                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic,
                          opt_minibatch_exact);
 #endregion
 ##################################################################################################################
