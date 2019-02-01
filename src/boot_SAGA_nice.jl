@@ -109,10 +109,6 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
 end
 
 
-
-
-
-
 """
     reset_SAGA_nice(prob::Prob, method, options::MyOptions)
 

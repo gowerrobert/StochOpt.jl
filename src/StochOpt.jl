@@ -205,17 +205,19 @@ for method in allmethods
     include(string("descent_", method , ".jl"))
 end
 include("descent_SAGApartition.jl")
+
 #Including utilities, plotting, data analysis
 include("plot_outputs_Plots.jl")
 include("plot_SAGA_nice_Plots.jl")
 include("get_saved_stepsize.jl");
 include("load_fsol.jl");
 include("../util/matrix_scaling.jl");
+include("../util/matrix_rotation.jl");
 include("../util/preprocessing.jl");
 include("../util/power_iteration.jl");
+
 #Additional
 include("BFGS_update!.jl");
 include("calculate_SAGA_rates_and_complexities.jl");
-include("../util/matrix_rotation.jl");
 include("get_saved_stepsize.jl");
 # include("../tmp/parallel_minimizeFunc_grid_stepsize.jl")

@@ -1,4 +1,6 @@
 # A wrapper function for testing and timing iterative methods for
+# solving the empirical risk minimization problem - 2018 - Robert M. Gower
+# StochOpt Copyright (C) 2018, Robert Gower
 
 function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing, stop_at_tol::Bool=false, skip_decrease::Bool=false)
 
@@ -39,7 +41,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
 
     # load a pre-calculated best  solution
     # println("size of X: ", size(X), " ", "prob.numdata ",prob.numdata, " length(1:prob.numdata): ",length(1:prob.numdata) )
-    f0 = prob.f_eval(x, 1:prob.numdata)
+    f0 = prob.f_eval(x, 1:prob.numdata);
     fs = [f0];
     if(testprob != nothing)   # calculating the test error
         testerrors = [testerror(testprob, x)];
@@ -47,7 +49,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         testerrors = [];
     end
     d = zeros(prob.numfeatures); # Search direction vector
-    local tickcounter = 1;
+    # local tickcounter = 1; # What is this for?
     local timeaccum = 0;
     iterations = 0;
     fail = "failed";
@@ -71,7 +73,24 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         end
     end
     for iter = 1:options.max_iter
-        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
+        if iter == 1
+            time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d); # Error at the first iteration of the first launch
+
+            ## Resetting back the method
+            if(typeof(method_input) == String)
+                method = boot_method(method_input, prob, options);
+                if(method=="METHOD DOES NOT EXIST")
+                    println("FAIL: unknown method name:")
+                    return
+                end
+            else
+                method = method_input;
+                method = method.bootmethod(prob, method, options); # Previous code
+            end
+            d = zeros(prob.numfeatures); # Search direction vector
+            fail = "failed";
+        end
+        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d); # Error at the first iteration of the first launch
         x[:] = x + method.stepsize * d;
         # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));
@@ -133,6 +152,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                 end
             end
             if(isnan(sum(x)) || isnan(fs[end]) || isinf(fs[end]))
+                println("DIV NAN");
                 fail = "nan";  iterations = iter;
                 break;
             end

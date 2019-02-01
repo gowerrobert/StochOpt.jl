@@ -21,7 +21,7 @@ Load a logistic regression problem. The option input sets the regularization par
 #OUTPUTS:\\
     - **Prob** prob: considered problem, here logistic regression
 """
-function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString, opts::MyOptions; lambda=-1, scaling="column-scaling")
+function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString, opts::MyOptions; lambda=-1, scaling="column-scaling", verbose=false)
     # Load logistic regression problem
 
     name = string("lgstc_", name);
@@ -83,7 +83,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     else
         error("lambda cannot be nonpositive (except -1)");
     end
-    println("lambda = ", lambda, "\n");
+    if verbose println("lambda = ", lambda, "\n") end
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
     ## To avoid very long computations when dimensions are large mu is approximated by lambda
@@ -92,10 +92,17 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     else
         mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
     end
-    println("--------- Computing L ---------");
-    @time L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
-    println("--------- Computing L_i's ---------");
-    @time Li_s = get_Li(X, lambda);
+
+    ## Computing smoothness constants
+    if verbose
+        println("--------- Computing L ---------");
+        @time L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
+        println("--------- Computing L_i's ---------");
+        @time Li_s = get_Li(X, lambda);
+    else
+        L = get_LC(X, lambda, collect(1:numdata));
+        Li_s = get_Li(X, lambda);
+    end
     Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
     Lbar = mean(Li_s);
 
@@ -152,7 +159,7 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 function get_fsol_logistic!(prob)
     if prob.numfeatures < 10000
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8,
-                              max_time=60.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=3);
+                              max_time=60.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=1); #3
         ## Running BFGS
         options.batchsize = prob.numdata;
         method_input = "BFGS";
@@ -189,7 +196,9 @@ function get_fsol_logistic!(prob)
         # save("$(default_path)$(savename).jld", "output", output)
 
         ## Setting the true solution as the smallest of both
-        prob.fsol = minimum(output.fs);
+        nanvalues = isnan.(output.fs);
+        fs = output.fs[.!vec(nanvalues)];
+        prob.fsol = minimum(fs);
     end
     println("\n----------------------------------------------------------------------")
     @printf "For %s, fsol = %5.25f\n" prob.name prob.fsol

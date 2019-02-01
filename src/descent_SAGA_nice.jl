@@ -29,7 +29,7 @@ function descent_SAGA_nice(x::Array{Float64}, prob::Prob, options::MyOptions, sg
     # sg.aux[:] = -(prob.X[:, s])*sg.Jac[s]; # - sum_{i\in S_k} J_ {:i}^k
     # sg.aux[:] += sg.gi; # + sum_{i\in S_k} grad f_i (x^k)
     # sg.Jac[s] = scalargrad;
-    
+
     # Minus the gradient estimate = descent direction
     # Update of minus the unbiased gradient estimate: -g^k
     if(sg.unbiased)
