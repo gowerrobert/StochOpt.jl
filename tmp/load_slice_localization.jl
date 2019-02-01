@@ -4,9 +4,9 @@ using CSV
 """
     csv2libsvm(path, skipheader)
 
-Converts a csv file with COMMA-separated values in the format of the slice localization dataset, 
+Converts a csv file with COMMA-separated values in the format of the slice localization dataset,
 e.g. "feature_1,feature_2,...,feature_d,output"
-# Ref: "https://archive.ics.uci.edu/ml/datasets/Relative+location+of+CT+slices+on+axial+axis#" 
+# Ref: "https://archive.ics.uci.edu/ml/datasets/Relative+location+of+CT+slices+on+axial+axis#"
 
 #INPUTS:\\
     - **AbstractString** path: path to the csv file (with or without the extension ".csv")\\
@@ -42,15 +42,15 @@ function csv2libsvm(path::AbstractString, skipheader::Bool)
 end
 
 ## Test on pyrim (cf LIBSVM) dataset subsample
-pathtest = "/home/nidham/Downloads/datasets/subsample_pyrim";
-pathtest2 = "/home/nidham/Downloads/datasets/subsample_pyrim.csv";
+pathtest = "/home/****/Downloads/datasets/subsample_pyrim";
+pathtest2 = "/home/****/Downloads/datasets/subsample_pyrim.csv";
 
 csv2libsvm(pathtest, true)
 csv2libsvm(pathtest2, true)
 
 ## Application to slice localization
-path = "/home/nidham/Downloads/datasets/slice_localization_data";
-path2 = "/home/nidham/Downloads/datasets/slice_localization_data.csv";
+path = "/home/****/Downloads/datasets/slice_localization_data";
+path2 = "/home/****/Downloads/datasets/slice_localization_data.csv";
 
 csv2libsvm(path, true)
 csv2libsvm(path2, true)

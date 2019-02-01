@@ -23,6 +23,10 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     if(options.batchsize > 1)
         name = string(name, "-", options.batchsize);
     end
+    name = string(name, "-nice");
+
+    descent_method = descent_SAGA_nice;
+
     minibatches = [];
     Jac = zeros(prob.numfeatures, prob.numdata); # Jacobian of size d x n
     Jacsp = spzeros(1); #spzeros(prob.numfeatures, prob.numdata);
@@ -32,9 +36,6 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     stepsize = 0.0;
     probs = [];
     Z = 0.0;
-
-    name = string(name, "-nice");
-    descent_method = descent_SAGA_nice;
 
     return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice, minibatches, unbiased,
                             Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, reset_SAGA_nice);

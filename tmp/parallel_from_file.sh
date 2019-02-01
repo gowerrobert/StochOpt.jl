@@ -8,7 +8,8 @@ task () {
     local lambda=$3
     # echo >> $dataset.text
     printf "Dataset: $dataset\n"
-    nohup julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice_2.jl $dataset $scaling $lambda &> ./nohups/nohup_exp_1_2_${dataset}_${scaling}_${lambda}.out &
+    nohup julia ./tmp/exp_1_2_compute_bounds_SAGA_nice.jl $dataset $scaling $lambda &> ./nohups/nohup_exp_1_2_${dataset}_${scaling}_${lambda}.out &
+    # nohup julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice_2.jl $dataset $scaling $lambda &> ./nohups/nohup_exp_1_2_${dataset}_${scaling}_${lambda}.out &
     # julia ./tmp/parallel_exp_1_2_compute_bounds_SAGA_nice_2.jl $dataset $scaling $lambda
 }
 

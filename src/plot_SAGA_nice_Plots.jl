@@ -1,5 +1,5 @@
 """
-    plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst)
+    plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst ; showlegend::Bool=false)
 
 Plots two upper-bounds of the expected smoothness constant (simple and Bernstein),
 a heuristic estimation of it and its exact value (if there are few data points).
@@ -13,37 +13,54 @@ a heuristic estimation of it and its exact value (if there are few data points).
 #OUTPUTS:\\
     - None
 """
-function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst)
+function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}, bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, expsmoothcst ; showlegend::Bool=false)
     # PROBLEM: there is still a problem of ticking non integer on the xaxis
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./figures/";
     fontsmll = 8;
     fontmed = 12;
+    fontlegend = 13;
     fontbig = 14;
-    xlabeltxt = "batchsize";
+    xlabeltxt = "mini-batch size";
 
-    colorlist = [:blue :orange :green :red :purple];
+    labellist = [L"$L_\mathrm{practical}$" L"$L_\mathrm{simple}$" L"$L_\mathrm{Bernstein}$" L"$\mathcal{L}_1$"];
+    colorlist = [:blue :orange :green :purple :black];
     markerlist = [:rect :circle :star5 :diamond :utriangle];
+    linestylelist = [:solid :dash :dot :dashdot :auto];
 
     n = prob.numdata;
     d = prob.numfeatures;
 
     if typeof(expsmoothcst)==Array{Float64,2}
-        plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst], label=["heuristic" "simple" "bernstein" "true"],
-             linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
-             marker=reshape(markerlist[1:4], 1, :), color=reshape(colorlist[1:4], 1, :),
-             ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(expsmoothcst)),
-             title=string(probname, ", n=", string(n), ", d=", string(d)));
+        plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst],
+             legend=showlegend,
+             label=labellist,
+             xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
+             guidefont=font(fontbig), legendfont=font(fontlegend), markersize=6, linewidth=3, grid=false,
+             color=reshape(colorlist[1:4], 1, :),
+            #  marker=reshape(markerlist[1:4], 1, :),
+            #  linestyle=:auto,
+             linestyle=reshape(linestylelist[1:4], 1, :)
+            #  ,
+             )
+            #  ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(expsmoothcst)))
+            #  title=string(probname, ", n=", string(n), ", d=", string(d)))
     elseif typeof(expsmoothcst)==Nothing
-        plot(1:n, [heuristicbound simplebound bernsteinbound], label=["heuristic" "simple" "bernstein"],
+        plot(1:n, [heuristicbound simplebound bernsteinbound],
+             legend=showlegend,
+             label=reshape(labellist[1:3], 1, :),
             #  yscale=:log10, # bug in julia 0.7
-             linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,
-             marker=reshape(markerlist[1:3], 1, :), color=reshape(colorlist[1:3], 1, :),
-             ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(heuristicbound)),
-             title=string(probname, ", n=", string(n), ", d=", string(d)));
+             xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), # xticks=1:n,
+             guidefont=font(fontbig), legendfont=font(fontlegend), linewidth=3, grid=false,
+             color=reshape(colorlist[1:3], 1, :),
+            #  marker=reshape(markerlist[1:3], 1, :),
+            #  linestyle=:auto,
+             linestyle=reshape(linestylelist[1:3], 1, :)
+            #  ,
+            )
+            #  ylim=(0, max(maximum(simplebound),maximum(bernsteinbound),maximum(heuristicbound))+minimum(heuristicbound)))
+            #  title=string(probname, ", n=", string(n), ", d=", string(d)));
     else
         error("Wrong type of expsmoothcst");
     end
@@ -52,20 +69,34 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
 
     # Zoom
     if typeof(expsmoothcst)==Array{Float64,2}
-        plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst], label=["heuristic" "simple" "bernstein" "true"],
-             linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # marker=:auto, # julia 0.7
-             marker=reshape(markerlist[1:4], 1, :), color=reshape(colorlist[1:4], 1, :),
-             ylim=(0.85*min(minimum(expsmoothcst), minimum(heuristicbound)), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])),
-             title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
+        plot(1:n, [heuristicbound simplebound bernsteinbound expsmoothcst],
+             legend=showlegend,
+             label=labellist,
+             xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
+             guidefont=font(fontbig), legendfont=font(fontlegend), markersize=6, linewidth=3, grid=false, # marker=:auto, # julia 0.7
+             color=reshape(colorlist[1:4], 1, :),
+            #  marker=reshape(markerlist[1:4], 1, :),
+            #  linestyle=:auto,
+             linestyle=reshape(linestylelist[1:4], 1, :)
+             ,
+            # )
+             ylim=(0.85*min(minimum(expsmoothcst), minimum(heuristicbound)), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])));
+            #  title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
     elseif typeof(expsmoothcst)==Nothing
-        plot(1:n, [heuristicbound simplebound bernsteinbound], label=["heuristic" "simple" "bernstein"],
-             linestyle=:auto, xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), linewidth=4, grid=false,  #marker=:auto,
-             marker=reshape(markerlist[1:3], 1, :), color=reshape(colorlist[1:3], 1, :),
+        plot(1:n, [heuristicbound simplebound bernsteinbound],
+             legend=showlegend,
+             label=reshape(labellist[1:3], 1, :),
+             xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
+             guidefont=font(fontbig), legendfont=font(fontlegend), linewidth=3, grid=false,  #marker=:auto,
+             color=reshape(colorlist[1:3], 1, :),
+            #  marker=reshape(markerlist[1:3], 1, :),
+            #  linestyle=:auto,
+             linestyle=reshape(linestylelist[1:3], 1, :)
+             ,
+            # )
             #  ylim=(0.85*minimum(heuristicbound), 1.5*minimum(heuristicbound)),
-             ylim=(0.85*minimum(heuristicbound), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])),
-             title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
+             ylim=(0.85*minimum(heuristicbound), 1.5*max(simplebound[end], bernsteinbound[end], heuristicbound[end])));
+            #  title=string(probname, ", n=", string(n), ", d=", string(d)," zoom"));
     else
         error("Wrong type of expsmoothcst");
     end
@@ -75,7 +106,7 @@ end
 
 
 """
-    plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, heuristicstepsize::Array{Float64}, expsmoothstepsize)
+    plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, heuristicstepsize::Array{Float64}, expsmoothstepsize ; showlegend::Bool=false)
 
 Plots upper bounds of the stepsizes corresponding to the simple and Bernstein upper bounds,
 heuristic estimation and the exact expected smoothness constant (if there are few data points).
@@ -91,51 +122,97 @@ heuristic estimation and the exact expected smoothness constant (if there are fe
     - None
 """
 function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64},
-                              heuristicstepsize::Array{Float64}, hofmannstepsize::Array{Float64}, expsmoothstepsize)
+                              heuristicstepsize::Array{Float64}, hofmannstepsize::Array{Float64}, expsmoothstepsize ; showlegend::Bool=false)
     # PROBLEM: there is still a problem of ticking non integer on the xaxis
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./figures/";
     fontsmll = 8;
     fontmed = 12;
+    fontlegend = 13;
     fontbig = 14;
-    xlabeltxt = "batchsize";
+    xlabeltxt = "mini-batch size";
 
-    colorlist = [:blue :orange :green :red :purple];
+    labellist = [L"$\gamma_\mathrm{practical}$" L"$\gamma_\mathrm{simple}$" L"$\gamma_\mathrm{Bernstein}$" L"$\gamma_{\mathcal{L}_1}$"];
+    colorlist = [:blue :orange :green :purple :black];
     markerlist = [:rect :circle :star5 :diamond :utriangle];
-    # linestylelist = [:solid :dash :dot :dashdot :dashdotdot];
+    linestylelist = [:solid :dash :dot :dashdot :solid];
+    seriestypelist = [:line :line :line :line :scatter];
 
     n = prob.numdata;
     d = prob.numfeatures;
 
+    if n > 24
+        freq = round(Int, n/20); # 20 points
+    else
+        freq = 1;
+    end
+
+    ymaxval = maximum(heuristicstepsize)+minimum(bernsteinstepsize);
+    yminval = minimum(vcat(heuristicstepsize, simplestepsize, bernsteinstepsize, hofmannstepsize));
+    ydelta = ymaxval - yminval;
+
     if typeof(expsmoothstepsize)==Array{Float64,2}
-        plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize hofmannstepsize expsmoothstepsize], label=["heuristic" "simple" "bernstein" "hofmann" "true"],
-             linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, # julia 0.7 'marker=:auto,'
-             marker=markerlist, color=colorlist,
-             ylim=(0, maximum(expsmoothstepsize)+minimum(bernsteinstepsize)),
-             # legend=:bottomright,
-             title=string(probname, ", n=", string(n), ", d=", string(d)));
+        p = plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize expsmoothstepsize],
+                 legend=showlegend,
+                 label=labellist,
+                 xlabel=xlabeltxt, ylabel="step size", tickfont=font(fontsmll), # xticks=1:n,
+                 guidefont=font(fontbig),
+                 legendfont=font(fontlegend),
+                 markersize=6,
+                 linewidth=3,
+                 grid=false, # julia 0.7 'marker=:auto,'
+                 color=reshape(colorlist[1:4], 1, :),
+                #  marker=markerlist,
+                #  linestyle=:auto,
+                 linestyle=reshape(linestylelist[1:4], 1, :),
+                 seriestype=reshape(seriestypelist[1:4], 1, :),
+                 markerstrokecolor=:black
+                )
+                #  ,
+                #  ylim=(-10*yminval, ymaxval));
+        plot!(p, 1:freq:n, hofmannstepsize[1:freq:n],
+              legend=showlegend,
+              label=L"$\gamma_\mathrm{Hofmann}$",
+              color=colorlist[end],
+              linestyle=linestylelist[end],
+              seriestype=seriestypelist[end])
+             #  title=string(probname, ", n=", string(n), ", d=", string(d)));
     elseif typeof(expsmoothstepsize)==Nothing
-        plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize hofmannstepsize], label=["heuristic" "simple" "bernstein" "hofmann"],
-             linestyle=:auto, xlabel=xlabeltxt, ylabel="step size",tickfont=font(fontsmll), # xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, grid=false, #marker=:auto,
-             marker=reshape([markerlist[1:3]; markerlist[end]], 1, :), color=reshape([colorlist[1:3]; colorlist[end]], 1, :),
-             ylim=(0, maximum(heuristicstepsize)+minimum(bernsteinstepsize)),
-             title=string(probname, ", n=", string(n), ", d=", string(d)));
+        p = plot(1:n, [heuristicstepsize simplestepsize bernsteinstepsize],
+                 legend=showlegend,
+                 label=reshape(labellist[1:3], 1, :),
+                 xlabel=xlabeltxt, ylabel="step size", tickfont=font(fontsmll), # xticks=1:n,
+                 guidefont=font(fontbig), legendfont=font(fontlegend), markersize=6, linewidth=3, grid=false, #marker=:auto,
+                #  color=reshape([colorlist[1:3]; colorlist[end]], 1, :),
+                 color=reshape(colorlist[1:3], 1, :),
+                #  marker=reshape([markerlist[1:3]; markerlist[end]], 1, :),
+                #  linestyle=:auto,
+                #  linestyle=reshape([linestylelist[1:3]; linestylelist[end]], 1, :),
+                #  seriestype=reshape([seriestypelist[1:3]; seriestypelist[end]], 1, :),
+                 linestyle=reshape(linestylelist[1:3], 1, :),
+                 seriestype=reshape(seriestypelist[1:3], 1, :)
+                #  ,
+                )
+                #  ylim=(-10*yminval, ymaxval))
+                #  title=string(probname, ", n=", string(n), ", d=", string(d)));
+        plot!(p, 1:freq:n, hofmannstepsize[1:freq:n],
+              legend=showlegend,
+              label=L"$\gamma_\mathrm{Hofmann}$",
+              color=colorlist[end],
+              linestyle=linestylelist[end],
+              seriestype=seriestypelist[end]);
     else
         error("Wrong type of expsmoothstepsize");
     end
     savename = "-exp2-stepsizes";
-    savefig("$(default_path)$(probname)$(savename).pdf");
+    savefig(p, "$(default_path)$(probname)$(savename).pdf");
 end
 
 """
     plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, empcomplex::Array{Float64,1},
-                              opt_minibatch_simple::Int64,
-                              opt_minibatch_bernstein::Int64,
-                              opt_minibatch_heuristic::Int64,
-                              opt_minibatch_emp::Int64)
+                              tau_heuristic::Int64,
+                              tau_empirical::Int64)
 
 Saves the plot of the empirical total complexity.
 
@@ -144,39 +221,42 @@ Saves the plot of the empirical total complexity.
     - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
     - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity)
       for each of the mini-batch size (tau) over numsimu samples\\
-    - **Int64** opt_minibatch_simple: simple bound optimal mini-batch size\\
-    - **Int64** opt_minibatch_bernstein: Bernstein bound optimal mini-batch size\\
-    - **Int64** opt_minibatch_heuristic: heuristic optimal mini-batch size\\
-    - **Int64** opt_minibatch_emp: empirical optimal mini-batch size\\
+    - **Int64** tau_heuristic: heuristic optimal mini-batch size\\
+    - **Int64** tau_empirical: empirical optimal mini-batch size\\
 #OUTPUTS:\\
     - None
 """
-function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, empcomplex::Array{Float64,1},
-                                   opt_minibatch_simple::Int64,
-                                   opt_minibatch_bernstein::Int64,
-                                   opt_minibatch_heuristic::Int64,
-                                   opt_minibatch_emp::Int64)
+function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1},
+                                   empcomplex::Array{Float64,1},
+                                   tau_heuristic::Int64,
+                                   tau_empirical::Int64)
+    numsimu = 1;
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./figures/";
-    fontsmll = 8;
+
     fontmed = 12;
-    fontbig = 14;
-    xlabeltxt = "batchsize";
+    fontbig = 15;
+    xlabeltxt = "mini-batch size";
     ylabeltxt = "empirical total complexity";
 
     n = prob.numdata;
     d = prob.numfeatures;
 
-    plot(minibatchlist, empcomplex, linestyle=:solid,
+    labellist = [latexstring("\$b_\\mathrm{empirical} = $tau_empirical\$"),
+                 latexstring("\$b_\\mathrm{practical} = $tau_heuristic\$")];
+
+    plot(minibatchlist, empcomplex, linestyle=:solid, color=:black,
+         xaxis=:log, yaxis=:log,
          xlabel=xlabeltxt, ylabel=ylabeltxt, label="",
          xticks=(minibatchlist, minibatchlist),
-         guidefont=font(fontbig), linewidth=4, grid=false, #marker=:auto,
-         title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)));
-    vline!([opt_minibatch_emp+0.04], line=(:auto, 3), color=1, label="empirical");
-    vline!([opt_minibatch_simple-0.04], line=(:auto, 3), color=:red, label="simple", legendtitle="Optimal mini-batch size");
-    vline!([opt_minibatch_bernstein-0.02], line=(:auto, 3), color=:black, label="bernstein");
-    vline!([opt_minibatch_heuristic+0.02], line=(:auto, 3), color=:purple, label="heuristic");
+         tickfont=font(fontmed),
+         guidefont=font(fontbig), linewidth=3, grid=false);
+        #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)));
+    vline!([tau_empirical-0.02], line=(:dash, 3), color=:blue, label=labellist[1],
+           legendfont=font(fontbig), legend=:best); #:legend
+    #legendtitle="Optimal mini-batch size");
+    vline!([tau_heuristic+0.02], line=(:dot, 3), color=:red, label=labellist[2]);
     savename = "-exp4_1-empcomplex-$(numsimu)-avg";
     savefig("$(default_path)$(probname)$(savename).pdf");
 end

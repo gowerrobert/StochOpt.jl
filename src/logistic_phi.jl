@@ -1,4 +1,3 @@
-## Implements the function phi(t) = e^t/(1+e^t) in a numerically efficient way
 function logistic_phi(t::Array{Float64})
     idx = t .> 0;
     out = zeros(size(t));

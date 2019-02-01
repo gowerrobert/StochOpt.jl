@@ -8,6 +8,7 @@ using SparseArrays # julia 0.7
 using LinearAlgebra
 using Printf
 using Random
+using LaTeXStrings
 mutable struct MyOptions # julia 0.7
     tol::Float64
     aux::Float64
@@ -198,12 +199,12 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SAGA_nice", "SPIN", "SAGA_partition", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
+allmethods = ["SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
 for method in allmethods
     include(string("boot_", method , ".jl"))
     include(string("descent_", method , ".jl"))
 end
-include("descent_SAGA.jl")  # Need to remove this eventually
+include("descent_SAGApartition.jl")
 #Including utilities, plotting, data analysis
 include("plot_outputs_Plots.jl")
 include("plot_SAGA_nice_Plots.jl")

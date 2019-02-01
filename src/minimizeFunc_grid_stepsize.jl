@@ -22,7 +22,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
         beststeps_found = zeros(options.rep_number);
         start_step = 1;
         for expnum = 1:options.rep_number
-            println("\n----------------> Experiment # ", expnum);
+            println("\n---------------------------------------------> Experiment # ", expnum);
             # minfval = 1.0; # Makes no sense, completely arabitrary value..
             minfval = Inf;
             thelastonebetter = 0;
@@ -76,8 +76,8 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
 
     save("$(default_path)$(savename).jld", "output", outputfirst)
 
-    # println("\nbest steps:");
-    # println(beststeps_found);
+    println("\nbest steps:");
+    println(beststeps_found);
     println("mode best step:");
     println(beststep);
 

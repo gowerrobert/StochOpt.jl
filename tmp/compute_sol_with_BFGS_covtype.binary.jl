@@ -9,20 +9,32 @@ using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
 
-include("./src/StochOpt.jl") # Be carefull about the path here
-
+## Bash inputs
+include("../src/StochOpt.jl") # Be carefull about the path here
 default_path = "./data/";
+data = ARGS[1];
+scaling = ARGS[2];
+lambda = parse(Float64, ARGS[3]);
+stepsize_multiplier = parse(Float64, ARGS[4]);
+println("Inputs: ", data, " + ", scaling, " + ", lambda, " + stepsize_multiplier = ",  stepsize_multiplier, "\n");
+
+## Manual inputs
+# include("./src/StochOpt.jl") # Be carefull about the path here
+# default_path = "./data/";
+# datasets = readlines("$(default_path)available_datasets.txt");
+# idx = 6; # YearPredictionMSD
+# data = datasets[idx];
+# # scaling = "none";
+# scaling = "column-scaling";
+# # lambda = -1;
+# # lambda = 10^(-3);
+# lambda = 10^(-1);
+# stepsize_multiplier = 2^(11.0);
 
 Random.seed!(1);
 
 ### LOADING DATA ###
 println("--- Loading data ---");
-datasets = readlines("$(default_path)available_datasets.txt");
-
-## Only loading datasets, no data generation
-idx = 15; # covtype.binary
-data = datasets[idx];
-
 @time X, y = loadDataset(default_path, data);
 
 ### SETTING UP THE PROBLEM ###
@@ -31,24 +43,21 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
                     #   regularizor_parameter = "1/num_data", # fixes lambda
                       regularizor_parameter = "normalized",
                     #   regularizor_parameter = "Lbar/n",
-                      initial_point="zeros", # is fixed not to add more randomness 
+                      initial_point="zeros", # is fixed not to add more randomness
                       force_continue=false); # force continue if diverging or if tolerance reached
 
-@time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");
+@time prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);
+
 
 ########################################### covtype.binary ############################################
 #region
 ## Computing the solution with a serial gridsearch
-@time get_fsol_logistic!(prob)
+# @time get_fsol_logistic!(prob)
 
-## BFGS, step = 2^21.0 , 200  epochs
-## BFGS-a-581012.0-0.01: step = 2^21.0 , 200  epochs
-## fsol = 4.9156389085785536e-11
-
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
-                      max_time=60.0*60.0, max_epocs=300, force_continue=true);
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=100, exacterror=false, max_iter=10^8,
+                      max_time=60.0*60.0, max_epocs=2500, force_continue=true);
 ## Running BFGS
-options.stepsize_multiplier = 2^(21.0);
+options.stepsize_multiplier = stepsize_multiplier;
 options.batchsize = prob.numdata;
 method_input = "BFGS";
 output = minimizeFunc(prob, method_input, options);
@@ -59,7 +68,7 @@ a = nothing;
 save("$(default_path)$(savename).jld", "output", output)
 
 ## Setting the true solution as the smallest of both
-prob.fsol = minimum(output.fs);
+prob.fsol = minimum(output.fs[.!isnan.(output.fs)]);
 println("\n----------------------------------------------------------------------")
 @printf "For %s, fsol = %f\n" prob.name prob.fsol
 println("----------------------------------------------------------------------\n")

@@ -13,6 +13,7 @@ using Printf # julia 0.7
 using LinearAlgebra # julia 0.7
 using Statistics # julia 0.7
 using Base64 # julia 0.7
+using LaTeXStrings
 
 ## Bash inputs
 include("../src/StochOpt.jl") # Be carefull about the path here
@@ -26,10 +27,10 @@ println("Inputs: ", data, " + ", scaling, " + ",  lambda, "\n");
 # include("./src/StochOpt.jl") # Be carefull about the path here
 # default_path = "./data/";
 # datasets = readlines("$(default_path)available_datasets.txt");
-# idx = 7; # YearPredictionMSD
+# idx = 10;
 # data = datasets[idx];
-# scaling = "none";
-# # scaling = "column-scaling";
+# # scaling = "none";
+# scaling = "column-scaling";
 # # # lambda = -1;
 # lambda = 10^(-3);
 # # lambda = 10^(-1);
@@ -79,7 +80,7 @@ simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothn
 println("\n--- Ploting upper bounds ---");
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 pyplot()
-plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst, showlegend=false);
 
 # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
 if(n<=datathreshold)
@@ -105,7 +106,7 @@ simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmooth
 println("\n--- Ploting stepsizes ---");
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 pyplot()
-plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize);
+plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize, showlegend=false);
 #endregion
 ##################################################################################################################
 
@@ -138,3 +139,5 @@ save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound
                          opt_minibatch_exact);
 #endregion
 ##################################################################################################################
+
+println("\n--- FINISHED ---");

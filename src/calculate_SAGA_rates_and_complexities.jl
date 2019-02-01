@@ -97,7 +97,7 @@ function calculate_complex_SAGA_nice(prob::Prob, options::MyOptions, tauseq::Vec
         # display(string("Calculating for tau =", tau))
         print("Calculating for tau = ", tau, "\n");
 
-        ## Computing the right-hand side term of the complexity from RMG, Richtarik and Bach(2018), eq. (103)
+        ## Computing the right-hand side term of the complexity from *****
         # Rsides[tau] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
         Rsides[tauidx] = (((n-tau)/(tau*(n-1)))*Lmax + (mu/4)*(n/tau))*(4/mu);
 
@@ -170,8 +170,8 @@ end
 """
     get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24)
 
-Compute two upper-bounds of the expected smoothness constant (simple and Bernstein), 
-a heuristic estimation of it and its exact value (if there are few data points) for 
+Compute two upper-bounds of the expected smoothness constant (simple and Bernstein),
+a heuristic estimation of it and its exact value (if there are few data points) for
 each mini-batch size ``τ`` from 1 to n.
 
 #INPUTS:\\
@@ -187,7 +187,7 @@ each mini-batch size ``τ`` from 1 to n.
 function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
     n = prob.numdata;
     d = prob.numfeatures;
-    
+
     if(n <= datathreshold)
         computeexpsmooth = true;
         expsmoothcst = zeros(n, 1);
@@ -229,35 +229,35 @@ end
 """
     get_stepsize_bounds(prob::Prob, datathreshold::Int64=24)
 
-Compute upper bounds of the stepsize based on the simple bound, the Bernstein bound, 
-our heuristic and the exact expected smoothness constant for each mini-batch size 
+Compute upper bounds of the stepsize based on the simple bound, the Bernstein bound,
+our heuristic and the exact expected smoothness constant for each mini-batch size
 ``τ`` from 1 to n.
 
 #INPUTS:\\
-    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression... 
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
       (see src/StochOpt.jl)\\
     - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
     - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
     - nx1 **Array{Float64,2}** or **Nothing** expsmoothcst: exact expected smoothness constant\\
 #OUTPUTS:\\
-    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to 
+    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to
       the simple upper bound\\
-    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to 
+    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to
       the Bernstein upper bound\\
-    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to 
+    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to
       the heuristic\\
     - nx1 **Array{Float64,2}** hofmannstepsize: optimal step size given by Hofmann et. al. 2015\\
-    - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact stepsize corresponding to 
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact stepsize corresponding to
       the exact expected smoothness constant\\
 """
-function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64}, 
-                             bernsteinbound::Array{Float64}, heuristicbound::Array{Float64}, 
+function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
+                             bernsteinbound::Array{Float64}, heuristicbound::Array{Float64},
                              expsmoothcst)
     n = prob.numdata;
     rho_over_n = ( n .- (1:n) ) ./ ( (1:n).*(n-1) ); # Sketch residual divided by n
     rightterm = rho_over_n*prob.Lmax + ((prob.mu*n)/(4*(1:n)))'; # Right-hand side term in the max
-    
+
     if typeof(expsmoothcst)==Array{Float64,2}
         expsmoothstepsize = 0.25 .* (1 ./ max.(expsmoothcst, rightterm) );
     else
@@ -274,34 +274,34 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
 end
 
 """
-    save_SAGA_nice_constants(prob, data, 
-                             simplebound, bernsteinbound, 
-                             heuristicbound, expsmoothcst, 
-                             simplestepsize, bernsteinstepsize, 
+    save_SAGA_nice_constants(prob, data,
+                             simplebound, bernsteinbound,
+                             heuristicbound, expsmoothcst,
+                             simplestepsize, bernsteinstepsize,
                              heuristicstepsize, expsmoothstepsize,
-                             opt_minibatch_simple, opt_minibatch_bernstein, 
+                             opt_minibatch_simple, opt_minibatch_bernstein,
                              opt_minibatch_heuristic, opt_minibatch_exact)
 
-Saves the problem, caracteristic constants of the problem, the upper bounds of the expected 
-smoothness constant, and corresponding estimation of the optimal mini-batch size. 
-It also saves the exact expected smoothness constant and its corresponding 
+Saves the problem, caracteristic constants of the problem, the upper bounds of the expected
+smoothness constant, and corresponding estimation of the optimal mini-batch size.
+It also saves the exact expected smoothness constant and its corresponding
 optimal mini-batch size (both are of type Nothing if not available).
 
 #INPUTS:\\
-    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression... 
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
       (see src/StochOpt.jl)\\
     - String data: selected data (artificially generated or dataset)\\
     - nx1 **Array{Float64,2}** simplebound: simple upper bound\\
     - nx1 **Array{Float64,2}** bernsteinbound: Bernstein upper bound\\
     - nx1 **Array{Float64,2}** heuristicbound: heuristic estimation\\
     - nx1 **Array{Float64,2}** or **Nothing** expsmoothcst: exact expected smoothness constant\\
-    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to 
+    - nx1 **Array{Float64,2}** simplestepsize: lower bound of the stepsize corresponding to
       the simple upper bound\\
-    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to 
+    - nx1 **Array{Float64,2}** bernsteinstepsize: lower bound of the stepsize corresponding to
       the Bernstein upper bound\\
-    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to 
+    - nx1 **Array{Float64,2}** heuristicstepsize: lower bound of the stepsize corresponding to
       the heuristic\\
-    - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact stepsize corresponding to 
+    - nx1 **Array{Float64,2}** or **Nothing** expsmoothstepsize: exact stepsize corresponding to
       the exact expected smoothness constant\\
     - **Int64** opt\\_minibatch\\_simple: simple bound optimal mini-batch size estimate\\
     - **Int64** opt\\_minibatch\\_bernstein: bernstein bound optimal mini-batch size estimate\\
@@ -310,12 +310,12 @@ optimal mini-batch size (both are of type Nothing if not available).
 #OUTPUTS:\\
     - None
 """
-function save_SAGA_nice_constants(prob::Prob, data::String, 
-                                  simplebound::Array{Float64}, bernsteinbound::Array{Float64}, 
-                                  heuristicbound::Array{Float64}, expsmoothcst, 
-                                  simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64}, 
+function save_SAGA_nice_constants(prob::Prob, data::String,
+                                  simplebound::Array{Float64}, bernsteinbound::Array{Float64},
+                                  heuristicbound::Array{Float64}, expsmoothcst,
+                                  simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64},
                                   heuristicstepsize::Array{Float64}, expsmoothstepsize,
-                                  opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64, 
+                                  opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64,
                                   opt_minibatch_heuristic::Int64, opt_minibatch_exact)
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_"); # julia 0.7
     default_path = "./data/";
@@ -334,20 +334,20 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
     end
 
     ## Saving the problem and the related constants
-    save("$(default_path)$(probname)$(savename).jld", 
+    save("$(default_path)$(probname)$(savename).jld",
          "mu", prob.mu, "L", prob.L, "Lmax", prob.Lmax, "Lbar", prob.Lbar, "Li_s", Li_s,
-         "simplebound", simplebound, "bernsteinbound", bernsteinbound, 
-         "heuristicbound", heuristicbound, "expsmoothcst", expsmoothcst, 
-         "simplestepsize", simplestepsize, "bernsteinstepsize", bernsteinstepsize, 
+         "simplebound", simplebound, "bernsteinbound", bernsteinbound,
+         "heuristicbound", heuristicbound, "expsmoothcst", expsmoothcst,
+         "simplestepsize", simplestepsize, "bernsteinstepsize", bernsteinstepsize,
          "heuristicstepsize", heuristicstepsize, "expsmoothstepsize", expsmoothstepsize,
-         "opt_minibatch_simple", opt_minibatch_simple, "opt_minibatch_bernstein", opt_minibatch_bernstein, 
+         "opt_minibatch_simple", opt_minibatch_simple, "opt_minibatch_bernstein", opt_minibatch_bernstein,
          "opt_minibatch_heuristic", opt_minibatch_heuristic, "opt_minibatch_exact", opt_minibatch_exact);
 end
 
 """
     compute_skip_error(n::Int64, minibatch_size::Int64, skip_multiplier::Float64=0.02)
 
-Compute the number of skipped iterations between two error estimation. 
+Compute the number of skipped iterations between two error estimation.
 The computation rule is arbitrary, but depends on the dimension of the problem and on the mini-batch size.
 
 #INPUTS:\\
@@ -370,7 +370,7 @@ function compute_skip_error(n::Int64, minibatch_size::Int64, skip_multiplier::Fl
 end
 
 """
-    simulate_SAGA_nice(prob, minibatchlist, numsimu=1, 
+    simulate_SAGA_nice(prob, minibatchlist, numsimu=1,
                        skipped_errors=1, skip_multiplier=0.02)
 
 Runs several times (numsimu) mini-batch SAGA with nice sampling for each
@@ -391,7 +391,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
                             skipped_errors::Int64=-1, skip_multiplier::Float64=0.02)
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/tau
-    
+
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./data/";
 
@@ -413,7 +413,15 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
         else
             options.skip_error_calculation = skipped_errors;
         end
-        
+
+        println("---------------------------------- MINI-BATCH ------------------------------------------");
+        println(tau);
+        println("----------------------------------------------------------------------------------------");
+
+        println("---------------------------------- SKIP_ERROR ------------------------------------------");
+        println(options.skip_error_calculation);
+        println("----------------------------------------------------------------------------------------");
+
         n = prob.numdata;
         L = prob.L;
         Lmax = prob.Lmax;

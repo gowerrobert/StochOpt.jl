@@ -13,7 +13,7 @@ addprocs(4)
     using LinearAlgebra
     using Statistics
     using Base64
-    
+
     using SharedArrays
 
     # include("./src/StochOpt.jl") # Be carefull about the path here
@@ -25,7 +25,6 @@ end
 
 ########################################### Exploring parallelization ###########################################
 #region
-# @everywhere include("/home/nidham/phd/moving2julia7/StochOpt.jl/tmp/count_heads.jl")
 # a = @spawn count_heads(100000000)
 # println("a: ", a)
 # b = @spawn count_heads(100000000)
@@ -75,12 +74,12 @@ data = datasets[idx];
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
-options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=10^8, 
+options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=10^8,
                       regularizor_parameter = "normalized", initial_point="zeros", force_continue=false);
 
 @time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");
 
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
                       max_time=60.0*1.0, max_epocs=1, repeat_stepsize_calculation=true, rep_number=3);
 options.batchsize = 100;
 method_input = "SVRG";

@@ -32,14 +32,14 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     numepochs = output.iterations*output.epocsperiter;
     lf_all = length(output.fs);
     epochs = (numepochs/(lf_all-1)).*(0:(lf_all-1));
-    
+
     rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol); # the relative loss might be negative if we reach a better solution
     fs = output.fs[rel_loss.>0];
     lf = length(fs);
     bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
-    plt = plot(epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), 
+    plt = plot(epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol),
                xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
-               linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed), 
+               linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(fontmed),
                markersize=6, linewidth=4, marker=:auto, grid=false)
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
@@ -50,18 +50,18 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         numepochs = output.iterations*output.epocsperiter;
         lf_all = length(output.fs);
         epochs = (numepochs/(lf_all-1)).*(0:(lf_all-1));
-        
+
         rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol); # the relative loss might be negative if we reach a better solution
         fs = output.fs[rel_loss.>0];
         lf = length(fs);
         bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
-        plot!(plt, epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), 
-              xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll), 
+        plot!(plt, epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol),
+              xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
               guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,  grid=false)
     end
     println("./figures/$(probname)-epoc.pdf");
     savefig(plt, "./figures/$(probname)-epoc.pdf");
-    
+
 
     # plotting times
     output = OUTPUTS[1];
@@ -86,7 +86,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     end
     println("./figures/$(probname)-time.pdf");
     savefig("./figures/$(probname)-time.pdf");
-    
+
 
     if(!isempty(OUTPUTS[1].testerrors)) # plot test error as well
         output = OUTPUTS[1];

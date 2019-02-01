@@ -125,9 +125,9 @@ opt_minibatch_heuristic = round(Int, 1 + (mu*(n-1))/(4*L));
 
 
 ########################################### SAVNG RESULTS ########################################################
-save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
+save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst,
                          simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
-                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
+                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic,
                          opt_minibatch_exact);
 ##################################################################################################################
 
@@ -190,7 +190,7 @@ println(tauseq);
 ### COMPUTE SAGA-NICE THEORETICAL COMPLEXITIES ###
 println("\n--- Compute SAGA-nice theoretical complexities (iteration and total) ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
-savenamecompperso = string(savename,"-complexities-nidham");
+savenamecompperso = string(savename,"-complexities");
 itercomp = 0.0; Lsides = 0.0; Rsides = 0.0;
 try
     itercomp, Lsides, Rsides = load("$(default_path)$(savenamecompperso).jld", "itercomp", "Lsides", "Rsides");

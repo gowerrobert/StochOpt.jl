@@ -21,8 +21,6 @@ using SparseArrays # julia 0.7
 using Statistics # julia 0.7
 
 # this needs to be changed to your personal path.
-#default_path = "/local/rgower/git/online_saga/julia-online-SAGA/data/" #/local/rgower/libsvmdata/"
-# default_path = "./data/"; #"/home/robert/git/online_saga/julia-online-SAGA/data/"
 
 function initDetails(default_path::AbstractString) # creates a blank details dictionary
     details = Dict();

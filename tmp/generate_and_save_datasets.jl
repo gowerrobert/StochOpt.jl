@@ -19,10 +19,10 @@ seed = string("_seed-", seed);
 
 ### LOADING DATA ###
 # data = "gaussian";
-data = "diagonal";
-# data = "alone_eig_val";
+# data = "diagonal";
+data = "alone_eig_val";
 
-numdata = 10;
+numdata = 24;
 numfeatures = 50; # useless for gen_diag_*
 
 rotate = true; # keeping same eigenvalues, but removing the diagonal structure of X

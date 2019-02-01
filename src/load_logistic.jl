@@ -92,8 +92,10 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     else
         mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
     end
-    L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
-    Li_s = get_Li(X, lambda);
+    println("--------- Computing L ---------");
+    @time L = get_LC(X, lambda, collect(1:numdata)); # L = eigmax(prob.X*prob.X')/n + prob.lambda;
+    println("--------- Computing L_i's ---------");
+    @time Li_s = get_Li(X, lambda);
     Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
     Lbar = mean(Li_s);
 
@@ -103,19 +105,19 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     #         Hess_opt(x,S,v) = ((1./length(S))*logistic_hessv_sub(Xt,y,x,S,v)+(reg)*bsxfun(@times, huber_hess_kimon(x,opts.hubermu), v) );
     #if opts.regularizor =="L2"# is the default
     f_eval(x, S)                = ((1. / length(S))*logistic_eval(X[:,S], y[S], x) + (lambda)*(0.5)*norm(x)^2); # julia 0.7
-    g_eval(x, S)                = ((1. / length(S))*logistic_grad(X[:,S], y[S], x) + (lambda).*x); # julia 0.7
+    g_eval(x, S)                = ((1. / length(S))*logistic_grad(X[:,S], y[S], x) .+ (lambda).*x); # julia 0.7
     g_eval!(x, S, g)            = logistic_grad!(X[:,S], y[S], x, lambda, length(S), g);
     Jac_eval!(x, S, Jac)        = logistic_Jac!(X[:,S], y[S], x, lambda, S, Jac);
     scalar_grad_eval(x, S)      = logistic_scalar_grad(X[:,S], y[S], x)
     scalar_grad_hess_eval(x, S) = logistic_scalar_grad_hess(X[:,S], y[S], x)
-    Hess_eval(x, S)             = ((1 ./ length(S)) .*logistic_hess(X[:,S], y[S], x) + (lambda).*sparse(I, numfeatures, numfeatures)); # julia 0.7
+    Hess_eval(x, S)             = ((1 ./ length(S))*logistic_hess(X[:,S], y[S], x).+ (lambda).*eye(numfeatures)); # julia 0.7
     Hess_eval!(x, S, g, H)      = logistic_hess!(X[:,S], y[S], x, lambda, length(S), g, H) ;
     Hess_C(x, S, C)             = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
     Hess_C!(x, S, C, g, HC)     = logistic_hessC!(X[:,S], y[S], x, C, lambda, length(S), g, HC);
     Hess_C2(x, S, C)            = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S));
-    Hess_opt(x, S, v)           = ((1 ./ length(S)) .*logistic_hessv(X[:,S], y[S], x, v) + (lambda).*v); # julia 0.7
+    Hess_opt(x, S, v)           = ((1 ./ length(S))*logistic_hessv(X[:,S], y[S], x, v) .+ (lambda).*v); # julia 0.7
     Hess_opt!(x, S, v, g, Hv)   = logistic_hessv!(X[:,S], y[S], x, v, lambda, length(S), g, Hv);
-    Hess_D(x, S)                = ((1 ./ length(S)) .*logistic_hessD(X[:,S], y[S], x) .+ (lambda).*ones(numfeatures)); # julia 0.7
+    Hess_D(x, S)                = ((1 ./ length(S))*logistic_hessD(X[:,S], y[S], x) .+ (lambda).*ones(numfeatures)); # julia 0.7
     Hess_D!(x, S, g, D)         = logistic_hessD!(X[:,S], y[S], x, lambda, length(S), g, D);
     # Hess_vv(x, S, v)            = ((1./length(S))*logistic_hessvv(X[:,S], y[S], x, v) .+ (lambda).*v'*v);
     #else
@@ -127,12 +129,12 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
         Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
 
     ## Try to load the solution of the problem, if already computed
-    # load_fsol!(opts, prob);
-    #
-    # if prob.fsol == 0.0
-    #     println("Need to compute the solution of the problem")
-    #     get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
-    # end
+    load_fsol!(opts, prob);
+
+    if prob.fsol == 0.0
+        println("Need to compute the solution of the problem")
+        # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
+    end
 
     return prob
 end
@@ -150,15 +152,18 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
 function get_fsol_logistic!(prob)
     if prob.numfeatures < 10000
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8,
-                              max_time=60.0*60.0*3.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=3);
+                              max_time=60.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=3);
         ## Running BFGS
         options.batchsize = prob.numdata;
         method_input = "BFGS";
+        # grid = [2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5)];
+        # output = minimizeFunc_grid_stepsize(prob, method_input, options, grid=grid);
         output = minimizeFunc_grid_stepsize(prob, method_input, options);
 
         ## Running accelerated BFGS
         options.embeddim = [prob.numdata, 0.01];  #[0.9, 5];
         method_input = "BFGS_accel";
+        # output1 = minimizeFunc_grid_stepsize(prob, method_input, options, grid=grid);
         output1 = minimizeFunc_grid_stepsize(prob, method_input, options);
         OUTPUTS = [output; output1];
 
@@ -170,7 +175,7 @@ function get_fsol_logistic!(prob)
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
     else
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8,
-                              max_time=60.0*60.0*3.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=3);
+                              max_time=60.0*2.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=3);
         # println("Dimensions are too large too compute the solution using BFGS, using SVRG instead")
         ## Running SVRG
         # options.batchsize = 1;
@@ -178,11 +183,6 @@ function get_fsol_logistic!(prob)
         # options.batchsize = prob.numdata;
         method_input = "SVRG";
         output = minimizeFunc_grid_stepsize(prob, method_input, options);
-
-        ## Step size setp by hand after a 120s gridsearch attempt
-        # options.force_continue = true;
-        # options.stepsize_multiplier = 0.5; # for news20.binary
-        # output = minimizeFunc(prob, method_input, options);
 
         # default_path = "./data/";
         # _, savename = get_saved_stepsize(prob.name, method_input, options)

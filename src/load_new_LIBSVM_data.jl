@@ -5,8 +5,8 @@ default_path = "./data/";
 initDetails(default_path)
 
 
-datasets = ["phishing", "splice", "gisette_scale", "rcv1_train", "a9a"] #  w1a, SUSY, pendigits, heart, YearPredictionMSD_full, leukemia_full, news20.binary, covtype.binary, ijcnn1_full
-# leukemia_full is the concatenation of leu and leu.t (resp. training and test sets)
+datasets = ["ijcnn1_full"];
+# already loaded: "covtype_binary", "YearPredictionMSD_full", "rcv1_full", "news20_binary", "slice", "real-sim"
 
 ## WARNING: be careful and select properly the following setting!
 # classification = false; # Regression

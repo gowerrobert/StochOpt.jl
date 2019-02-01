@@ -1,7 +1,6 @@
 # A wrapper function for testing and timing iterative methods for
-# solving the empirical risk minimization problem - 2018 - Robert M. Gower
-# StochOpt Copyright (C) 2018, Robert Gower
-function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing, stop_at_tol::Bool=false)
+
+function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing, stop_at_tol::Bool=false, skip_decrease::Bool=false)
 
     if(options.initial_point == "randn") # set initial point
         x = randn(prob.numfeatures);
@@ -52,6 +51,8 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     local timeaccum = 0;
     iterations = 0;
     fail = "failed";
+
+    skip_error_calculation = options.skip_error_calculation;
     ## Print head
     # if(options.printiters)
     #     println("------------------------------------------------------------------")
@@ -75,7 +76,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));
         timeaccum = timeaccum + time_elapsed; # Keeps track of time accumulated at every iteration
-        if(mod(iter, options.skip_error_calculation) == 0)
+        if(mod(iter, skip_error_calculation) == 0)
             fs = [fs prob.f_eval(x, 1:prob.numdata)];
             # println("fs[end] = ", fs[end]);
             if(testprob != nothing) # calculating the test error
@@ -134,6 +135,14 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             if(isnan(sum(x)) || isnan(fs[end]) || isinf(fs[end]))
                 fail = "nan";  iterations = iter;
                 break;
+            end
+
+            if ((fs[end]-prob.fsol)/(f0-prob.fsol) < 2*options.tol) && skip_decrease
+                println("Decreasing the skip_error parameter");
+                println("--------------- Before: ", skip_error_calculation);
+                skip_error_calculation = round(Int, skip_error_calculation/2);
+                println("--------------- After: ", skip_error_calculation);
+                skip_decrease = false;
             end
         end # End printing and function evaluation if
         if(timeaccum > options.max_time || iter*method.epocsperiter > options.max_epocs)

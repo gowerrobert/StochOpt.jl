@@ -23,7 +23,7 @@ using Distributed
     using Formatting
     using SharedArrays
 
-    include("/home/nidham/phd/moving2julia7/StochOpt.jl/src/StochOpt.jl") # Be carefull about the path here
+    include("/home/****/phd/moving2julia7/StochOpt.jl/src/StochOpt.jl") # Be carefull about the path here
 end
 
 # @everywhere include("./src/StochOpt.jl")
@@ -53,7 +53,7 @@ julia> closest_power(204)
 function closest_power_of_ten(integer::Int64)
     if integer < 0
         closest_power = 10.0 ^ (1 - length(string(integer)));
-    else 
+    else
         closest_power = 10 ^ (length(string(integer)) - 1);
     end
     return closest_power
@@ -271,13 +271,13 @@ heuristicbound = ( n*(tau_heuristic-1)*L + (n-tau_heuristic)*Lmax ) / ( tau_heur
 step_heuristic = 0.25 / max(heuristicbound, rightterm);
 
 ## Calculating best grid search step size for SAGA_nice with batchsize >= 1
-options = set_options(tol=10.0^(-6), 
-                      max_iter=10^8, 
-                      max_epocs=10^8, 
-                      max_time=10.0^4, 
+options = set_options(tol=10.0^(-6),
+                      max_iter=10^8,
+                      max_epocs=10^8,
+                      max_time=10.0^4,
                       skip_error_calculation=10^5,
-                      regularizor_parameter = "normalized", 
-                      initial_point="zeros", 
+                      regularizor_parameter = "normalized",
+                      initial_point="zeros",
                       force_continue=false,
                       batchsize=tau_heuristic);
 if options.batchsize == 1
@@ -328,12 +328,12 @@ elapsedtime = SharedArray{Float64}(length(method_names), numsimu);
 
 @sync @distributed for idxmethod in 1:length(stepsizes)
     @sync @distributed for idxsimu=1:numsimu
-        options = set_options(tol=10.0^(-6), 
+        options = set_options(tol=10.0^(-6),
                       max_time=10.0^4,
                       stepsize_multiplier=fetch(stepsizes[idxmethod]),
                       skip_error_calculation=fetch(skip_error[idxmethod]), # compute a skip error for each step size
                       batchsize=fetch(mini_batch_sizes[idxmethod]),
-                      max_iter=10^8, 
+                      max_iter=10^8,
                       max_epocs=10^8,
                       regularizor_parameter="normalized", initial_point="zeros", force_continue=true, printiters=false);
         println("\n----- Method #", idxmethod, ", ----- Simulation #", idxsimu, " -----");
@@ -387,11 +387,11 @@ savename = string(probname, "-exp3_2-empcomplex-", numsimu, "-avg");
 if numsimu == 1
     save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS,
          "method_names", method_names, "skip_error", skip_error,
-        "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes, 
+        "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes,
         "empcomplex", empcomplex);
 else
     save("$(default_path)$(savename).jld", "method_names", method_names, "skip_error", skip_error,
-         "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes, 
+         "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes,
          "itercomplex", itercomplex, "empcomplex", empcomplex);
 end
 
@@ -400,7 +400,7 @@ if numsimu == 1
     fails = [OUTPUTS[i].fail for i=1:length(stepsizes)*numsimu];
     if all(s->(string(s)=="tol-reached"), fails)
         println("Tolerance always reached");
-    else 
+    else
         error("Tolerance should be reached for all simulations");
     end
 end
@@ -425,10 +425,10 @@ end
 
 # ############################## AVERAGE ITERATION COMPLEXITIES THROUGH FITTING CURVES #############################
 # # region Extracting the average iteration complexity through average angle between the tolerance horizontal line and a fitted affine curve
-# withintercept = true; # if true, then an intercept is fitted, else, there it is set to 0 
+# withintercept = true; # if true, then an intercept is fitted, else, there it is set to 0
 # itercomplex2 = [];
 # if withintercept
-#     alphahat = []; # value of the intercept 
+#     alphahat = []; # value of the intercept
 # else
 #     alphahat = zeros(length(method_names)*numsimu); # null intercept
 # end
@@ -497,8 +497,8 @@ end
 # # logyout = log.((output.fs'.-prob.fsol)./(output.fs[1].-prob.fsol));
 # # colorlist = distinguishable_colors(7);
 # # p = plot(xout, logyout, line=(2,:dash), label="simu #1", c=colorlist[1], legend=:topright);
-# # plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+1] + betahat[(tauidx-1)*numsimu+1].*longetsxout, 
-# #           line=(4,:solid), c=colorlist[1], label="lin approx #1", xlabel="iterations", 
+# # plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+1] + betahat[(tauidx-1)*numsimu+1].*longetsxout,
+# #           line=(4,:solid), c=colorlist[1], label="lin approx #1", xlabel="iterations",
 # #           ylabel="log(residual)", title=string("\$", output.name, "\$"));
 # # for j=2:numsimu
 # #     println(j);
@@ -508,7 +508,7 @@ end
 # #     ## Plotting the SAGA-nice simulation
 # #     plot!(p, xout, logyout, line=(2,:dash), c=colorlist[j], label=string("simu #", j));
 # #     ## Plotting the corresponding fitted line
-# #     plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+j] + betahat[(tauidx-1)*numsimu+j].*longetsxout, 
+# #     plot!(p, longetsxout, alphahat[(tauidx-1)*numsimu+j] + betahat[(tauidx-1)*numsimu+j].*longetsxout,
 # #           line=(4,:solid), c=colorlist[j], label=string("lin approx #", j));
 # # end
 # # plot!(p, longetsxout, fill(log(tolerance), length(xout)), line=(2,:dot), c=:black, label="tol");
