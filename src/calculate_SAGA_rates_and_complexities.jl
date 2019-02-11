@@ -315,8 +315,8 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   heuristicbound::Array{Float64}, expsmoothcst,
                                   simplestepsize::Array{Float64}, bernsteinstepsize::Array{Float64},
                                   heuristicstepsize::Array{Float64}, expsmoothstepsize,
-                                  opt_minibatch_simple::Int64, opt_minibatch_bernstein::Int64,
-                                  opt_minibatch_heuristic::Int64, opt_minibatch_exact)
+                                  opt_minibatch_simple::Int64=0, opt_minibatch_bernstein::Int64=0,
+                                  opt_minibatch_heuristic::Int64=0, opt_minibatch_exact=0)
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_"); # julia 0.7
     default_path = "./data/";
     savename = "-exp1-cst";
