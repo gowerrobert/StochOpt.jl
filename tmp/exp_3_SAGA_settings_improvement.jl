@@ -94,7 +94,7 @@ X, y = loadDataset(default_path, data);
 
 ### SETTING UP THE PROBLEM ###
 println("\n--- Setting up the selected problem ---");
-options = set_options(tol=10.0^(-4), max_iter=10^8, max_epocs=200, # for slice scaled 1e-1
+options = set_options(tol=10.0^(-4), max_iter=10^8, max_epocs=2000, # for slice scaled 1e-1
                       max_time=60.0*60.0*5.0,
                       skip_error_calculation=10^5,
                       batchsize=1,

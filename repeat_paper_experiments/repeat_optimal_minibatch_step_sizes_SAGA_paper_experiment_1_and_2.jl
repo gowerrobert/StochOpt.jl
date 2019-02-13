@@ -1,7 +1,8 @@
 ### EXPERIMENT 1 & 2
 
 ## Computing the upper-bounds of the expected smoothness constant (exp. 1)
-## and our step sizes (exp. 2)
+## and our step sizes (exp. 2).
+## In computes all the bounds and step sizes. It is very long (around 1h20 on my computer 8 CPUs).
 
 using JLD
 using Plots
@@ -39,7 +40,7 @@ lambdas = [10^(-3) 10^(-1)];
 runnb = 1;
 for data in datasets
     for lambda in lambdas
-        if !(data in ["real-sim" "news20.binary" "rcv1"])
+        if !(data in ["real-sim" "news20_binary" "rcv1_full"])
             scalings = ["none" "column-scaling"];
         else
             scalings = ["none"];
@@ -52,8 +53,6 @@ for data in datasets
             println(@sprintf "lambda: %1.0e" lambda);
             println("scaling: ", scaling);
             println("######################################################################\n")
-
-            Random.seed!(1);
 
             ### LOADING DATA ###
             println("--- Loading data ---");
