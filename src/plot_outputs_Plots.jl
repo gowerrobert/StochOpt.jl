@@ -1,6 +1,7 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
-function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, suffix::AbstractString="") #, datapassbnd::Int64
-    #Now in epocs X function values
+function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, suffix::AbstractString="", path::AbstractString="./") #, datapassbnd::Int64
+    println("ENTERING plot_outputs_Plots function ---------------------------------------------------------------")
+    ## Now in epocs X function values
     if length(suffix) > 0
         probname = string(replace(prob.name, r"[\/]." => "-"), suffix);
     elseif options.batchsize > 0
@@ -12,8 +13,8 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     if(options.precondition)
         probname = string(probname, "-precon")
     end
-    default_path = "./data/";  # savename= string(replace(prob.name, r"[\/]" => "-"),"-", options.batchsize);
-    save("$(default_path)$(probname).jld", "OUTPUTS", OUTPUTS);
+    data_path = "data/";  # savename= string(replace(prob.name, r"[\/]" => "-"),"-", options.batchsize);
+    save("$(path)$(data_path)$(probname).jld", "OUTPUTS", OUTPUTS);
     fontsmll = 8;
     fontmed = 12;
     fontbig = 14;
@@ -59,11 +60,10 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
               xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
               guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto,  grid=false)
     end
-    println("./figures/$(probname)-epoc.pdf");
-    savefig(plt, "./figures/$(probname)-epoc.pdf");
+    println("$(path)figures/$(probname)-epoc.pdf");
+    savefig(plt, "$(path)figures/$(probname)-epoc.pdf");
 
-
-    # plotting times
+    ## Plotting times
     output = OUTPUTS[1];
     datapassbnd = output.iterations*output.epocsperiter; # no truncation option available for time
     rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
@@ -84,8 +84,8 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
             guidefont=font(fontbig), legendfont=font(fontmed), markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2,output.stepsize_multiplier))
     end
-    println("./figures/$(probname)-time.pdf");
-    savefig("./figures/$(probname)-time.pdf");
+    println("$(path)figures/$(probname)-time.pdf");
+    savefig("$(path)figures/$(probname)-time.pdf");
 
 
     if(!isempty(OUTPUTS[1].testerrors)) # plot test error as well
@@ -108,10 +108,10 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
             println(output.name, ": 2^", log(2, output.stepsize_multiplier))
         end
         println(probname)
-        savefig("./figures/$(probname)-t-time.pdf");
+        savefig("$(path)figures/$(probname)-t-time.pdf");
     end
 
-    open("./figures/$(probname)-stepsizes.txt", "w") do f
+    open("$(path)figures/$(probname)-stepsizes.txt", "w") do f
         write(f, "$(probname) stepsize_multiplier \n")
         for i=1:length(OUTPUTS)
             output = OUTPUTS[i];

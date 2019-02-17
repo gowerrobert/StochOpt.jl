@@ -470,3 +470,74 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
 
     return OUTPUTS, itercomplex
 end
+
+
+## for the skip_error parameter:
+"""
+    closest_power_of_ten(integer::Int64)
+
+    Compute the closest power of ten of an integer.
+
+#INPUTS:\\
+    - **Int64** integer: integer\\
+#OUTPUTS:\\
+    - **Int64** or **Float64** closest_power: closest power of ten of the input
+
+# Examples
+```jldoctest
+julia> closest_power(0)
+1
+julia> closest_power(9)
+1
+julia> closest_power(204)
+100
+```
+"""
+function closest_power_of_ten(integer::Int64)
+    if integer < 0
+        closest_power = 10.0 ^ (1 - length(string(integer)));
+    else
+        closest_power = 10 ^ (length(string(integer)) - 1);
+    end
+    return closest_power
+end
+
+## Calculating best grid search step size for SAGA_nice
+function calculate_best_stepsize_SAGA_nice(prob, options ; skip, max_time, rep_number, batchsize, grid)
+    old_skip = options.skip_error_calculation;
+    old_tol = options.tol;
+    old_max_iter = options.max_iter;
+    old_max_epocs = options.max_epocs;
+    old_max_time = options.max_time;
+    old_rep_number = options.rep_number;
+    old_batchsize = options.batchsize;
+
+    options.repeat_stepsize_calculation = true;
+    options.rep_number = rep_number;
+    options.skip_error_calculation = skip;
+    # options.tol = 10.0^(-16);
+    options.max_iter = 10^8;
+    options.max_time = max_time;
+    options.batchsize = batchsize;
+    SAGA_nice = initiate_SAGA_nice(prob, options);
+    output = minimizeFunc_grid_stepsize(prob, SAGA_nice, options, grid=grid);
+
+    options.repeat_stepsize_calculation = false;
+    options.skip_error_calculation = old_skip;
+    options.tol = old_tol;
+    options.max_iter = old_max_iter;
+    options.max_epocs = old_max_epocs;
+    options.max_time = old_max_time;
+    options.rep_number = old_rep_number;
+    options.batchsize = old_batchsize;
+    return output
+end
+
+## Toy example for parallel experiences
+function save_plot_parallel(i, path)
+    x = 1:10;
+    y = x .^ i;
+    plt = plot(x, y, label=string(i));
+    println("$(path)figures/$(string(i)).pdf")
+    savefig(plt, "$(path)figures/$(string(i)).pdf");
+end
