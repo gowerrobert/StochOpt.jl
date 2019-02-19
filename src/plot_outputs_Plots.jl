@@ -1,6 +1,5 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
 function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, suffix::AbstractString="", path::AbstractString="./") #, datapassbnd::Int64
-    println("ENTERING plot_outputs_Plots function ---------------------------------------------------------------")
     ## Now in epocs X function values
     if length(suffix) > 0
         probname = string(replace(prob.name, r"[\/]." => "-"), suffix);

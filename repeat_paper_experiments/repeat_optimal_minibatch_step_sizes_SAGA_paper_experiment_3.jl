@@ -1,6 +1,31 @@
-### EXPERIMENT 3
+"""
+### "Optimal mini-batch and step sizes for SAGA", Nidham Gazagnadou, Robert M. Gower, Joseph Salmon (2019)
 
-## Comparing different classical settings of SAGA and ours
+## --- EXPERIMENT 3 (serial implementation) ---
+Goal: Comparing different classical settings of (single and mini-batch) SAGA and ours.
+
+## --- THINGS TO CHANGE BEFORE RUNNING ---
+- line 43: enter your full path to the "StochOpt.jl/" repository in the *path* variable
+
+## --- HOW TO RUN THE CODE ---
+To run only the first experiment (ijcnn1_full + column-scaling + lambda=1e-1), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
+>julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3.jl false
+To launch all the 12 experiments of the paper change the bash input and run:
+>julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3.jl true
+
+## --- EXAMPLE OF RUNNING TIME ---
+Running time of all experiments when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+7768.175183 seconds (9.31 G allocations: 13.712 TiB, 15.83% gc time), around 2h09
+
+## --- SAVED FILES ---
+For each problem (data set + scaling process + regularization),
+- the epoch and time plots (with and without Hofmann settings) are saved in ".pdf" format in the "./figures/" folder
+- the results of the simulations (OUTPUTS objects) are saved in ".jld" format in the "./data/" folder
+- the total complexities of the run methods are saved in ".txt" files the "./outputs/" folder
+"""
+
+## Bash input
+allexperiments = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 experiments (true)
 
 using JLD
 using Plots
@@ -15,8 +40,10 @@ using Base64 # julia 0.7
 using Formatting
 using LaTeXStrings
 
-## for the skip_error parameter:
+include("../src/StochOpt.jl") # Be carefull about the path here
+
 #region
+## Function used to the skip_error parameter
 """
     closest_power_of_ten(integer::Int64)
 
@@ -46,7 +73,7 @@ function closest_power_of_ten(integer::Int64)
     return closest_power
 end
 
-## Calculating best grid search step size for SAGA_nice
+## Function used to compute the best grid search step size for SAGA_nice
 function calculate_best_stepsize_SAGA_nice(prob, options ; skip, max_time, rep_number, batchsize, grid)
     old_skip = options.skip_error_calculation;
     old_tol = options.tol;
@@ -78,14 +105,11 @@ function calculate_best_stepsize_SAGA_nice(prob, options ; skip, max_time, rep_n
 end
 #endregion
 
-
-## Bash inputs
-include("../src/StochOpt.jl") # Be carefull about the path here
+## Experiments settings
 default_path = "./data/";
-numsimu = 1;
-relaunch_gridsearch = false;
+numsimu = 1;                 # Increase the number of simulations to compute an average of the empiracal total complexity of each method
+relaunch_gridsearch = false; # Change to true for recomputing the grid search on the step sizes
 
-allexperiments = parse(Bool, ARGS[1]);
 if allexperiments
     experiments = 1:12;
 else
@@ -138,13 +162,13 @@ for exp in experiments
 
     Random.seed!(1);
 
-    ### LOADING THE DATA ###
+    ## Loading the data
     println("--- Loading data ---");
     X, y = loadDataset(default_path, data);
 
-    ### SETTING UP THE PROBLEM ###
+    ## Setting up the problem
     println("\n--- Setting up the selected problem ---");
-    options = set_options(tol=10.0^(-4), max_iter=10^8, max_epocs=600, # for slice scaled 1e-1
+    options = set_options(tol=10.0^(-4), max_iter=10^8, max_epocs=600,
                           max_time=60.0*60.0*5.0,
                           skip_error_calculation=10^5,
                           batchsize=1,
@@ -159,7 +183,7 @@ for exp in experiments
         prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);
     else
         println("More than three modalities in the outputs: the problem is set to ridge regression")
-        prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling); #column-scaling
+        prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling);
     end
 
     X = nothing;
@@ -171,13 +195,12 @@ for exp in experiments
     Lmax = prob.Lmax;
     L = prob.L;
 
-    if occursin("lgstc", prob.name) # julia 0.7
+    if occursin("lgstc", prob.name)
         ## Correcting for logistic since phi'' <= 1/4
         Lmax /= 4;
     end
 
-    ### II) tau = tau* ###
-    ##---------- Computing mini-batch and step sizes ----------
+    ## Computing mini-batch and step sizes
     tau_defazio = 1;
     step_defazio = 1.0 / (3.0*(Lmax + n*mu));
 
@@ -191,7 +214,7 @@ for exp in experiments
     heuristicbound = ( n*(tau_heuristic-1)*L + (n-tau_heuristic)*Lmax ) / ( tau_heuristic*(n-1) );
     step_heuristic = 0.25 / max(heuristicbound, rightterm);
 
-    ## Calculating/Loading the best grid search step size for SAGA_nice with batchsize >= 1
+    ## Calculating/Loading the best grid search step size for SAGA_nice with our optimal mini-batch size
     options.batchsize = tau_heuristic;
     if options.batchsize == 1
         method_name = "SAGA-nice";
@@ -224,8 +247,6 @@ for exp in experiments
     mini_batch_sizes = [tau_defazio, tau_heuristic, tau_heuristic, tau_hofmann];
     stepsizes = [step_defazio, step_heuristic, step_heuristic_gridsearch, step_hofmann];
 
-    ##---------- SAGA_nice-1 runs ----------
-
     ## Allowing user skip_error
     if skip_error == [0 0 0 0]
         skip_error = closest_power_of_ten.(round.(Int, n ./ (5*mini_batch_sizes) )); # around 5 points per epoch
@@ -242,6 +263,7 @@ for exp in experiments
     println(stepsizes);
     println("----------------------------------------------------------------------------------------");
 
+    ## SAGA 4 different runs (Defazio, our settings, grid search and Hofmann)
     itercomplex = zeros(length(stepsizes), numsimu);
     OUTPUTS = [];
     for idxmethod in 1:length(stepsizes)
@@ -262,6 +284,8 @@ for exp in experiments
     end
     avg_itercomplex = mean(itercomplex, dims=2);
     avg_empcomplex = mini_batch_sizes .* avg_itercomplex;
+
+    ## Computing the standard deviation of the measured total complexities if one runs more the experiments more than once
     if numsimu > 1
         empcomplex = mini_batch_sizes .* itercomplex;
         std_itercomplex = std(empcomplex, dims=2);
@@ -273,7 +297,7 @@ for exp in experiments
 
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-    savename = string(probname, "-exp3_2-empcomplex-", numsimu, "-avg");
+    savename = string(probname, "-exp3-empcomplex-", numsimu, "-avg");
     save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "empcomplex", empcomplex, "ci_itercomplex", ci_itercomplex,
          "OUTPUTS", OUTPUTS, "method_names", method_names, "skip_error", skip_error,
          "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes);
@@ -288,12 +312,11 @@ for exp in experiments
     if numsimu == 1
         # gr()
         pyplot()
-        plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3.2"); # Plot and save output
+        plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3"); # Plot and save output epoch and time figures
 
         OUTPUTS_without_hofmann = OUTPUTS[1:3];
-        # OUTPUTS_without_hofmann = [OUTPUTS_without_hofmann; OUTPUTS[3:5]];
         pyplot()
-        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3.2"); # Plot and save output
+        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3"); # Removing Hofmann settings curve from the plots
     end
 
     line1 =          "method name      | b_Defazio + step_Defazio | b_heuristic + step_heuristic | b_heuristic + step_gridsearch | b_Hofmann + step_Hofmann |\n"
@@ -301,7 +324,6 @@ for exp in experiments
     line3 = @sprintf "step size        |         %e          |       %e       |       %e       |        %e        |\n" stepsizes[1] stepsizes[2] stepsizes[3] stepsizes[4]
     line4 = @sprintf "total complexity |             %s             |           %s            |         %s           |            %s             |\n" format(avg_empcomplex[1], commas=true) format(avg_empcomplex[2], commas=true) format(avg_empcomplex[3], commas=true) format(avg_empcomplex[4], commas=true)
     line5 = @sprintf "CI delta         |               %d             |           %d           |         %d           |         %d          |\n" ci_itercomplex[1] ci_itercomplex[2] ci_itercomplex[3] ci_itercomplex[4]
-
 
     println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     println(line1);
@@ -312,7 +334,8 @@ for exp in experiments
     println(line5);
     println("number of simulations: $numsimu\n\n");
 
-    open("./outputs/$probname-exp3_2-complexity.txt", "a") do file
+    ## Saving the averaged empirical total complexities and the corresponding confidence intervals
+    open("./outputs/$probname-exp3-complexity.txt", "a") do file
         write(file, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
         write(file, line1);
         write(file, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
