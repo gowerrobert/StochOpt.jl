@@ -14,8 +14,10 @@ To launch all the 12 experiments of the paper change the bash input and run:
 >julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3.jl true
 
 ## --- EXAMPLE OF RUNNING TIME ---
-Running time of all experiments when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-7768.175183 seconds (9.31 G allocations: 13.712 TiB, 15.83% gc time), around 2h09
+Running time of the first experiment on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+81.827728 seconds (263.18 M allocations: 33.242 GiB, 9.57% gc time), around 1min 22s
+Running time of all 12 experiments on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+7768.175183 seconds (9.31 G allocations: 13.712 TiB, 15.83% gc time), around 2h 09min
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization),
@@ -40,7 +42,7 @@ using Base64 # julia 0.7
 using Formatting
 using LaTeXStrings
 
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl")
 
 #region
 ## Function used to the skip_error parameter
@@ -158,7 +160,7 @@ for exp in experiments
     lambda = lambdas[exp];
     skip_error = skip_errors[exp];
     println("EXPERIMENT : ", exp, " over ", length(experiments));
-    println("Inputs: ", data, " + ", scaling, " + ", lambda);
+    @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda;
 
     Random.seed!(1);
 

@@ -16,7 +16,9 @@ To launch all the 12 experiments of the paper change the bash input and run:
 where <number_of_processor_to_add> has to be replaced by the user.
 
 ## --- EXAMPLE OF RUNNING TIME ---
-Running time of all experiments when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+Running time of the first experiment when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+68.949029 seconds (2.96 M allocations: 146.438 MiB, 0.07% gc time), around 1min 9s
+Running time of all 12 experiments when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 4737.082030 seconds (3.59 M allocations: 163.263 MiB, 0.00% gc time), around 1h19
 
 ## --- SAVED FILES ---
@@ -32,7 +34,7 @@ allexperiments = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 experiments
 using Distributed
 
 @everywhere begin
-    path = "/home/nidham/phd/StochOpt.jl/"; # Be carefull about the full path here
+    path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
 
     using JLD
     using Plots
