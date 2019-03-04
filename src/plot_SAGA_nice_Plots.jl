@@ -211,8 +211,7 @@ end
 
 """
     plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                              tau_practical::Int64,
-                              tau_empirical::Int64)
+                              tau_practical::Int64, tau_empirical::Int64 ; path::AbstractString="./")
 
 Saves the plot of the empirical total complexity.
 
@@ -223,13 +222,12 @@ Saves the plot of the empirical total complexity.
       for each of the mini-batch size (tau) over numsimu samples\\
     - **Int64** tau_practical: heuristic optimal mini-batch size\\
     - **Int64** tau_empirical: empirical optimal mini-batch size\\
+    - **AbstractString** path: path to the folder where the plots are saved\\
 #OUTPUTS:\\
     - None
 """
-function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1},
-                                   empcomplex::Array{Float64,1},
-                                   tau_practical::Int64,
-                                   tau_empirical::Int64)
+function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
+                                   tau_practical::Int64, tau_empirical::Int64 ; path::AbstractString="./")
     numsimu = 1
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
