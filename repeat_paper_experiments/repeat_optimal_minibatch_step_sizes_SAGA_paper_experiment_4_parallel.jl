@@ -9,10 +9,10 @@ Goal: Testing the optimality of our optimal mini-batch size tau_practical with c
 
 ## --- HOW TO RUN THE CODE ---
 To run only the first experiment (ijcnn1_full + column-scaling + lambda=1e-1), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia -p <number_of_processor_to_add> repeat_paper_experiments/parallel_repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4.jl false
+>julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl false
 where <number_of_processor_to_add> has to be replaced by the user.
 To launch all the 12 experiments of the paper change the bash input and run:
->julia -p <number_of_processor_to_add> repeat_paper_experiments/parallel_repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4.jl true
+>julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl true
 where <number_of_processor_to_add> has to be replaced by the user.
 
 ## --- EXAMPLE OF RUNNING TIME ---
