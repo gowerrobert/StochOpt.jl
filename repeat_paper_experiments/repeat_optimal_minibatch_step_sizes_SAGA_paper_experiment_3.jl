@@ -242,10 +242,10 @@ for exp in experiments
     str_step_heuristic = @sprintf "%.2e" step_heuristic
     str_step_heuristic_gridsearch = @sprintf "%.2e" step_heuristic_gridsearch
     str_step_hofmann = @sprintf "%.2e" step_hofmann
-    method_names = [latexstring("\$b_\\mathrm{Defazio} \\; \\; = 1 \\ \\ + \\gamma_\\mathrm{Defazio} \\ \\ \\: \\: = $str_step_defazio\$"),
-                    latexstring("\$b_\\mathrm{practical} \\, = $tau_heuristic + \\gamma_\\mathrm{practical} \\ \\ = $str_step_heuristic\$"),
-                    latexstring("\$b_\\mathrm{practical} \\, = $tau_heuristic + \\gamma_\\mathrm{grid search} = $str_step_heuristic_gridsearch\$"),
-                    latexstring("\$b_\\mathrm{Hofmann} = 20 + \\gamma_\\mathrm{Hofmann}  \\ \\, = $str_step_hofmann\$")];
+    method_names = [latexstring("\$b_\\mathrm{Defazio} \\; \\; = 1 \\ \\ , \\gamma_\\mathrm{Defazio} \\ \\ \\: \\: = $str_step_defazio\$"),
+                    latexstring("\$b_\\mathrm{practical} \\, = $tau_heuristic , \\gamma_\\mathrm{practical} \\ \\ = $str_step_heuristic\$"),
+                    latexstring("\$b_\\mathrm{practical} \\, = $tau_heuristic , \\gamma_\\mathrm{grid search} = $str_step_heuristic_gridsearch\$"),
+                    latexstring("\$b_\\mathrm{Hofmann} = 20 , \\gamma_\\mathrm{Hofmann}  \\ \\, = $str_step_hofmann\$")];
     mini_batch_sizes = [tau_defazio, tau_heuristic, tau_heuristic, tau_hofmann];
     stepsizes = [step_defazio, step_heuristic, step_heuristic_gridsearch, step_hofmann];
 
