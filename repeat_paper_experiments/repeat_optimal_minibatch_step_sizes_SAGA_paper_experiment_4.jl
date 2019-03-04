@@ -15,14 +15,13 @@ To launch all the 12 experiments of the paper change the bash input and run:
 ## --- EXAMPLE OF RUNNING TIME ---
 Running time of the first experiment on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 73.587067 seconds (214.50 M allocations: 62.803 GiB, 11.63% gc time), around 1min 14s
-Running time of all experiments when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+Running time of all experiments on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 XXXX.XXXX seconds (XX.XX G allocations: XX.XX TiB, XX.XX% gc time), around XX.XX
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization),
-- the epoch and time plots (with and without Hofmann settings) are saved in ".pdf" format in the "./figures/" folder
-- the results of the simulations (OUTPUTS objects) are saved in ".jld" format in the "./data/" folder
-- the total complexities of the run methods are saved in ".txt" files the "./outputs/" folder
+- the empirical total complexity vs mini-batch size plots are saved in ".pdf" format in the "./figures/" folder
+- the results of the simulations (empirical complexities, optimal empirical mini-batch size, etc) are saved in ".jld" format in the "./data/" folder
 """
 
 ## Bash input
