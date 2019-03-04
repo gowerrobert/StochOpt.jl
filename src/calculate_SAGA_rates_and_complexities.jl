@@ -364,30 +364,30 @@ function compute_skip_error(n::Int64, minibatch_size::Int64, skip_multiplier::Fl
         tmp /= 2;
         skipped_errors *= 2^1;
     end
-    skipped_errors = convert(Int64, skipped_errors); # Seems useless
+    skipped_errors = convert(Int64, skipped_errors);
 
     return skipped_errors
 end
 
 """
-    simulate_SAGA_nice(prob, minibatchlist, numsimu=1,
+    simulate_SAGA_nice(prob, minibatchgrid, numsimu=1,
                        skipped_errors=1, skip_multiplier=0.02)
 
 Runs several times (numsimu) mini-batch SAGA with nice sampling for each
-mini-batch size in the give list (minibatchlist) in order to evaluate the
+mini-batch size in the give list (minibatchgrid) in order to evaluate the
 correpsonding average iteration complexity.
 
 #INPUTS:\\
     - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
-    - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
+    - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
     - **Int64** numsimu: number of runs of mini-batch SAGA\\
     - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
     - **Float64** skip\\_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
 #OUTPUTS:\\
-    - OUTPUTS: output of each run, size length(minibatchlist)*numsimu\\
+    - OUTPUTS: output of each run, size length(minibatchgrid)*numsimu\\
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
 """
-function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::MyOptions, numsimu::Int64 ;
+function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions, numsimu::Int64 ;
                             skipped_errors::Int64=-1, skip_multiplier::Float64=0.02)
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/tau
@@ -397,11 +397,10 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
 
     n = prob.numdata;
 
-    itercomplex = zeros(length(minibatchlist), 1); # List of saved outputs
+    itercomplex = zeros(length(minibatchgrid), 1); # List of saved outputs
     OUTPUTS = [];
-    # fail = true;
-    for idxtau in 1:length(minibatchlist) # 1:n
-        tau = minibatchlist[idxtau];
+    for idxtau in 1:length(minibatchgrid)
+        tau = minibatchgrid[idxtau];
         println("\nCurrent mini-batch size: ", tau);
 
         if(skipped_errors<-1||skipped_errors==0)
@@ -425,17 +424,17 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
         n = prob.numdata;
         L = prob.L;
         Lmax = prob.Lmax;
-        Lbar = prob.Lbar;
+        # Lbar = prob.Lbar;
 
-        if(occursin("lgstc", prob.name)) # julia 0.7
+        if(occursin("lgstc", prob.name))
             ## Correcting for logistic since phi'' <= 1/4
             L /= 4;
             Lmax /= 4;
-            Lbar /= 4;
+            # Lbar /= 4;
         end
         leftcoeff = (n*(tau-1))/(tau*(n-1));
         rightcoeff = (n-tau)/(tau*(n-1));
-        Lheuristic = leftcoeff*L + rightcoeff*Lmax;
+        Lpractical = leftcoeff*L + rightcoeff*Lmax;
         # Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;
         # Lbernstein = 2*leftcoeff*L + (1/tau)*((n-tau)/(n-1) + (4/3)*log(prob.numfeatures))*Lmax;
         rightterm = ((n-tau)/(tau*(n-1)))*Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
@@ -443,29 +442,36 @@ function simulate_SAGA_nice(prob::Prob, minibatchlist::Array{Int64,1}, options::
         options.batchsize = tau;
         for i=1:numsimu
             println("----- Simulation #", i, " -----");
-            # sg = initiate_SAGA(prob, options, minibatch_type="nice"); # Old and diverging implementation
-            sg = initiate_SAGA_nice(prob, options); # new separated implementation
-            ## Heuristic
-            println("Heuristic step size");
-            options.stepsize_multiplier = 1.0/(4.0*max(Lheuristic, rightterm));
+            sg = initiate_SAGA_nice(prob, options);
+
+            ## Practical approximation
+            options.stepsize_multiplier = 1.0/(4.0*max(Lpractical, rightterm));
+            println("----------------------------- PRACTICAL STEP SIZE --------------------------------------");
+            println(options.stepsize_multiplier);
+            println("----------------------------------------------------------------------------------------");
+
             ## Simple bound
             # println("Simple step size");
             # options.stepsize_multiplier = 1.0/(4.0*max(Lsimple, rightterm));
+
             ## Bernstein bound
             # println("Bernstein step size");
             # options.stepsize_multiplier =  1.0/(4.0*max(Lbernstein, rightterm));
+
             output = minimizeFunc(prob, sg, options);
             println("Output fail = ", output.fail, "\n");
             itercomplex[idxtau] += output.iterations;
-            output.name = string("\\tau=", tau); # Tiny modification for smaller legend name / Latex symbols in strings
-            OUTPUTS = [OUTPUTS; output]; # Array{Any,1} or Array{Output,1}?
+            output.name = string("\\tau=", tau);
+            OUTPUTS = [OUTPUTS; output];
         end
     end
-    itercomplex = itercomplex ./ numsimu; # simply averaging the last iteration number
+
+    ## Averaging the last iteration number
+    itercomplex = itercomplex ./ numsimu;
     itercomplex = itercomplex[:];
 
     ## Saving the result of the simulations
-    savename = "-exp4_1-empcomplex-$(numsimu)-avg";
+    savename = "-exp4-empcomplex-$(numsimu)-avg";
     save("$(default_path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS);
 
     return OUTPUTS, itercomplex
