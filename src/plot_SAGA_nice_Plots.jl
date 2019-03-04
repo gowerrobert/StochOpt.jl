@@ -210,53 +210,54 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
 end
 
 """
-    plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1}, empcomplex::Array{Float64,1},
-                              tau_heuristic::Int64,
+    plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
+                              tau_practical::Int64,
                               tau_empirical::Int64)
 
 Saves the plot of the empirical total complexity.
 
 #INPUTS:\\
     - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
-    - **Array{Int64,1}** minibatchlist: list of the different mini-batch sizes\\
+    - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
     - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity)
       for each of the mini-batch size (tau) over numsimu samples\\
-    - **Int64** tau_heuristic: heuristic optimal mini-batch size\\
+    - **Int64** tau_practical: heuristic optimal mini-batch size\\
     - **Int64** tau_empirical: empirical optimal mini-batch size\\
 #OUTPUTS:\\
     - None
 """
-function plot_empirical_complexity(prob::Prob, minibatchlist::Array{Int64,1},
+function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1},
                                    empcomplex::Array{Float64,1},
-                                   tau_heuristic::Int64,
+                                   tau_practical::Int64,
                                    tau_empirical::Int64)
-    numsimu = 1;
+    numsimu = 1
 
-    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-    default_path = "./figures/";
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+    default_path = "./figures/"
 
-    fontmed = 12;
-    fontbig = 15;
-    xlabeltxt = "mini-batch size";
-    ylabeltxt = "empirical total complexity";
+    fontmed = 12
+    fontbig = 15
+    xlabeltxt = "mini-batch size"
+    ylabeltxt = "empirical total complexity"
 
-    n = prob.numdata;
-    d = prob.numfeatures;
+    n = prob.numdata
+    d = prob.numfeatures
 
     labellist = [latexstring("\$b_\\mathrm{empirical} = $tau_empirical\$"),
-                 latexstring("\$b_\\mathrm{practical} = $tau_heuristic\$")];
+                 latexstring("\$b_\\mathrm{practical} \\; = $tau_practical\$")]
 
-    plot(minibatchlist, empcomplex, linestyle=:solid, color=:black,
+    plot(minibatchgrid, empcomplex, linestyle=:solid, color=:black,
          xaxis=:log, yaxis=:log,
          xlabel=xlabeltxt, ylabel=ylabeltxt, label="",
-         xticks=(minibatchlist, minibatchlist),
+         xticks=(minibatchgrid, minibatchgrid),
+         xrotation = 45,
          tickfont=font(fontmed),
-         guidefont=font(fontbig), linewidth=3, grid=false);
-        #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)));
+         guidefont=font(fontbig), linewidth=3, grid=false)
+        #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
     vline!([tau_empirical-0.02], line=(:dash, 3), color=:blue, label=labellist[1],
-           legendfont=font(fontbig), legend=:best); #:legend
-    #legendtitle="Optimal mini-batch size");
-    vline!([tau_heuristic+0.02], line=(:dot, 3), color=:red, label=labellist[2]);
-    savename = "-exp4_1-empcomplex-$(numsimu)-avg";
-    savefig("$(default_path)$(probname)$(savename).pdf");
+           legendfont=font(fontbig), legend=:best) #:legend
+    #legendtitle="Optimal mini-batch size")
+    vline!([tau_practical+0.02], line=(:dot, 3), color=:red, label=labellist[2])
+    savename = "-exp4-empcomplex-$(numsimu)-avg"
+    savefig("$(default_path)$(probname)$(savename).pdf")
 end
