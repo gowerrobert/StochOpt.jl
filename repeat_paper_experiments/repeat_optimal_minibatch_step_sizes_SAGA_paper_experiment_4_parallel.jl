@@ -62,12 +62,12 @@ else
     experiments = 1:1;
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full", # scaled
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled
-            "covtype_binary", "covtype_binary", # scaled
-            "slice", "slice", # scaled
-            "slice", "slice", # unscaled
-            "real-sim", "real-sim"]; # unscaled
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "slice", "slice",                                   # unscaled, n =  53,500, d =    384
+            "real-sim", "real-sim"];                            # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -149,7 +149,12 @@ skip_multiplier = [0.05, 0.05,
     tau_practical = round(Int, 1 + (mu*(n-1))/(4*L))
 
     ## Computing the empirical mini-batch size over a grid
-    minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
+    # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
+    if data == "real-sim"
+        minibatchlist = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16];
+    else
+        minibatchlist = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14];
+    end
 
     println("---------------------------------- MINI-BATCH GRID ------------------------------------------");
     println(minibatchgrid);
