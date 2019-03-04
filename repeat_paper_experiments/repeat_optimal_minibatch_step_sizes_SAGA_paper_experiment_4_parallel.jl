@@ -11,14 +11,14 @@ Goal: Testing the optimality of our optimal mini-batch size tau_practical with c
 To run only the first experiment (ijcnn1_full + column-scaling + lambda=1e-1), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
 >julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl false
 where <number_of_processor_to_add> has to be replaced by the user.
-To launch all the 12 experiments of the paper change the bash input and run:
+To launch all the 12 problems of the paper change the bash input and run:
 >julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl true
 where <number_of_processor_to_add> has to be replaced by the user.
 
 ## --- EXAMPLE OF RUNNING TIME ---
 Running time of the first experiment when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 88.395703 seconds (2.01 M allocations: 98.863 MiB, 0.05% gc time), around 1min 28s
-Running time of all experiments when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+Running time of all problems when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 XXXX.XXXX seconds (XX.XX G allocations: XX.XX TiB, XX.XX% gc time), around XX.XX
 
 ## --- SAVED FILES ---
@@ -29,7 +29,7 @@ For each problem (data set + scaling process + regularization),
 
 
 ## Bash input
-allexperiments = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 experiments (true)
+all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (true)
 
 using Distributed
 
@@ -56,10 +56,10 @@ end
 
 ## Experiments settings
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-if allexperiments
-    experiments = 1:12;
+if all_problems
+    problems = 1:12;
 else
-    experiments = 1:1;
+    problems = 1:1;
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
@@ -92,11 +92,11 @@ skip_multiplier = [0.05, 0.05,
                    0.05, 0.05];
 
 @time begin
-@sync @distributed for exp in experiments
-    data = datasets[exp];
-    scaling = scalings[exp];
-    lambda = lambdas[exp];
-    println("EXPERIMENT : ", exp, " over ", length(experiments));
+@sync @distributed for idx_prob in problems
+    data = datasets[idx_prob];
+    scaling = scalings[idx_prob];
+    lambda = lambdas[idx_prob];
+    println("EXPERIMENT : ", idx_prob, " over ", length(problems));
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda;
 
     Random.seed!(1);
@@ -160,7 +160,7 @@ skip_multiplier = [0.05, 0.05,
     println(minibatchgrid);
     println("---------------------------------------------------------------------------------------------");
 
-    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multiplier[exp]);
+    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multiplier[idx_prob]);
 
     ## Checking that all simulations reached tolerance
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];

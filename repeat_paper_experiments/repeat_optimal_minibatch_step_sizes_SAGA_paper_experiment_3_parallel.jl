@@ -8,17 +8,17 @@ Goal: Comparing different classical settings of (single and mini-batch) SAGA and
 - line 35: enter your full path to the "StochOpt.jl/" repository in the *path* variable
 
 ## --- HOW TO RUN THE CODE ---
-To run only the first experiment (ijcnn1_full + column-scaling + lambda=1e-1), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
+To run only the first problem (ijcnn1_full + column-scaling + lambda=1e-1), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
 >julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3_parallel.jl false
 where <number_of_processor_to_add> has to be replaced by the user.
-To launch all the 12 experiments of the paper change the bash input and run:
+To launch all the 12 problems of the paper change the bash input and run:
 >julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3_parallel.jl true
 where <number_of_processor_to_add> has to be replaced by the user.
 
 ## --- EXAMPLE OF RUNNING TIME ---
-Running time of the first experiment when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+Running time of the first problem when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 68.949029 seconds (2.96 M allocations: 146.438 MiB, 0.07% gc time), around 1min 9s
-Running time of all 12 experiments when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+Running time of all 12 problems when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 4737.082030 seconds (3.59 M allocations: 163.263 MiB, 0.00% gc time), around 1h19
 
 ## --- SAVED FILES ---
@@ -29,7 +29,7 @@ For each problem (data set + scaling process + regularization),
 """
 
 ## Bash input
-allexperiments = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 experiments (true)
+all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (true)
 
 using Distributed
 
@@ -121,10 +121,10 @@ end
 ## Experiments settings
 numsimu = 1;                 # Increase the number of simulations to compute an average of the empirical total complexity of each method
 relaunch_gridsearch = false; # Change to true for recomputing the grid search on the step sizes
-if allexperiments
-    experiments = 1:12;
+if all_problems
+    problems = 1:12;
 else
-    experiments = 1:1;
+    problems = 1:1;
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled
@@ -163,12 +163,12 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
               ];
 
 @time begin
-@sync @distributed for exp in experiments
-    data = datasets[exp];
-    scaling = scalings[exp];
-    lambda = lambdas[exp];
-    skip_error = skip_errors[exp];
-    println("\n--- EXPERIMENT : ", exp, " over ", length(experiments), " ---\nInputs: ", data, " + ", scaling, " + ", lambda);
+@sync @distributed for idx_prob in problems
+    data = datasets[idx_prob];
+    scaling = scalings[idx_prob];
+    lambda = lambdas[idx_prob];
+    skip_error = skip_errors[idx_prob];
+    println("\n--- EXPERIMENT : ", idx_prob, " over ", length(problems), " ---\nInputs: ", data, " + ", scaling, " + ", lambda);
 
     Random.seed!(1);
 
@@ -295,7 +295,7 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
     avg_itercomplex = mean(itercomplex, dims=2);
     avg_empcomplex = mini_batch_sizes .* avg_itercomplex;
 
-    ## Computing the standard deviation of the measured total complexities if one runs more the experiments more than once
+    ## Computing the standard deviation of the measured total complexities if one runs the experiments more than once
     if numsimu > 1
         empcomplex = mini_batch_sizes .* itercomplex;
         std_itercomplex = std(empcomplex, dims=2);
