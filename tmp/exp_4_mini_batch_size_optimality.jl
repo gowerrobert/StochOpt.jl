@@ -79,6 +79,10 @@ tau_heuristic = round(Int, 1 + (mu*(n-1))/(4*L))
 ######################################## EMPIRICAL OPTIMAL MINIBATCH SIZE ########################################
 ## Empirical stepsizes returned by optimal mini-batch SAGA with line searchs
 
+###
+# The mini-batch list has to be chosen to always have tau < n .....
+###
+
 # minibatchlist = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14];
 
 minibatchlist = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16];
@@ -88,7 +92,7 @@ println(minibatchlist);
 println("---------------------------------------------------------------------------------------------");
 
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-@time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, options, numsimu, skip_multiplier=0.000005);
+@time OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchlist, options, numsimu, skip_multiplier=0.05);
 
 ## Checking that all simulations reached tolerance
 fails = [OUTPUTS[i].fail for i=1:length(minibatchlist)*numsimu];
