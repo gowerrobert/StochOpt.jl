@@ -7,6 +7,8 @@ Pkg.add("JLD")
 Pkg.add("Plots")
 Pkg.add("StatsBase")
 Pkg.add("Match")
+...
+Pkg.add("Distributed")
 ```
 
 # StochOpt
@@ -28,10 +30,14 @@ For a demo of the BFGS and accelerated BFGS methods from [2]
 julia ./test/demo_BFGS.jl
 ```
 
-
 For a demo of SAGA with optimized probabilities from [4]
 ```julia
 julia ./test/demo_SAGA.jl
+```
+
+For a demo of SAGA nice from [5]
+```julia
+julia ./test/demo_SAGA_nice.jl
 ```
 
 
@@ -47,7 +53,6 @@ To re-generate all of the experiments from [2]
 julia ./repeat_paper_experiments/repeat_BFGS_accel_paper_results.jl
 ```
 
-
 To re-generate the experiments from Section 6.1 of [4]
 ```julia
 julia ./repeat_paper_experiments/compare_SAGA_importance_opt_Lis.jl
@@ -58,21 +63,49 @@ To re-generate the experiments from Section 6.1 of [4]
 julia ./repeat_paper_experiments/test_optimal_minibatch_SAGA_nice.jl
 ```
 
+To re-generate the experiments from Section 5.1 & 5.2 of [5] (~1h 30min)
+```julia
+julia ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl
+```
+
+To re-generate experiments from Section 5.3 of [5]
+```julia
+julia ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem (~1min) or to `true` to run it on all of them (~2h 09min).
+Or using the parallel implementation
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3_parallel.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem (~1min) or to `true` to run it on all of them (~1h 30min).
+
+To re-generate the experiments from Section 5.4 of [5]
+```julia
+julia ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem (~2min) or to `true` to run it on all of them (~XXh XXmin).
+Or using the parallel implementation
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl true
+```
+setting `all_problems` to `false` to run the code only on the first problem (~2min) or to `true` to run it on all of them (~XXh XXmin).
+
 
 # Methods implemented
 
-SVRG, the original SVRG algorithm; <br>
+SVRG, the original SVRG algorithm. <br>
 SVRG2, which tracks the gradients using the full Hessian. <br>
 2D, which tracks the gradients using the diagonal of the Hessian. <br>
 2Dsec, which tracks the gradients using the robust secant equation. <br>
 SVRG2emb, which tracks the gradients using a low-rank approximation of the Hessians. <br>
-CM, which tracks the gradients using the low-rank curvature matching approximation of the Hessian <br>
+CM, which tracks the gradients using the low-rank curvature matching approximation of the Hessian. <br>
 AM, which uses the low-rank action matching approximation of the Hessian. <br>
 BFGS, the standard, full memory BFGS method. <br>
 BFGS_accel, an accelerated BFGS method. <br>
-SAGA, stochastic average gradient descent, with several options of samplings (including optimal probabilities) <br>
+SAGA, stochastic average gradient descent, with several options of samplings (including optimal probabilities). <br>
+SAGA nice, mini-batch version of SAGA with nice sampling. <br>
 
-More details on the methods can be found in [1], [2] and [4] <br>
+More details on the methods can be found in [1], [2], [4] and [5] <br>
 
 # Code Philosophy
 
@@ -86,7 +119,7 @@ Then replace "liver-disorders" in the code *src/load_new_LIBSVM_data.jl* and exe
 include("dataLoad.jl")
 initDetails()
 
-datasets = ["liver-disorders"]  
+datasets = ["liver-disorders"]
 for  dataset in datasets
 transformDataJLD(dataset)
 X,y = loadDataset(dataset)
@@ -119,6 +152,9 @@ Chih-Chung Chang and Chih-Jen Lin, ACM Transactions on Intelligent Systems and T
 Variance Reduction via Jacobian Sketching* <br>
 RMG, Peter Richtárik, Francis Bach
 
+[5] *Optimal mini-batch and step sizes for SAGA* <br>
+Nidham Gazagnadou, Robert M. Gower and Joseph Salmon.
+arXiv:1902.00071, 2019
 
 For up-to-date references see https://perso.telecom-paristech.fr/rgower/publications.html
 

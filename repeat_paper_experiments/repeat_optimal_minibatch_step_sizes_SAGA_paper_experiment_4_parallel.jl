@@ -17,7 +17,7 @@ where <number_of_processor_to_add> has to be replaced by the user.
 
 ## --- EXAMPLE OF RUNNING TIME ---
 Running time of the first experiment when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-88.395703 seconds (2.01 M allocations: 98.863 MiB, 0.05% gc time), around 1min 28s
+96.882105 seconds (2.02 M allocations: 99.035 MiB, 0.05% gc time), around 1min 37s
 Running time of all problems when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 XXXX.XXXX seconds (XX.XX G allocations: XX.XX TiB, XX.XX% gc time), around XX.XX
 
