@@ -119,7 +119,7 @@ end
 #endregion
 
 ## Experiments settings
-numsimu = 1;                 # Increase the number of simulations to compute an average of the empiracal total complexity of each method
+numsimu = 1;                 # Increase the number of simulations to compute an average of the empirical total complexity of each method
 relaunch_gridsearch = false; # Change to true for recomputing the grid search on the step sizes
 if allexperiments
     experiments = 1:12;
