@@ -9,13 +9,13 @@ Goal: Computing the upper-bounds of the expected smoothness constant (exp. 1) an
 ## --- HOW TO RUN THE CODE ---
 To run only the first problem (XXXX), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
 >julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl false
-To launch all the 45 problems of the paper change the bash input and run:
+To launch all the 42 problems of the paper change the bash input and run:
 >julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl true
 
 ## --- EXAMPLE OF RUNNING TIME ---
 Running time of the first problem on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 , around XXmin XXs
-Running time of all 45 problems on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+Running time of all 42 problems on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 , around 1h 20min ## TO DOUBLE CHECK
 
 ## --- SAVED FILES ---
@@ -25,7 +25,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 # ## Bash input
-# all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 45 problems (true)
+# all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 42 problems (true)
 
 using JLD
 using Plots
@@ -44,7 +44,7 @@ include("../src/StochOpt.jl") # Be carefull about the path here
 default_path = "./data/";
 
 # if all_problems
-#     problems = 1:45;
+#     problems = 1:42;
 # else
 #     problems = 1:1;
 # end
@@ -100,7 +100,7 @@ for data in datasets
             println("\n\n######################################################################")
             println("Run ", string(run_number), " over 42");
             println("Dataset: ", data);
-            println(@sprintf "lambda: %1.0e" lambda);
+            @printf "lambda: %1.0e\n" lambda;
             println("scaling: ", scaling);
             println("######################################################################\n")
 
