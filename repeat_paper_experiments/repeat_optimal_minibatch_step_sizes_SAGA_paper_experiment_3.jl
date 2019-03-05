@@ -199,7 +199,7 @@ for idx_prob in problems
     # Lbar = prob.Lbar;
 
     if occursin("lgstc", prob.name)
-        ## Correcting for logistic since phi'' <= 1/4
+        ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
         Lmax /= 4;
         L /= 4;
         # Lbar /= 4;

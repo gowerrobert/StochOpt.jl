@@ -106,7 +106,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
     Lbar = mean(Li_s);
 
-    ## Correcting for logistic since phi'' <= 1/4
+    ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
     # Lmax /= 4;
     # L /= 4;
     # Lbar /= 4;

@@ -138,7 +138,7 @@ skip_multiplier = [0.05, 0.05,
     # Lbar = prob.Lbar;
 
     if occursin("lgstc", prob.name)
-        ## Correcting for logistic since phi'' <= 1/4
+        ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
         L /= 4;
         # Lmax /= 4;
         # Lbar /= 4;

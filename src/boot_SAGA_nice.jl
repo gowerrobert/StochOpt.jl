@@ -63,7 +63,7 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     # Lbar = prob.Lbar;
 
     # if(occursin("lgstc", prob.name)) # julia 0.7
-    #     ## Correcting for logistic since phi'' <= 1/4
+    #     ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
     #     # Lexpected = Lexpected/4;
     #     L /= 4;
     #     Lmax /= 4;
@@ -71,16 +71,16 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     # end
     # leftcoeff = (n*(tau-1))/(tau*(n-1));
     # rightcoeff = (n-tau)/(tau*(n-1));
-    # Lheuristic = leftcoeff*L + rightcoeff*Lmax;
+    # Lpractical = leftcoeff*L + rightcoeff*Lmax;
     # Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;
     # Lbernstein = 2*leftcoeff*L + (1/tau)*((n-tau)/(n-1) + (4/3)*log(prob.numfeatures))*Lmax;
     # rightterm = ((n-tau)/(tau*(n-1)))*Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
 
     # if options.stepsize_multiplier == -1.0
-    #     ## Heuristic
-    #     println("Heuristic step size");
+    #     ## Practical
+    #     println("Practical step size");
     #     sleep(2);
-    #     method.stepsize = 1.0/(4.0*max(Lheuristic, rightterm));
+    #     method.stepsize = 1.0/(4.0*max(Lpractical, rightterm));
     # elseif options.stepsize_multiplier == -2.0
     #     ## Simple bound
     #     println("Simple step size");
@@ -105,7 +105,7 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
     println("Skipping ", options.skip_error_calculation, " iterations per epoch")
-    return method;
+    return method
 end
 
 

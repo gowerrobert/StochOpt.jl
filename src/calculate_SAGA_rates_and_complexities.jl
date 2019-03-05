@@ -427,7 +427,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
         # Lbar = prob.Lbar;
 
         if(occursin("lgstc", prob.name))
-            ## Correcting for logistic since phi'' <= 1/4
+            ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
             L /= 4;
             Lmax /= 4;
             # Lbar /= 4;
