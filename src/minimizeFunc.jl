@@ -24,7 +24,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     else
         # println("\n---Method is not a String---\n") # To try if this else is for SAGA
         method = method_input;
-        method = method.bootmethod(prob, method, options); # Previous code
+        method = method.bootmethod(prob, method, options);
         # method = method.bootmethod(prob, method, options, x);
     end
     println(method.name);
@@ -74,7 +74,8 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     end
     for iter = 1:options.max_iter
         if iter == 1
-            time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d); # Error at the first iteration of the first launch
+            ## "Warm up" to avoid error on the elpased time at the first iteration of the first launch
+            time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
 
             ## Resetting back the method
             if(typeof(method_input) == String)
@@ -90,7 +91,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             d = zeros(prob.numfeatures); # Search direction vector
             fail = "failed";
         end
-        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d); # Error at the first iteration of the first launch
+        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
         x[:] = x + method.stepsize * d;
         # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));

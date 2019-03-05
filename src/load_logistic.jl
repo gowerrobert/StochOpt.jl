@@ -107,8 +107,8 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     Lbar = mean(Li_s);
 
     ## Correcting for logistic since phi'' <= 1/4
-    Lmax /= 4;
     L /= 4;
+    Lmax /= 4;
     Lbar /= 4;
 
     # if opts.regularizor =="huber"
@@ -138,7 +138,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     #end
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
-        Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
+                Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
 
     ## Try to load the solution of the problem, if already computed
     load_fsol!(opts, prob);

@@ -32,7 +32,7 @@ function descent_SAGA_nice(x::Array{Float64}, prob::Prob, options::MyOptions, sg
 
     # Minus the gradient estimate = descent direction
     # Update of minus the unbiased gradient estimate: -g^k
-    if(sg.unbiased)
+    if sg.unbiased
         d[:] = -sg.SAGgrad - (1/options.batchsize)*sg.aux;
     else
         d[:] = -sg.SAGgrad; #- (1/options.batchsize)*sg.aux;
