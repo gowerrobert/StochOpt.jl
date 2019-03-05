@@ -48,7 +48,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
             probs[:] = probs/Z;
             stepsize = prob.numdata/Z;
             descent_method = descent_SAGA_adapt2;#descent_SAGA_adapt;
-        elseif(probability_type == "uni"||probability_type == "Li"||probability_type == "opt") # adding "Li" and "opt" cases
+        elseif(probability_type == "uni" || probability_type == "Li" || probability_type == "opt") # adding "Li" and "opt" cases
             Jac, minibatches, probs, name, L, Lmax, stepsize = boot_SAGA_partition(prob, options, probability_type, name, mu); # Does "ada" exist for "partition"?
             descent_method = descent_SAGApartition;
         else
@@ -58,7 +58,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
         end
     ### End partition
     elseif(minibatch_type == "Li_order_partition")
-        if(probability_type == "uni"||probability_type == "Li"||probability_type == "opt") # adding "Li" and "opt" cases
+        if(probability_type == "uni" || probability_type == "Li" || probability_type == "opt") # adding "Li" and "opt" cases
             Jac, minibatches, probs, name, L, Lmax = boot_SAGA_Li_order_partition(prob, options, probability_type, name, mu); # Does "ada" exist for "Li_order_partition"?
             descent_method = descent_SAGApartition;
         else
@@ -69,7 +69,7 @@ function initiate_SAGA(prob::Prob, options::MyOptions; minibatch_type="nice", pr
     # elseif(minibatch_type == "nice")
     #     println("\nFor nice minibatch: probability_type is useless\n");
     #     name = string(name, "-", minibatch_type);
-    #     L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
+    #     L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda;
     #     Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
     #     Jac = zeros(prob.numfeatures, prob.numdata);
     else
@@ -86,32 +86,39 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
     n = prob.numdata;
     if(method.minibatch_type == "partition")  # 1/(4 L + n/tau mu)
         if(method.probability_type == "uni")
-            Lexpected = method.Lmax;
+            Lexpected = method.Lmax; # Why ?
         else
-            Lexpected = method.L;
+            Lexpected = method.L;    # Why ?
         end
+
+        if(occursin(prob.name, "lgstc"))
+            Lexpected /= 4;    #  correcting for logistic since phi'' <= 1/4
+        end
+
+        method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*method.mu);
     else # nice sampling     # interpolate Lmax and L
+        Lmax = method.Lmax
         Li_s = get_Li(prob.X, prob.lambda);
         Lbar = mean(Li_s);
+
+        if occursin(prob.name, "lgstc")
+            Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
+            Lbar /= 4;
+        end
+
         leftcoeff = (n*(tau-1))/(tau*(n-1));
         rightcoeff = (n-tau)/(tau*(n-1));
-        simplebound = leftcoeff*Lbar + rightcoeff*method.Lmax;
-        # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*method.Lmax + ((tau - 1)/(n - 1))*method.L;
+        L_simple = leftcoeff*Lbar + rightcoeff*Lmax; # Use L_simple as an approximation of the expected smoothness constant
+        rightterm = ((n-tau)/(tau*(n-1)))*Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
+        method.stepsize = 1.0/(4*max(L_simple, rightterm));
     end
-    if(occursin(prob.name, "lgstc"))
-        Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4 #TOCHANGE
-    end
-    rightterm = ((n-tau)/(tau*(n-1)))*method.Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
-    ### Broken code: how is this possible? simplebound not defined depending on execution
-    method.stepsize = 1.0/(4*max(simplebound, rightterm));
-    # method.stepsize = options.stepsize_multiplier/(4*Lexpected + (n/tau)*method.mu);
 
     if(options.skip_error_calculation == 0.0)
         options.skip_error_calculation = ceil(options.max_epocs*prob.numdata/(options.batchsize*30)); # show 5 times per pass over the data
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
     println("Skipping ", options.skip_error_calculation, " iterations per epoch")
-    return method;
+    return method
 end
 
 function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::AbstractString, name::AbstractString, mu::Float64)
@@ -138,6 +145,13 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
     end
     Lmax = maximum(probs);
     L = mean(probs);
+
+    ## Shouldn't we correct the smoothness constants in the logistic regression case?
+    # if occursin(prob.name, "lgstc")
+    #     Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
+    #     L /= 4;
+    # end
+
     if(probability_type == "Li")
         probs[:] = probs./sum(probs);
         stepsize = 1/(4*L+numpartitions*mu);
@@ -145,7 +159,7 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
         probs[:] .= 1/numpartitions;
         stepsize = 1/(4*Lmax+numpartitions*mu);
     elseif(probability_type == "opt") # What is else for? I think it is "opt"
-        probs[:] = probs.*4 .+numpartitions*mu; # julia 0.7
+        probs[:] = probs.*4 .+numpartitions*mu;
         stepsize = 1/(mean(probs));
         probs[:] = probs./sum(probs);
     else
@@ -193,12 +207,19 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
     end
     Lmax = maximum(probs);
     L = mean(probs);
+
+    ## Shouldn't we correct the smoothness constants in the logistic regression case?
+    # if occursin(prob.name, "lgstc")
+    #     Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
+    #     L /= 4;
+    # end
+
     if(probability_type == "Li")
         probs[:] = probs./sum(probs);
     elseif(probability_type == "uni")
         probs[:] .= 1/numpartitions;
     elseif(probability_type == "opt") # What is else for? I think it is "opt"
-        probs[:] = probs.*4 .+numpartitions*mu; # julia 0.7
+        probs[:] = probs.*4 .+numpartitions*mu;
         probs[:] = probs./sum(probs);
     else
         error("unknown probability_type name (", probability_type, ").")
@@ -274,7 +295,7 @@ end
 #         descent_method = descent_SAGApartition;
 #     else
 #         name = string(name, "-", minibatch_type);
-#         L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda; # julia 0.7
+#         L = eigmax(Matrix(prob.X*prob.X'))/prob.numdata + prob.lambda;
 #         Lmax = maximum(sum(prob.X.^2,1)) + prob.lambda;
 #         Jac = zeros(prob.numfeatures, prob.numdata);
 #     end
