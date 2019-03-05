@@ -20,7 +20,7 @@ Running time of all 12 problems on a laptop with 16Gb RAM and Intel® Core™ i7
 7768.175183 seconds (9.31 G allocations: 13.712 TiB, 15.83% gc time), around 2h 09min
 
 ## --- SAVED FILES ---
-For each problem (data set + scaling process + regularization),
+For each problem (data set + scaling process + regularization)
 - the epoch and time plots (with and without Hofmann settings) are saved in ".pdf" format in the "./figures/" folder
 - the results of the simulations (OUTPUTS objects) are saved in ".jld" format in the "./data/" folder
 - the total complexities of the run methods are saved in ".txt" files the "./outputs/" folder

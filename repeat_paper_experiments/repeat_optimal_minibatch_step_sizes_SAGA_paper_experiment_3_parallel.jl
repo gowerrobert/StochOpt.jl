@@ -22,7 +22,7 @@ Running time of all 12 problems when adding 4 processors on a laptop with 16Gb R
 4737.082030 seconds (3.59 M allocations: 163.263 MiB, 0.00% gc time), around 1h19
 
 ## --- SAVED FILES ---
-For each problem (data set + scaling process + regularization),
+For each problem (data set + scaling process + regularization)
 - the epoch and time plots (with and without Hofmann settings) are saved in ".pdf" format in the "./figures/" folder
 - the results of the simulations (OUTPUTS objects) are saved in ".jld" format in the "./data/" folder
 - the total complexities of the run methods are saved in ".txt" files the "./outputs/" folder
