@@ -59,6 +59,7 @@ function initiate_SAGA_partition(prob::Prob, options::MyOptions; minibatch_type=
     Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, probability_type, Z, L, Lmax, mu);
 end
 
+## WANRING: potential conflict with the same function defined in src/boot_SAGA.jl
 function boot_SAGA(prob::Prob, method, options::MyOptions)
     tau = options.batchsize;
     n = prob.numdata;
@@ -91,6 +92,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
     return method;
 end
 
+## WANRING: potential conflict with the same function defined in src/boot_SAGA.jl
 function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::AbstractString, name::AbstractString, mu::Float64)
     ## Setting up a partition mini-batch
     numpartitions = convert(Int64, ceil(prob.numdata/options.batchsize)) ;
@@ -122,7 +124,7 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
         probs[:] .= 1/numpartitions;
         stepsize = 1/(4*Lmax+numpartitions*mu);
     elseif(probability_type == "opt") # What is else for? I think it is "opt"
-        probs[:] = probs.*4 .+numpartitions*mu; # julia 0.7
+        probs[:] = probs.*4 .+numpartitions*mu;
         stepsize = 1/(mean(probs));
         probs[:] = probs./sum(probs);
     else
