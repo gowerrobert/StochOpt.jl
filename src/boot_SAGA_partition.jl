@@ -76,7 +76,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
     simplebound = leftcoeff*Lbar + rightcoeff*method.Lmax;
     # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*method.Lmax + ((tau - 1)/(n - 1))*method.L;
     if(occursin(prob.name, "lgstc"))
-        Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4
+        Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4 #TOCHANGE
     end
     rightterm = ((n-tau)/(tau*(n-1)))*method.Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
     ### Broken code: how is this possible? simplebound not defined depending on execution
