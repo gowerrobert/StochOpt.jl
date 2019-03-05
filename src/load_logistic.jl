@@ -106,6 +106,11 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
     Lbar = mean(Li_s);
 
+    ## Correcting for logistic since phi'' <= 1/4
+    # Lmax /= 4;
+    # L /= 4;
+    # Lbar /= 4;
+
     # if opts.regularizor =="huber"
     #         f_eval(x,S) =  (1./length(S))*logistic_eval(Xt,y,x,S)+(reg)* huber_eval(x,opts.hubermu);
     #         g_eval(x,S) = ((1./length(S))*logistic_grad_sub(Xt,y,x,S)+(reg)*huber_grad(x,opts.hubermu));

@@ -80,7 +80,20 @@ for data in datasets
             end
 
             n = prob.numdata;
-            d = prob.numfeatures;
+
+
+            # d = prob.numfeatures;
+            # mu = prob.mu
+            # Lmax = prob.Lmax;
+            # L = prob.L;
+            # # Lbar = prob.Lbar;
+
+            # if occursin("lgstc", prob.name)
+            #     ## Correcting for logistic since phi'' <= 1/4
+            #     Lmax /= 4;
+            #     L /= 4;
+            #     # Lbar /= 4;
+            # end
 
             ### COMPUTING THE SMOOTHNESS CONSTANTS ###
             # Compute the smoothness constants L, L_max, \cL, \bar{L}
@@ -97,7 +110,7 @@ for data in datasets
             plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst, showlegend=false);
 
             # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
-            if(n<=datathreshold)
+            if n <= datathreshold
                 println("Heuristic - expected smoothness gap: ", heuristicbound - expsmoothcst)
                 println("Simple - heuristic gap: ", simplebound - heuristicbound)
                 println("Bernstein - simple gap: ", bernsteinbound - simplebound)
