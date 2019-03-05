@@ -66,7 +66,7 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
     n = 1
     for line in eachline(fi)
         line = split(line, " ")
-        append!(b, [parse(Float64, line[1])]) `float(x::AbstractString)` is deprecated, use `parse(Float64, x)` instead.
+        append!(b, [parse(Float64, line[1])])
         line = line[2:end]
         for itm in line
             if !(strip(itm) == "")

@@ -127,9 +127,9 @@ function get_mu_str_conv(X, lambda::Float64)
     numfeatures = sX[1];
     numdata = sX[2];
     if numfeatures < numdata
-        mu = eigmin(Matrix(X*X'))/numdata + lambda; 'full(A)' has been deprecated
+        mu = eigmin(Matrix(X*X'))/numdata + lambda;
     else
-        mu = eigmin(Matrix(X'*X))/numdata + lambda; 'full(A)' has been deprecated
+        mu = eigmin(Matrix(X'*X))/numdata + lambda;
     end
     return mu
 end
@@ -152,9 +152,9 @@ end
 #     numfeatures = sX[1];
 #     numdata = sX[2];
 #     if numfeatures < numdata
-#         mu = (1/power_iteration(inv(Matrix(X*X'))))/numdata + lambda; 'full(A)' has been deprecated
+#         mu = (1/power_iteration(inv(Matrix(X*X'))))/numdata + lambda;
 #     else
-#         mu = (1/power_iteration(inv(Matrix(X'*X))))/numdata + lambda; 'full(A)' has been deprecated
+#         mu = (1/power_iteration(inv(Matrix(X'*X))))/numdata + lambda;
 #     end
 #     return mu
 # end
