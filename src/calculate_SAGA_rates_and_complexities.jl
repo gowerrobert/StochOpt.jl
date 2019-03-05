@@ -208,12 +208,12 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
     heuristicbound = zeros(n, 1);
     bernsteinbound = zeros(n, 1);
     for tau = 1:n
-        if(n<100)
+        if n < 100
             print("Calculating bounds for tau = ", tau, "\n");
         elseif((tau % floor(Int64, (n/100))) == 1) # 100 messages for the whole data set
             print("Calculating bounds for tau = ", tau, "\n");
         end
-        if(n <= datathreshold)
+        if n <= datathreshold
             expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
         end
         leftcoeff = (n*(tau-1))/(tau*(n-1));
