@@ -1,15 +1,15 @@
 """
     initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
 
-Initiate the SAGA method for ``τ``--nice sampling.
-It uniformly picks ``τ`` data points out of ``n`` at each iteration to build an estimate of the gradient.
+Initiate the SAGA method for b-nice sampling.
+It uniformly picks b data points out of ``n`` at each iteration to build an estimate of the gradient.
 
 #INPUTS:\\
     - prob: considered problem (i.e. logistic regression, ridge ression...) of the type **Prob** (see src/StochOpt.jl)\\
     - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
     - unbiased: select the desired estimate of the gradient. If `true`, SAGA is implemented, else if `false` SAG is implemented\\
 #OUTPUTS:\\
-    - SAGA_nice_method: SAGA mini-batch method for ``τ``--nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
+    - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
 """
 function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     # options.stepsize_multiplier = 1; # WHY ?!
@@ -52,7 +52,7 @@ Set the stepsize based on the smoothness constants of the problem stored in **SA
     - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
     - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
 #OUTPUTS:\\
-    - SAGA_nice_method: SAGA mini-batch method for ``τ``--nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
+    - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
 """
 function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     # /!\ WARNING: this function modifies its own arguments (`method` and `options`) and returns method! Shouldn't we name it "boot_SAGA_nice!(...)" with an "!" ?
@@ -62,13 +62,6 @@ function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
     # Lmax = prob.Lmax;
     # Lbar = prob.Lbar;
 
-    # if(occursin("lgstc", prob.name)) # julia 0.7
-    #     ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
-    #     # Lexpected = Lexpected/4;
-    #     L /= 4;
-    #     Lmax /= 4;
-    #     Lbar /= 4;
-    # end
     # leftcoeff = (n*(tau-1))/(tau*(n-1));
     # rightcoeff = (n-tau)/(tau*(n-1));
     # Lpractical = leftcoeff*L + rightcoeff*Lmax;
@@ -112,14 +105,14 @@ end
 """
     reset_SAGA_nice(prob::Prob, method, options::MyOptions)
 
-Reset the SAGA method with  ``τ``--nice sampling, especially the step size, the gradient and the Jacobian estimates.
+Reset the SAGA method with  b-nice sampling, especially the step size, the gradient and the Jacobian estimates.
 
 #INPUTS:\\
     - prob: considered problem (i.e. logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
     - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
     - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
 #OUTPUTS:\\
-    - SAGA_nice_method: SAGA mini-batch method for ``τ``--nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
+    - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
 """
 function reset_SAGA_nice(prob::Prob, method, options::MyOptions; unbiased=true)
     # println("\n---- RESET SAGA NICE ----\n");
