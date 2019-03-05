@@ -205,10 +205,13 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
     mu = prob.mu
     Lmax = prob.Lmax;
     L = prob.L;
+    # Lbar = prob.Lbar;
 
     if occursin("lgstc", prob.name)
         ## Correcting for logistic since phi'' <= 1/4
         Lmax /= 4;
+        L /= 4;
+        # Lbar /= 4;
     end
 
     ## Computing mini-batch and step sizes
