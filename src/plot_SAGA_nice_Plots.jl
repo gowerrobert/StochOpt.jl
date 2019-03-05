@@ -73,7 +73,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
              legend=showlegend,
              label=labellist,
              xlabel=xlabeltxt, ylabel="smoothness constant", tickfont=font(fontsmll), #xticks=1:n,
-             guidefont=font(fontbig), legendfont=font(fontlegend), markersize=6, linewidth=3, grid=false, # marker=:auto, # julia 0.7
+             guidefont=font(fontbig), legendfont=font(fontlegend), markersize=6, linewidth=3, grid=false, # marker=:auto,
              color=reshape(colorlist[1:4], 1, :),
             #  marker=reshape(markerlist[1:4], 1, :),
             #  linestyle=:auto,
@@ -161,7 +161,7 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
                  legendfont=font(fontlegend),
                  markersize=6,
                  linewidth=3,
-                 grid=false, # julia 0.7 'marker=:auto,'
+                 grid=false, #'marker=:auto,'
                  color=reshape(colorlist[1:4], 1, :),
                 #  marker=markerlist,
                 #  linestyle=:auto,

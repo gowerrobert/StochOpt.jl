@@ -1,6 +1,6 @@
 using Random
 using Printf
-using LinearAlgebra # julia 0.7
+using LinearAlgebra
 
 include("../util/power_iteration.jl") # Be carefull about the path here
 

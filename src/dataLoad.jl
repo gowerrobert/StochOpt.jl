@@ -17,8 +17,8 @@
 # 4) Enjoy.
 
 using JLD
-using SparseArrays # julia 0.7
-using Statistics # julia 0.7
+using SparseArrays
+using Statistics
 
 # this needs to be changed to your personal path.
 
@@ -66,14 +66,14 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
     n = 1
     for line in eachline(fi)
         line = split(line, " ")
-        append!(b, [parse(Float64, line[1])]) # julia 0.7 `float(x::AbstractString)` is deprecated, use `parse(Float64, x)` instead.
+        append!(b, [parse(Float64, line[1])]) `float(x::AbstractString)` is deprecated, use `parse(Float64, x)` instead.
         line = line[2:end]
         for itm in line
             if !(strip(itm) == "")
                 itm = split(itm, ":")
                 append!(Ir, [n])
                 append!(Jr, [parse(Int, strip(itm[1]))])
-                # append!(Jr, [Meta.parse(Int, strip(itm[1]))]) # julia 0.7
+                # append!(Jr, [Meta.parse(Int, strip(itm[1]))])
                 append!(Pr, [parse(Float64, strip(itm[2]))])
             end
         end
@@ -83,7 +83,7 @@ function readLIBSVM(fname::AbstractString, classification::Bool) # the function 
     if classification
         mb = mean(b)
         for i=1:length(b)
-            b[i] = (b[i] > mb) ? 1. : -1. # julia 0.7
+            b[i] = (b[i] > mb) ? 1. : -1.
         end
     end
     A = sparse(round.(Integer, Ir), round.(Integer, Jr), Pr)

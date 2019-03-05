@@ -3,11 +3,11 @@ using Plots
 using StatsBase
 using Match
 using Combinatorics
-using Random # julia 0.7
-using Printf # julia 0.7
-using LinearAlgebra # julia 0.7
-using Statistics # julia 0.7
-using Base64 # julia 0.7
+using Random
+using Printf
+using LinearAlgebra
+using Statistics
+using Base64
 
 include("../src/StochOpt.jl") # Be carefull about the path here
 
@@ -33,7 +33,7 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
                     #   regularizor_parameter = "1/num_data", # fixes lambda
                       regularizor_parameter = "normalized",
                     #   regularizor_parameter = "Lbar/n",
-                      initial_point="zeros", # is fixed not to add more randomness 
+                      initial_point="zeros", # is fixed not to add more randomness
                       force_continue=false); # force continue if diverging or if tolerance reached
 
 @time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");
@@ -45,13 +45,13 @@ y = nothing; # available in prob.y
 #region
 ## Computing the solution with a serial gridsearch
 # @time get_fsol_logistic!(prob)
-## ---> First gridsearch on news20.binary of 1 hour led us to fsol = 0.429724 
+## ---> First gridsearch on news20.binary of 1 hour led us to fsol = 0.429724
 ## (for SVRG, beststep = 2.0 and batchsize = 100)
 
 ## By hand, let us try another single run of 3 hours with step = 2.0 on news20.binary
 method_input = "SVRG";
 
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8, 
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^1, exacterror=false, max_iter=10^8,
                       max_time=60.0*60.0*3.0, max_epocs=70, force_continue=true);
 options.batchsize = 100;
 options.stepsize_multiplier = 2.0; # beststep = 2.0 for batchsize = 100

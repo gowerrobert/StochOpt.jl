@@ -6,8 +6,8 @@ using StatsBase
 using Match
 using Combinatorics
 using Random
-using Printf # julia 0.7
-using LinearAlgebra # julia 0.7
+using Printf
+using LinearAlgebra
 
 include("./src/StochOpt.jl") # Be carefull about the path here
 

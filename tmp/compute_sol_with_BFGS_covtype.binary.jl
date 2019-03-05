@@ -3,11 +3,11 @@ using Plots
 using StatsBase
 using Match
 using Combinatorics
-using Random # julia 0.7
-using Printf # julia 0.7
-using LinearAlgebra # julia 0.7
-using Statistics # julia 0.7
-using Base64 # julia 0.7
+using Random
+using Printf
+using LinearAlgebra
+using Statistics
+using Base64
 
 ## Bash inputs
 include("../src/StochOpt.jl") # Be carefull about the path here

@@ -7,11 +7,11 @@ using Plots
 using StatsBase
 using Match
 using Combinatorics
-using Random # julia 0.7
-using Printf # julia 0.7
-using LinearAlgebra # julia 0.7
-using Statistics # julia 0.7
-using Base64 # julia 0.7
+using Random
+using Printf
+using LinearAlgebra
+using Statistics
+using Base64
 using Formatting
 using LaTeXStrings
 
@@ -66,8 +66,8 @@ mu = prob.mu
 Lmax = prob.Lmax;
 L = prob.L;
 
-if occursin("lgstc", prob.name) # julia 0.7
-    ## Correcting for logistic since phi'' <= 1/4
+if occursin("lgstc", prob.name)
+    ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
     Lmax /= 4;
 end
 

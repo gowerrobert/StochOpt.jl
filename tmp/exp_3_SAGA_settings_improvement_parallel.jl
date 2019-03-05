@@ -114,8 +114,8 @@ mu = prob.mu
 Lmax = prob.Lmax;
 L = prob.L;
 
-if occursin("lgstc", prob.name) # julia 0.7
-    ## Correcting for logistic since phi'' <= 1/4
+if occursin("lgstc", prob.name)
+    ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
     Lmax /= 4;
 end
 

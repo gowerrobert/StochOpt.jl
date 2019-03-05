@@ -17,7 +17,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     sX = size(X);
     numfeatures = sX[1];
     numdata = sX[2];
-    
+
     if lambda == -1
         if(opts.regularizor_parameter == "1/num_data")
             lambda = 1/numdata;
@@ -25,7 +25,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
             lambda = 1/(2.0*numdata); #maximum(sum(X.^2,1))/(4.0*numdata);
             #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
         elseif(opts.regularizor_parameter == "Lbar/n")
-            lambda = mean(sum(X.^2, dims=1))/numdata; # Lbar / n # julia 0.7
+            lambda = mean(sum(X.^2, dims=1))/numdata; # Lbar / n
             # display(lambda)
             #println("maximum(sum(X.^2,1)): ", maximum(sum(X.^2,1)))
         else
@@ -51,19 +51,19 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     Lmax = maximum(Li_s); # Lmax = maximum(sum(prob.X.^2, 1)) + prob.lambda;
     Lbar = mean(Li_s); # = mean(sum(X.^2, dims=1))
 
-    f_eval(x, S)                = ((1 ./ length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2); # julia 0.7
-    g_eval(x, S)                = ((1 ./ length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x); # julia 0.7
+    f_eval(x, S)                = ((1 ./ length(S))*ridge_eval(X[:, S], y[S], x) + lambda*0.5*norm(x)^2);
+    g_eval(x, S)                = ((1 ./ length(S))*ridge_grad(X[:, S], y[S], x) + lambda*x);
     g_eval!(x, S, g)            = ridge_grad!(X[:, S], y[S], x, lambda, length(S), g);
     Jac_eval!(x, S, Jac)        = ridge_Jac!(X[:, S], y[S], x, lambda, S, Jac);
     scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:, S], y[S], x);
     scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:, S], y[S], x);
 
-    prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval, 
+    prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
                 x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda, mu, L, Lmax, Lbar)
-  
+
     ## Try to load the solution of the problem, if already computed
     load_fsol!(opts, prob);
-    
+
     if prob.fsol == 0.0
         println("Computing and saving the exact solution of the problem")
         get_fsol_ridge!(prob); ## getting and saving approximation of the solution fsol
@@ -117,7 +117,7 @@ xsol = ( (1/n)X X' + lambda I )^(-1) Xy
 """
 function get_fsol_ridge!(prob)
     # ((1/n)X X' + lambda I) w = Xy
-    # xsol = ( (1/n)X X' + lambda I ) \ Xy 
+    # xsol = ( (1/n)X X' + lambda I ) \ Xy
 
     ## Computation of fsol
     xsol = (prob.X*prob.X' + prob.numdata*prob.lambda*Matrix(1.0I, prob.numfeatures, prob.numfeatures)) \ (prob.X*prob.y); # no more 'eye(numfeatures)' in julia 0.7

@@ -127,9 +127,9 @@ function get_mu_str_conv(X, lambda::Float64)
     numfeatures = sX[1];
     numdata = sX[2];
     if numfeatures < numdata
-        mu = eigmin(Matrix(X*X'))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+        mu = eigmin(Matrix(X*X'))/numdata + lambda; 'full(A)' has been deprecated
     else
-        mu = eigmin(Matrix(X'*X))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+        mu = eigmin(Matrix(X'*X))/numdata + lambda; 'full(A)' has been deprecated
     end
     return mu
 end
@@ -152,9 +152,9 @@ end
 #     numfeatures = sX[1];
 #     numdata = sX[2];
 #     if numfeatures < numdata
-#         mu = (1/power_iteration(inv(Matrix(X*X'))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+#         mu = (1/power_iteration(inv(Matrix(X*X'))))/numdata + lambda; 'full(A)' has been deprecated
 #     else
-#         mu = (1/power_iteration(inv(Matrix(X'*X))))/numdata + lambda; # julia 0.7 'full(A)' has been deprecated
+#         mu = (1/power_iteration(inv(Matrix(X'*X))))/numdata + lambda; 'full(A)' has been deprecated
 #     end
 #     return mu
 # end
@@ -317,7 +317,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   heuristicstepsize::Array{Float64}, expsmoothstepsize,
                                   opt_minibatch_simple::Int64=0, opt_minibatch_bernstein::Int64=0,
                                   opt_minibatch_heuristic::Int64=0, opt_minibatch_exact=0)
-    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_"); # julia 0.7
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./data/";
     savename = "-exp1-cst";
 

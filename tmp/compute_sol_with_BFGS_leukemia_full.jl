@@ -3,11 +3,11 @@ using Plots
 using StatsBase
 using Match
 using Combinatorics
-using Random # julia 0.7
-using Printf # julia 0.7
-using LinearAlgebra # julia 0.7
-using Statistics # julia 0.7
-using Base64 # julia 0.7
+using Random
+using Printf
+using LinearAlgebra
+using Statistics
+using Base64
 
 include("../src/StochOpt.jl") # Be carefull about the path here
 
@@ -31,7 +31,7 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
                     #   regularizor_parameter = "1/num_data", # fixes lambda
                       regularizor_parameter = "normalized",
                     #   regularizor_parameter = "Lbar/n",
-                      initial_point="zeros", # is fixed not to add more randomness 
+                      initial_point="zeros", # is fixed not to add more randomness
                       force_continue=false); # force continue if diverging or if tolerance reached
 
 @time prob = load_logistic_from_matrices(X, y, data, options, lambda=-1, scaling="none");  # scaling = centering and scaling
@@ -42,7 +42,7 @@ options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=1
 # @time get_fsol_logistic!(prob)
 ##  0.002187786371    /   200 epochs  /  beststep = 2048.0
 
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8, 
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=20, exacterror=false, max_iter=10^8,
                       max_time=60.0*60.0, max_epocs=300, force_continue=true);
 ## Running BFGS
 options.stepsize_multiplier = 2^(11.0); # beststep = 2^(11.0) for batchsize = prob.numdata

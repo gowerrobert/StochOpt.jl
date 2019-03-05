@@ -1,6 +1,6 @@
 ### EXPERIMENT 1 & 2
 
-## Computing the upper-bounds of the expected smoothness constant (exp. 1) 
+## Computing the upper-bounds of the expected smoothness constant (exp. 1)
 ## and our stepsizes (exp. 2)
 
 ## Bash inputs
@@ -14,11 +14,11 @@ using Plots
 using StatsBase
 using Match
 using Combinatorics
-using Random # julia 0.7
-using Printf # julia 0.7
-using LinearAlgebra # julia 0.7
-using Statistics # julia 0.7
-using Base64 # julia 0.7
+using Random
+using Printf
+using LinearAlgebra
+using Statistics
+using Base64
 
 # using Distributed
 # addprocs(4)
@@ -31,7 +31,7 @@ Random.seed!(1);
 
 ### LOADING DATA ###
 println("--- Loading data ---");
-# Available datasets are in "./data/available_datasets.txt" 
+# Available datasets are in "./data/available_datasets.txt"
 # datasets = ["fff", "gauss-5-8-0.0_seed-1234", "YearPredictionMSD", "abalone", "housing"];
 # datasets = readlines("$(default_path)available_datasets.txt");
 #, "letter_scale", "heart", "phishing", "madelon", "a9a",
@@ -58,14 +58,14 @@ println("--- Loading data ---");
                           regularizor_parameter = "normalized",
                         #   regularizor_parameter = "Lbar/n",
                         #   repeat_stepsize_calculation=true, # used in minimizeFunc_grid_stepsize
-                          initial_point="zeros", # is fixed not to add more randomness 
+                          initial_point="zeros", # is fixed not to add more randomness
                           force_continue=false); # force continue if diverging or if tolerance reached
     u = unique(y);
     if length(u) < 2
         error("Wrong number of possible outputs")
     elseif length(u) == 2
         println("Binary output detected: the problem is set to logistic regression")
-        prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);  
+        prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);
     else
         println("More than three modalities in the outputs: the problem is set to ridge regression")
         prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling);
@@ -142,9 +142,9 @@ println("--- Loading data ---");
 
     ########################################### SAVNG RESULTS ########################################################
     #region
-    save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
+    save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst,
                              simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
-                             opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
+                             opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic,
                              opt_minibatch_exact);
     #endregion
     ##################################################################################################################

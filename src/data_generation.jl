@@ -7,7 +7,7 @@ end
 
 function gen_diag_data(numdata::Int64; lambda=1, Lmax=numdata, err=0.001, rotate=false)
     # X = diagm([1; (1.0:1.0:numdata-1).*(Lmax/numdata)]); #
-    X = diagm(0 => sqrt.([1; (1.0:1.0:numdata-2).*(Lmax/numdata); Lmax])); # julia 0.7 equiv to 'Matrix(Diagonal(v))'
+    X = diagm(0 => sqrt.([1; (1.0:1.0:numdata-2).*(Lmax/numdata); Lmax])); equiv to 'Matrix(Diagonal(v))'
     # X = diagm(sqrt.([1; (1.0:1.0:numdata).*(Lmax/numdata)])); #
     if rotate
         X = rotate_matrix(X);
@@ -32,7 +32,7 @@ function gen_gauss_scaled_data(numfeatures::Int64, numdata::Int64; lambda=1, Lmi
 end
 
 function gen_diag_alone_eig_data(numfeatures::Int64, numdata::Int64; lambda=1, a=1, err=0.001, rotate=false)
-    X = diagm(0 => [ones(numdata-1); a]); # julia 0.7
+    X = diagm(0 => [ones(numdata-1); a]);
     if rotate
         X = rotate_matrix(X);
     end

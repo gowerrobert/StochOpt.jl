@@ -1,14 +1,14 @@
 using JLD
 using Plots
-using Printf # julia 0.7
+using Printf
 using Match
-using LinearAlgebra # julia 0.7
-using Random # julia 0.7
+using LinearAlgebra
+using Random
 using Combinatorics
 using StatsBase
 
-# using Statistics # julia 0.7
-# using Base64 # julia 0.7
+# using Statistics
+# using Base64
 
 include("./src/StochOpt.jl") # Be carefull about the path here
 
@@ -18,7 +18,7 @@ Random.seed!(1);
 
 ### LOADING DATA ###
 println("--- Loading data ---");
-# Available datasets are in "./data/available_datasets.txt" 
+# Available datasets are in "./data/available_datasets.txt"
 # datasets = ["fff", "gauss-5-8-0.0_seed-1234", "YearPredictionMSD", "abalone", "housing"];
 datasets = readlines("$(default_path)available_datasets.txt");
 for i in 1:length(datasets) println(i, ": ", datasets[i]) end
@@ -38,7 +38,7 @@ options = set_options(tol=10.0^(-3), max_iter=10^8, max_time=10.0^2, max_epocs=1
                       regularizor_parameter = "normalized",
                     #   regularizor_parameter = "Lbar/n",
                     #   repeat_stepsize_calculation=true, # used in minimizeFunc_grid_stepsize
-                      initial_point="zeros", # is fixed not to add more randomness 
+                      initial_point="zeros", # is fixed not to add more randomness
                       force_continue=false); # force continue if diverging or if tolerance reached
 u = unique(y);
 if length(u) < 2
@@ -122,9 +122,9 @@ opt_minibatch_heuristic = round(Int, 1 + (prob.mu*(n-1))/(4*prob.L));
 
 ########################################### SAVNG RESULTS ########################################################
 #region
-save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst, 
+save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst,
                          simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize,
-                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic, 
+                         opt_minibatch_simple, opt_minibatch_bernstein, opt_minibatch_heuristic,
                          opt_minibatch_exact);
 #endregion
 ##################################################################################################################
@@ -203,11 +203,11 @@ end
 ## Computing the empirical complexity
 # itercomplex -= 1; #-> should we remove 1 from itercomplex?
 empcomplex = reshape(minibatchlist.*itercomplex, length(minibatchlist)); # tau times number of iterations
-opt_minibatch_emp = minibatchlist[argmin(empcomplex)]; # julia 0.7
+opt_minibatch_emp = minibatchlist[argmin(empcomplex)];
 
 pyplot()
-plot_empirical_complexity(prob, minibatchlist, empcomplex, 
-                          opt_minibatch_simple, opt_minibatch_bernstein, 
+plot_empirical_complexity(prob, minibatchlist, empcomplex,
+                          opt_minibatch_simple, opt_minibatch_bernstein,
                           opt_minibatch_heuristic, opt_minibatch_emp);
 
 # ######################################### PRINTING CONSTANTS AND RESULTS #########################################

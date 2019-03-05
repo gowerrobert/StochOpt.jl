@@ -4,12 +4,12 @@
 #export pseudoinvert_matrix, uniform_mat_rank, uniform_sym_rank
 #export plot_outputs_Plots
 
-using SparseArrays # julia 0.7
+using SparseArrays
 using LinearAlgebra
 using Printf
 using Random
 using LaTeXStrings
-mutable struct MyOptions # julia 0.7
+mutable struct MyOptions
     tol::Float64
     aux::Float64
     max_iter::Int
@@ -51,14 +51,14 @@ function set_options(; tol::Float64 = 10.0^(-6.0),
         printiters, exacterror, repeat_stepsize_calculation, batchsize, "normalized", stepsize_multiplier, precondition, force_continue, rep_number, embeddim, initial_point)
 end
 
-mutable struct DataScaling # julia 0.7
+mutable struct DataScaling
     rowscaling::Array{Float64}
     colscaling::Array{Float64}
     colsmean::Array{Float64}
     name::AbstractString
 end
 
-mutable struct Prob # julia 0.7
+mutable struct Prob
     X  # why not a sparse array?
     y::Array{Float64}
     numfeatures::Int64
@@ -90,7 +90,7 @@ mutable struct Prob # julia 0.7
     Lbar::Float64 # Average of the smoothness constant of the f_i functions
 end
 
-mutable struct SAGAmethod # julia 0.7
+mutable struct SAGAmethod
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -113,7 +113,7 @@ mutable struct SAGAmethod # julia 0.7
     mu::Float64
 end
 
-mutable struct SAGA_nice_method # julia 0.7
+mutable struct SAGA_nice_method
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -136,7 +136,7 @@ mutable struct SAGA_nice_method # julia 0.7
     # mu::Float64 # Strong-convexity constant
 end
 
-mutable struct SPIN # julia 0.7
+mutable struct SPIN
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -153,7 +153,7 @@ mutable struct SPIN # julia 0.7
     sketchtype::AbstractString
 end
 
-mutable struct Method # julia 0.7
+mutable struct Method
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -175,7 +175,7 @@ mutable struct Method # julia 0.7
     numinneriters::Int64
 end
 
-mutable struct Output # julia 0.7
+mutable struct Output
     name::AbstractString
     iterations::Int
     epocsperiter::Float64 #Array{Float64}
