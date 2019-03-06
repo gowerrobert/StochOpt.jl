@@ -211,7 +211,7 @@ end
 
 """
     plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                              tau_practical::Int64, tau_empirical::Int64 ; path::AbstractString="./")
+                              b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./")
 
 Saves the plot of the empirical total complexity.
 
@@ -220,14 +220,14 @@ Saves the plot of the empirical total complexity.
     - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
     - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity)
       for each of the mini-batch size (tau) over numsimu samples\\
-    - **Int64** tau_practical: heuristic optimal mini-batch size\\
-    - **Int64** tau_empirical: empirical optimal mini-batch size\\
+    - **Int64** b_practical: heuristic optimal mini-batch size\\
+    - **Int64** b_empirical: empirical optimal mini-batch size\\
     - **AbstractString** path: path to the folder where the plots are saved\\
 #OUTPUTS:\\
     - None
 """
 function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                                   tau_practical::Int64, tau_empirical::Int64 ; path::AbstractString="./")
+                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./")
     numsimu = 1
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
@@ -241,8 +241,8 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
     n = prob.numdata
     d = prob.numfeatures
 
-    labellist = [latexstring("\$b_\\mathrm{empirical} = $tau_empirical\$"),
-                 latexstring("\$b_\\mathrm{practical} \\; = $tau_practical\$")]
+    labellist = [latexstring("\$b_\\mathrm{empirical} = $b_empirical\$"),
+                 latexstring("\$b_\\mathrm{practical} \\; = $b_practical\$")]
 
     plot(minibatchgrid, empcomplex, linestyle=:solid, color=:black,
          xaxis=:log, yaxis=:log,
@@ -252,10 +252,10 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
          tickfont=font(fontmed),
          guidefont=font(fontbig), linewidth=3, grid=false)
         #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-    vline!([tau_empirical-0.02], line=(:dash, 3), color=:blue, label=labellist[1],
+    vline!([b_empirical], line=(:dash, 3), color=:blue, label=labellist[1],
            legendfont=font(fontbig), legend=:best) #:legend
     #legendtitle="Optimal mini-batch size")
-    vline!([tau_practical+0.02], line=(:dot, 3), color=:red, label=labellist[2])
+    vline!([b_practical], line=(:dot, 3), color=:red, label=labellist[2])
     savename = "-exp4-empcomplex-$(numsimu)-avg"
     savefig("$(default_path)$(probname)$(savename).pdf")
 end
