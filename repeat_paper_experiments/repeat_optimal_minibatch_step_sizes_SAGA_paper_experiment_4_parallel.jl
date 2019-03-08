@@ -59,7 +59,7 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 if all_problems
     problems = 1:12;
 else
-    problems = 6:6; # DO NOT FORGET TO SET IT BACK TO "1:1"
+    problems = 10:10; # DO NOT FORGET TO SET IT BACK TO "1:1"
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
@@ -89,9 +89,11 @@ skip_multiplier = [0.01,        # GOOD
                    0.01,        # GOOD
                    0.01,        # GOOD (1->4 16 min)
                    0.05,        # GOOD 15 min for 0.05
-                   0.1,         # 13 min avec 1.0
-                   1.0, 1.0,
-                   1.0, 1.0,
+                   1.0,         # 25 min avec 1.0 et 2^18 et n en plus
+                   1.0,         # 22 min avec 1.0 / 43 min avec 0.1
+                   1.0,         # 52 min avec 1.0
+                   0.1,         # 12 min avec 1.0 / 21 min avec 0.1
+                   10.0,         # plus de 7h (max_time reached) pour 1.0
                    1.0, 1.0];
 
 precision = 10.0^(-4)
@@ -155,11 +157,11 @@ precision = 10.0^(-4)
 
     ## Computing the empirical mini-batch size over a grid
     # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
-    if data == "covtype_binary" && lambda == 10^(-1)
+    if data == "covtype_binary"
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
     elseif (data == "real-sim" && lambda == 10^(-1)) || (data == "ijcnn1_full" && lambda == 10^(-1))
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
-    elseif data == "real-sim" && lambda == 10^(-3)
+    elseif (data == "real-sim" && lambda == 10^(-3))
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
     else
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
