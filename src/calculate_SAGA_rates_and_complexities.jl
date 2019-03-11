@@ -14,7 +14,7 @@ function get_Li(X, lambda::Float64)
     return Li_s
 end
 
-function get_LC(X, lambda::Float64, C)
+function get_LC(X, lambda::Float64, C) # TO CHANGE: pass prob instead of X because the smoothness constant depends on the nature of the problem
     # println("full")
     # Matrix(prob.X[:, C]'*prob.X[:, C])
     # println("Symmetric")
@@ -48,18 +48,26 @@ function get_LC(X, lambda::Float64, C)
     return LC
 end
 
-function get_expected_smoothness_cst(prob::Prob, tau::Int64)
-    ## Computing the expected smoothness constant for a given minibatch size tau
+function get_expected_smoothness_cst(prob::Prob, b::Int64)
+    ## Computing the expected smoothness constant for a given minibatch size b
     n = prob.numdata;
-    Csets = combinations(1:n, tau);
+    Csets = combinations(1:n, b);
     Ls = zeros(1, n);
-    c1 = binomial(n-1, tau-1);
+    c1 = binomial(n-1, b-1);
     # Iteration is on the sets then saving is done for corresponding indices
     # It's another way of counting than in the definition of the expected smoothness constant
     # (first an iteration over the indices, then an iteration over the sets containing the picked index)
     for C in Csets
         Ls[C] = Ls[C] .+ (1/c1)*get_LC(prob.X, prob.lambda, C); # Implementation without inner loop
     end
+    println("Ls\n", Ls)
+
+    if occursin("lgstc", prob.name) # Problem....
+        println("Dividing by 4 the smoothness constants\n")
+        Ls /= 4;    #  correcting for logistic since phi'' <= 1/4
+    end
+    println("Ls\n", Ls)
+
     expsmoothcst = maximum(Ls);
     return expsmoothcst
 end
@@ -172,7 +180,7 @@ end
 
 Compute two upper-bounds of the expected smoothness constant (simple and Bernstein),
 a heuristic estimation of it and its exact value (if there are few data points) for
-each mini-batch size ``τ`` from 1 to n.
+each mini-batch size b from 1 to n.
 
 #INPUTS:\\
     - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
@@ -188,7 +196,7 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
     n = prob.numdata;
     d = prob.numfeatures;
 
-    if(n <= datathreshold)
+    if n <= datathreshold
         computeexpsmooth = true;
         expsmoothcst = zeros(n, 1);
     else # if n is too large we do not compute the exact expected smoothness constant
@@ -197,30 +205,24 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
         println("The number of data is to large to compute the exact expected smoothness constant");
     end
 
-    ### COMPUTING DIVERSE SMOOTHNESS CONSTANTS ###
-    # L = get_LC(prob.X, prob.lambda, collect(1:n)); # WARNING: it should not be recomputed every time
-    # Li_s = get_Li(prob.X, prob.lambda);
-    # Lmax = maximum(Li_s);
-    # Lbar = mean(Li_s);
-
     ### COMPUTING THE UPPER-BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###
     simplebound = zeros(n, 1);
     heuristicbound = zeros(n, 1);
     bernsteinbound = zeros(n, 1);
-    for tau = 1:n
+    for b = 1:n
         if n < 100
-            print("Calculating bounds for tau = ", tau, "\n");
-        elseif((tau % floor(Int64, (n/100))) == 1) # 100 messages for the whole data set
-            print("Calculating bounds for tau = ", tau, "\n");
+            print("Calculating bounds for b = ", b, "\n");
+        elseif (b % floor(Int64, (n/100))) == 1               # 100 messages for the whole data set
+            print("Calculating bounds for b = ", b, "\n");
         end
         if n <= datathreshold
-            expsmoothcst[tau] = get_expected_smoothness_cst(prob, tau);
+            expsmoothcst[b] = get_expected_smoothness_cst(prob, b);
         end
-        leftcoeff = (n*(tau-1))/(tau*(n-1));
-        rightcoeff = (n-tau)/(tau*(n-1));
-        simplebound[tau] = leftcoeff*prob.Lbar + rightcoeff*prob.Lmax;
-        heuristicbound[tau] = leftcoeff*prob.L + rightcoeff*prob.Lmax;
-        bernsteinbound[tau] = 2*leftcoeff*prob.L + (rightcoeff + (4*log(d))/(3*tau))*prob.Lmax;
+        leftcoeff = (n*(b-1))/(b*(n-1));
+        rightcoeff = (n-b)/(b*(n-1));
+        simplebound[b] = leftcoeff*prob.Lbar + rightcoeff*prob.Lmax;
+        heuristicbound[b] = leftcoeff*prob.L + rightcoeff*prob.Lmax;
+        bernsteinbound[b] = 2*leftcoeff*prob.L + (rightcoeff + (4*log(d))/(3*b))*prob.Lmax;
     end
 
     return simplebound, bernsteinbound, heuristicbound, expsmoothcst
@@ -231,7 +233,7 @@ end
 
 Compute upper bounds of the stepsize based on the simple bound, the Bernstein bound,
 our heuristic and the exact expected smoothness constant for each mini-batch size
-``τ`` from 1 to n.
+b from 1 to n.
 
 #INPUTS:\\
     - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
