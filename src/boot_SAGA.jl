@@ -92,6 +92,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
         end
 
         if(occursin("lgstc", prob.name))
+            println("Correcting smoothness constants for logistic since phi'' <= 1/4")
             Lexpected /= 4;    #  correcting for logistic since phi'' <= 1/4
         end
 
@@ -102,6 +103,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
         Lbar = mean(Li_s);
 
         if occursin("lgstc", prob.name)
+            println("Correcting smoothness constants for logistic since phi'' <= 1/4")
             Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
             Lbar /= 4;
         end
@@ -148,6 +150,7 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
 
     ## Shouldn't we correct the smoothness constants in the logistic regression case?
     # if occursin("lgstc", prob.name)
+    #     println("Correcting smoothness constants for logistic since phi'' <= 1/4")
     #     Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
     #     L /= 4;
     # end
@@ -210,6 +213,7 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
 
     ## Shouldn't we correct the smoothness constants in the logistic regression case?
     # if occursin("lgstc", prob.name)
+    #     println("Correcting smoothness constants for logistic since phi'' <= 1/4")
     #     Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
     #     L /= 4;
     # end

@@ -83,7 +83,10 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     else
         error("lambda cannot be nonpositive (except -1)");
     end
-    if verbose println("lambda = ", lambda, "\n") end
+
+    if verbose
+        println("lambda = ", lambda, "\n")
+    end
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
     ## To avoid very long computations when dimensions are large mu is approximated by lambda
@@ -107,6 +110,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     Lbar = mean(Li_s);
 
     ## Correcting for logistic since phi'' <= 1/4
+    println("Correcting smoothness constants for logistic since phi'' <= 1/4")
     L /= 4;
     Lmax /= 4;
     Lbar /= 4;

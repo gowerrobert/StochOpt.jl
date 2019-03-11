@@ -126,6 +126,7 @@ for idx_prob in problems
     # Lbar = prob.Lbar;
 
     if occursin("lgstc", prob.name)
+        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
         ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
         L /= 4;
         # Lmax /= 4;

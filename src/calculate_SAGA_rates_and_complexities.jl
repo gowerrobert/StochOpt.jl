@@ -60,13 +60,11 @@ function get_expected_smoothness_cst(prob::Prob, b::Int64)
     for C in Csets
         Ls[C] = Ls[C] .+ (1/c1)*get_LC(prob.X, prob.lambda, C); # Implementation without inner loop
     end
-    println("Ls\n", Ls)
 
-    if occursin("lgstc", prob.name) # Problem....
-        println("Dividing by 4 the smoothness constants\n")
+    if occursin("lgstc", prob.name)
+        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
         Ls /= 4;    #  correcting for logistic since phi'' <= 1/4
     end
-    println("Ls\n", Ls)
 
     expsmoothcst = maximum(Ls);
     return expsmoothcst
@@ -429,6 +427,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
         # Lbar = prob.Lbar;
 
         if(occursin("lgstc", prob.name))
+            println("Correcting smoothness constants for logistic since phi'' <= 1/4")
             ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
             L /= 4;
             Lmax /= 4;

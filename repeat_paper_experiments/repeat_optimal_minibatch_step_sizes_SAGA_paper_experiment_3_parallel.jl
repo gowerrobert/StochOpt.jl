@@ -208,6 +208,7 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
     # Lbar = prob.Lbar;
 
     if occursin("lgstc", prob.name)
+        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
         ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
         Lmax /= 4;
         L /= 4;
