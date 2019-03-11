@@ -22,10 +22,12 @@ seed = string("_seed-", seed);
 # data = "diagonal";
 data = "alone_eig_val";
 
-numdata = 24;
-numfeatures = 50; # useless for gen_diag_*
+numdata = 10;
+numfeatures = 30; # useless for gen_diag_*
 
 rotate = true; # keeping same eigenvalues, but removing the diagonal structure of X
+
+binary = true  # Binary outputs for binary classification problem
 
 println("--- Generating data ---")
 if(data == "gaussian")
@@ -36,6 +38,11 @@ elseif(data == "alone_eig_val")
     X, y, probname = gen_diag_alone_eig_data(numfeatures, numdata, lambda=0.0, a=100, err=0.001, rotate=rotate);
 else
     error("unkown generation scheme.");
+end
+
+if binary
+    y = sign.(y)
+    probname = string(probname, "-binary")
 end
 
 ## Saving the generated datasets with the corresponding seed
