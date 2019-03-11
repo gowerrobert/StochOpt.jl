@@ -255,7 +255,7 @@ function get_stepsize_bounds(prob::Prob, simplebound::Array{Float64},
                              bernsteinbound::Array{Float64}, heuristicbound::Array{Float64},
                              expsmoothcst)
     n = prob.numdata;
-    rho_over_n = ( n .- (1:n) ) ./ ( (1:n).*(n-1) ); # Sketch residual divided by n
+    rho_over_n = ( n .- (1:n) ) ./ ( (1:n).*(n-1) );             # Sketch residual divided by n
     rightterm = rho_over_n*prob.Lmax + ((prob.mu*n)/(4*(1:n)))'; # Right-hand side term in the max
 
     if typeof(expsmoothcst)==Array{Float64,2}

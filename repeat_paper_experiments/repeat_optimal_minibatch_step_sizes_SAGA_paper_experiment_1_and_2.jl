@@ -87,6 +87,11 @@ scalings = ["none" "column-scaling"] #for all datasets except real-sim, news20.b
 
 lambdas = [10^(-3) 10^(-1)];
 
+## Small example of relaunched experiment
+# datasets = ["ijcnn1_full"]
+# scalings = ["none"]
+# lambdas = [10^(-1)];
+
 run_number = 1;
 for data in datasets
     for lambda in lambdas
