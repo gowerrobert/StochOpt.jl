@@ -93,7 +93,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
         simplebound = leftcoeff*Lbar + rightcoeff*method.Lmax;
         # Lexpected = exp((1 - tau)/((n + 0.1) - tau))*method.Lmax + ((tau - 1)/(n - 1))*method.L;
     end
-    if(occursin(prob.name, "lgstc"))
+    if(occursin("lgstc", prob.name))
         Lexpected = Lexpected/4;    #  correcting for logistic since phi'' <= 1/4 #TOCHANGE
     end
     rightterm = ((n-tau)/(tau*(n-1)))*method.Lmax + (method.mu*n)/(4*tau); # Right-hand side term in the max in the denominator

@@ -91,7 +91,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
             Lexpected = method.L;    # Why ?
         end
 
-        if(occursin(prob.name, "lgstc"))
+        if(occursin("lgstc", prob.name))
             Lexpected /= 4;    #  correcting for logistic since phi'' <= 1/4
         end
 
@@ -101,7 +101,7 @@ function boot_SAGA(prob::Prob, method, options::MyOptions)
         Li_s = get_Li(prob.X, prob.lambda);
         Lbar = mean(Li_s);
 
-        if occursin(prob.name, "lgstc")
+        if occursin("lgstc", prob.name)
             Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
             Lbar /= 4;
         end
@@ -147,7 +147,7 @@ function boot_SAGA_partition(prob::Prob, options::MyOptions, probability_type::A
     L = mean(probs);
 
     ## Shouldn't we correct the smoothness constants in the logistic regression case?
-    # if occursin(prob.name, "lgstc")
+    # if occursin("lgstc", prob.name)
     #     Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
     #     L /= 4;
     # end
@@ -209,7 +209,7 @@ function boot_SAGA_Li_order_partition(prob::Prob, options::MyOptions, probabilit
     L = mean(probs);
 
     ## Shouldn't we correct the smoothness constants in the logistic regression case?
-    # if occursin(prob.name, "lgstc")
+    # if occursin("lgstc", prob.name)
     #     Lmax /= 4;    #  correcting for logistic since phi'' <= 1/4
     #     L /= 4;
     # end
