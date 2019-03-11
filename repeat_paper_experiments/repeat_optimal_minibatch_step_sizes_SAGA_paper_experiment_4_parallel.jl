@@ -93,8 +93,9 @@ skip_multiplier = [0.01,        # GOOD
                    1.0,         # 22 min avec 1.0 / 43 min avec 0.1
                    1.0,         # 52 min avec 1.0
                    0.1,         # 12 min avec 1.0 / 21 min avec 0.1
-                   10.0,         # plus de 7h (max_time reached) pour 1.0
-                   1.0, 1.0];
+                   0.1,         # plus de 7h (max_time reached for b=2^14) avec 1.0 / à lancer avec 0.1
+                   0.1,         # 3h 5min avec 1.0 / 3h avec 0.1 / 2h30 avec 0.1
+                   0.1];        # 6h30 avec 0.1  / 6h 20 min avec 0.1
 
 precision = 10.0^(-4)
 
@@ -144,6 +145,7 @@ precision = 10.0^(-4)
     # Lbar = prob.Lbar;
 
     if occursin("lgstc", prob.name)
+        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
         ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
         L /= 4;
         # Lmax /= 4;
@@ -153,15 +155,15 @@ precision = 10.0^(-4)
     ## Computing mini-batch and step sizes
     # tau_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar))
     # tau_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L))))
-    tau_practical = round(Int, 1 + (mu*(n-1))/(4*L))
+    tau_practical = max(1, min(round(Int, 1 + (mu*(n-1))/(4*L)), n)) # Thresholds the optimal mini-batch size when the problem is ill-conditioned
 
     ## Computing the empirical mini-batch size over a grid
     # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
     if data == "covtype_binary"
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
-    elseif (data == "real-sim" && lambda == 10^(-1)) || (data == "ijcnn1_full" && lambda == 10^(-1))
+    elseif data == "ijcnn1_full" && lambda == 10^(-1)
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
-    elseif (data == "real-sim" && lambda == 10^(-3))
+    elseif data == "real-sim"
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
     else
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
