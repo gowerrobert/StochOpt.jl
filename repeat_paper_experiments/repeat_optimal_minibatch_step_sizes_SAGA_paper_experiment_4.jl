@@ -119,19 +119,11 @@ for idx_prob in problems
     y = nothing;
 
     n = prob.numdata;
-    d = prob.numfeatures;
-    mu = prob.mu
+    # d = prob.numfeatures;
+    mu = prob.mu;
     # Lmax = prob.Lmax;
     L = prob.L;
     # Lbar = prob.Lbar;
-
-    if occursin("lgstc", prob.name)
-        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
-        ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
-        L /= 4;
-        # Lmax /= 4;
-        # Lbar /= 4;
-    end
 
     ## Computing mini-batch and step sizes
     # tau_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar))
