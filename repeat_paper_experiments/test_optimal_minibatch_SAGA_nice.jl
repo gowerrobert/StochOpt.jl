@@ -50,8 +50,8 @@ totcomp = (itercomp').*(1:prob.numdata);
 itercomphoff = calculate_complex_Hofmann(prob, options);
 
 
-### PLOTING ###
-println("\n--- Ploting complexities ??? ---");
+### PLOTTING ###
+println("\n--- Plotting complexities ??? ---");
 pgfplots() # pyplot
 fontsmll = 8; fontmed = 14; fontbig = 14;
 plot([totcomp itercomp' itercomphoff'], label=["our total complex" "our iter complex" "Hofmann et al. iter complex"],

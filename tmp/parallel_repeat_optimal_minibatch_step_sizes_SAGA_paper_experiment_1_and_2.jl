@@ -121,8 +121,8 @@ runnb = 1;
             # expsmoothcst = nothing;
             # simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob); # WARNING : markers are missing!
 
-            # ### PLOTING ###
-            # println("\n--- Ploting upper bounds ---");
+            # ### PLOTTING ###
+            # println("\n--- Plotting upper bounds ---");
             # pyplot()
             # plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst, showlegend=false);
 
@@ -139,8 +139,8 @@ runnb = 1;
             # ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
             # simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-            # ### PLOTING ###
-            # println("\n--- Ploting stepsizes ---");
+            # ### PLOTTING ###
+            # println("\n--- Plotting stepsizes ---");
             # # PROBLEM: there is still a problem of ticking non integer on the xaxis
             # pyplot()
             # plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize, showlegend=false);

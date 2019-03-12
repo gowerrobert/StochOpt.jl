@@ -49,7 +49,7 @@ n = prob.numdata;
 d = prob.numfeatures;
 
 ### PLOTTING SETTINGS ###
-println("\n--- Ploting upper bounds of the expected smoothness constant ---");
+println("\n--- Plotting upper bounds of the expected smoothness constant ---");
 default_path = "./data/"; savename = replace(replace(prob.name, r"[\/]", "-"), ".", "_");
 savenamecomp = string(savename);
 fontsmll = 8; fontmed = 14; fontbig = 14;
@@ -70,8 +70,8 @@ Lbar = mean(Li_s);
 ### COMPUTING THE BOUNDS
 simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob);
 
-### PLOTING ###
-println("\n--- Ploting upper bounds ---");
+### PLOTTING ###
+println("\n--- Plotting upper bounds ---");
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 pyplot()
 plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
@@ -96,8 +96,8 @@ end
 ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
 simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
 
-### PLOTING ###
-println("\n--- Ploting stepsizes ---");
+### PLOTTING ###
+println("\n--- Plotting stepsizes ---");
 # PROBLEM: there is still a problem of ticking non integer on the xaxis
 pyplot()
 plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
@@ -208,8 +208,8 @@ println("Mini-batch size sequence:\n", tauseq)
 # totcomp = (itercomp').*(1:prob.numdata);
 totcomp = (itercomp').*tauseq;
 
-### PLOTING ###
-println("\n--- Ploting complexities ??? ---");
+### PLOTTING ###
+println("\n--- Plotting complexities ??? ---");
 pyplot() # pyplot
 fontsmll = 8; fontmed = 14; fontbig = 14;
 plot(tauseq, [totcomp itercomp'], label=["total complex" "iter complex"],

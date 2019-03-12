@@ -138,8 +138,8 @@ for data in datasets
             expsmoothcst = nothing;
             simple_bound, bernstein_bound, practical_approx, expsmoothcst = get_expected_smoothness_bounds(prob);
 
-            ### PLOTING ###
-            println("\n--- Ploting upper-bounds ---");
+            ### PLOTTING ###
+            println("\n--- Plotting upper-bounds ---");
             pyplot()
             plot_expected_smoothness_bounds(prob, simple_bound, bernstein_bound, practical_approx, expsmoothcst, showlegend=false);
 
@@ -157,7 +157,7 @@ for data in datasets
             simple_step_size, bernstein_step_size, practical_step_size, hofmann_step_size, expsmooth_step_size = get_stepsize_bounds(prob, simple_bound, bernstein_bound, practical_approx, expsmoothcst);
 
             ## Plotting
-            println("\n--- Ploting step sizes ---");
+            println("\n--- Plotting step sizes ---");
             ## WARNING: there is still a problem of ticking non integer on the xaxis
             pyplot()
             plot_stepsize_bounds(prob, simple_step_size, bernstein_step_size, practical_step_size, hofmann_step_size, expsmooth_step_size, showlegend=false);

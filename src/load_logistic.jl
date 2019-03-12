@@ -183,7 +183,7 @@ function get_fsol_logistic!(prob)
         output1 = minimizeFunc_grid_stepsize(prob, method_input, options);
         OUTPUTS = [output; output1];
 
-        ## Ploting the two solutions
+        ## Plotting the two solutions
         gr()# gr() pyplot() # pgfplots() #plotly()
         plot_outputs_Plots(OUTPUTS, prob, options);
 

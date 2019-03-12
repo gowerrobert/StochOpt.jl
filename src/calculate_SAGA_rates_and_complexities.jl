@@ -190,7 +190,7 @@ each mini-batch size b from 1 to n.
     - nx1 **Array{Float64,2}** practical_approx: practical approximation of the expected smoothness constant\\
     - nx1 **Array{Float64,2}** or **Nothing** expsmoothcst: exact expected smoothness constant\\
 """
-function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24);
+function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24)
     n = prob.numdata;
     d = prob.numfeatures
     # mu = prob.mu
