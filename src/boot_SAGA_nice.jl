@@ -48,7 +48,7 @@ end
 Set the stepsize based on the smoothness constants of the problem stored in **SAGA_nice_method**.
 
 #INPUTS:\\
-    - prob: considered problem (i.e. logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
+    - prob: considered problem (e.g., logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
     - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
     - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
 #OUTPUTS:\\
@@ -108,7 +108,7 @@ end
 Reset the SAGA method with  b-nice sampling, especially the step size, the gradient and the Jacobian estimates.
 
 #INPUTS:\\
-    - prob: considered problem (i.e. logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
+    - prob: considered problem (e.g., logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
     - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
     - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
 #OUTPUTS:\\
