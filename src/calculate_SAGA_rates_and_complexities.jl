@@ -62,7 +62,7 @@ function get_expected_smoothness_cst(prob::Prob, b::Int64)
     end
 
     if occursin("lgstc", prob.name)
-        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
+        println("Correcting the expected smoothness constant: for logistic phi'' <= 1/4")
         Ls /= 4;    #  correcting for logistic since phi'' <= 1/4
     end
 
@@ -390,7 +390,7 @@ correpsonding average iteration complexity.
 function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions, numsimu::Int64 ;
                             skipped_errors::Int64=-1, skip_multiplier::Float64=0.02)
     ## Remarks
-    ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/tau
+    ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/b
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     default_path = "./data/";
@@ -400,13 +400,13 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
     itercomplex = zeros(length(minibatchgrid), 1); # List of saved outputs
     OUTPUTS = [];
     for idxtau in 1:length(minibatchgrid)
-        tau = minibatchgrid[idxtau];
-        println("\nCurrent mini-batch size: ", tau);
+        b = minibatchgrid[idxtau];
+        println("\nCurrent mini-batch size: ", b);
 
-        if(skipped_errors<-1||skipped_errors==0)
+        if skipped_errors < -1 || skipped_errors == 0
             error("skipped_errors has to be set to -1 (auto) or to a positive integer");
-        elseif(skipped_errors==-1)
-            options.skip_error_calculation = compute_skip_error(n, tau, skip_multiplier);
+        elseif skipped_errors == -1
+            options.skip_error_calculation = compute_skip_error(n, b, skip_multiplier);
             println("The number of skipped calculations of the error has been automatically set to ",
                     options.skip_error_calculation);
         else
@@ -414,7 +414,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
         end
 
         println("---------------------------------- MINI-BATCH ------------------------------------------");
-        println(tau);
+        println(b);
         println("----------------------------------------------------------------------------------------");
 
         println("---------------------------------- SKIP_ERROR ------------------------------------------");
@@ -422,47 +422,45 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
         println("----------------------------------------------------------------------------------------");
 
         n = prob.numdata;
+        # d = prob.numfeatures
+
         L = prob.L;
         Lmax = prob.Lmax;
         # Lbar = prob.Lbar;
 
-        if(occursin("lgstc", prob.name))
-            println("Correcting smoothness constants for logistic since phi'' <= 1/4")
-            ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
-            L /= 4;
-            Lmax /= 4;
-            # Lbar /= 4;
-        end
-        leftcoeff = (n*(tau-1))/(tau*(n-1));
-        rightcoeff = (n-tau)/(tau*(n-1));
-        Lpractical = leftcoeff*L + rightcoeff*Lmax;
-        # Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;
-        # Lbernstein = 2*leftcoeff*L + (1/tau)*((n-tau)/(n-1) + (4/3)*log(prob.numfeatures))*Lmax;
-        rightterm = ((n-tau)/(tau*(n-1)))*Lmax + (prob.mu*n)/(4*tau); # Right-hand side term in the max in the denominator
+        mu = prob.mu
 
-        options.batchsize = tau;
+        leftcoeff = (n*(b-1))/(b*(n-1));
+        rightcoeff = (n-b)/(b*(n-1));
+        Lpractical = leftcoeff*L + rightcoeff*Lmax;                                 # Practical approximation
+        # Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;                               # Simple bound
+        # Lbernstein = 2*leftcoeff*L + (1/b)*((n-b)/(n-1) + (4/3)*log(d))*Lmax;     # Bernstein bound
+
+        rightterm = ((n-b)/(b*(n-1)))*Lmax + (mu*n)/(4*b); # Right-hand side term in the max in the denominator
+
+        options.batchsize = b;
         for i=1:numsimu
             println("----- Simulation #", i, " -----");
             sg = initiate_SAGA_nice(prob, options);
 
-            ## Practical approximation
+            ## Practical approximation of the step size
             options.stepsize_multiplier = 1.0/(4.0*max(Lpractical, rightterm));
             println("----------------------------- PRACTICAL STEP SIZE --------------------------------------");
             println(options.stepsize_multiplier);
             println("----------------------------------------------------------------------------------------");
 
-            ## Simple bound
+            ## Simple step size
             # println("Simple step size");
             # options.stepsize_multiplier = 1.0/(4.0*max(Lsimple, rightterm));
 
-            ## Bernstein bound
+            ## Bernstein step size
             # println("Bernstein step size");
             # options.stepsize_multiplier =  1.0/(4.0*max(Lbernstein, rightterm));
 
             output = minimizeFunc(prob, sg, options);
             println("Output fail = ", output.fail, "\n");
             itercomplex[idxtau] += output.iterations;
-            output.name = string("\\tau=", tau);
+            output.name = string("b=", b);
             OUTPUTS = [OUTPUTS; output];
         end
     end
