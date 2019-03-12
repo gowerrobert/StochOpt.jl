@@ -358,3 +358,5 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
     end
 end
 end
+
+println("\n\n--- EXPERIMENT 3 (PARALLEL) FINISHED ---");

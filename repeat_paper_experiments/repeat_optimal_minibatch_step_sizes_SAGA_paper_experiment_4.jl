@@ -180,3 +180,5 @@ for idx_prob in problems
     println("Empirical optimal mini-batch = ", tau_empirical, "\n\n")
 end
 end
+
+println("\n\n--- EXPERIMENT 4 FINISHED ---");

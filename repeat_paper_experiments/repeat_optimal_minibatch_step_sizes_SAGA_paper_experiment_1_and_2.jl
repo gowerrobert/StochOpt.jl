@@ -109,12 +109,11 @@ for data in datasets
             println("scaling: ", scaling);
             println("######################################################################\n")
 
-            ### LOADING DATA ###
+            ## Loading data
             println("--- Loading data ---");
-            ## Only loading datasets, no data generation
-            X, y = loadDataset(default_path, data);
+            X, y = loadDataset(default_path, data); # Only loading existing datasets, no data generation here
 
-            ### SETTING UP THE PROBLEM ###
+            ## Setting up the problem
             println("\n--- Setting up the selected problem ---");
             options = set_options(tol=10.0^(-1), max_iter=10^8, max_time=10.0^2, max_epocs=10^8,
                                   regularizor_parameter = "normalized",
@@ -132,48 +131,45 @@ for data in datasets
             end
 
             n = prob.numdata;
-
-            ### COMPUTING THE SMOOTHNESS CONSTANTS ###
-            # Compute the smoothness constants L, L_max, \cL, \bar{L}
-            datathreshold = 24; # if n is too large we do not compute the exact expected smoothness constant nor its relative quantities
+            datathreshold = 24; # if n is too large we do not compute the exact expected smoothness constant nor corresponding step sizes
 
             ########################### EMPIRICAL UPPER BOUNDS OF THE EXPECTED SMOOTHNESS CONSTANT ###########################
-            ### COMPUTING THE BOUNDS ###
+            ## Computing the upper-bounds
             expsmoothcst = nothing;
-            simplebound, bernsteinbound, heuristicbound, expsmoothcst = get_expected_smoothness_bounds(prob); # WARNING : markers are missing!
+            simple_bound, bernstein_bound, practical_approx, expsmoothcst = get_expected_smoothness_bounds(prob);
 
             ### PLOTING ###
-            println("\n--- Ploting upper bounds ---");
+            println("\n--- Ploting upper-bounds ---");
             pyplot()
-            plot_expected_smoothness_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst, showlegend=false);
+            plot_expected_smoothness_bounds(prob, simple_bound, bernstein_bound, practical_approx, expsmoothcst, showlegend=false);
 
-            # heuristic equals true expected smoothness constant for tau=1 and n as expected, else it is above as hoped
+            ## Practical approximation equals true expected smoothness constant for b=1 and b=n as expected, but is not an upper-bound
             if n <= datathreshold
-                println("Heuristic - expected smoothness gap: ", heuristicbound - expsmoothcst)
-                println("Simple - heuristic gap: ", simplebound - heuristicbound)
-                println("Bernstein - simple gap: ", bernsteinbound - simplebound)
+                println("\nPractical - expected smoothness gap: ", practical_approx - expsmoothcst)
+                println("Simple - Practical gap: ", simple_bound - practical_approx)
+                println("Bernstein - Simple gap: ", bernstein_bound - simple_bound, "\n")
             end
             ##################################################################################################################
 
 
-            ##################################### EMPIRICAL UPPER BOUNDS OF THE STEPSIZES ####################################
-            ### COMPUTING THE UPPER-BOUNDS OF THE STEPSIZES ###
-            simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize = get_stepsize_bounds(prob, simplebound, bernsteinbound, heuristicbound, expsmoothcst);
+            ##################################### EMPIRICAL UPPER BOUNDS OF THE STEP SIZES ####################################
+            ## Computing the step sizes
+            simple_step_size, bernstein_step_size, practical_step_size, hofmann_step_size, expsmooth_step_size = get_stepsize_bounds(prob, simple_bound, bernstein_bound, practical_approx, expsmoothcst);
 
-            ### PLOTING ###
-            println("\n--- Ploting stepsizes ---");
-            # PROBLEM: there is still a problem of ticking non integer on the xaxis
+            ## Plotting
+            println("\n--- Ploting step sizes ---");
+            ## WARNING: there is still a problem of ticking non integer on the xaxis
             pyplot()
-            plot_stepsize_bounds(prob, simplestepsize, bernsteinstepsize, heuristicstepsize, hofmannstepsize, expsmoothstepsize, showlegend=false);
+            plot_stepsize_bounds(prob, simple_step_size, bernstein_step_size, practical_step_size, hofmann_step_size, expsmooth_step_size, showlegend=false);
             ##################################################################################################################
 
             ########################################### SAVNG RESULTS ########################################################
-            save_SAGA_nice_constants(prob, data, simplebound, bernsteinbound, heuristicbound, expsmoothcst,
-                                     simplestepsize, bernsteinstepsize, heuristicstepsize, expsmoothstepsize);
+            save_SAGA_nice_constants(prob, data, simple_bound, bernstein_bound, practical_approx, expsmoothcst,
+                                     simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size);
             ##################################################################################################################
             global run_number += 1;
         end
     end
 end
 
-println("\n--- EXPERIMENTS 1 AND 2 FINISHED ---");
+println("\n\n--- EXPERIMENTS 1 AND 2 FINISHED ---");

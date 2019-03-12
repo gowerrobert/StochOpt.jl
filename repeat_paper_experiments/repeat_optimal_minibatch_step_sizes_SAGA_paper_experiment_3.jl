@@ -354,3 +354,5 @@ for idx_prob in problems
     end
 end
 end
+
+println("\n\n--- EXPERIMENT 3 FINISHED ---");

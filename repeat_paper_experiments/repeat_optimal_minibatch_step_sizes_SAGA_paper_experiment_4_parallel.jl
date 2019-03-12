@@ -198,3 +198,5 @@ precision = 10.0^(-4)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
 end
 end
+
+println("\n\n--- EXPERIMENT 4 (PARALLEL) FINISHED ---");
