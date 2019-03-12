@@ -192,8 +192,7 @@ each mini-batch size b from 1 to n.
 """
 function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24)
     n = prob.numdata;
-    d = prob.numfeatures
-    # mu = prob.mu
+    d = prob.numfeatures;
     L = prob.L;
     Lmax = prob.Lmax;
     Lbar = prob.Lbar;
@@ -201,7 +200,7 @@ function get_expected_smoothness_bounds(prob::Prob, datathreshold::Int64=24)
     if n <= datathreshold
         computeexpsmooth = true;
         expsmoothcst = zeros(n, 1);
-    else # if n is too large we do not compute the exact expected smoothness constant
+    else  # if n is too large we do not compute the exact expected smoothness constant
         computeexpsmooth = false;
         expsmoothcst = nothing; # equivalent of "None"
         println("The number of data is to large to compute the exact expected smoothness constant");
@@ -259,20 +258,23 @@ function get_stepsize_bounds(prob::Prob, simple_bound::Array{Float64},
                              bernstein_bound::Array{Float64}, practical_approx::Array{Float64},
                              expsmoothcst)
     n = prob.numdata;
-    rho_over_n = ( n .- (1:n) ) ./ ( (1:n).*(n-1) );             # Sketch residual divided by n
-    rightterm = rho_over_n*prob.Lmax + ((prob.mu*n)/(4*(1:n)))'; # Right-hand side term in the max
+    mu = prob.mu
+    Lmax = prob.Lmax;
+
+    rho_over_n = ( n .- (1:n) ) ./ ( (1:n).*(n-1) );    # Sketch residual divided by n
+    right_term = rho_over_n*Lmax + ((mu*n)/(4*(1:n)))';  # Right-hand side term in the max
 
     if typeof(expsmoothcst)==Array{Float64,2}
-        expsmooth_step_size = 0.25 .* (1 ./ max.(expsmoothcst, rightterm) );
+        expsmooth_step_size = 0.25 .* (1 ./ max.(expsmoothcst, right_term) );
     else
         expsmooth_step_size = nothing;
     end
-    simple_step_size = 0.25 .* (1 ./ max.(simple_bound, rightterm) );
-    bernstein_step_size = 0.25 .* (1 ./ max.(bernstein_bound, rightterm) );
-    practical_step_size = 0.25 .* (1 ./ max.(practical_approx, rightterm) );
+    simple_step_size = 0.25 .* (1 ./ max.(simple_bound, right_term) );
+    bernstein_step_size = 0.25 .* (1 ./ max.(bernstein_bound, right_term) );
+    practical_step_size = 0.25 .* (1 ./ max.(practical_approx, right_term) );
 
-    K = (4*prob.Lmax*(1:n))/(n*prob.mu); # Hofmann
-    hofmann_step_size = K ./ (2*prob.Lmax*(1 .+ K .+ sqrt.(1 .+ K.^2)));
+    K = (4*Lmax*(1:n))/(n*mu); # Hofmann
+    hofmann_step_size = K ./ (2*Lmax*(1 .+ K .+ sqrt.(1 .+ K.^2)));
 
     return simple_step_size, bernstein_step_size, practical_step_size, hofmann_step_size, expsmooth_step_size
 end
@@ -328,7 +330,12 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
     n = prob.numdata;
     d = prob.numfeatures;
 
+    println("Recomputing the Li's")
     Li_s = get_Li(prob.X, prob.lambda);
+    if occursin("lgstc", prob.name)
+        println("Correcting the Li's: for logistic phi'' <= 1/4")
+        Li_s /= 4;    #  correcting for logistic since phi'' <= 1/4
+    end
 
     ## Saving the seed used to generate data
     if data in ["gaussian", "diagonal", "lone_eig_val"]
@@ -438,7 +445,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
         # Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;                               # Simple bound
         # Lbernstein = 2*leftcoeff*L + (1/b)*((n-b)/(n-1) + (4/3)*log(d))*Lmax;     # Bernstein bound
 
-        rightterm = ((n-b)/(b*(n-1)))*Lmax + (mu*n)/(4*b); # Right-hand side term in the max in the denominator
+        right_term = ((n-b)/(b*(n-1)))*Lmax + (mu*n)/(4*b); # Right-hand side term in the max in the denominator
 
         options.batchsize = b;
         for i=1:numsimu
@@ -446,18 +453,18 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
             sg = initiate_SAGA_nice(prob, options);
 
             ## Practical step size
-            options.stepsize_multiplier = 1.0/(4.0*max(Lpractical, rightterm));
+            options.stepsize_multiplier = 1.0/(4.0*max(Lpractical, right_term));
             println("----------------------------- PRACTICAL STEP SIZE --------------------------------------");
             println(options.stepsize_multiplier);
             println("----------------------------------------------------------------------------------------");
 
             ## Simple step size
             # println("Simple step size");
-            # options.stepsize_multiplier = 1.0/(4.0*max(Lsimple, rightterm));
+            # options.stepsize_multiplier = 1.0/(4.0*max(Lsimple, right_term));
 
             ## Bernstein step size
             # println("Bernstein step size");
-            # options.stepsize_multiplier =  1.0/(4.0*max(Lbernstein, rightterm));
+            # options.stepsize_multiplier =  1.0/(4.0*max(Lbernstein, right_term));
 
             output = minimizeFunc(prob, sg, options);
             println("Output fail = ", output.fail, "\n");
