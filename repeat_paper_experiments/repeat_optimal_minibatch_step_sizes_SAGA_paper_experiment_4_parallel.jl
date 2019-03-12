@@ -139,7 +139,7 @@ precision = 10.0^(-4)
 
     n = prob.numdata;
     d = prob.numfeatures;
-    mu = prob.mu
+    mu = prob.mu;
     # Lmax = prob.Lmax;
     L = prob.L;
     # Lbar = prob.Lbar;
@@ -171,8 +171,8 @@ precision = 10.0^(-4)
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];
     if all(s->(string(s)=="tol-reached"), fails)
         println("Tolerance always reached")
-    # else
-    #     error("Tolerance is not always reached")
+    else
+        println("Some total complexities might be threshold because of reached maximal time")
     end
 
     ## Computing the empirical complexity

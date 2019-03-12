@@ -378,7 +378,7 @@ mini-batch size in the give list (minibatchgrid) in order to evaluate the
 correpsonding average iteration complexity.
 
 #INPUTS:\\
-    - **Prob** prob: considered problem, i.e. logistic regression, ridge regression...
+    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
     - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
     - **Int64** numsimu: number of runs of mini-batch SAGA\\
     - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
@@ -443,7 +443,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
             println("----- Simulation #", i, " -----");
             sg = initiate_SAGA_nice(prob, options);
 
-            ## Practical approximation of the step size
+            ## Practical step size
             options.stepsize_multiplier = 1.0/(4.0*max(Lpractical, rightterm));
             println("----------------------------- PRACTICAL STEP SIZE --------------------------------------");
             println(options.stepsize_multiplier);
