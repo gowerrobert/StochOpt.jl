@@ -2,7 +2,7 @@
 ### "Optimal mini-batch and step sizes for SAGA", Nidham Gazagnadou, Robert M. Gower, Joseph Salmon (2019)
 
 ## --- EXPERIMENT 4 (parallel implementation) ---
-Goal: Testing the optimality of our optimal mini-batch size tau_practical with corresponding step size gamma_practical
+Goal: Testing the optimality of our optimal mini-batch size b_practical with corresponding step size gamma_practical
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 - line 37: enter your full path to the "StochOpt.jl/" repository in the *path* variable
@@ -59,7 +59,7 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 if all_problems
     problems = 1:12;
 else
-    problems = 10:10; # DO NOT FORGET TO SET IT BACK TO "1:1"
+    problems = 6:6; # DO NOT FORGET TO SET IT BACK TO "1:1"
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
@@ -89,7 +89,7 @@ skip_multiplier = [0.01,        # GOOD
                    0.01,        # GOOD
                    0.01,        # GOOD (1->4 16 min)
                    0.05,        # GOOD 15 min for 0.05
-                   1.0,         # 25 min avec 1.0 et 2^18 et n en plus
+                   0.1,         # 25 min avec 1.0 et 2^18 et n en plus / XXX avec 0.1
                    1.0,         # 22 min avec 1.0 / 43 min avec 0.1
                    1.0,         # 52 min avec 1.0
                    0.1,         # 12 min avec 1.0 / 21 min avec 0.1
@@ -144,18 +144,10 @@ precision = 10.0^(-4)
     L = prob.L;
     # Lbar = prob.Lbar;
 
-    if occursin("lgstc", prob.name)
-        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
-        ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
-        L /= 4;
-        # Lmax /= 4;
-        # Lbar /= 4;
-    end
-
     ## Computing mini-batch and step sizes
-    # tau_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar))
-    # tau_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L))))
-    tau_practical = max(1, min(round(Int, 1 + (mu*(n-1))/(4*L)), n)) # Thresholds the optimal mini-batch size when the problem is ill-conditioned
+    # b_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar))
+    # b_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L))))
+    b_practical = max(1, min(round(Int, 1 + (mu*(n-1))/(4*L)), n)) # Thresholds the optimal mini-batch size when the problem is ill-conditioned
 
     ## Computing the empirical mini-batch size over a grid
     # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
@@ -186,7 +178,7 @@ precision = 10.0^(-4)
     ## Computing the empirical complexity
     empcomplex = reshape(minibatchgrid .* itercomplex, length(minibatchgrid)); # mini-batch size times number of iterations
     min_empcomplex, idx_min = findmin(empcomplex)
-    tau_empirical = minibatchgrid[idx_min]
+    b_empirical = minibatchgrid[idx_min]
 
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
@@ -195,14 +187,14 @@ precision = 10.0^(-4)
         save("$(data_path)$(savename).jld",
         "options", options, "minibatchgrid", minibatchgrid,
         "itercomplex", itercomplex, "empcomplex", empcomplex,
-        "tau_empirical", tau_empirical);
+        "b_empirical", b_empirical);
     end
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, tau_practical, tau_empirical, path=path)
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=path)
 
-    println("Practical optimal mini-batch = ", tau_practical)
-    println("Empirical optimal mini-batch = ", tau_empirical, "\n\n")
+    println("Practical optimal mini-batch = ", b_practical)
+    println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
 end
 end
