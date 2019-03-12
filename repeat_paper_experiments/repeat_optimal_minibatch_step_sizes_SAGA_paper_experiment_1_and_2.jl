@@ -7,16 +7,16 @@ Goal: Computing the upper-bounds of the expected smoothness constant (exp. 1) an
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 
 ## --- HOW TO RUN THE CODE ---
-To run only the first problem (XXXX), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
+To run only the first 2 problems (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) with and without scaling), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
 >julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl false
 To launch all the 42 problems of the paper change the bash input and run:
 >julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl true
 
 ## --- EXAMPLE OF RUNNING TIME ---
 Running time of the first problem on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-, around XXmin XXs
+386.126520 seconds (1.78 G allocations: 573.866 GiB, 19.41% gc time), around 7min
 Running time of all 42 problems on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-, around 1h 20min ## TO DOUBLE CHECK
+4915.046022 seconds (17.41 G allocations: 4.504 TiB, 17.94% gc time), around 1h 22min
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
@@ -24,8 +24,8 @@ For each problem (data set + scaling process + regularization)
 - the results of the simulations (smoothness constants, upper-bounds of the expected smoothness constant, estimates of the step sizes and optimal mini-batch estimates) are saved in ".jld" format in the "./data/" folder using function ``save_SAGA_nice_constants``
 """
 
-# ## Bash input
-# all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 42 problems (true)
+## Bash input
+all_problems = parse(Bool, ARGS[1]); # run 2 (false) or all the 42 problems (true)
 
 using JLD
 using Plots
@@ -40,70 +40,45 @@ using Base64
 using LaTeXStrings
 
 ## Manual inputs
-include("../src/StochOpt.jl") # Be carefull about the path here
+include("../src/StochOpt.jl") # be carefull about the path here
 default_path = "./data/";
 
-# if all_problems
-#     problems = 1:42;
-# else
-#     problems = 1:1;
-# end
+## Experiments settings
+numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
+if all_problems
+    datasets = ["gauss-50-24-0.0_seed-1",
+                "diagints-24-0.0-100_seed-1",
+                "diagalone-24-0.0-100_seed-1",
+                "diagints-24-0.0-100-rotated_seed-1",
+                "diagalone-24-0.0-100-rotated_seed-1",
+                "slice",
+                "YearPredictionMSD_full",
+                "covtype_binary",
+                "rcv1_full",
+                "news20_binary",
+                "real-sim",
+                "ijcnn1_full"]
+    lambdas = [10^(-1), 10^(-3)]
+    num_problems = 42
+else
+    datasets = ["gauss-50-24-0.0_seed-1"]
+    lambdas = [10^(-1)]
+    num_problems = 2
+end
 
-# datasets = ["ijcnn1_full", "ijcnn1_full", # scaled
-#             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled
-#             "covtype_binary", "covtype_binary", # scaled
-#             "slice", "slice", # scaled
-#             "slice", "slice", # unscaled
-#             "real-sim", "real-sim"]; # unscaled
-
-# scalings = ["column-scaling", "column-scaling",
-#             "column-scaling", "column-scaling",
-#             "column-scaling", "column-scaling",
-#             "column-scaling", "column-scaling",
-#             "none", "none",
-#             "none", "none"];
-
-# lambdas = [10^(-1), 10^(-3),
-#            10^(-1), 10^(-3),
-#            10^(-1), 10^(-3),
-#            10^(-1), 10^(-3),
-#            10^(-1), 10^(-3),
-#            10^(-1), 10^(-3)];
-
-datasets = ["gauss-50-24-0.0_seed-1"
-            "diagints-24-0.0-100_seed-1"
-            "diagalone-24-0.0-100_seed-1"
-            "diagints-24-0.0-100-rotated_seed-1"
-            "diagalone-24-0.0-100-rotated_seed-1"
-            "slice"
-            "YearPredictionMSD_full"
-            "covtype_binary"
-            "rcv1_full"
-            "news20_binary"
-            "real-sim"
-            "ijcnn1_full"]
-
-scalings = ["none" "column-scaling"] #for all datasets except real-sim, news20.binary and rcv1
-
-lambdas = [10^(-3) 10^(-1)];
-
-## Small example of relaunched experiment
-# datasets = ["ijcnn1_full"]
-# scalings = ["none"]
-# lambdas = [10^(-1)];
-
+@time begin
 run_number = 1;
 for data in datasets
     for lambda in lambdas
         if !(data in ["real-sim" "news20_binary" "rcv1_full"])
-            scalings = ["none" "column-scaling"];
+            scalings = ["none" "column-scaling"]; # for all datasets except real-sim, news20.binary and rcv1
         else
             scalings = ["none"];
         end
 
         for scaling in scalings
             println("\n\n######################################################################")
-            println("Run ", string(run_number), " over 42");
+            println("Run ", string(run_number), " over ", num_problems);
             println("Dataset: ", data);
             @printf "lambda: %1.0e\n" lambda;
             println("scaling: ", scaling);
@@ -145,7 +120,7 @@ for data in datasets
 
             ## Practical approximation equals true expected smoothness constant for b=1 and b=n as expected, but is not an upper-bound
             if n <= datathreshold
-                println("\nPractical - expected smoothness gap: ", practical_approx - expsmoothcst)
+                println("\nPractical - Expected smoothness gap: ", practical_approx - expsmoothcst)
                 println("Simple - Practical gap: ", simple_bound - practical_approx)
                 println("Bernstein - Simple gap: ", bernstein_bound - simple_bound, "\n")
             end
@@ -170,6 +145,7 @@ for data in datasets
             global run_number += 1;
         end
     end
+end
 end
 
 println("\n\n--- EXPERIMENTS 1 AND 2 FINISHED ---");
