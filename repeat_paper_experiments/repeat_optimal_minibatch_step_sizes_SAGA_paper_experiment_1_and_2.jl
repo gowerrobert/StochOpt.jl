@@ -139,6 +139,7 @@ for data in datasets
             ##################################################################################################################
 
             ########################################### SAVNG RESULTS ########################################################
+            println("\n--- Saving the bounds ---");
             save_SAGA_nice_constants(prob, data, simple_bound, bernstein_bound, practical_approx, expsmoothcst,
                                      simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size);
             ##################################################################################################################
