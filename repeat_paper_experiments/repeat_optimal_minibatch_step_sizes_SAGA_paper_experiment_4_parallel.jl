@@ -17,7 +17,7 @@ where <number_of_processor_to_add> has to be replaced by the user.
 
 ## --- EXAMPLE OF RUNNING TIME ---
 Running time of the first experiment when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-96.882105 seconds (2.02 M allocations: 99.035 MiB, 0.5% gc time), around 1min 37s
+132.544913 seconds (2.19 M allocations: 102.777 MiB, 0.03% gc time), around 2min 20s
 Running time of all problems when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 XXXX.XXXX seconds (XX.XX G allocations: XX.XX TiB, XX.XX% gc time), around XX.XX
 
@@ -59,7 +59,7 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 if all_problems
     problems = 1:12;
 else
-    problems = 6:6; # DO NOT FORGET TO SET IT BACK TO "1:1"
+    problems = 1:1; # DO NOT FORGET TO SET IT BACK TO "1:1"
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
@@ -84,12 +84,12 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)];
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multiplier = [0.01,        # GOOD
-                   0.01,        # GOOD
-                   0.01,        # GOOD
-                   0.01,        # GOOD (1->4 16 min)
-                   0.05,        # GOOD 15 min for 0.05
-                   0.1,         # 25 min avec 1.0 et 2^18 et n en plus / XXX avec 0.1
+skip_multipliers = [0.01,        # 2min 20s avec 0.01
+                   0.01,        # 4 min avec 0.01
+                   0.01,        # 11 min avec 0.01
+                   0.01,        # 10 min avec 0.01
+                   0.05,        # 36 min avec 0.05 / 1h 30min avec 0.01
+                   1.0,         # 1h 47min avec 1.0 / 2h 36min avec 0.1
                    1.0,         # 22 min avec 1.0 / 43 min avec 0.1
                    1.0,         # 52 min avec 1.0
                    0.1,         # 12 min avec 1.0 / 21 min avec 0.1
@@ -147,7 +147,7 @@ precision = 10.0^(-4)
     ## Computing mini-batch and step sizes
     # b_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar))
     # b_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L))))
-    b_practical = max(1, min(round(Int, 1 + (mu*(n-1))/(4*L)), n)) # Thresholds the optimal mini-batch size when the problem is ill-conditioned
+    b_practical = round(Int, 1 + (mu*(n-1))/(4*L)) # ERROR: b_practical cannot be lager than n ....
 
     ## Computing the empirical mini-batch size over a grid
     # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
@@ -165,7 +165,7 @@ precision = 10.0^(-4)
     println(minibatchgrid);
     println("---------------------------------------------------------------------------------------------");
 
-    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multiplier[idx_prob]);
+    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multipliers[idx_prob]);
 
     ## Checking that all simulations reached tolerance
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];
@@ -183,6 +183,7 @@ precision = 10.0^(-4)
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     savename = string(probname, "-exp4-optimality-", numsimu, "-avg");
+    savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")); # Extra suffix to check which skip values to keep
     if numsimu == 1
         save("$(data_path)$(savename).jld",
         "options", options, "minibatchgrid", minibatchgrid,
@@ -192,7 +193,7 @@ precision = 10.0^(-4)
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=path)
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=path, skip_multiplier=skip_multipliers[idx_prob])
 
     println("Practical optimal mini-batch = ", b_practical)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")

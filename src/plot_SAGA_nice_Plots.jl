@@ -227,7 +227,7 @@ Saves the plot of the empirical total complexity.
     - None
 """
 function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./")
+                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", skip_multiplier::Float64=0.0)
     numsimu = 1
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
@@ -257,5 +257,8 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
     #legendtitle="Optimal mini-batch size")
     vline!([b_practical], line=(:dot, 3), color=:red, label=labellist[2])
     savename = "-exp4-empcomplex-$(numsimu)-avg"
+    if skip_multiplier > 0.0
+        savename = string(savename, "_skip_mult_", replace(string(skip_multiplier), "." => "_")); # Extra suffix to check which skip values to keep
+    end
     savefig("$(default_path)$(probname)$(savename).pdf")
 end

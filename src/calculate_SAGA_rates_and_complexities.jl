@@ -441,9 +441,9 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
 
         leftcoeff = (n*(b-1))/(b*(n-1));
         rightcoeff = (n-b)/(b*(n-1));
-        Lpractical = leftcoeff*L + rightcoeff*Lmax;                                 # Practical approximation
-        # Lsimple = leftcoeff*Lbar + rightcoeff*Lmax;                               # Simple bound
-        # Lbernstein = 2*leftcoeff*L + (1/b)*((n-b)/(n-1) + (4/3)*log(d))*Lmax;     # Bernstein bound
+        L_practical = leftcoeff*L + rightcoeff*Lmax;                                 # Practical approximation
+        # L_simple = leftcoeff*Lbar + rightcoeff*Lmax;                               # Simple bound
+        # L_bernstein = 2*leftcoeff*L + (1/b)*((n-b)/(n-1) + (4/3)*log(d))*Lmax;     # Bernstein bound
 
         right_term = ((n-b)/(b*(n-1)))*Lmax + (mu*n)/(4*b); # Right-hand side term in the max in the denominator
 
@@ -453,18 +453,18 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
             sg = initiate_SAGA_nice(prob, options);
 
             ## Practical step size
-            options.stepsize_multiplier = 1.0/(4.0*max(Lpractical, right_term));
+            options.stepsize_multiplier = 1.0/(4.0*max(L_practical, right_term));
             println("----------------------------- PRACTICAL STEP SIZE --------------------------------------");
             println(options.stepsize_multiplier);
             println("----------------------------------------------------------------------------------------");
 
             ## Simple step size
             # println("Simple step size");
-            # options.stepsize_multiplier = 1.0/(4.0*max(Lsimple, right_term));
+            # options.stepsize_multiplier = 1.0/(4.0*max(L_simple, right_term));
 
             ## Bernstein step size
             # println("Bernstein step size");
-            # options.stepsize_multiplier =  1.0/(4.0*max(Lbernstein, right_term));
+            # options.stepsize_multiplier =  1.0/(4.0*max(L_bernstein, right_term));
 
             output = minimizeFunc(prob, sg, options);
             println("Output fail = ", output.fail, "\n");
