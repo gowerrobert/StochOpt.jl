@@ -59,7 +59,7 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 if all_problems
     problems = 1:12;
 else
-    problems = 1:1; # DO NOT FORGET TO SET IT BACK TO "1:1"
+    problems = 12:12; # DO NOT FORGET TO SET IT BACK TO "1:1"
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
@@ -88,14 +88,14 @@ skip_multipliers = [0.01,        # 2min 20s avec 0.01
                    0.01,        # 4 min avec 0.01
                    0.01,        # 11 min avec 0.01
                    0.01,        # 10 min avec 0.01
-                   0.05,        # 36 min avec 0.05 / 1h 30min avec 0.01
+                   0.05,        # 36 min avec 0.05 / 1h 30min avec 0.01 / 5h30 avec 0.001
                    1.0,         # 1h 47min avec 1.0 / 2h 36min avec 0.1
                    1.0,         # 22 min avec 1.0 / 43 min avec 0.1
                    1.0,         # 52 min avec 1.0
                    0.1,         # 12 min avec 1.0 / 21 min avec 0.1
-                   0.1,         # plus de 7h (max_time reached for b=2^14) avec 1.0 / à lancer avec 0.1
-                   0.1,         # 3h 5min avec 1.0 / 3h avec 0.1 / 2h30 avec 0.1
-                   0.1];        # 6h30 avec 0.1  / 6h 20 min avec 0.1
+                   1.0,         # plus de 7h (max_time reached for b=2^14) avec 1.0 / 6h30 avec 10.0 (pas assez précis)
+                   0.1,         # 1h 27min avec 1.0 (pas assez précis) / 2h 12 min avec 0.1
+                   0.1];        # XXX avec 1.0 / XXX min avec 0.1
 
 precision = 10.0^(-4)
 
