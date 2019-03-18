@@ -85,17 +85,17 @@ lambdas = [10^(-1), 10^(-3),
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
 skip_multipliers = [0.01,        # 2min 20s avec 0.01
-                   0.01,        # 4 min avec 0.01
-                   0.01,        # 11 min avec 0.01
-                   0.01,        # 10 min avec 0.01
-                   0.05,        # 36 min avec 0.05 / 1h 30min avec 0.01 / 5h30 avec 0.001
-                   1.0,         # 1h 47min avec 1.0 / 2h 36min avec 0.1
-                   1.0,         # 22 min avec 1.0 / 43 min avec 0.1
-                   1.0,         # 52 min avec 1.0
-                   0.1,         # 12 min avec 1.0 / 21 min avec 0.1
-                   1.0,         # plus de 7h (max_time reached for b=2^14) avec 1.0 / 6h30 avec 10.0 (pas assez précis)
-                   0.1,         # 1h 27min avec 1.0 (pas assez précis) / 2h 12 min avec 0.1
-                   0.1];        # XXX avec 1.0 / XXX min avec 0.1
+                    0.01,        # 4 min avec 0.01
+                    0.01,        # 11 min avec 0.01
+                    0.01,        # 10 min avec 0.01
+                    0.05,        # 36 min avec 0.05 / 1h 30min avec 0.01 / 5h30 avec 0.001
+                    1.0,         # 1h 47min avec 1.0 / 2h 36min avec 0.1
+                    0.1,         # 22 min avec 1.0 / 43 min avec 0.1
+                    1.0,         # 52 min avec 1.0
+                    0.1,         # 12 min avec 1.0 / 21 min avec 0.1
+                    1.0,         # plus de 7h (max_time reached for b=2^14) avec 1.0 / 6h30 avec 10.0 (pas assez précis)
+                    0.1,         # 1h 27min avec 1.0 (pas assez précis) / 2h 12 min avec 0.1
+                    0.1];        # 6h 15min avec 1.0 / more than 6h avec 0.1
 
 precision = 10.0^(-4)
 
