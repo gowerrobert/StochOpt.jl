@@ -110,7 +110,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     Lbar = mean(Li_s);
 
     ## Correcting for logistic since phi'' <= 1/4
-    println("Loading logistic: correcting smoothness constants since phi'' <= 1/4 ")
+    println("Loading logistic: correcting smoothness constants since phi'' <= 1/4")
     L /= 4;
     Lmax /= 4;
     Lbar /= 4;
@@ -151,6 +151,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
         println("Need to compute the solution of the problem")
         # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
     end
+    print("\n")
 
     return prob
 end

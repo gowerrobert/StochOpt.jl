@@ -59,7 +59,7 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 if all_problems
     problems = 1:12;
 else
-    problems = 12:12; # DO NOT FORGET TO SET IT BACK TO "1:1"
+    problems = 1:1; # DO NOT FORGET TO SET IT BACK TO "1:1"
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
