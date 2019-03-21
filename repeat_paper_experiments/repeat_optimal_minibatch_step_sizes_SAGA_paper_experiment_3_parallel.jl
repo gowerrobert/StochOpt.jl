@@ -124,7 +124,7 @@ relaunch_gridsearch = false; # Change to true for recomputing the grid search on
 if all_problems
     problems = 1:12;
 else
-    problems = 1:1;
+    problems = 11:11;
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled
@@ -148,19 +148,18 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)];
 
-skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
-               [10^4 10^3 10^3 10^3],  # ijcnn1_full + scaled + 1e-3
+skip_errors = [[10^4 1 1 500],        # ijcnn1_full + scaled + 1e-1
+               [10^4 500 500 10^3],  # ijcnn1_full + scaled + 1e-3
                [10^4 10 10 10^4],      # YearPredictionMSD_full + scaled + 1e-1
                [10^4 10^3 10 10^4],    # YearPredictionMSD_full + scaled + 1e-3
-               [10^5 10^2 10 10^5],    # covtype_binary + scaled + 1e-1
+               [10^5 10 10 10^5],    # covtype_binary + scaled + 1e-1
                [10^6 10^4 10^3 10^6],  # covtype_binary + scaled + 1e-3
                [10^4 10^3 10^3 10^4],  # slice + scaled + 1e-1
                [10^5 10^5 10^5 10^5],  # slice + scaled + 1e-3
                [10^4 10^2 10^2 10^2],  # slice + unscaled + 1e-1
-               [10^4 10^4 10^4 10^4],  # slice + unscaled + 1e-3
+               [10^3 5000 5000 10^4],  # slice + unscaled + 1e-3
                [10^4 1 1 10^3],        # real-sim + unscaled + 1e-1
-               [10^4 10 10 10^3]       # real-sim + unscaled + 1e-3
-              ];
+               [10^4 10 10 10^3]];     # real-sim + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -207,46 +206,39 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
     L = prob.L;
     # Lbar = prob.Lbar;
 
-    if occursin("lgstc", prob.name)
-        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
-        ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
-        Lmax /= 4;
-        L /= 4;
-        # Lbar /= 4;
-    end
-
     ## Computing mini-batch and step sizes
-    tau_defazio = 1;
+    b_defazio = 1;
     step_defazio = 1.0 / (3.0*(Lmax + n*mu));
 
-    tau_hofmann = 20; # Hofmann : tau = 20, gamma = gamma(20)
-    K = (4.0*tau_hofmann*Lmax) / (n*mu);
+    b_hofmann = 20; # Hofmann: b = 20, gamma = gamma(20)
+    K = (4.0*b_hofmann*Lmax) / (n*mu);
     step_hofmann = K / (2*Lmax*(1+K+sqrt(1+K^2)));
 
-    tau_practical = round(Int, 1 + ( mu*(n-1) ) / ( 4*L ) );
-    rho = ( n*(n - tau_practical) ) / ( tau_practical*(n-1) ); # Sketch residual
-    rightterm = (rho / n)*Lmax + ( (mu*n) / (4*tau_practical) ); # Right-hand side term in the max
-    practical_bound = ( n*(tau_practical-1)*L + (n-tau_practical)*Lmax ) / ( tau_practical*(n-1) );
+    b_practical = round(Int, 1 + ( mu*(n-1) ) / ( 4*L ) );
+    rho = ( n*(n - b_practical) ) / ( b_practical*(n-1) ); # Sketch residual
+    rightterm = (rho / n)*Lmax + ( (mu*n) / (4*b_practical) ); # Right-hand side term in the max
+    practical_bound = ( n*(b_practical-1)*L + (n-b_practical)*Lmax ) / ( b_practical*(n-1) );
     step_practical = 0.25 / max(practical_bound, rightterm);
 
     ## Calculating/Loading the best grid search step size for SAGA_nice with our optimal mini-batch size
-    options.batchsize = tau_practical;
+    options.batchsize = b_practical;
     if options.batchsize == 1
         method_name = "SAGA-nice";
-    elseif options.batchsize > 1
+    elseif options.batchsize > 1 && options.batchsize <= n
         method_name = string("SAGA-", options.batchsize, "-nice");
     else
         error("Invalid batch size");
     end
     step_practical_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
     if step_practical_gridsearch == 0.0 || relaunch_gridsearch
-        grid = [2.0^(25), 2.0^(23), 2.0^(21), 2.0^(19), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11),
-                2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5),
-                2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
-                2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
-        nbskip = closest_power_of_ten(round.(Int, n ./ tau_practical ));
+        # grid = [2.0^(25), 2.0^(23), 2.0^(21), 2.0^(19), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11),
+        #         2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5),
+        #         2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
+        #         2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
+        grid = [2.0^(5), 2.0^(3), 2.0^(1)];
+        nbskip = closest_power_of_ten(round.(Int, n ./ b_practical ));
         output = calculate_best_stepsize_SAGA_nice(prob, options, skip=nbskip, max_time=180.0,
-                                                   rep_number=5, batchsize=tau_practical, grid=grid);
+                                                   rep_number=1, batchsize=b_practical, grid=grid);
         step_practical_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
     end
 
@@ -254,11 +246,11 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
     str_step_practical = @sprintf "%.2e" step_practical
     str_step_practical_gridsearch = @sprintf "%.2e" step_practical_gridsearch
     str_step_hofmann = @sprintf "%.2e" step_hofmann
-    method_names = [latexstring("\$b_\\mathrm{Defazio} \\; \\; = 1 \\ \\ + \\gamma_\\mathrm{Defazio} \\ \\ \\: \\: = $str_step_defazio\$"),
-                    latexstring("\$b_\\mathrm{practical} \\, = $tau_practical + \\gamma_\\mathrm{practical} \\ \\ = $str_step_practical\$"),
-                    latexstring("\$b_\\mathrm{practical} \\, = $tau_practical + \\gamma_\\mathrm{grid search} = $str_step_practical_gridsearch\$"),
-                    latexstring("\$b_\\mathrm{Hofmann} = 20 + \\gamma_\\mathrm{Hofmann}  \\ \\, = $str_step_hofmann\$")];
-    mini_batch_sizes = [tau_defazio, tau_practical, tau_practical, tau_hofmann];
+    method_names = [latexstring("\$b_\\mathrm{Defazio} \\; \\; = 1 \\ \\ , \\gamma_\\mathrm{Defazio} \\ \\ \\: \\: = $str_step_defazio\$"),
+                    latexstring("\$b_\\mathrm{practical} \\, = $b_practical \\ , \\gamma_\\mathrm{practical} \\ \\ = $str_step_practical\$"),
+                    latexstring("\$b_\\mathrm{practical} \\, = $b_practical \\ , \\gamma_\\mathrm{grid search} = $str_step_practical_gridsearch\$"),
+                    latexstring("\$b_\\mathrm{Hofmann} = 20 \\ \\ , \\gamma_\\mathrm{Hofmann}  \\ \\, = $str_step_hofmann\$")];
+    mini_batch_sizes = [b_defazio, b_practical, b_practical, b_hofmann];
     stepsizes = [step_defazio, step_practical, step_practical_gridsearch, step_hofmann];
 
     ## Allowing user skip_error
@@ -277,7 +269,7 @@ skip_errors = [[10^4 10 10 10^3],      # ijcnn1_full + scaled + 1e-1
     println(stepsizes);
     println("----------------------------------------------------------------------------------------");
 
-    ## SAGA 4 different runs (Defazio, our settings, grid search and Hofmann)
+    ## SAGA 4 different runs (Defazio, our practical settings, b_practical with grid searched step size and Hofmann)
     itercomplex = zeros(length(stepsizes), numsimu);
     OUTPUTS = [];
     for idxmethod in 1:length(stepsizes)

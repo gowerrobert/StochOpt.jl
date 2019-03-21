@@ -3,14 +3,14 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     # savename = string(replace(prob.name, r"[\/]", "-"),'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
     # savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
 
-    if(typeof(method_input) == String)
+    if typeof(method_input) == String
         method_name = method_input;
     else
         method_name = method_input.name;
     end
 
     beststep, savename = get_saved_stepsize(prob.name, method_name, options);
-    if(beststep == 0.0 || options.repeat_stepsize_calculation == true)
+    if beststep == 0.0 || options.repeat_stepsize_calculation == true
         options.force_continue = false;
         if grid == [0.0]
             stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5),
@@ -69,7 +69,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     options.stepsize_multiplier = beststep;
 
     options.max_epocs *= 2;
-    options.max_time *= 2.0;
+    options.max_time *= 2.0; # To adjust
 
     println("\n=> Best step: ", beststep);
     outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
