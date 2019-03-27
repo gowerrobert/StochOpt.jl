@@ -196,6 +196,10 @@ skip_errors = [[10^4 1 1 500],        # ijcnn1_full + scaled + 1e-1
         prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling);
     end
 
+    println("######################")
+    println("Fsol: ", prob.fsol)
+    println("######################")
+
     X = nothing;
     y = nothing;
 
