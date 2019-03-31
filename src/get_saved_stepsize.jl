@@ -2,7 +2,7 @@ function get_saved_stepsize(probname::AbstractString, method_name::AbstractStrin
     default_path = "./data/";
     savename = replace(probname, r"[\/]" => "-");
     # if method_name != "SVRG2"
-    #     method_name_temp = replace(method_name, r"-" => "");
+    #     method_name_temp = replace(method_name, r"6" => "");
     # else
     #     method_name_temp = method_name;
     # end
