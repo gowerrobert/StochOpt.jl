@@ -2,7 +2,7 @@ function get_saved_stepsize(probname::AbstractString, method_name::AbstractStrin
     default_path = "./data/";
     savename = replace(probname, r"[\/]" => "-");
     if method_name != "SVRG2"
-        method_name_temp = replace(method_name, r"6" => "");
+        method_name_temp = replace(method_name, r"-" => "");
     else
         method_name_temp = method_name;
     end
@@ -11,6 +11,7 @@ function get_saved_stepsize(probname::AbstractString, method_name::AbstractStrin
     else
         # savename = string(savename, '-', method_name_temp, "-", options.batchsize, "-stepsize") ;
         savename = string(savename, '-', method_name_temp, "-stepsize");
+        println("savename in get_saved_stepsize: %", savename, "%")
     end
     beststep = 0.0;
     #repeat =1 means we should repeat all calculations even if there is a saved output already
