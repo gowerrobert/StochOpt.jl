@@ -1,5 +1,11 @@
 **warning package under development:** it will break. But renewed shall be the code that was broken, the crashless again shall compile.
 
+# Download the datasets
+```bash
+bash download_datasets
+```
+If it crashes, data can be downloaded [here](https://partage.mines-telecom.fr/index.php/s/9MreP5y6evFWyJP). Then, datasets `.jld` files should be placed in the directory `./data`.
+
 # Dependencies
 
 ```julia
