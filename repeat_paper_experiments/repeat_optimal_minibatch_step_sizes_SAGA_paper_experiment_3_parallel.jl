@@ -124,7 +124,7 @@ relaunch_gridsearch = false; # Change to true for recomputing the grid search on
 if all_problems
     problems = 1:12;
 else
-    problems = 11:11;
+    problems = 1:1;
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled
@@ -226,10 +226,13 @@ skip_errors = [[10^4 1 1 500],        # ijcnn1_full + scaled + 1e-1
 
     ## Calculating/Loading the best grid search step size for SAGA_nice with our optimal mini-batch size
     options.batchsize = b_practical;
+    println("Options.batchsize: ", options.batchsize)
+
     if options.batchsize == 1
         method_name = "SAGA-nice";
     elseif options.batchsize > 1 && options.batchsize <= n
         method_name = string("SAGA-", options.batchsize, "-nice");
+        println("method_name:%", method_name, "%")
     else
         error("Invalid batch size");
     end
