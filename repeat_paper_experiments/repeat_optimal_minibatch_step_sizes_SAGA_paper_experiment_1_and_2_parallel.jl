@@ -8,7 +8,7 @@ Goal: Computing the upper-bounds of the expected smoothness constant (exp. 1) an
 - line 36: enter your full path to the "StochOpt.jl/" repository in the *path* variable
 
 ## --- HOW TO RUN THE CODE ---
-To run only the first 2 problems (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) with and without scaling), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
+To run only the first problem (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) without scaling), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
 >julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2_parallel.jl false
 where <number_of_processor_to_add> has to be replaced by the user.
 To launch all the 42 problems of the paper change the bash input and run:
@@ -16,10 +16,10 @@ To launch all the 42 problems of the paper change the bash input and run:
 where <number_of_processor_to_add> has to be replaced by the user.
 
 ## --- EXAMPLE OF RUNNING TIME ---
-Running time of the first 2 problems (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) with and without scaling) when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-XXXXXXXXXXXXXXXXX, around XXXXXXX
+Running time of the first problem (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) without scaling) when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+248.733721 seconds (1.78 M allocations: 88.664 MiB, 0.01% gc time), around 4min
 Running time of all 42 problems when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-XXXXXXXXXXXXXXXXX, around XXXXXXX
+2815.618789 seconds (1.99 M allocations: 94.417 MiB, 0.12% gc time), around 45min
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)

@@ -7,14 +7,14 @@ Goal: Computing the upper-bounds of the expected smoothness constant (exp. 1) an
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 
 ## --- HOW TO RUN THE CODE ---
-To run only the first 2 problems (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) with and without scaling), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
+To run only the first problem (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) without scaling), open a terminal, go into the "StochOpt.jl/" repository and run the following command:
 >julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl false
 To launch all the 42 problems of the paper change the bash input and run:
 >julia repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl true
 
 ## --- EXAMPLE OF RUNNING TIME ---
-Running time of the first first 2 problems (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) with and without scaling) on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-386.126520 seconds (1.78 G allocations: 573.866 GiB, 19.41% gc time), around 7min
+Running time of the first problem (ridge regression for gauss-50-24-0.0_seed-1 with lambda=10^(-1) without scaling) on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
+200.731967 seconds (923.79 M allocations: 286.969 GiB, 14.72% gc time), around 4min
 Running time of all 42 problems on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 4915.046022 seconds (17.41 G allocations: 4.504 TiB, 17.94% gc time), around 1h 22min
 
