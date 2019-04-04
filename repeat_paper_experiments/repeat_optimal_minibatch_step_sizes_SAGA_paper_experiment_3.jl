@@ -153,6 +153,8 @@ skip_errors = [[10^4 10 10 10^3], # ijcnn1_full + scaled + 1e-1                 
                [10^4 10 10 10^3] # real-sim + unscaled + 1e-3                   : CHECKED
               ];
 
+precision = 10.0^(-4)
+
 @time begin
 for idx_prob in problems
     data = datasets[idx_prob];
@@ -170,7 +172,7 @@ for idx_prob in problems
 
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---");
-    options = set_options(tol=10.0^(-4), max_iter=10^8, max_epocs=600,
+    options = set_options(tol=precision, max_iter=10^8, max_epocs=600,
                           max_time=60.0*60.0*5.0,
                           skip_error_calculation=10^5,
                           batchsize=1,
@@ -187,6 +189,10 @@ for idx_prob in problems
         println("More than three modalities in the outputs: the problem is set to ridge regression")
         prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling);
     end
+
+    println("######################")
+    println("Fsol: ", prob.fsol)
+    println("######################")
 
     X = nothing;
     y = nothing;
