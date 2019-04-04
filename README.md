@@ -8,17 +8,29 @@ If it crashes, data can be downloaded [here](https://partage.mines-telecom.fr/in
 
 # Dependencies
 
-```julia
-Pkg.add("JLD")
-Pkg.add("Plots")
-Pkg.add("StatsBase")
-Pkg.add("Match")
+Launch the  Julia REPL and press `]` to enter the package REPL mode, then install the required packages with
+```bash
+(v1.0) pkg> add JLD
+(v1.0) pkg> add Plots
+(v1.0) pkg> add StatsBase
+(v1.0) pkg> add Match
+(v1.0) pkg> add Combinatorics
+(v1.0) pkg> add Formatting
+(v1.0) pkg> add LaTeXStrings
+(v1.0) pkg> add PyPlot
 ...
-Pkg.add("Distributed")
+(v1.0) pkg> add Distributed
+```
+if any problem with PyPlot, try the following manipulation
+```bash
+$ julia
+julia> ENV["PYTHON"]=""
+julia> ]
+(v1.0) pkg> build PyCall
 ```
 
 # StochOpt
-A suite of stochastic optimization methods for solving the empirical risk minimization problem.  <br>
+A suite of stochastic optimization methods for solving the empirical risk minimization problem. <br>
 
 
 # Demo
@@ -74,6 +86,11 @@ To re-generate the experiments from Section 5.1 & 5.2 of [5] (~1h 30min)
 julia ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first two problem, *uniform* synthetic dataset (scaled and unscaled with $\lambda =10^{-1}$), (~7min) or to `true` to run it on all of them (~1h 22min).
+Or using the parallel implementation
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2_parallel.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem, *uniform* unscaled with $\lambda =10^{-1}$, (~XXXXXmin) or to `true` to run it on all of them (~XXXXXXXXh XXXXXmin).
 
 To re-generate experiments from Section 5.3 of [5]
 ```julia
