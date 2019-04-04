@@ -29,7 +29,7 @@ tpm/test_open.jl
 
 ## Monitoring outputs
 nohups/*
-
+outputs/*
 figures/\.directory
 
 \.directory
