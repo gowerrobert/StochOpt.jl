@@ -198,14 +198,6 @@ for idx_prob in problems
     L = prob.L;
     # Lbar = prob.Lbar;
 
-    if occursin("lgstc", prob.name)
-        println("Correcting smoothness constants for logistic since phi'' <= 1/4")
-        ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
-        Lmax /= 4;
-        L /= 4;
-        # Lbar /= 4;
-    end
-
     ## Computing mini-batch and step sizes
     tau_defazio = 1;
     step_defazio = 1.0 / (3.0*(Lmax + n*mu));
