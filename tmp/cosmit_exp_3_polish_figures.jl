@@ -29,6 +29,11 @@ default_path = "./data/";
 # scaling = "column-scaling";
 # lambda = 10^(-3);
 
+filename = "lgstc_real-sim-none-regularizor-1e-01-exp3"
+data = "real-sim"
+scaling = "none";
+lambda = 10^(-1);
+
 numsimu = 1;
 
 Random.seed!(1);
@@ -65,12 +70,6 @@ d = prob.numfeatures;
 mu = prob.mu
 Lmax = prob.Lmax;
 L = prob.L;
-
-if occursin("lgstc", prob.name)
-    println("Correcting smoothness constants for logistic since phi'' <= 1/4")
-    ## Correcting for logistic since phi'' <= 1/4 #TOCHANGE
-    Lmax /= 4;
-end
 
 
 ### II) tau = tau* ###
@@ -151,10 +150,10 @@ OUTPUTS = load("$(default_path)$(filename).jld", "OUTPUTS")
 
 ## Re-plotting one SAGA-nice simulation for each mini-batch size
 pyplot()
-plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3.2-cosmit"); # Plot and save output
+plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3-cosmit", legendpos=:topright); # Plot and save output
 
 OUTPUTS_without_hofmann = OUTPUTS[1:3];
 # OUTPUTS_without_hofmann = [OUTPUTS_without_hofmann; OUTPUTS[3:5]];
 pyplot()
-plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3.2-cosmit"); # Plot and save output
+plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3-cosmit"); # Plot and save output
 
