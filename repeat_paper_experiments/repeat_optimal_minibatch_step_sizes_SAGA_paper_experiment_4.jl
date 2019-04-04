@@ -16,7 +16,7 @@ To launch all the 12 problems of the paper change the bash input and run:
 Running time of the first problem on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 100.569983 seconds (214.39 M allocations: 52.932 GiB, 9.88% gc time), around 1min 41s
 Running time of all problems on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-XXXX.XXXX seconds (XX.XX G allocations: XX.XX TiB, XX.XX% gc time), around XX.XX
+XXXXXXX.XXXXXXX seconds (XX.XX G allocations: XX.XX TiB, XX.XX% gc time), around XX.XX
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
