@@ -139,19 +139,18 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)];
 
-skip_errors = [[10^4 10 10 10^3], # ijcnn1_full + scaled + 1e-1                 : CHECKED
-               [10^4 10^3 10^3 10^3], # ijcnn1_full + scaled + 1e-3             : CHECKED
-               [10^4 10 10 10^4], # YearPredictionMSD_full + scaled + 1e-1      : CHECKED
-               [10^4 10^3 10 10^4], # YearPredictionMSD_full + scaled + 1e-3    : CHECKED
-               [10^5 10^2 10 10^5], # covtype_binary + scaled + 1e-1            : CHECKED
-               [10^6 10^4 10^3 10^6], # covtype_binary + scaled + 1e-3          : CHECKED
-               [10^4 10^3 10^3 10^4], # slice + scaled + 1e-1                   : CHECKED
-               [10^5 10^5 10^5 10^5], # slice + scaled + 1e-3                   : CHECKED
-               [10^4 10^2 10^2 10^2], # slice + unscaled + 1e-1                 : CHECKED
-               [10^4 10^4 10^4 10^4], # slice + unscaled + 1e-3                 : CHECKED
-               [10^4 1 1 10^3], # real-sim + unscaled + 1e-1                    : CHECKED
-               [10^4 10 10 10^3] # real-sim + unscaled + 1e-3                   : CHECKED
-              ];
+skip_errors = [[10^4 1 1 500],         # ijcnn1_full + scaled + 1e-1
+               [10^4 500 500 10^3],    # ijcnn1_full + scaled + 1e-3
+               [10^4 10 10 10^4],      # YearPredictionMSD_full + scaled + 1e-1
+               [10^4 10^3 10 10^4],    # YearPredictionMSD_full + scaled + 1e-3
+               [10^5 10 10 10^5],      # covtype_binary + scaled + 1e-1
+               [10^6 10^4 10^3 10^6],  # covtype_binary + scaled + 1e-3
+               [10^4 10^3 10^3 10^4],  # slice + scaled + 1e-1
+               [10^5 10^5 10^5 10^5],  # slice + scaled + 1e-3
+               [10^4 10^2 10^2 10^2],  # slice + unscaled + 1e-1
+               [10^3 5000 5000 10^4],  # slice + unscaled + 1e-3
+               [10^4 1 1 10^3],        # real-sim + unscaled + 1e-1
+               [10^4 10 10 10^3]];     # real-sim + unscaled + 1e-3
 
 precision = 10.0^(-4)
 
