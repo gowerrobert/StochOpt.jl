@@ -63,14 +63,14 @@ if all_problems
 else
     datasets = ["gauss-50-24-0.0_seed-1"]
     lambdas = [10^(-1)]
-    num_problems = 2
+    num_problems = 1
 end
 
 @time begin
 run_number = 1;
 for data in datasets
     for lambda in lambdas
-        if !(data in ["real-sim" "news20_binary" "rcv1_full"])
+        if !(data in ["real-sim" "news20_binary" "rcv1_full"]) && !(num_problems == 1)
             scalings = ["none" "column-scaling"]; # for all datasets except real-sim, news20.binary and rcv1
         else
             scalings = ["none"];
