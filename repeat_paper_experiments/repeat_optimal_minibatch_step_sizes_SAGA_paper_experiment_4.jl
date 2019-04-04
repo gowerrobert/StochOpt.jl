@@ -72,13 +72,21 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)];
 
-## In the following table, set smaller values for finer estimations (yet longer simulations)
-skip_multiplier = [0.05, 0.05,
-                   0.05, 0.05,
-                   0.05, 0.05,
-                   0.05, 0.05,
-                   0.05, 0.05,
-                   0.05, 0.05];
+## In the following table, set smaller values for finer estimations (yet, longer simulations)
+skip_multipliers = [0.01,        # 2min 20s avec 0.01
+                    0.01,        # 4 min avec 0.01
+                    0.01,        # 11 min avec 0.01
+                    0.01,        # 10 min avec 0.01
+                    0.05,        # 36 min avec 0.05 / 1h 30min avec 0.01 / 5h30 avec 0.001
+                    1.0,         # 1h 47min avec 1.0 / 2h 36min avec 0.1
+                    0.1,         # 22 min avec 1.0 / 43 min avec 0.1
+                    1.0,         # 52 min avec 1.0
+                    0.1,         # 12 min avec 1.0 / 21 min avec 0.1
+                    1.0,         # plus de 7h (max_time reached for b=2^14) avec 1.0 / 6h30 avec 10.0 (pas assez précis)
+                    0.1,         # 1h 27min avec 1.0 (pas assez précis) / 2h 12 min avec 0.1
+                    0.1];        # 6h 15min avec 1.0 / more than 6h avec 0.1
+
+precision = 10.0^(-4)
 
 @time begin
 for idx_prob in problems
@@ -97,7 +105,7 @@ for idx_prob in problems
 
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---");
-    options = set_options(tol=10.0^(-4), max_iter=10^8, max_epocs=10^8,
+    options = set_options(tol=precision, max_iter=10^8, max_epocs=10^8,
                           max_time=60.0*60.0*5.0,
                           skip_error_calculation=10^4,
                           batchsize=1,
@@ -132,11 +140,11 @@ for idx_prob in problems
 
     ## Computing the empirical mini-batch size over a grid
     # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
-    if data == "covtype_binary" && lambda == 10^(-1)
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18]
-    elseif data == "real-sim" && lambda == 10^(-1)
+    if data == "covtype_binary"
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
+    elseif data == "ijcnn1_full" && lambda == 10^(-1)
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
-    elseif data == "real-sim" && lambda == 10^(-3)
+    elseif data == "real-sim"
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
     else
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
@@ -165,6 +173,7 @@ for idx_prob in problems
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     savename = string(probname, "-exp4-optimality-", numsimu, "-avg");
+    # savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")); # Extra suffix to check which skip values to keep
     if numsimu == 1
         save("$(default_path)$(savename).jld",
         "options", options, "minibatchgrid", minibatchgrid,
