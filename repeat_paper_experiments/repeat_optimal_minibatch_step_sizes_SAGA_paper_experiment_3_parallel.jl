@@ -326,7 +326,7 @@ precision = 10.0^(-4)
     if numsimu == 1
         plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3", path=path, legendpos=:topright); # Plot and save output epoch and time figures
         OUTPUTS_without_hofmann = OUTPUTS[1:3];
-        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3.2", path=path, legendpos=:topright); # Removing Hofmann settings curve from the plots
+        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3", path=path, legendpos=:topright); # Removing Hofmann settings curve from the plots
     end
 
     line1 =          "method name      | b_Defazio + step_Defazio | b_practical + step_practical | b_practical + step_gridsearch | b_Hofmann + step_Hofmann |\n"
