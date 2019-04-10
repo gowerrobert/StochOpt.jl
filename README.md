@@ -4,7 +4,7 @@
 ```bash
 bash download_datasets
 ```
-If it crashes, data can be downloaded [here](https://partage.mines-telecom.fr/index.php/s/9MreP5y6evFWyJP). Then, datasets `.jld` files should be placed in the directory `./data`.
+If it crashes, data can be downloaded manually [here](https://partage.mines-telecom.fr/index.php/s/9MreP5y6evFWyJP). Then, datasets `.jld` files should be placed in the directory `./data`.
 
 # Dependencies
 
