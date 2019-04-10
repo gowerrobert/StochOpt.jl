@@ -19,7 +19,8 @@ where <number_of_processor_to_add> has to be replaced by the user.
 Running time of the first experiment when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
 132.544913 seconds (2.19 M allocations: 102.777 MiB, 0.03% gc time), around 2min 20s
 Running time of all problems when adding 4 processors on a laptop with 16Gb RAM and Intel® Core™ i7-8650U CPU @ 1.90GHz × 8
-XXXXXX.XXXXXX seconds (XX.XX G allocations: XX.XX TiB, XX.XX% gc time), around XX.XX
+Many hours... 16Gb RAM is not enough for the real-sim dataset (memory might be stored on the swap of the machine which explodes the coputation time)
+We encourage users to run the code on servers.
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
