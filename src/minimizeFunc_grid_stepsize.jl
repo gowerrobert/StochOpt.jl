@@ -29,9 +29,10 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             beststep = 0.0; #iteratesp = 1;
             for stepind = start_step:length(stepsizes)
                 println("--------------------------------> minfval = ", minfval);
-                if typeof(method_input) == SAGA_nice_method
+                if typeof(method_input) == SAGA_nice_method || typeof(method_input) == SVRG_nice_method # reset
                     # println("\n\nMONITORING BEFORE RESET => ", method_input.SAGgrad, "\n\n")
                     method_input = method_input.reset(prob, method_input, options); # SAGA_nice = initiate_SAGA_nice(prob, options);
+                    # method_input.reset!(prob, method_input, options); # /!\ TO DO: modify SAGA_nice and verify if this works
                     # println("\n\nMONITORING AFTER RESET  => ", method_input.SAGgrad, "\n\n")
                 end
                 step = stepsizes[stepind];

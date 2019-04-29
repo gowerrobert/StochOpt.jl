@@ -4,7 +4,7 @@
 
 function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing, stop_at_tol::Bool=false, skip_decrease::Bool=false)
 
-    if(options.initial_point == "randn") # set initial point
+    if options.initial_point == "randn" # set initial point
         x = randn(prob.numfeatures);
     elseif(options.initial_point == "rand")
         x = rand(prob.numfeatures); #
@@ -13,26 +13,28 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     else
         x = zeros(prob.numfeatures); #
     end
-    # println("---> Initial point set")
+    println("---> Initial point set")
 
-    if(typeof(method_input) == String)
+    if typeof(method_input) == String
         method = boot_method(method_input, prob, options);
-        if(method=="METHOD DOES NOT EXIST")
+        if method=="METHOD DOES NOT EXIST"
             println("FAIL: unknown method name:")
             return
         end
     else
-        # println("\n---Method is not a String---\n") # To try if this else is for SAGA
+        println("\n---Method is not a String---\n") # To try if this else is for SAGA_nice or SVRG_nice
         method = method_input;
-        method = method.bootmethod(prob, method, options);
-        # method = method.bootmethod(prob, method, options, x);
+        # method = method.bootmethod(prob, method, options); # SAGA_nice
+        method.bootmethod(prob, method, options); # SVRG_nice
+        # method = method.bootmethod(prob, method, options, x); # ??
     end
+    show(method)
     println(method.name);
-    # println("---> Method set")
+    println("---> Method set")
 
     times = [0];
     ##
-    if(options.exacterror == false)
+    if options.exacterror == false
         prob.fsol = 0.0; # Using suboptimality as a measure of error
     else
         load_fsol!(options, prob); # already loaded in load_logistic.jl
@@ -43,7 +45,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     # println("size of X: ", size(X), " ", "prob.numdata ",prob.numdata, " length(1:prob.numdata): ",length(1:prob.numdata) )
     f0 = prob.f_eval(x, 1:prob.numdata);
     fs = [f0];
-    if(testprob != nothing)   # calculating the test error
+    if testprob != nothing  # calculating the test error
         testerrors = [testerror(testprob, x)];
     else
         testerrors = [];
@@ -78,20 +80,21 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
 
             ## Resetting back the method
-            if(typeof(method_input) == String)
+            if typeof(method_input) == String
                 method = boot_method(method_input, prob, options);
-                if(method=="METHOD DOES NOT EXIST")
+                if method=="METHOD DOES NOT EXIST"
                     println("FAIL: unknown method name:")
                     return
                 end
             else
                 method = method_input;
-                method = method.bootmethod(prob, method, options); # Previous code
+                # method = method.bootmethod(prob, method, options); # SAGA_nice
+                method.bootmethod(prob, method, options); # SVRG_nice
             end
             d = zeros(prob.numfeatures); # Search direction vector
             fail = "failed";
         end
-        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
+        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d); # mutating function
         x[:] = x + method.stepsize * d;
         # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));

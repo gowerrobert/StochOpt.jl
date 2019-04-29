@@ -11,7 +11,7 @@ using Base64
 include("./src/StochOpt.jl")
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=150, force_continue=true, initial_point="zeros");
+options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=50, force_continue=true, initial_point="zeros");
 options.batchsize = 10;
 
 ## Load problem
@@ -25,21 +25,21 @@ OUTPUTS = [];  # List of saved outputs
 #######
 options.stepsize_multiplier = 1e-3;
 options.batchsize = 1;
-options.skip_error_calculation = 5000;
-SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
-output = minimizeFunc(prob, SAGA_nice, options);
+options.skip_error_calculation = 1000;
+SVRG_nice = initiate_SVRG_nice(prob, options);
+output = minimizeFunc(prob, SVRG_nice, options);
 OUTPUTS = [OUTPUTS; output];
-#######
-options.batchsize = 10;
+######
+options.batchsize = 50;
 options.skip_error_calculation = 500;
-SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
-output = minimizeFunc(prob, SAGA_nice, options);
+SVRG_nice = initiate_SVRG_nice(prob, options);
+output = minimizeFunc(prob, SVRG_nice, options);
 OUTPUTS = [OUTPUTS; output];
 #######
 options.batchsize = prob.numdata;
 options.skip_error_calculation = 50;
-SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
-output = minimizeFunc(prob, SAGA_nice, options);
+SVRG_nice = initiate_SVRG_nice(prob, options);
+output = minimizeFunc(prob, SVRG_nice, options);
 OUTPUTS = [OUTPUTS; output];
 
 ## Saving outputs and plots

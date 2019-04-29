@@ -2,7 +2,7 @@
     initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
 
 Initiate the SAGA method for b-nice sampling.
-It uniformly picks b data points out of ``n`` at each iteration to build an estimate of the gradient.
+It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
 
 #INPUTS:\\
     - prob: considered problem (i.e. logistic regression, ridge ression...) of the type **Prob** (see src/StochOpt.jl)\\
@@ -15,12 +15,12 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     # options.stepsize_multiplier = 1; # WHY ?!
     epocsperiter = options.batchsize/prob.numdata;
     gradsperiter = options.batchsize;
-    if(unbiased)
+    if unbiased
         name = "SAGA"
     else
         name = "SAG"
     end
-    if(options.batchsize > 1)
+    if options.batchsize > 1
         name = string(name, "-", options.batchsize);
     end
     name = string(name, "-nice");
@@ -37,13 +37,13 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
     probs = [];
     Z = 0.0;
 
-    return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice, minibatches, unbiased,
+    return SAGA_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SAGA_nice!, minibatches, unbiased,
                             Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, reset_SAGA_nice);
 end
 
 
 """
-    boot_SAGA_nice(prob::Prob, method, options::MyOptions)
+    boot_SAGA_nice!(prob::Prob, method, options::MyOptions)
 
 Set the stepsize based on the smoothness constants of the problem stored in **SAGA_nice_method**.
 
@@ -54,7 +54,7 @@ Set the stepsize based on the smoothness constants of the problem stored in **SA
 #OUTPUTS:\\
     - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
 """
-function boot_SAGA_nice(prob::Prob, method, options::MyOptions)
+function boot_SAGA_nice!(prob::Prob, method, options::MyOptions)
     # /!\ WARNING: this function modifies its own arguments (`method` and `options`) and returns method! Shouldn't we name it "boot_SAGA_nice!(...)" with an "!" ?
     # tau = options.batchsize;
     # n = prob.numdata;

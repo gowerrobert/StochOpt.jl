@@ -9,6 +9,7 @@ using LinearAlgebra
 using Printf
 using Random
 using LaTeXStrings
+
 mutable struct MyOptions
     tol::Float64
     aux::Float64
@@ -125,7 +126,7 @@ mutable struct SAGA_nice_method
     Jacsp::SparseMatrixCSC # Sparse JAcobian estimate
     SAGgrad::Array{Float64}  # The SAG estimate of full gradient, needed for computing unbiased gradient estimate.
     gi::Array{Float64} # Storage for a single stochastic gradient
-    aux::Array{Float64}  # Storage for an auxiliary vector, used as the update vectoe
+    aux::Array{Float64}  # Storage for an auxiliary vector, used as the update vector
     stepsize::Float64     # The stepsize
     probs::Array{Float64}  # Probability of selecting a coordinate or mini-batch
     Z    # normalizing variable for probabilities
@@ -134,6 +135,28 @@ mutable struct SAGA_nice_method
     # Lmax::Float64 # Max of the smoothness constant of the f_i functions
     # Lbar::Float64 # Average of the smoothness constant of the f_i functions
     # mu::Float64 # Strong-convexity constant
+end
+
+mutable struct SVRG_nice_method
+    epocsperiter::Float64
+    gradsperiter::Float64
+    name::AbstractString
+    stepmethod::Function # /!\ mutating function
+    bootmethod::Function # /!\ mutating function
+    minibatch_size::Int64
+    stepsize::Float64     # step size
+    probs::Array{Float64}  # probability of selecting a coordinate or mini-batch
+    Z    # normalizing variable for probabilities
+    L::Float64 # smoothness constant of the whole objective function f
+    Lmax::Float64 # max of the smoothness constant of the f_i functions
+    mu::Float64 # strong-convexity constant
+    expected_smoothness::Float64 # Expected smoothness constant
+    expected_residual::Float64 # expected residual
+    numinneriters::Int64 # number of inner iterations, usually denoted m
+    reference_point::Array{Float64}
+    reference_grad::Array{Float64}
+    averaging_weights::Array{Float64} # averaging weights of the output of the inner loop
+    reset::Function # reset the parameters of the method like after initiate_SVRG_nice_method
 end
 
 mutable struct SPIN
@@ -199,10 +222,15 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
+allmethods = ["SVRG_nice", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
 for method in allmethods
-    include(string("boot_", method , ".jl"))
-    include(string("descent_", method , ".jl"))
+    if method == "SVRG_nice"
+        include(string("boot_", method , "!.jl")) # boot is a mutating function
+        include(string("descent_", method , "!.jl")) # descent is a mutating function
+    else
+        include(string("boot_", method , ".jl"))
+        include(string("descent_", method , ".jl"))
+    end
 end
 include("descent_SAGApartition.jl")
 
