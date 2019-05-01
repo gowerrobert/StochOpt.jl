@@ -1,0 +1,4 @@
+lgstc_australian-column-scaling-regularizor-1e-01-SVRG-690-nice stepsize_multiplier 
+SVRG-nice : 2^ -9.965784284662087
+SVRG-50-nice : 2^ -9.965784284662087
+SVRG-690-nice : 2^ -9.965784284662087

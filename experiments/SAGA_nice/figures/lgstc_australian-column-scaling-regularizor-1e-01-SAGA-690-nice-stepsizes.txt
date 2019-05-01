@@ -1,0 +1,4 @@
+lgstc_australian-column-scaling-regularizor-1e-01-SAGA-690-nice stepsize_multiplier 
+SAGA-nice : 2^ -9.965784284662087
+SAGA-10-nice : 2^ -9.965784284662087
+SAGA-690-nice : 2^ -9.965784284662087
