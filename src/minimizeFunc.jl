@@ -28,7 +28,6 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         method.bootmethod(prob, method, options); # SVRG_nice
         # method = method.bootmethod(prob, method, options, x); # ??
     end
-    show(method)
     println(method.name);
     println("---> Method set")
 

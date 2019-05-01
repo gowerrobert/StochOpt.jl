@@ -43,10 +43,26 @@ output = minimizeFunc(prob, SAGA_nice, options);
 OUTPUTS = [OUTPUTS; output];
 
 ## Saving outputs and plots
-default_path = "./data/";
-savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-savename = string("demo_", savename);
-save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
+path = "./experiments/SAGA_nice/";
+if !isdir(path) # create directory if not existing
+    if !isdir("./experiments/")
+        mkdir("./experiments/");
+    end
+    mkdir(path);
+    mkdir(string(path, "data/"));
+    mkdir(string(path, "figures/"));
+end
 
+data_path = string(path, "data/");
+if !isdir(data_path)
+    mkdir(data_path);
+end
+savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
+savename = string(savename, "-", SAGA_nice.name);
+save("$(data_path)$(savename).jld", "OUTPUTS", OUTPUTS);
+
+if !isdir(string(path, "figures/"))
+    mkdir(string(path, "figures/"));
+end
 pyplot() # gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options) # Plot and save output
+plot_outputs_Plots(OUTPUTS, prob, options, methodname=SAGA_nice.name, path=path) # Plot and save output

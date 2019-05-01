@@ -1,14 +1,26 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
-function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best) #, datapassbnd::Int64
+function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, methodname::AbstractString="", suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best) #, datapassbnd::Int64
     ## Now in epocs X function values
-    if length(suffix) > 0
-        probname = string(replace(prob.name, r"[\/]." => "-"), suffix);
-    elseif options.batchsize > 0
-        probname = string(replace(prob.name, r"[\/]." => "-"), "-", options.batchsize);
-    else
-        probname = string(replace(prob.name, r"[\/]." => "-"));
+
+    # New version with method name
+    probname = string(replace(prob.name, r"[\/]." => "-"));
+    if length(methodname) > 0
+        probname = string(probname, "-", methodname);
     end
-    probname = replace(probname, "." => "_")
+    if length(suffix) > 0
+        probname = string(probname, suffix);
+    end
+    probname = replace(probname, "." => "_");
+    ## Previous version
+    # if length(suffix) > 0
+    #     probname = string(replace(prob.name, r"[\/]." => "-"), suffix);
+    # elseif options.batchsize > 0
+    #     probname = string(replace(prob.name, r"[\/]." => "-"), "-", options.batchsize);
+    # else
+    #     probname = string(replace(prob.name, r"[\/]." => "-"));
+    # end
+    # probname = replace(probname, "." => "_");
+
     if(options.precondition)
         probname = string(probname, "-precon")
     end
