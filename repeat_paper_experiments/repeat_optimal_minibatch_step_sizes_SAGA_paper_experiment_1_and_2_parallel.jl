@@ -33,7 +33,8 @@ all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (tru
 using Distributed
 
 @everywhere begin
-    path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    # path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
 
     using JLD
     using Plots

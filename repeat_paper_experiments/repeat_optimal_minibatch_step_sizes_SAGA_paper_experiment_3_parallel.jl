@@ -34,7 +34,8 @@ all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (tru
 using Distributed
 
 @everywhere begin
-    path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    # path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
 
     using JLD
     using Plots
@@ -54,6 +55,17 @@ using Distributed
     pyplot() # No problem with pyplot when called in @everywhere statement
 end
 
+save_path = "$(path)experiments/SAGA_nice/";
+# Create saving directories if not existing
+if !isdir("$(save_path)data/")
+    mkdir("$(save_path)data/");
+end
+if !isdir("$(save_path)figures/")
+    mkdir("$(save_path)figures/");
+end
+if !isdir("$(save_path)outputs/")
+    mkdir("$(save_path)outputs/");
+end
 
 #region
 ## Function used to the skip_error parameter
@@ -312,7 +324,7 @@ precision = 10.0^(-4)
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     savename = string(probname, "-exp3-empcomplex-", numsimu, "-avg");
-    save("$(data_path)$(savename).jld", "itercomplex", itercomplex, "empcomplex", empcomplex, "ci_itercomplex", ci_itercomplex,
+    save("$(save_path)data/$(savename).jld", "itercomplex", itercomplex, "empcomplex", empcomplex, "ci_itercomplex", ci_itercomplex,
          "OUTPUTS", OUTPUTS, "method_names", method_names, "skip_error", skip_error,
          "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes);
 
@@ -324,9 +336,9 @@ precision = 10.0^(-4)
 
     ## Plotting one SAGA-nice simulation for each mini-batch size
     if numsimu == 1
-        plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3", path=path, legendpos=:topright); # Plot and save output epoch and time figures
+        plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3", path=save_path, legendpos=:topright); # Plot and save output epoch and time figures
         OUTPUTS_without_hofmann = OUTPUTS[1:3];
-        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3", path=path, legendpos=:topright); # Removing Hofmann settings curve from the plots
+        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3", path=save_path, legendpos=:topright); # Removing Hofmann settings curve from the plots
     end
 
     line1 =          "method name      | b_Defazio + step_Defazio | b_practical + step_practical | b_practical + step_gridsearch | b_Hofmann + step_Hofmann |\n"
@@ -345,7 +357,7 @@ precision = 10.0^(-4)
     println("number of simulations: $numsimu\n\n");
 
     ## Saving the averaged empirical total complexities and the corresponding confidence intervals
-    open("./outputs/$probname-exp3-complexity.txt", "a") do file
+    open("$(save_path)outputs/$(probname)-exp3-complexity.txt", "a") do file
         write(file, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
         write(file, line1);
         write(file, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");

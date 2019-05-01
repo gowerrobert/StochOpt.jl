@@ -35,7 +35,8 @@ all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (tru
 using Distributed
 
 @everywhere begin
-    path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    # path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
 
     using JLD
     using Plots
@@ -53,6 +54,18 @@ using Distributed
     include("$(path)src/StochOpt.jl")
     # gr()
     pyplot() # No problem with pyplot when called in @everywhere statement
+end
+
+save_path = "$(path)experiments/SAGA_nice/";
+# Create saving directories if not existing
+if !isdir("$(save_path)data/")
+    mkdir("$(save_path)data/");
+end
+if !isdir("$(save_path)figures/")
+    mkdir("$(save_path)figures/");
+end
+if !isdir("$(save_path)outputs/")
+    mkdir("$(save_path)outputs/");
 end
 
 ## Experiments settings
@@ -186,7 +199,7 @@ precision = 10.0^(-4)
     savename = string(probname, "-exp4-optimality-", numsimu, "-avg");
     # savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")); # Extra suffix to check which skip values to keep
     if numsimu == 1
-        save("$(data_path)$(savename).jld",
+        save("$(save_path)data/$(savename).jld",
         "options", options, "minibatchgrid", minibatchgrid,
         "itercomplex", itercomplex, "empcomplex", empcomplex,
         "b_empirical", b_empirical);
@@ -194,7 +207,7 @@ precision = 10.0^(-4)
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=path, skip_multiplier=skip_multipliers[idx_prob])
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob])
 
     println("Practical optimal mini-batch = ", b_practical)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")

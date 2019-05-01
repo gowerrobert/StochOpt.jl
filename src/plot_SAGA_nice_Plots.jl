@@ -19,6 +19,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     # default_path = "./figures/"; # old path
     default_path = "./experiments/SAGA_nice/figures/"; # new path
+
     fontsmll = 8;
     fontmed = 12;
     fontlegend = 13;
@@ -128,7 +129,9 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     # default_path = "./figures/"; # old path
-    default_path = "./experiments/SAGA_nice/figures/"; # new path    fontsmll = 8;
+    default_path = "./experiments/SAGA_nice/figures/"; # new path
+
+    fontsmll = 8;
     fontmed = 12;
     fontlegend = 13;
     fontbig = 14;
