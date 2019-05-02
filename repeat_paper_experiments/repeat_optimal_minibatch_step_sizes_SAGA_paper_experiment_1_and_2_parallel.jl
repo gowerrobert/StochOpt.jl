@@ -59,7 +59,7 @@ end
 if all_problems
     problems = 1:42;
 else
-    problems = 1:1;
+    problems = 21:21; # for debugging
 end
 
 datasets = collect(Iterators.flatten([fill("gauss-50-24-0.0_seed-1", 4),
@@ -81,6 +81,7 @@ scalings = collect(Iterators.flatten([Iterators.flatten(fill(["none", "none", "c
 lambdas = collect(Iterators.flatten(fill([10^(-1), 10^(-3)], 21)))
 
 data_path = "$(path)data/";
+save_path = "$(path)experiments/SAGA_nice/";
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -152,7 +153,8 @@ data_path = "$(path)data/";
     ########################################### SAVNG RESULTS ########################################################
     println("\n--- Saving the bounds ---");
     save_SAGA_nice_constants(prob, data, simple_bound, bernstein_bound, practical_approx, expsmoothcst,
-                             simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size);
+                             simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size,
+                             path=save_path);
     ##################################################################################################################
 
 end

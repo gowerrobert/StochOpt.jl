@@ -41,7 +41,8 @@ using LaTeXStrings
 
 ## Manual inputs
 include("../src/StochOpt.jl") # be carefull about the path here
-default_path = "./data/";
+data_path = "./data/";
+save_path = "./experiments/SAGA_nice/";
 
 ## Experiments settings
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
@@ -61,7 +62,8 @@ if all_problems
     lambdas = [10^(-1), 10^(-3)]
     num_problems = 42
 else
-    datasets = ["gauss-50-24-0.0_seed-1"]
+    # datasets = ["gauss-50-24-0.0_seed-1"]
+    datasets = ["ijcnn1_full"] # for debugging
     lambdas = [10^(-1)]
     num_problems = 1
 end
@@ -86,7 +88,7 @@ for data in datasets
 
             ## Loading data
             println("--- Loading data ---");
-            X, y = loadDataset(default_path, data); # Only loading existing datasets, no data generation here
+            X, y = loadDataset(data_path, data); # Only loading existing datasets, no data generation here
 
             ## Setting up the problem
             println("\n--- Setting up the selected problem ---");
@@ -141,7 +143,8 @@ for data in datasets
             ########################################### SAVNG RESULTS ########################################################
             println("\n--- Saving the bounds ---");
             save_SAGA_nice_constants(prob, data, simple_bound, bernstein_bound, practical_approx, expsmoothcst,
-                                     simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size);
+                                     simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size,
+                                     path=save_path);
             ##################################################################################################################
             global run_number += 1;
         end

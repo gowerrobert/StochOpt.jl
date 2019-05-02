@@ -2,7 +2,7 @@
 ### "Optimal mini-batch and step sizes for SAGA", Nidham Gazagnadou, Robert M. Gower, Joseph Salmon (2019)
 
 ## --- EXPERIMENT 4 (serial implementation) ---
-Goal: Testing the optimality of our optimal mini-batch size tau_practical with corresponding step size gamma_practical
+Goal: Testing the optimality of our optimal mini-batch size b_practical with corresponding step size gamma_practical
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 
@@ -45,7 +45,8 @@ using LaTeXStrings
 include("../src/StochOpt.jl")
 
 ## Experiments settings
-default_path = "./data/";
+data_path = "./data/";
+save_path = "./experiments/SAGA_nice/";
 
 if all_problems
     problems = 1:12;
@@ -103,7 +104,7 @@ for idx_prob in problems
 
     ## Loading the data
     println("--- Loading data ---");
-    X, y = loadDataset(default_path, data);
+    X, y = loadDataset(data_path, data);
 
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---");
@@ -138,7 +139,7 @@ for idx_prob in problems
     ## Computing mini-batch and step sizes
     # tau_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar))
     # tau_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L))))
-    tau_practical = round(Int, 1 + (mu*(n-1))/(4*L))
+    b_practical = round(Int, 1 + (mu*(n-1))/(4*L))
 
     ## Computing the empirical mini-batch size over a grid
     # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
@@ -157,7 +158,7 @@ for idx_prob in problems
     println("---------------------------------------------------------------------------------------------");
 
     numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multiplier[idx_prob]);
+    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path);
 
     ## Checking that all simulations reached tolerance
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];
@@ -170,25 +171,25 @@ for idx_prob in problems
     ## Computing the empirical complexity
     empcomplex = reshape(minibatchgrid .* itercomplex, length(minibatchgrid)); # mini-batch size times number of iterations
     min_empcomplex, idx_min = findmin(empcomplex)
-    tau_empirical = minibatchgrid[idx_min]
+    b_empirical = minibatchgrid[idx_min]
 
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     savename = string(probname, "-exp4-optimality-", numsimu, "-avg");
     # savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")); # Extra suffix to check which skip values to keep
     if numsimu == 1
-        save("$(default_path)$(savename).jld",
+        save("$(save_path)data/$(savename).jld",
         "options", options, "minibatchgrid", minibatchgrid,
         "itercomplex", itercomplex, "empcomplex", empcomplex,
-        "tau_empirical", tau_empirical);
+        "b_empirical", b_empirical);
     end
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, tau_practical, tau_empirical)
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob]);
 
-    println("Practical optimal mini-batch = ", tau_practical)
-    println("Empirical optimal mini-batch = ", tau_empirical, "\n\n")
+    println("Practical optimal mini-batch = ", b_practical)
+    println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
 end
 end
 

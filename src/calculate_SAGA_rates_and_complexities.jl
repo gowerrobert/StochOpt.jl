@@ -322,10 +322,10 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   simple_step_size::Array{Float64}, bernstein_step_size::Array{Float64},
                                   practical_step_size::Array{Float64}, expsmooth_step_size,
                                   b_simple::Int64=0, b_bernstein::Int64=0,
-                                  b_practical::Int64=0, b_exact=0)
+                                  b_practical::Int64=0, b_exact=0 ; path::AbstractString="./")
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-    default_path = "./data/";
     savename = "-exp1-cst";
+    path = string(path, "data/");
 
     n = prob.numdata;
     d = prob.numfeatures;
@@ -345,7 +345,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
     end
 
     ## Saving the problem and the related constants
-    save("$(default_path)$(probname)$(savename).jld",
+    save("$(path)$(probname)$(savename).jld",
          "mu", prob.mu, "L", prob.L, "Lmax", prob.Lmax, "Lbar", prob.Lbar, "Li_s", Li_s,
          "simple_bound", simple_bound, "bernstein_bound", bernstein_bound,
          "practical_approx", practical_approx, "expsmoothcst", expsmoothcst,
@@ -399,12 +399,12 @@ correpsonding average iteration complexity.
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
 """
 function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions, numsimu::Int64 ;
-                            skipped_errors::Int64=-1, skip_multiplier::Float64=0.02)
+                            skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/b
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-    default_path = "./data/";
+    path = string(path, "data/")
 
     n = prob.numdata;
 
@@ -480,7 +480,7 @@ function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::
 
     ## Saving the result of the simulations
     savename = "-exp4-empcomplex-$(numsimu)-avg";
-    save("$(default_path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS);
+    save("$(path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS);
 
     return OUTPUTS, itercomplex
 end

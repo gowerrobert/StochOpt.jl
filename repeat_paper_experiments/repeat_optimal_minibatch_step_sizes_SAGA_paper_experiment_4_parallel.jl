@@ -179,7 +179,7 @@ precision = 10.0^(-4)
     println(minibatchgrid);
     println("---------------------------------------------------------------------------------------------");
 
-    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multipliers[idx_prob]);
+    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path);
 
     ## Checking that all simulations reached tolerance
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];

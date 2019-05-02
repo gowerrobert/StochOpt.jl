@@ -108,7 +108,9 @@ end
 #endregion
 
 ## Experiments settings
-default_path = "./data/";
+data_path = "./data/";
+save_path = "./experiments/SAGA_nice/";
+
 numsimu = 1;                 # Increase the number of simulations to compute an average of the empirical total complexity of each method
 relaunch_gridsearch = false; # Change to true for recomputing the grid search on the step sizes
 
@@ -167,7 +169,7 @@ for idx_prob in problems
 
     ## Loading the data
     println("--- Loading data ---");
-    X, y = loadDataset(default_path, data);
+    X, y = loadDataset(data_path, data);
 
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---");
@@ -301,7 +303,7 @@ for idx_prob in problems
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     savename = string(probname, "-exp3-empcomplex-", numsimu, "-avg");
-    save("$(default_path)$(savename).jld", "itercomplex", itercomplex, "empcomplex", empcomplex, "ci_itercomplex", ci_itercomplex,
+    save("$(save_path)data/$(savename).jld", "itercomplex", itercomplex, "empcomplex", empcomplex, "ci_itercomplex", ci_itercomplex,
          "OUTPUTS", OUTPUTS, "method_names", method_names, "skip_error", skip_error,
          "stepsizes", stepsizes, "mini_batch_sizes", mini_batch_sizes);
 
@@ -315,11 +317,11 @@ for idx_prob in problems
     if numsimu == 1
         # gr()
         pyplot()
-        plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3"); # Plot and save output epoch and time figures
+        plot_outputs_Plots(OUTPUTS, prob, options, path=save_path, suffix="-exp3"); # Plot and save output epoch and time figures
 
         OUTPUTS_without_hofmann = OUTPUTS[1:3];
         pyplot()
-        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, suffix="_without_hofmann-exp3"); # Removing Hofmann settings curve from the plots
+        plot_outputs_Plots(OUTPUTS_without_hofmann, prob, options, path=save_path, suffix="_without_hofmann-exp3"); # Removing Hofmann settings curve from the plots
     end
 
     line1 =          "method name      | b_Defazio + step_Defazio | b_practical + step_practical | b_practical + step_gridsearch | b_Hofmann + step_Hofmann |\n"
@@ -338,7 +340,7 @@ for idx_prob in problems
     println("number of simulations: $numsimu\n\n");
 
     ## Saving the averaged empirical total complexities and the corresponding confidence intervals
-    open("./outputs/$probname-exp3-complexity.txt", "a") do file
+    open("$(save_path)outputs/$probname-exp3-complexity.txt", "a") do file
         write(file, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
         write(file, line1);
         write(file, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
