@@ -1,0 +1,4 @@
+lgstc_covtype_binary-column-scaling-regularizor-1e-01_without_hofmann-exp3 stepsize_multiplier 
+$b_\mathrm{Defazio} \; \; = 1 \ \ , \gamma_\mathrm{Defazio} \ \ \: \: = 3.13e-06$ : 2^ -18.285851193034798
+$b_\mathrm{practical} \, = 15304 \ , \gamma_\mathrm{practical} \ \ = 6.20e-02$ : 2^ -4.0108407567035185
+$b_\mathrm{practical} \, = 15304 \ , \gamma_\mathrm{grid search} = 2.00e+00$ : 2^ 1.0

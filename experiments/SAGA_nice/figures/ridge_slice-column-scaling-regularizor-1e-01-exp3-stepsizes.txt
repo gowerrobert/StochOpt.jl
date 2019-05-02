@@ -1,0 +1,5 @@
+ridge_slice-column-scaling-regularizor-1e-01-exp3 stepsize_multiplier 
+$b_\mathrm{Defazio} \; \; = 1 \ \ , \gamma_\mathrm{Defazio} \ \ \: \: = 5.53e-06$ : 2^ -17.465493892883988
+$b_\mathrm{practical} \, = 26 \ , \gamma_\mathrm{practical} \ \ = 1.15e-04$ : 2^ -13.080137045938892
+$b_\mathrm{practical} \, = 26 \ , \gamma_\mathrm{grid search} = 1.22e-04$ : 2^ -13.0
+$b_\mathrm{Hofmann} = 20 \ \ , \gamma_\mathrm{Hofmann}  \ \, = 4.54e-06$ : 2^ -17.747434928271762
