@@ -11,15 +11,6 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         probname = string(probname, suffix);
     end
     probname = replace(probname, "." => "_");
-    ## Previous version
-    # if length(suffix) > 0
-    #     probname = string(replace(prob.name, r"[\/]." => "-"), suffix);
-    # elseif options.batchsize > 0
-    #     probname = string(replace(prob.name, r"[\/]." => "-"), "-", options.batchsize);
-    # else
-    #     probname = string(replace(prob.name, r"[\/]." => "-"));
-    # end
-    # probname = replace(probname, "." => "_");
 
     if(options.precondition)
         probname = string(probname, "-precon")

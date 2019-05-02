@@ -62,8 +62,7 @@ if all_problems
     lambdas = [10^(-1), 10^(-3)]
     num_problems = 42
 else
-    # datasets = ["gauss-50-24-0.0_seed-1"]
-    datasets = ["ijcnn1_full"] # for debugging
+    datasets = ["gauss-50-24-0.0_seed-1"]
     lambdas = [10^(-1)]
     num_problems = 1
 end

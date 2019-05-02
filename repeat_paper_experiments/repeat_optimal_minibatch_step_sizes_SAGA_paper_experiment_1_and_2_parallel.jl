@@ -59,7 +59,7 @@ end
 if all_problems
     problems = 1:42;
 else
-    problems = 21:21; # for debugging
+    problems = 1:1;
 end
 
 datasets = collect(Iterators.flatten([fill("gauss-50-24-0.0_seed-1", 4),
