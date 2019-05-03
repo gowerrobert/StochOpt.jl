@@ -1,4 +1,3 @@
-
 """
     descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_nice_method, iter::Int64, d::Array{Float64})
 
@@ -15,8 +14,6 @@ Compute the descent direction (d)
     - NONE
 """
 function descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_nice_method, iter::Int64, d::Array{Float64})
-    # /!\ WARNING: this function modifies its own arguments (d and method) and return nothing! Shouldn't we name it "descent_SVRG_nice!(...)" with an "!" ?
-
     # SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # Reset reference point, grad estimate and Hessian estimate
         println("SVRG outer loop at iteration: ", iter)

@@ -87,8 +87,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                 end
             else
                 method = method_input;
-                # method = method.bootmethod(prob, method, options); # SAGA_nice
-                method.bootmethod(prob, method, options); # SVRG_nice
+                method.bootmethod(prob, method, options); # SAGA_nice and SVRG_nice implementation
             end
             d = zeros(prob.numfeatures); # Search direction vector
             fail = "failed";

@@ -19,7 +19,8 @@ function initiate_SVRG_nice(prob::Prob, options::MyOptions)
     end
     name = string(name, "-nice");
 
-    descent_method = descent_SVRG_nice!;
+    stepmethod = descent_SVRG_nice!;
+    bootmethod = boot_SVRG_nice!;
 
     minibatch_size = 0;
     stepsize = 0.0;
@@ -37,7 +38,7 @@ function initiate_SVRG_nice(prob::Prob, options::MyOptions)
     reference_grad = zeros(prob.numfeatures);
     averaging_weights = [];
 
-    return SVRG_nice_method(epocsperiter, gradsperiter, name, descent_method, boot_SVRG_nice!, minibatch_size, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, reference_grad, averaging_weights, reset_SVRG_nice!);
+    return SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatch_size, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, reference_grad, averaging_weights, reset_SVRG_nice!);
 end
 
 
