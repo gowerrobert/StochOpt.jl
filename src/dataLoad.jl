@@ -40,7 +40,7 @@ function loadDataset(default_path::AbstractString, dataset) # once transformed, 
         return X, y
     catch loaderror
         println(loaderror);
-        println("Dataset: ", dataset, " not found at ", "$(default_path)$(dataset).jld");
+        # println("Dataset: ", dataset, " not found at ", "$(default_path)$(dataset).jld");
         error("Check the list of available datasets in: \"$(default_path)available_datasets.txt\"");
     end
 end
