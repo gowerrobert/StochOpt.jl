@@ -286,7 +286,8 @@ end
                              simple_step_size, bernstein_step_size,
                              practical_step_size, expsmooth_step_size,
                              b_simple, b_bernstein,
-                             b_practical, b_exact)
+                             b_practical, b_exact,
+                             path="./")
 
 Saves the problem, caracteristic constants of the problem, the upper bounds of the expected
 smoothness constant, and corresponding estimation of the optimal mini-batch size.
@@ -312,7 +313,8 @@ optimal mini-batch size (both are of type Nothing if not available).
     - **Int64** b_simple: simple bound optimal mini-batch size estimate\\
     - **Int64** b_bernstein: bernstein bound optimal mini-batch size estimate\\
     - **Int64** b_practical: practical optimal mini-batch size approximation\\
-    - b_exact: theoretical exact optimal mini-batch size\\
+    - **Int64** b_exact: theoretical exact optimal mini-batch size\\
+    - **AbstractString** path: path to the folder where the plots are saved\\
 #OUTPUTS:\\
     - None
 """
@@ -322,7 +324,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   simple_step_size::Array{Float64}, bernstein_step_size::Array{Float64},
                                   practical_step_size::Array{Float64}, expsmooth_step_size,
                                   b_simple::Int64=0, b_bernstein::Int64=0,
-                                  b_practical::Int64=0, b_exact=0 ; path::AbstractString="./")
+                                  b_practical::Int64=0, b_exact::Int64=0 ; path::AbstractString="./")
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     savename = "-exp1-cst";
     path = string(path, "data/");
@@ -381,25 +383,27 @@ function compute_skip_error(n::Int64, minibatch_size::Int64, skip_multiplier::Fl
 end
 
 """
-    simulate_SAGA_nice(prob, minibatchgrid, numsimu=1,
-                       skipped_errors=1, skip_multiplier=0.02)
+    simulate_SAGA_nice(prob, minibatchgrid, options,
+                       numsimu=1, skipped_errors=1, skip_multiplier=0.02, path="./")
 
 Runs several times (numsimu) mini-batch SAGA with nice sampling for each
 mini-batch size in the give list (minibatchgrid) in order to evaluate the
 correpsonding average iteration complexity.
 
 #INPUTS:\\
-    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
+    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
     - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
+    - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
     - **Int64** numsimu: number of runs of mini-batch SAGA\\
     - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
     - **Float64** skip\\_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
+    - **AbstractString** path: path to the folder where the plots are saved\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(minibatchgrid)*numsimu\\
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
 """
-function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions, numsimu::Int64 ;
-                            skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
+function simulate_SAGA_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions ;
+                            numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/b
 

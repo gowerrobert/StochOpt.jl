@@ -1,17 +1,17 @@
 """
-    initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
+    initiate_SAGA_nice(prob, options, unbiased=true)
 
 Initiate the SAGA method for b-nice sampling.
 It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
 
 #INPUTS:\\
-    - prob: considered problem (i.e. logistic regression, ridge ression...) of the type **Prob** (see src/StochOpt.jl)\\
-    - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
-    - unbiased: select the desired estimate of the gradient. If `true`, SAGA is implemented, else if `false` SAG is implemented\\
+    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
+    - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
+    - **Bool** unbiased: select the desired estimate of the gradient. If `true`, SAGA is implemented, else if `false` SAG is implemented\\
 #OUTPUTS:\\
     - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
 """
-function initiate_SAGA_nice(prob::Prob, options::MyOptions; unbiased=true)
+function initiate_SAGA_nice(prob::Prob, options::MyOptions ; unbiased::Bool=true)
     # options.stepsize_multiplier = 1; # WHY ?!
     epocsperiter = options.batchsize/prob.numdata;
     gradsperiter = options.batchsize;
@@ -44,19 +44,18 @@ end
 
 
 """
-    boot_SAGA_nice!(prob::Prob, method, options::MyOptions)
+    boot_SAGA_nice!(prob, method, options)
 
 Set the stepsize based on the smoothness constants of the problem stored in **SAGA_nice_method**.
 
 #INPUTS:\\
-    - prob: considered problem (e.g., logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
-    - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
-    - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
+    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
+    - **SAGA _nice_method** method: SAGA nice method created by `initiate_SAGA_nice`\\
+    - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
 #OUTPUTS:\\
-    - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
+    - **SAGA_nice_method** SAGA_nice_method: SAGA mini-batch method for b-nice sampling
 """
 function boot_SAGA_nice!(prob::Prob, method, options::MyOptions)
-    # /!\ WARNING: this function modifies its own arguments (`method` and `options`) and returns method! Shouldn't we name it "boot_SAGA_nice!(...)" with an "!" ?
     # tau = options.batchsize;
     # n = prob.numdata;
     # L = prob.L;
