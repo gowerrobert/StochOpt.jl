@@ -32,14 +32,21 @@ OUTPUTS = [OUTPUTS; output];
 #######
 options.batchsize = 10;
 options.skip_error_calculation = 500;
-SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
+SAGA_nice = initiate_SAGA_nice(prob, options);
 output = minimizeFunc(prob, SAGA_nice, options);
 OUTPUTS = [OUTPUTS; output];
 #######
 options.batchsize = prob.numdata;
 options.skip_error_calculation = 50;
-SAGA_nice = initiate_SAGA_nice(prob, options); # separated implementation from SAGA
+SAGA_nice = initiate_SAGA_nice(prob, options);
 output = minimizeFunc(prob, SAGA_nice, options);
+OUTPUTS = [OUTPUTS; output];
+
+## Testing step size grid search
+options.batchsize = prob.numdata;
+options.skip_error_calculation = 50;
+SAGA_nice = initiate_SAGA_nice(prob, options);
+output = minimizeFunc_grid_stepsize(prob, SAGA_nice, options);
 OUTPUTS = [OUTPUTS; output];
 
 ## Saving outputs and plots

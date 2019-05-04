@@ -4,12 +4,12 @@
 Initiate the SAGA method for b-nice sampling.
 It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
 
-#INPUTS:\\
-    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
-    - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
-    - **Bool** unbiased: select the desired estimate of the gradient. If `true`, SAGA is implemented, else if `false` SAG is implemented\\
-#OUTPUTS:\\
-    - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
+# INPUTS:
+- **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
+- **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
+- **Bool** unbiased: select the desired estimate of the gradient. If `true`, SAGA is implemented, else if `false` SAG is implemented\\
+# OUTPUTS:
+- **SAGA\\_nice\\_method** method: SAGA mini-batch method for b-nice sampling
 """
 function initiate_SAGA_nice(prob::Prob, options::MyOptions ; unbiased::Bool=true)
     # options.stepsize_multiplier = 1; # WHY ?!
@@ -38,22 +38,21 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions ; unbiased::Bool=true
     probs = [];
     Z = 0.0;
 
-    return SAGA_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatches, unbiased,
-                            Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, reset_SAGA_nice);
+    method = SAGA_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatches, unbiased,
+                              Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, reset_SAGA_nice!);
+    return method
 end
 
 
 """
     boot_SAGA_nice!(prob, method, options)
 
-Set the stepsize based on the smoothness constants of the problem stored in **SAGA_nice_method**.
+Modify the method to set the stepsize based on the smoothness constants of the problem stored in **SAGA\\_nice\\_method** and possibly sets the number of skipped error calculation if not specfied such that 30 points are to be plotted.
 
-#INPUTS:\\
-    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
-    - **SAGA _nice_method** method: SAGA nice method created by `initiate_SAGA_nice`\\
-    - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
-#OUTPUTS:\\
-    - **SAGA_nice_method** SAGA_nice_method: SAGA mini-batch method for b-nice sampling
+# INPUTS:
+- **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
+- **SAGA\\_nice\\_method** method: SAGA nice method created by `initiate_SAGA_nice`\\
+- **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
 """
 function boot_SAGA_nice!(prob::Prob, method, options::MyOptions)
     # tau = options.batchsize;
@@ -98,23 +97,21 @@ function boot_SAGA_nice!(prob::Prob, method, options::MyOptions)
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
     println("Skipping ", options.skip_error_calculation, " iterations per epoch")
-    return method
+    # return method #should it be commented since it's a mutating function
 end
 
 
 """
-    reset_SAGA_nice(prob::Prob, method, options::MyOptions)
+    reset_SAGA_nice!(prob::Prob, method, options::MyOptions)
 
-Reset the SAGA method with  b-nice sampling, especially the step size, the gradient and the Jacobian estimates.
+Reset the SAGA method with b-nice sampling, especially the step size, the gradient and the Jacobian estimates.
 
-#INPUTS:\\
-    - prob: considered problem (e.g., logistic regression, ridge regression...) of the type **Prob** (see src/StochOpt.jl)\\
-    - method: **SAGA_nice_method** created by `initiate_SAGA_nice` \\
-    - options: different options such as the mini-batch size, the stepsize_multiplier etc of the type MyOptions (see src/StochOpt.jl)\\
-#OUTPUTS:\\
-    - SAGA_nice_method: SAGA mini-batch method for b-nice sampling of type SAGA_nice_method (see src/StochOpt.jl)
+# INPUTS:
+- **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
+- **SAGA\\_nice\\_method**: SAGA mini-batch method for b-nice sampling\\
+- **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
 """
-function reset_SAGA_nice(prob::Prob, method, options::MyOptions; unbiased=true)
+function reset_SAGA_nice!(prob::Prob, method, options::MyOptions; unbiased=true)
     # println("\n---- RESET SAGA NICE ----\n");
 
     # method.epocsperiter = options.batchsize/prob.numdata;
@@ -140,5 +137,5 @@ function reset_SAGA_nice(prob::Prob, method, options::MyOptions; unbiased=true)
     method.probs = [];
     method.Z = 0.0;
 
-    return method
+    # return method
 end

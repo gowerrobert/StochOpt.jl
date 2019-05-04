@@ -224,7 +224,7 @@ include("testing.jl")
 #Including iterative methods for calculating search direction
 allmethods = ["SVRG_nice", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
 for method in allmethods
-    if method == "SVRG_nice"
+    if method == "SAGA_nice" || method == "SVRG_nice"
         include(string("boot_", method , "!.jl")) # boot is a mutating function
         include(string("descent_", method , "!.jl")) # descent is a mutating function
     else
