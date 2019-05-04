@@ -45,6 +45,7 @@ OUTPUTS = [OUTPUTS; output];
 ## Testing step size grid search
 options.batchsize = prob.numdata;
 options.skip_error_calculation = 50;
+options.repeat_stepsize_calculation = true;
 SAGA_nice = initiate_SAGA_nice(prob, options);
 output = minimizeFunc_grid_stepsize(prob, SAGA_nice, options);
 OUTPUTS = [OUTPUTS; output];
