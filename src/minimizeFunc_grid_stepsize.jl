@@ -78,12 +78,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     #   outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling
     # end
 
-    save("$(default_path)$(savename).jld", "output", outputfirst)
-
-    println("\nbest steps:");
-    println(beststeps_found);
-    println("mode best step:");
-    println(beststep);
+    save("$(default_path)$(savename).jld", "output", outputfirst);
 
     return outputfirst
 end
