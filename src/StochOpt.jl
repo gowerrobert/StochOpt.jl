@@ -137,7 +137,7 @@ mutable struct SAGA_nice_method
     # mu::Float64 # Strong-convexity constant
 end
 
-mutable struct SVRG_nice_method
+mutable struct free_SVRG_nice_method
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -223,9 +223,10 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SVRG_nice", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"] ;
+allmethods = ["free_SVRG_nice", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
+recentmethods = ["SAGA_nice", "free_SVRG_nice"]
 for method in allmethods
-    if method == "SAGA_nice" || method == "SVRG_nice"
+    if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function
         include(string("descent_", method , "!.jl")) # descent is a mutating function
     else

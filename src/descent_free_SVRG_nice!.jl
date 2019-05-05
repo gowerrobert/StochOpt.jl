@@ -1,5 +1,5 @@
 """
-    descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_nice_method, iter::Int64, d::Array{Float64})
+    descent_free_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::free_SVRG_nice_method, iter::Int64, d::Array{Float64})
 
 Compute the descent direction (d)
 
@@ -7,13 +7,13 @@ Compute the descent direction (d)
     - **Array{Float64}** x: point at the current iteration
     - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
     - **MyOptions** options: different options such as the mini-batch size, the stepsize_multiplier... (see src/StochOpt.jl)\\
-    - **SVRG_nice_method** method: method of SVRG for b-nice sampling\\
+    - **free_SVRG_nice_method** method: method of Free-SVRG for b-nice sampling\\
     - **Int64** iter: current iteration\\
     - **Array{Float64}** d: descent direction\\
 #OUTPUTS:\\
     - NONE
 """
-function descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_nice_method, iter::Int64, d::Array{Float64})
+function descent_free_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::free_SVRG_nice_method, iter::Int64, d::Array{Float64})
     # # SVRG outerloop
     # if iter%method.numinneriters == 1 || method.numinneriters == 1 # Reset reference point, grad estimate and Hessian estimate
     #     println("SVRG outer loop at iteration: ", iter)

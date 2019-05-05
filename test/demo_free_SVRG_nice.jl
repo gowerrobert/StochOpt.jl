@@ -30,32 +30,32 @@ options.batchsize = 1;
 options.stepsize_multiplier = 1e-3;
 options.skip_error_calculation = 1000;
 
-SVRG_nice = initiate_SVRG_nice(prob, options, averaged_reference_point=true);
-SVRG_nice.numinneriters = prob.numdata;
+free_SVRG_nice = initiate_free_SVRG_nice(prob, options, averaged_reference_point=true);
+free_SVRG_nice.numinneriters = prob.numdata;
 
-output = minimizeFunc(prob, SVRG_nice, options);
+output = minimizeFunc(prob, free_SVRG_nice, options);
 OUTPUTS = [OUTPUTS; output];
 #######
 options.batchsize = 1;
 options.stepsize_multiplier = 1e-3;
-# options.stepsize_multiplier = -1.0; # automatic step size in boot_SVRG_nice
+# options.stepsize_multiplier = -1.0; # automatic step size in boot_free_SVRG_nice
 options.skip_error_calculation = 1000;
 
-SVRG_nice = initiate_SVRG_nice(prob, options, averaged_reference_point=false);
-output = minimizeFunc(prob, SVRG_nice, options);
+free_SVRG_nice = initiate_free_SVRG_nice(prob, options, averaged_reference_point=false);
+output = minimizeFunc(prob, free_SVRG_nice, options);
 OUTPUTS = [OUTPUTS; output];
 ######
-# options.batchsize = optimal_minibatch_free_SVRG(n, mu, L, Lmax);
+# options.batchsize = optimal_minibatch_free_SVRG_nice(n, mu, L, Lmax);
 options.batchsize = 1;
 println("Theoretical mini-batch size: ", options.batchsize);
 options.stepsize_multiplier = 1e-3;
-# options.stepsize_multiplier = -1.0; # automatic step size in boot_SVRG_nice
+# options.stepsize_multiplier = -1.0; # automatic step size in boot_free_SVRG_nice
 options.skip_error_calculation = 1000;
 
-SVRG_nice = initiate_SVRG_nice(prob, options, averaged_reference_point=true);
-# SVRG_nice.numinneriters = floor(Int, (2*log(2)*(SVRG_nice.expected_smoothness+2*SVRG_nice.expected_residual)) / SVRG_nice.mu);
-println("Theoretical inner loop size: ", SVRG_nice.numinneriters);
-output = minimizeFunc(prob, SVRG_nice, options);
+free_SVRG_nice = initiate_free_SVRG_nice(prob, options, averaged_reference_point=true);
+# free_SVRG_nice.numinneriters = floor(Int, (2*log(2)*(free_SVRG_nice.expected_smoothness+2*free_SVRG_nice.expected_residual)) / free_SVRG_nice.mu);
+println("Theoretical inner loop size: ", free_SVRG_nice.numinneriters);
+output = minimizeFunc(prob, free_SVRG_nice, options);
 OUTPUTS = [OUTPUTS; output];
 
 
@@ -75,11 +75,11 @@ OUTPUTS = [OUTPUTS; output];
 #     mkdir(data_path);
 # end
 # savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-# savename = string(savename, "-", SVRG_nice.name);
+# savename = string(savename, "-", free_SVRG_nice.name);
 # save("$(data_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
 # if !isdir(string(save_path, "figures/"))
 #     mkdir(string(save_path, "figures/"));
 # end
 pyplot() # gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options, methodname=SVRG_nice.name, path=save_path) # Plot and save output
+plot_outputs_Plots(OUTPUTS, prob, options, methodname=free_SVRG_nice.name, path=save_path) # Plot and save output
