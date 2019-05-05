@@ -1,0 +1,4 @@
+lgstc_australian-column-scaling-regularizor-1e-01-demo_free_SVRG_nice stepsize_multiplier 
+Free-SVRG-nice (m=n) : 2^ -9.965784284662087
+Free-SVRG-nice (m=m^*) : 2^ -9.965784284662087
+Free-SVRG-nice (b=b^*, m=m^*) : 2^ -9.965784284662087
