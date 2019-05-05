@@ -38,8 +38,8 @@ function initiate_SAGA_nice(prob::Prob, options::MyOptions ; unbiased::Bool=true
     probs = [];
     Z = 0.0;
 
-    method = SAGA_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatches, unbiased,
-                              Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, reset_SAGA_nice!);
+    method = SAGA_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatches, unbiased, Jac, Jacsp, SAGgrad, gi, aux, stepsize, probs, Z, reset_SAGA_nice!);
+
     return method
 end
 
@@ -97,7 +97,6 @@ function boot_SAGA_nice!(prob::Prob, method, options::MyOptions)
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
     println("Skipping ", options.skip_error_calculation, " iterations per epoch")
-    # return method #should it be commented since it's a mutating function
 end
 
 
