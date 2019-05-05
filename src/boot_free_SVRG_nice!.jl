@@ -7,10 +7,12 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 # INPUTS:
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
+- **Int64** numinneriters: size of the inner loop (theoretical value m^* if set to -1, number of data samples n if set to 0).
+- **Bool** averaged_reference_point: select if the reference point is an average of the iterates of the inner loop or the last one.
 # OUTPUTS:
 - **free\\_SVRG\\_nice\\_method** method: Free-SVRG mini-batch method for b-nice sampling
 """
-function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; averaged_reference_point::Bool=false)
+function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
     epocsperiter = options.batchsize/prob.numdata
     gradsperiter = options.batchsize
     name = "Free-SVRG"
@@ -22,7 +24,7 @@ function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; averaged_refer
     stepmethod = descent_free_SVRG_nice!
     bootmethod = boot_free_SVRG_nice!
 
-    minibatch_size = options.batchsize
+    batchsize = options.batchsize
     stepsize = 0.0
     probs = []
     Z = 0.0
@@ -32,11 +34,15 @@ function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; averaged_refer
     mu = prob.mu
 
     n = prob.numdata
-    b = minibatch_size
+    b = batchsize
     expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L
     expected_residual = ((n-b)/(b*(n-1)))*Lmax
 
-    numinneriters = 5 #prob.numdata
+    if numinneriters == 0
+        numinneriters = prob.numdata
+    elseif numinneriters == -1
+        numinneriters = floor(Int, (2*log(2)*(expected_smoothness + 2*expected_residual)) / mu) # theoretical optimal value
+    end
     reference_point = zeros(prob.numfeatures)
     new_reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
@@ -46,7 +52,7 @@ function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; averaged_refer
         averaging_weights = []
     end
 
-    method = free_SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatch_size, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset_free_SVRG_nice!)
+    method = free_SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, batchsize, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset_free_SVRG_nice!)
 
     return method
 end
@@ -72,7 +78,7 @@ function boot_free_SVRG_nice!(prob::Prob, method, options::MyOptions)
         println("Automatically set Free-SVRG step size")
         method.stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual))
         options.stepsize_multiplier = method.stepsize # /!\ Modifies the options
-        println("Theoretical step size: ", free_SVRG_nice.stepsize)
+        println("Theoretical step size: ", method.stepsize)
     else
         error("Invalid options.stepsize_multiplier")
     end
@@ -108,7 +114,7 @@ Reset the Free-SVRG method with b-nice sampling, especially the step size, the p
 function reset_free_SVRG_nice!(prob::Prob, method, options::MyOptions)
     println("\n---- RESET FREE-SVRG NICE ----\n")
 
-    method.minibatch_size = 0
+    method.batchsize = 0
     method.stepsize = 0.0
     method.probs = []
     method.Z = 0.0

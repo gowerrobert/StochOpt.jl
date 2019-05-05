@@ -143,7 +143,7 @@ mutable struct free_SVRG_nice_method
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
-    minibatch_size::Int64
+    batchsize::Int64
     stepsize::Float64     # step size
     probs::Array{Float64}  # probability of selecting a coordinate or mini-batch
     Z    # normalizing variable for probabilities

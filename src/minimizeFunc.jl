@@ -13,7 +13,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     else
         x = zeros(prob.numfeatures); #
     end
-    println("---> Initial point set")
+    # println("---> Initial point set")
 
     if typeof(method_input) == String
         method = boot_method(method_input, prob, options);
@@ -22,14 +22,14 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             return
         end
     else
-        println("\n---Method is not a String---\n") # To try if this else is for SAGA_nice or SVRG_nice
+        # println("\n---Method is not a String---\n") # To try if this else is for SAGA_nice or SVRG_nice
         method = method_input;
         # method = method.bootmethod(prob, method, options); # SAGA_nice
         method.bootmethod(prob, method, options); # SVRG_nice
         # method = method.bootmethod(prob, method, options, x); # ??
     end
     println(method.name);
-    println("---> Method set")
+    # println("---> Method set")
 
     times = [0];
     ##
