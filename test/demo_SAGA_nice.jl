@@ -50,17 +50,17 @@ output = minimizeFunc_grid_stepsize(prob, SAGA_nice, options);
 OUTPUTS = [OUTPUTS; output];
 
 ## Saving outputs and plots
-path = "./experiments/SAGA_nice/";
-if !isdir(path) # create directory if not existing
+save_path = "./experiments/SAGA_nice/";
+if !isdir(save_path) # create directory if not existing
     if !isdir("./experiments/")
         mkdir("./experiments/");
     end
-    mkdir(path);
-    mkdir(string(path, "data/"));
-    mkdir(string(path, "figures/"));
+    mkdir(save_path);
+    mkdir(string(save_path, "data/"));
+    mkdir(string(save_path, "figures/"));
 end
 
-data_path = string(path, "data/");
+data_path = string(save_path, "data/");
 if !isdir(data_path)
     mkdir(data_path);
 end
@@ -68,8 +68,8 @@ savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 savename = string(savename, "-", SAGA_nice.name);
 save("$(data_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
-if !isdir(string(path, "figures/"))
-    mkdir(string(path, "figures/"));
+if !isdir(string(save_path, "figures/"))
+    mkdir(string(save_path, "figures/"));
 end
 pyplot() # gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options, methodname=SAGA_nice.name, path=path) # Plot and save output
+plot_outputs_Plots(OUTPUTS, prob, options, methodname=SAGA_nice.name, path=save_path) # Plot and save output

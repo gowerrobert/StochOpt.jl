@@ -10,7 +10,7 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 # OUTPUTS:
 - **SVRG\\_nice\\_method** method: SVRG mini-batch method for b-nice sampling
 """
-function initiate_SVRG_nice(prob::Prob, options::MyOptions)
+function initiate_SVRG_nice(prob::Prob, options::MyOptions ; averaged_reference_point::Bool=false)
     epocsperiter = options.batchsize/prob.numdata;
     gradsperiter = options.batchsize;
     name = "SVRG"
@@ -36,12 +36,17 @@ function initiate_SVRG_nice(prob::Prob, options::MyOptions)
     expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L;
     expected_residual = ((n-b)/(b*(n-1)))*Lmax;
 
-    numinneriters = 10; #prob.numdata;
+    numinneriters = 5; #prob.numdata;
     reference_point = zeros(prob.numfeatures);
+    new_reference_point = zeros(prob.numfeatures);
     reference_grad = zeros(prob.numfeatures);
-    averaging_weights = [];
+    if averaged_reference_point
+        averaging_weights = zeros(numinneriters);
+    else
+        averaging_weights = [];
+    end
 
-    method = SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatch_size, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, reference_grad, averaging_weights, reset_SVRG_nice!);
+    method = SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, minibatch_size, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset_SVRG_nice!);
 
     return method
 end
@@ -64,14 +69,17 @@ function boot_SVRG_nice!(prob::Prob, method, options::MyOptions)
     elseif options.stepsize_multiplier == -1.0
         println("Automatically set Free-SVRG step size");
         method.stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual));
+        options.stepsize_multiplier = method.stepsize; # /!\ Modifies the options
         println("Theoretical step size: ", SVRG_nice.stepsize);
     else
         error("Invalid options.stepsize_multiplier");
     end
 
-    averaging_weights = [(1-method.stepsize*method.mu)^(method.numinneriters-1-t) for t in 0:(method.numinneriters-1)];
-    method.averaging_weights = averaging_weights ./ sum(averaging_weights);
-    println("Theoretical averaging weights");
+    if !isempty(method.averaging_weights)
+        averaging_weights = [(1-method.stepsize*method.mu)^(method.numinneriters-1-t) for t in 0:(method.numinneriters-1)];
+        method.averaging_weights = averaging_weights ./ sum(averaging_weights);
+    end
+    println("Averaging weights");
     println(method.averaging_weights);
 
     # WARNING: The following if statement does not seem to modify the method that is returned afterwards...

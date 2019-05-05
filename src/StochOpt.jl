@@ -154,6 +154,7 @@ mutable struct SVRG_nice_method
     expected_residual::Float64 # expected residual
     numinneriters::Int64 # number of inner iterations, usually denoted m
     reference_point::Array{Float64}
+    new_reference_point::Array{Float64} # average on the fly of the inner loop iterates
     reference_grad::Array{Float64}
     averaging_weights::Array{Float64} # averaging weights of the output of the inner loop
     reset::Function # reset the parameters of the method like after initiate_SVRG_nice_method
