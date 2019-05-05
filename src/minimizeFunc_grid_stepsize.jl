@@ -29,7 +29,8 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             beststep = 0.0; #iteratesp = 1;
             for stepind = start_step:length(stepsizes)
                 println("--------------------------------> minfval = ", minfval);
-                if typeof(method_input) == SAGA_nice_method || typeof(method_input) == SVRG_nice_method # reset
+                recentmethods = [SAGA_nice_method, free_SVRG_nice_method] # reset if one of these
+                if typeof(method_input) in recentmethods
                     # println("\n\nMONITORING STEPSIZE BEFORE RESET => ", method_input.stepsize, "\n\n")
                     # method_input = method_input.reset(prob, method_input, options); # old implementation
                     method_input.reset(prob, method_input, options); # /!\ new implementation with mutating fucntion. TO CHECK IF IT WORKS!!!
@@ -38,6 +39,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
                 step = stepsizes[stepind];
                 println("\nTrying stepsize ", step);
                 options.stepsize_multiplier = step;
+
 
                 output = minimizeFunc(prob, method_input, options);
                 println("---> Fail = ", output.fail);
@@ -60,8 +62,8 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             start_step = max(bestindx - 4, 1);
         end
         # Get the median over experiments as the best step size
-        # println("\nbest steps:")
-        # println(beststeps_found)
+        println("\nbest steps:")
+        println(beststeps_found)
         beststep = mode(beststeps_found);
         # println("mode best step:")
         # println(beststep)
@@ -72,11 +74,11 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     options.max_epocs *= 2;
     options.max_time *= 2.0; # To adjust
 
-    println("\n=> Best step: ", beststep);
     outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
     # for expnum =2: options.rep_number
     #   outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling
     # end
+    println("\n=> Best step: ", beststep);
 
     save("$(default_path)$(savename).jld", "output", outputfirst);
 

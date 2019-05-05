@@ -87,8 +87,8 @@ function boot_free_SVRG_nice!(prob::Prob, method, options::MyOptions)
         averaging_weights = [(1-method.stepsize*method.mu)^(method.numinneriters-1-t) for t in 0:(method.numinneriters-1)]
         method.averaging_weights = averaging_weights ./ sum(averaging_weights)
     end
-    println("Averaging weights")
-    println(method.averaging_weights)
+    # println("Averaging weights")
+    # println(method.averaging_weights)
 
     # WARNING: The following if statement does not seem to modify the method that is returned afterwards...
     if options.skip_error_calculation == 0.0
@@ -114,18 +114,9 @@ Reset the Free-SVRG method with b-nice sampling, especially the step size, the p
 function reset_free_SVRG_nice!(prob::Prob, method, options::MyOptions)
     println("\n---- RESET FREE-SVRG NICE ----\n")
 
-    method.batchsize = 0
-    method.stepsize = 0.0
-    method.probs = []
-    method.Z = 0.0
+    method.batchsize = options.batchsize
+    method.stepsize = options.stepsize_multiplier
 
-    method.L = 0.0
-    method.Lmax = 0.0
-    method.mu = 0.0
-    method.expected_smoothness = 0.0
-    method.expected_residual = 0.0
-
-    method.numinneriters = 0
     method.reference_point = zeros(prob.numfeatures)
     method.reference_grad = zeros(prob.numfeatures)
     method.averaging_weights = []

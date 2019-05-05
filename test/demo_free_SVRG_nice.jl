@@ -8,9 +8,10 @@ using Printf
 using LinearAlgebra
 using Statistics
 using Base64
-include("./src/StochOpt.jl")
+include("../src/StochOpt.jl")
 
 ## Path settings
+#region
 save_path = "./experiments/SVRG/"
 if !isdir(save_path) # create directory if not existing
     if !isdir("./experiments/")
@@ -28,12 +29,13 @@ end
 if !isdir("$(save_path)figures/")
     mkdir("$(save_path)figures/")
 end
+#endregion
 
 Random.seed!(1)
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros",
-                      skip_error_calculation = 1000)
+options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation = 1000,
+                      repeat_stepsize_calculation=false)
 
 ## Load problem
 datapath = "./data/"
@@ -46,9 +48,9 @@ OUTPUTS = []  # List of saved outputs
 
 ## m = n, b = 1, step size = 1e-3
 options.batchsize = 1
-options.stepsize_multiplier = 1e-3
-free_SVRG_nice1 = initiate_free_SVRG_nice(prob, options, numinneriters=0, averaged_reference_point=false)
-output = minimizeFunc(prob, free_SVRG_nice1, options)
+# options.stepsize_multiplier = 1e-3
+free_SVRG_nice1 = initiate_free_SVRG_nice(prob, options, numinneriters=0, averaged_reference_point=true)
+output = minimizeFunc_grid_stepsize(prob, free_SVRG_nice1, options)
 
 str_m_1 = @sprintf "%d" free_SVRG_nice1.numinneriters
 str_b_1 = @sprintf "%d" free_SVRG_nice1.batchsize
