@@ -55,7 +55,7 @@ output = minimizeFunc_grid_stepsize(prob, free_SVRG_nice1, options)
 str_m_1 = @sprintf "%d" free_SVRG_nice1.numinneriters
 str_b_1 = @sprintf "%d" free_SVRG_nice1.batchsize
 str_step_1 = @sprintf "%.2e" free_SVRG_nice1.stepsize
-output.name = latexstring("\$m = n = $str_m_1, b = $str_b_1 , \\gamma = $str_step_1\$")
+output.name = latexstring("\$m = n = $str_m_1, b = $str_b_1 , \\gamma_\\mathrm{grid search} = $str_step_1\$")
 OUTPUTS = [OUTPUTS; output]
 
 ## m = m^*, b = 1, step size = 1e-3

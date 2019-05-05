@@ -1,4 +1,4 @@
 lgstc_australian-column-scaling-regularizor-1e-01-demo_free_SVRG_nice stepsize_multiplier 
-$m = n = 690, b = 1 , \gamma = 3.13e-02$ : 2^ -5.0
+$m = n = 690, b = 1 , \gamma_\mathrm{grid search} = 3.13e-02$ : 2^ -5.0
 $m^* = 874, b = 1 , \gamma = 1.00e-03$ : 2^ -9.965784284662087
 $m^* = 874, b^* = 1 , \gamma^* = 1.64e-03$ : 2^ -9.255299687235764
