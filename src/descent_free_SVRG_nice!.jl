@@ -15,7 +15,7 @@ Compute the descent direction (d)
 """
 function descent_free_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::free_SVRG_nice_method, iter::Int64, d::Array{Float64})
     # # SVRG outerloop
-    # if iter%method.numinneriters == 1 || method.numinneriters == 1 # Reset reference point, grad estimate and Hessian estimate
+    # if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
     #     println("SVRG outer loop at iteration: ", iter)
     #     method.reference_point[:] = x;
 
@@ -24,12 +24,12 @@ function descent_free_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptio
     #             println("Dimensions are too large too compute the full gradient")
     #         end
     #         s = sample(1:prob.numdata, 100, replace=false);
-    #         method.reference_grad[:] = prob.g_eval(x, s); # Reset a stochastic reference gradient
+    #         method.reference_grad[:] = prob.g_eval(x, s); # reset a stochastic reference gradient
     #     else
-    #         method.reference_grad[:] = prob.g_eval(x, 1:prob.numdata); # Reset reference gradient
+    #         method.reference_grad[:] = prob.g_eval(x, 1:prob.numdata); # reset reference gradient
     #     end
 
-    #     d[:] = -method.reference_grad; # seems wrong
+    #     d[:] = -method.reference_grad; # the first iteratation of the inner loop is equivalent to a gradient step
     # else
     #     # SVRG inner step
     #     # println("        SVRG inner loop at iteration: ", iter)
@@ -38,7 +38,7 @@ function descent_free_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptio
     # end
 
     # SVRG outerloop
-    if iter%method.numinneriters == 1 || method.numinneriters == 1 # Reset reference point, grad estimate and Hessian estimate
+    if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
         # println("SVRG outer loop at iteration: ", iter)
         if isempty(method.averaging_weights) || iter == 1
             method.reference_point[:] = x; # Reference point set to last iterate iterates x^m
