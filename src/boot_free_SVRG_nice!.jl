@@ -41,7 +41,7 @@ function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters:
     if numinneriters == 0
         numinneriters = prob.numdata
     elseif numinneriters == -1
-        numinneriters = floor(Int, (2*log(2)*(expected_smoothness + 2*expected_residual)) / mu) # theoretical optimal value
+        numinneriters = floor(Int, (expected_smoothness + 2*expected_residual)) / mu) # theoretical optimal value
     end
     reference_point = zeros(prob.numfeatures)
     new_reference_point = zeros(prob.numfeatures)
