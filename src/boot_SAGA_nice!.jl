@@ -10,6 +10,11 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 - **Bool** unbiased: select the desired estimate of the gradient. If `true`, SAGA is implemented, else if `false` SAG is implemented\\
 # OUTPUTS:
 - **SAGA\\_nice\\_method** method: SAGA mini-batch method for b-nice sampling
+
+# REFERENCES:
+__Optimal mini-batch and step sizes for SAGA__\\
+Nidham Gazagnadou, Robert M. Gower and Joseph Salmon\\
+arXiv:1902.00071, 2019
 """
 function initiate_SAGA_nice(prob::Prob, options::MyOptions ; unbiased::Bool=true)
     # options.stepsize_multiplier = 1; # WHY ?!

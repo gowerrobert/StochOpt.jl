@@ -1,5 +1,5 @@
 """
-    initiate_free_SVRG_nice(prob, options ; unbiased=true)
+    initiate_free_SVRG_nice(prob, options ; numinneriters=0, averaged_reference_point=false)
 
 Initiate the Free-SVRG method for b-nice sampling.
 It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
@@ -23,6 +23,7 @@ function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters:
 
     stepmethod = descent_free_SVRG_nice!
     bootmethod = boot_free_SVRG_nice!
+    reset = reset_free_SVRG_nice!
 
     batchsize = options.batchsize
     stepsize = 0.0
@@ -41,7 +42,7 @@ function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters:
     if numinneriters == 0
         numinneriters = prob.numdata
     elseif numinneriters == -1
-        numinneriters = floor(Int, (expected_smoothness + 2*expected_residual)) / mu) # theoretical optimal value
+        numinneriters = floor(Int, (expected_smoothness + 2*expected_residual) / mu) # theoretical optimal value
     end
     reference_point = zeros(prob.numfeatures)
     new_reference_point = zeros(prob.numfeatures)
@@ -52,7 +53,7 @@ function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters:
         averaging_weights = []
     end
 
-    method = free_SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, batchsize, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset_free_SVRG_nice!)
+    method = free_SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, batchsize, stepsize, probs, Z, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset)
 
     return method
 end
@@ -70,7 +71,7 @@ Modify the method to set the stepsize based on the smoothness constants of the p
 # OUTPUTS:
 - **NONE**
 """
-function boot_free_SVRG_nice!(prob::Prob, method, options::MyOptions)
+function boot_free_SVRG_nice!(prob::Prob, method::free_SVRG_nice_method, options::MyOptions)
     if options.stepsize_multiplier > 0.0
         println("Manually set step size")
         method.stepsize = options.stepsize_multiplier
@@ -111,7 +112,7 @@ Reset the Free-SVRG method with b-nice sampling, especially the step size, the p
 # OUTPUTS:
 - **NONE**
 """
-function reset_free_SVRG_nice!(prob::Prob, method, options::MyOptions)
+function reset_free_SVRG_nice!(prob::Prob, method::free_SVRG_nice_method, options::MyOptions)
     println("\n---- RESET FREE-SVRG NICE ----\n")
 
     method.batchsize = options.batchsize

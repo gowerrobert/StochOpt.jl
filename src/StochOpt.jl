@@ -137,6 +137,24 @@ mutable struct SAGA_nice_method
     # mu::Float64 # Strong-convexity constant
 end
 
+mutable struct SVRG_nice_method
+    ## SVRG original algorithm with option I
+    ## Ref: Accelerating stochastic gradient descent using predictive variance reduction, R. Johnson and T. Zhang, NIPS (2013)
+    epocsperiter::Float64
+    gradsperiter::Float64
+    name::AbstractString
+    stepmethod::Function # /!\ mutating function
+    bootmethod::Function # /!\ mutating function
+    batchsize::Int64
+    stepsize::Float64 # step size
+    Lmax::Float64 # max of the smoothness constant of the f_i functions
+    mu::Float64 # strong-convexity constant
+    numinneriters::Int64 # number of inner iterations, usually denoted m
+    reference_point::Array{Float64}
+    reference_grad::Array{Float64}
+    reset::Function # reset some parameters of the method
+end
+
 mutable struct free_SVRG_nice_method
     epocsperiter::Float64
     gradsperiter::Float64
@@ -144,9 +162,9 @@ mutable struct free_SVRG_nice_method
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
     batchsize::Int64
-    stepsize::Float64     # step size
-    probs::Array{Float64}  # probability of selecting a coordinate or mini-batch
-    Z    # normalizing variable for probabilities
+    stepsize::Float64 # step size
+    probs::Array{Float64} # probability of selecting a coordinate or mini-batch
+    Z # normalizing variable for probabilities
     L::Float64 # smoothness constant of the whole objective function f
     Lmax::Float64 # max of the smoothness constant of the f_i functions
     mu::Float64 # strong-convexity constant
@@ -157,7 +175,7 @@ mutable struct free_SVRG_nice_method
     new_reference_point::Array{Float64} # average on the fly of the inner loop iterates
     reference_grad::Array{Float64}
     averaging_weights::Array{Float64} # averaging weights of the output of the inner loop
-    reset::Function # reset the parameters of the method like after initiate_SVRG_nice_method
+    reset::Function # reset some parameters of the method
 end
 
 mutable struct SPIN
@@ -211,6 +229,7 @@ mutable struct Output
     fail::AbstractString
     stepsize_multiplier::Float64
 end
+
 #Functions for getting and manipulating data
 include("dataLoad.jl")
 include("data_generation.jl")
@@ -223,8 +242,8 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["free_SVRG_nice", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
-recentmethods = ["SAGA_nice", "free_SVRG_nice"]
+allmethods = ["free_SVRG_nice", "SVRG_nice", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
+recentmethods = ["free_SVRG_nice", "SVRG_nice", "SAGA_nice"]
 for method in allmethods
     if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function

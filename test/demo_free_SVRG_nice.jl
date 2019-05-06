@@ -8,7 +8,7 @@ using Printf
 using LinearAlgebra
 using Statistics
 using Base64
-include("../src/StochOpt.jl")
+include("./src/StochOpt.jl")
 
 ## Path settings
 #region
