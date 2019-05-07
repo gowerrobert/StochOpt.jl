@@ -7,6 +7,7 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 # INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
+- **AbstractString** sampling: type of sampling b-nice (if set to "nice") or independent (if set to "independent")
 - **Int64** numinneriters: size of the inner loop (twice the number of data samples n if set to 0)
 - **Array{Float64}** probs: probability of selecting each coordinate (used for independent sampling)
 # OUTPUTS
@@ -17,42 +18,49 @@ __Accelerating stochastic gradient descent using predictive variance reduction__
 Rie Johnson and Tong Zhang\\
 Advances in neural information processing systems. 2013.
 """
-function initiate_SVRG_vanilla(prob::Prob, options::MyOptions ; numinneriters::Int64=0, probs::Array{Float64}=Float64[])
-    epocsperiter = options.batchsize/prob.numdata
-    gradsperiter = options.batchsize
+function initiate_SVRG_vanilla(prob::Prob, options::MyOptions, sampling::AbstractString ; numinneriters::Int64=0, probs::Array{Float64}=Float64[])
+    n = prob.numdata
+    b = options.batchsize
+    epocsperiter = b/n
+    gradsperiter = b
 
     name = "SVRG-vanilla"
-    if options.batchsize > 1 # b-nice sampling
-        name = string(name, "-", options.batchsize)
-    elseif !isempty(probs) # independent sampling
-        if all(y->y==probs[1], probs) ## check if the probabilities are uniform
-            b = round(Int64, sum(probs)) ## estimate of the average cardinal of the mini-batch
+    if sampling == "independent" # independent sampling
+        if isempty(probs) || length(probs) != n
+            error("Uncorrect probabilities")
+        else
+            if all(y->y==probs[1], probs) ## check if the probabilities are uniform
+                avg_cardinal = round(Int64, sum(probs)) ## estimate of the average cardinal of the mini-batch
+                name = string(name, "-", avg_cardinal)
+            end
+            name = string(name, "-indep")
+        end
+    elseif sampling == "nice" # b-nice sampling
+        if b > 1
             name = string(name, "-", b)
         end
-        name = string(name, "-indep")
+    else
+        error("Unknown sampling procedure")
     end
+    name = string(name, "-", sampling)
 
     stepmethod = descent_SVRG_vanilla!
     bootmethod = boot_SVRG_vanilla!
     reset = reset_SVRG_vanilla!
 
-    batchsize = options.batchsize
     stepsize = 0.0
     probs = []
 
     Lmax = prob.Lmax
     mu = prob.mu
 
-    n = prob.numdata
-    b = batchsize
-
     if numinneriters == 0
-        numinneriters = 2*prob.numdata
+        numinneriters = 2*n
     end
     reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
-    method = SVRG_vanilla_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, batchsize, stepsize, probs, Lmax, mu, numinneriters, reference_point, reference_grad, reset)
+    method = SVRG_vanilla_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, b, stepsize, probs, Lmax, mu, numinneriters, reference_point, reference_grad, reset, sampling)
 
     return method
 end

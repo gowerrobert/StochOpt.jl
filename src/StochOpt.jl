@@ -155,6 +155,7 @@ mutable struct SVRG_vanilla_method
     reference_point::Array{Float64}
     reference_grad::Array{Float64}
     reset::Function # reset some parameters of the method
+    sampling::AbstractString # b-nice or independent sampling
 end
 
 mutable struct free_SVRG_method
@@ -177,6 +178,7 @@ mutable struct free_SVRG_method
     reference_grad::Array{Float64}
     averaging_weights::Array{Float64} # averaging weights of the output of the inner loop
     reset::Function # reset some parameters of the method
+    sampling::AbstractString # b-nice or independent sampling
 end
 
 mutable struct SPIN

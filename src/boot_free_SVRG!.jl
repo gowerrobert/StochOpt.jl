@@ -7,18 +7,18 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 # INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
+- **AbstractString** sampling: type of sampling b-nice (if set to "nice") or independent (if set to "independent")
 - **Int64** numinneriters: size of the inner loop (theoretical value m^* if set to -1, number of data samples n if set to 0)
 - **Array{Float64}** probs: probability of selecting each coordinate (used for independent sampling)
 - **Bool** averaged_reference_point: select if the reference point is an average of the iterates of the inner loop or the last one
 # OUTPUTS
-- **free\\_SVRG\\_method** method: Free-SVRG mini-batch method for b-nice sampling
+- **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`
 """
 function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::AbstractString ; numinneriters::Int64=0, averaged_reference_point::Bool=false, probs::Array{Float64}=Float64[])
     n = prob.numdata
-    batchsize = options.batchsize
-
-    epocsperiter = batchsize/n
-    gradsperiter = batchsize
+    b = options.batchsize
+    epocsperiter = b/n
+    gradsperiter = b
 
     name = "Free-SVRG"
     if sampling == "independent" # independent sampling
@@ -26,19 +26,19 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::AbstractSt
             error("Uncorrect probabilities")
         else
             if all(y->y==probs[1], probs) ## check if the probabilities are uniform
-                b = round(Int64, sum(probs)) ## estimate of the average cardinal of the mini-batch
-                name = string(name, "-", b)
+                avg_cardinal = round(Int64, sum(probs)) ## estimate of the average cardinal of the mini-batch
+                name = string(name, "-", avg_cardinal)
             end
             name = string(name, "-indep")
         end
     elseif sampling == "nice" # b-nice sampling
-        if batchsize > 1
-            name = string(name, "-", batchsize)
+        if b > 1
+            name = string(name, "-", b)
         end
-        name = string(name, "-nice")
     else
         error("Unknown sampling procedure")
     end
+    name = string(name, "-", sampling)
 
     stepmethod = descent_free_SVRG!
     bootmethod = boot_free_SVRG!
@@ -67,7 +67,7 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::AbstractSt
         averaging_weights = []
     end
 
-    method = free_SVRG_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, batchsize, stepsize, probs, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset)
+    method = free_SVRG_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, b, stepsize, probs, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
 
     return method
 end
@@ -80,7 +80,7 @@ Modify the method to set the stepsize based on the smoothness constants of the p
 
 # INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
-- **free\\_SVRG\\_method** method: Free-SVRG nice method created by `initiate_free_SVRG`
+- **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
 # OUTPUTS
 - **NONE**
@@ -121,7 +121,7 @@ Reset the Free-SVRG method with b-nice sampling, especially the step size, the p
 
 # INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
-- **free\\_SVRG\\_method**: Free-SVRG mini-batch method for b-nice sampling
+- **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
 # OUTPUTS
 - **NONE**

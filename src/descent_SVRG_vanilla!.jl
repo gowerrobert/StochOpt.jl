@@ -33,8 +33,15 @@ function descent_SVRG_vanilla!(x::Array{Float64}, prob::Prob, options::MyOptions
     else
         ## SVRG inner step
         # println("        SVRG inner loop at iteration: ", iter)
-        s = sample(1:prob.numdata, options.batchsize, replace=false); # b-nice sampling
-        # s = independent_sampling(method.probs) # independent_sampling
+
+        ## Sampling method
+        if method.sampling == "nice"
+            s = sample(1:prob.numdata, options.batchsize, replace=false); # b-nice sampling
+            # println("\n\nSAMPLING: type of s: ", typeof(s))
+        elseif method.sampling == "independent"
+            s = independent_sampling(method.probs) # independent_sampling
+        end
+
         d[:] = -prob.g_eval(x, s) + prob.g_eval(method.reference_point, s) - method.reference_grad
     end
 
