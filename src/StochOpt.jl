@@ -8,6 +8,7 @@ using SparseArrays
 using LinearAlgebra
 using Printf
 using Random
+using Distributions
 using LaTeXStrings
 
 mutable struct MyOptions
@@ -137,7 +138,7 @@ mutable struct SAGA_nice_method
     # mu::Float64 # Strong-convexity constant
 end
 
-mutable struct SVRG_nice_method
+mutable struct SVRG_vanilla_method
     ## SVRG original algorithm with option I
     ## Ref: Accelerating stochastic gradient descent using predictive variance reduction, R. Johnson and T. Zhang, NIPS (2013)
     epocsperiter::Float64
@@ -156,7 +157,7 @@ mutable struct SVRG_nice_method
     reset::Function # reset some parameters of the method
 end
 
-mutable struct free_SVRG_nice_method
+mutable struct free_SVRG_method
     epocsperiter::Float64
     gradsperiter::Float64
     name::AbstractString
@@ -165,7 +166,6 @@ mutable struct free_SVRG_nice_method
     batchsize::Int64
     stepsize::Float64 # step size
     probs::Array{Float64} # probability of selecting a coordinate
-    Z # normalizing variable for probabilities
     L::Float64 # smoothness constant of the whole objective function f
     Lmax::Float64 # max of the smoothness constant of the f_i functions
     mu::Float64 # strong-convexity constant
@@ -243,8 +243,8 @@ include("boot_method.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["free_SVRG_nice", "SVRG_nice", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
-recentmethods = ["free_SVRG_nice", "SVRG_nice", "SAGA_nice"]
+allmethods = ["free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
+recentmethods = ["free_SVRG", "SVRG_vanilla", "SAGA_nice"]
 for method in allmethods
     if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function
@@ -265,6 +265,7 @@ include("../util/matrix_scaling.jl");
 include("../util/matrix_rotation.jl");
 include("../util/preprocessing.jl");
 include("../util/power_iteration.jl");
+include("../util/independent_sampling.jl");
 
 #Additional
 include("BFGS_update!.jl");

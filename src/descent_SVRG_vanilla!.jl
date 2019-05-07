@@ -1,5 +1,5 @@
 """
-    descent_SVRG_nice!(x, prob, options, method, iter, d)
+    descent_SVRG_vanilla!(x, prob, options, method, iter, d)
 
 Compute the descent direction (d).
 
@@ -7,16 +7,16 @@ Compute the descent direction (d).
 - **Array{Float64}** x: point at the current iteration
 - **Prob** prob: considered problem, i.e. logistic regression, ridge ression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize_multiplier...
-- **SVRG\\_nice\\_method** method: method of SVRG for b-nice sampling
+- **SVRG\\_vanilla\\_method** method: original SVRG method (option I) created by `initiate_SVRG_vanilla`
 - **Int64** iter: current iteration
 - **Array{Float64}** d: descent direction
 # OUTPUTS
 - **NONE**
 """
-function descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_nice_method, iter::Int64, d::Array{Float64})
+function descent_SVRG_vanilla!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_vanilla_method, iter::Int64, d::Array{Float64})
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        println("SVRG outer loop at iteration: ", iter)
+        # println("SVRG outer loop at iteration: ", iter)
         method.reference_point[:] = x; # option I: the reference is the last iterate
 
         if prob.numdata > 10000 || prob.numfeatures > 10000
@@ -34,6 +34,7 @@ function descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         ## SVRG inner step
         # println("        SVRG inner loop at iteration: ", iter)
         s = sample(1:prob.numdata, options.batchsize, replace=false); # b-nice sampling
+        # s = independent_sampling(method.probs) # independent_sampling
         d[:] = -prob.g_eval(x, s) + prob.g_eval(method.reference_point, s) - method.reference_grad
     end
 

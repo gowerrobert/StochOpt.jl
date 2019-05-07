@@ -34,8 +34,8 @@ end
 Random.seed!(1)
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation = 1000,
-                      repeat_stepsize_calculation=false)
+options = set_options(max_iter=10^8, max_time=0.001, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
+# options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation = 1000, repeat_stepsize_calculation=false)
 
 ## Load problem
 datapath = "./data/"
@@ -49,7 +49,7 @@ OUTPUTS = []  # List of saved outputs
 ## m = n, b = 1, step size = 1e-3
 options.batchsize = 1
 # options.stepsize_multiplier = 1e-3
-free_SVRG_nice1 = initiate_free_SVRG_nice(prob, options, numinneriters=0, averaged_reference_point=true)
+free_SVRG_nice1 = initiate_free_SVRG_nice(prob, options, numinneriters=5, averaged_reference_point=true) #0
 output = minimizeFunc_grid_stepsize(prob, free_SVRG_nice1, options)
 
 str_m_1 = @sprintf "%d" free_SVRG_nice1.numinneriters

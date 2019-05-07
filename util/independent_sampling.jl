@@ -1,11 +1,9 @@
-## b-Independent sampling
-
-using Distributions
+## Independent sampling
 
 """
     independent_sampling(probs)
 
-Sample the indices of the randomly selected coordinates according to the independent probabilities probs.
+Sample the indices of the randomly selected coordinates according to the independent probabilities probs. It boils down to b-independent sampling if sum(probs) = b, for instance with p_i = b/n for all data points i.
 
 # INPUTS
 - **Array{Float64}** probs: vector of probabilities of selecting each coordinate (size: number of data points)
@@ -28,10 +26,3 @@ function independent_sampling(probs::Array{Float64})
 
     return indices
 end
-
-## For b-independent sampling, at each descent step, do the following
-n = 1000
-b = 5
-probs = (b/n)*ones(n) ## p_i = b/n for all i
-indices = independent_sampling(probs)
-mean(indices)

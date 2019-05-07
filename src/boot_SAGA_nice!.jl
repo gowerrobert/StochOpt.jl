@@ -11,7 +11,7 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 # OUTPUTS
 - **SAGA\\_nice\\_method** method: SAGA mini-batch method for b-nice sampling
 
-# REFERENCES:
+# REFERENCES
 __Optimal mini-batch and step sizes for SAGA__\\
 Nidham Gazagnadou, Robert M. Gower and Joseph Salmon\\
 arXiv:1902.00071, 2019
