@@ -3,14 +3,14 @@
 
 Compute the descent direction (d).
 
-# INPUTS:
+# INPUTS
 - **Array{Float64}** x: point at the current iteration
 - **Prob** prob: considered problem, i.e. logistic regression, ridge ression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize_multiplier...
 - **SVRG\\_nice\\_method** method: method of SVRG for b-nice sampling
 - **Int64** iter: current iteration
 - **Array{Float64}** d: descent direction
-# OUTPUTS:
+# OUTPUTS
 - **NONE**
 """
 function descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_nice_method, iter::Int64, d::Array{Float64})
@@ -33,7 +33,7 @@ function descent_SVRG_nice!(x::Array{Float64}, prob::Prob, options::MyOptions, m
     else
         ## SVRG inner step
         # println("        SVRG inner loop at iteration: ", iter)
-        s = sample(1:prob.numdata, options.batchsize, replace=false);
+        s = sample(1:prob.numdata, options.batchsize, replace=false); # b-nice sampling
         d[:] = -prob.g_eval(x, s) + prob.g_eval(method.reference_point, s) - method.reference_grad
     end
 

@@ -3,12 +3,12 @@
 
 Compute the optimal mini-batch size for the Free-SVRG algorithm with b-nice sampling.
 
-# INPUTS:
+# INPUTS
 - **Int64** n: number of data samples
 - **Float64** mu: strong convexity parameter of the objective function
 - **Float64** L: smoothness constant of the whole objective function f
 - **Float64** Lmax: max of the smoothness constant of the f_i functions
-# OUTPUTS:
+# OUTPUTS
 - **Int64** minibatch_size: theoretical mini-batch size for Free-SVRG with b-nice sampling
 """
 function optimal_minibatch_free_SVRG_nice(n, mu, L, Lmax)

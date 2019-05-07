@@ -4,11 +4,11 @@
 Initiate the original SVRG method with option I for b-nice sampling.
 It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
 - **Int64** numinneriters: size of the inner loop (twice the number of data samples n if set to 0).
-# OUTPUTS:
+# OUTPUTS
 - **SVRG\\_nice\\_method** method: SVRG mini-batch method for b-nice sampling
 
 # REFERENCES:
@@ -31,6 +31,7 @@ function initiate_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters::Int6
 
     batchsize = options.batchsize
     stepsize = 0.0
+    probs = []
 
     Lmax = prob.Lmax
     mu = prob.mu
@@ -44,7 +45,7 @@ function initiate_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters::Int6
     reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
-    method = SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, batchsize, stepsize, Lmax, mu, numinneriters, reference_point, reference_grad, reset)
+    method = SVRG_nice_method(epocsperiter, gradsperiter, name, stepmethod, probs, bootmethod, batchsize, stepsize, Lmax, mu, numinneriters, reference_point, reference_grad, reset)
 
     return method
 end
@@ -55,11 +56,11 @@ end
 
 Modify the method to set the stepsize based on the smoothness constants of the problem stored in **SVRG\\_nice\\_method** and possibly sets the number of skipped error calculation if not specfied such that 30 points are to be plotted.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **SVRG\\_nice\\_method** method: SVRG nice method created by `initiate_SVRG_nice`
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
-# OUTPUTS:
+# OUTPUTS
 - **NONE**
 """
 function boot_SVRG_nice!(prob::Prob, method::SVRG_nice_method, options::MyOptions)
@@ -89,11 +90,11 @@ end
 
 Reset the SVRG method with b-nice sampling, especially the step size, the point and gradient reference.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **SVRG\\_nice\\_method**: SVRG mini-batch method for b-nice sampling
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
-# OUTPUTS:
+# OUTPUTS
 - **NONE**
 """
 function reset_SVRG_nice!(prob::Prob, method::SVRG_nice_method, options::MyOptions)

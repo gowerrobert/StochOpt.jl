@@ -4,11 +4,11 @@
 Initiate the SAGA method for b-nice sampling.
 It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
 - **Bool** unbiased: select the desired estimate of the gradient. If `true`, SAGA is implemented, else if `false` SAG is implemented\\
-# OUTPUTS:
+# OUTPUTS
 - **SAGA\\_nice\\_method** method: SAGA mini-batch method for b-nice sampling
 
 # REFERENCES:
@@ -54,7 +54,7 @@ end
 
 Modify the method to set the stepsize based on the smoothness constants of the problem stored in **SAGA\\_nice\\_method** and possibly sets the number of skipped error calculation if not specfied such that 30 points are to be plotted.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
 - **SAGA\\_nice\\_method** method: SAGA nice method created by `initiate_SAGA_nice`\\
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
@@ -110,7 +110,7 @@ end
 
 Reset the SAGA method with b-nice sampling, especially the step size, the gradient and the Jacobian estimates.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
 - **SAGA\\_nice\\_method**: SAGA mini-batch method for b-nice sampling\\
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\

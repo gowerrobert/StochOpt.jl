@@ -147,6 +147,7 @@ mutable struct SVRG_nice_method
     bootmethod::Function # /!\ mutating function
     batchsize::Int64
     stepsize::Float64 # step size
+    probs::Array{Float64} # probability of selecting a coordinate
     Lmax::Float64 # max of the smoothness constant of the f_i functions
     mu::Float64 # strong-convexity constant
     numinneriters::Int64 # number of inner iterations, usually denoted m
@@ -163,7 +164,7 @@ mutable struct free_SVRG_nice_method
     bootmethod::Function # /!\ mutating function
     batchsize::Int64
     stepsize::Float64 # step size
-    probs::Array{Float64} # probability of selecting a coordinate or mini-batch
+    probs::Array{Float64} # probability of selecting a coordinate
     Z # normalizing variable for probabilities
     L::Float64 # smoothness constant of the whole objective function f
     Lmax::Float64 # max of the smoothness constant of the f_i functions
@@ -212,7 +213,7 @@ mutable struct Method
     prevx::Array{Float64} # Storing a reference point or previous point
     diffpnt::Array{Float64} #Stores differences between old and new
     Sold::Array{Float64} #old embedding space
-    ind::Array{Int64} # place holder for aan array of indices
+    ind::Array{Int64} # place holder for an array of indices
     aux::Array{Float64} # An auxiliary vector used in computations
     numinneriters::Int64
 end

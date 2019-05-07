@@ -4,12 +4,12 @@
 Initiate the Free-SVRG method for b-nice sampling.
 It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
 - **Int64** numinneriters: size of the inner loop (theoretical value m^* if set to -1, number of data samples n if set to 0).
 - **Bool** averaged_reference_point: select if the reference point is an average of the iterates of the inner loop or the last one.
-# OUTPUTS:
+# OUTPUTS
 - **free\\_SVRG\\_nice\\_method** method: Free-SVRG mini-batch method for b-nice sampling
 """
 function initiate_free_SVRG_nice(prob::Prob, options::MyOptions ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
@@ -64,11 +64,11 @@ end
 
 Modify the method to set the stepsize based on the smoothness constants of the problem stored in **free\\_SVRG\\_nice\\_method** and possibly sets the number of skipped error calculation if not specfied such that 30 points are to be plotted.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **free\\_SVRG\\_nice\\_method** method: Free-SVRG nice method created by `initiate_free_SVRG_nice`
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
-# OUTPUTS:
+# OUTPUTS
 - **NONE**
 """
 function boot_free_SVRG_nice!(prob::Prob, method::free_SVRG_nice_method, options::MyOptions)
@@ -105,11 +105,11 @@ end
 
 Reset the Free-SVRG method with b-nice sampling, especially the step size, the point and gradient reference.
 
-# INPUTS:
+# INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **free\\_SVRG\\_nice\\_method**: Free-SVRG mini-batch method for b-nice sampling
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
-# OUTPUTS:
+# OUTPUTS
 - **NONE**
 """
 function reset_free_SVRG_nice!(prob::Prob, method::free_SVRG_nice_method, options::MyOptions)
