@@ -23,7 +23,7 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::AbstractSt
     name = "Free-SVRG"
     if sampling == "independent" # independent sampling
         if isempty(probs) || length(probs) != n
-            error("Uncorrect probabilities")
+            error("Incorrect probabilities")
         else
             if all(y->y==probs[1], probs) ## check if the probabilities are uniform
                 avg_cardinal = round(Int64, sum(probs)) ## estimate of the average cardinal of the mini-batch
@@ -102,8 +102,8 @@ function boot_free_SVRG!(prob::Prob, method::free_SVRG_method, options::MyOption
         averaging_weights = [(1-method.stepsize*method.mu)^(method.numinneriters-1-t) for t in 0:(method.numinneriters-1)]
         method.averaging_weights = averaging_weights ./ sum(averaging_weights)
     end
-    println("Averaging weights")
-    println(method.averaging_weights)
+    # println("Averaging weights")
+    # println(method.averaging_weights)
 
     # WARNING: The following if statement does not seem to modify the method that is returned afterwards...
     if options.skip_error_calculation == 0.0

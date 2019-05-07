@@ -37,7 +37,6 @@ function descent_SVRG_vanilla!(x::Array{Float64}, prob::Prob, options::MyOptions
         ## Sampling method
         if method.sampling == "nice"
             s = sample(1:prob.numdata, options.batchsize, replace=false); # b-nice sampling
-            # println("\n\nSAMPLING: type of s: ", typeof(s))
         elseif method.sampling == "independent"
             s = independent_sampling(method.probs) # independent_sampling
         end

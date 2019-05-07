@@ -27,7 +27,7 @@ function initiate_SVRG_vanilla(prob::Prob, options::MyOptions, sampling::Abstrac
     name = "SVRG-vanilla"
     if sampling == "independent" # independent sampling
         if isempty(probs) || length(probs) != n
-            error("Uncorrect probabilities")
+            error("Incorrect probabilities")
         else
             if all(y->y==probs[1], probs) ## check if the probabilities are uniform
                 avg_cardinal = round(Int64, sum(probs)) ## estimate of the average cardinal of the mini-batch

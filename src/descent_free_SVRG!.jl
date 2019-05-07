@@ -16,7 +16,7 @@ Compute the descent direction (d)
 function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, method::free_SVRG_method, iter::Int64, d::Array{Float64})
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        println("SVRG outer loop at iteration: ", iter)
+        # println("SVRG outer loop at iteration: ", iter)
         if isempty(method.averaging_weights)
             method.reference_point[:] = x; # Reference point set to last iterate iterates x^m
         else
@@ -25,8 +25,8 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
             else
                 method.reference_point[:] = method.new_reference_point; # Reference point set to the average of iterates from x^0 to x^{m-1}
             end
-            println("Resetting new_reference_point to zero")
-            println("        idx weights: 1")
+            # println("Resetting new_reference_point to zero")
+            # println("        idx weights: 1")
             method.new_reference_point[:] = method.averaging_weights[1] .* x;
         end
 
@@ -43,14 +43,14 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         d[:] = -method.reference_grad; # the first iteratation of the inner loop is equivalent to a gradient step
     else
         ## SVRG inner step
-        println("---- SVRG inner loop at iteration: ", iter)
+        # println("---- SVRG inner loop at iteration: ", iter)
         if !isempty(method.averaging_weights)
             if iter % method.numinneriters == 0 # small index shift
                 idx_weights = method.numinneriters;
             else
                 idx_weights = iter % method.numinneriters;
             end
-            println("        idx weights: ", idx_weights)
+            # println("        idx weights: ", idx_weights)
             method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x;
         end
 
@@ -60,6 +60,11 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         elseif method.sampling == "independent"
             s = independent_sampling(method.probs) # independent_sampling
         end
+        # if iter == 2
+        #     println("\n\nSAMPLING: type of s: ", typeof(s))
+        #     println("Sampled points: ", s)
+        # end
+        # println("Sampled points: ", s)
         d[:] = -prob.g_eval(x, s) + prob.g_eval(method.reference_point, s) - method.reference_grad
     end
 
