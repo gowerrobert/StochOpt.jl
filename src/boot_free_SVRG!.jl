@@ -14,31 +14,13 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 # OUTPUTS
 - **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`
 """
-function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::AbstractString ; numinneriters::Int64=0, averaged_reference_point::Bool=false, probs::Array{Float64}=Float64[])
+function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
     n = prob.numdata
     b = options.batchsize
     epocsperiter = b/n
     gradsperiter = b
 
-    name = "Free-SVRG"
-    if sampling == "independent" # independent sampling
-        if isempty(probs) || length(probs) != n
-            error("Incorrect probabilities")
-        else
-            if all(y->y==probs[1], probs) ## check if the probabilities are uniform
-                avg_cardinal = round(Int64, sum(probs)) ## estimate of the average cardinal of the mini-batch
-                name = string(name, "-", avg_cardinal)
-            end
-            name = string(name, "-indep")
-        end
-    elseif sampling == "nice" # b-nice sampling
-        if b > 1
-            name = string(name, "-", b)
-        end
-    else
-        error("Unknown sampling procedure")
-    end
-    name = string(name, "-", sampling)
+    name = string("Free-SVRG-", sampling.name)
 
     stepmethod = descent_free_SVRG!
     bootmethod = boot_free_SVRG!
@@ -53,9 +35,7 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::AbstractSt
     expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L
     expected_residual = ((n-b)/(b*(n-1)))*Lmax
 
-    if numinneriters == 0
-        numinneriters = n
-    elseif numinneriters == -1
+    if numinneriters == -1
         numinneriters = floor(Int, (expected_smoothness + 2*expected_residual) / mu) # theoretical optimal value
     end
     reference_point = zeros(prob.numfeatures)
@@ -67,7 +47,7 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::AbstractSt
         averaging_weights = []
     end
 
-    method = free_SVRG_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, b, stepsize, probs, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
+    method = free_SVRG_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, b, stepsize, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
 
     return method
 end

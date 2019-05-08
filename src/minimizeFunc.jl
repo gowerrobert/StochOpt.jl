@@ -76,6 +76,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     for iter = 1:options.max_iter
         if iter == 1
             ## "Warm up" to avoid error on the elpased time at the first iteration of the first launch
+            println("Warm up")
             time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
 
             ## Resetting back the method

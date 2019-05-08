@@ -92,6 +92,15 @@ mutable struct Prob
     Lbar::Float64 # Average of the smoothness constant of the f_i functions
 end
 
+mutable struct Sampling
+    name::AbstractString # "independent" or "nice"
+    numdata::Int64 # number of data points
+    batchsize::Int64 # average (case of independent sampling) or exact mini-batch size at each iteration
+    probas::Array{Float64} # probabilities associated to each data point
+    sampleindices::Function # returns indices sampled according to the sampling parameters
+    # Sampling(name, numdata, batchsize, probas, samplingfunc) = new("nice", 0, 1, [], nice_sampling)
+end
+
 mutable struct SAGAmethod
     epocsperiter::Float64
     gradsperiter::Float64
@@ -155,7 +164,6 @@ mutable struct SVRG_vanilla_method
     reference_point::Array{Float64}
     reference_grad::Array{Float64}
     reset::Function # reset some parameters of the method
-    sampling::AbstractString # b-nice or independent sampling
 end
 
 mutable struct free_SVRG_method
@@ -166,7 +174,6 @@ mutable struct free_SVRG_method
     bootmethod::Function # /!\ mutating function
     batchsize::Int64
     stepsize::Float64 # step size
-    probs::Array{Float64} # probability of selecting a coordinate
     L::Float64 # smoothness constant of the whole objective function f
     Lmax::Float64 # max of the smoothness constant of the f_i functions
     mu::Float64 # strong-convexity constant
@@ -178,7 +185,7 @@ mutable struct free_SVRG_method
     reference_grad::Array{Float64}
     averaging_weights::Array{Float64} # averaging weights of the output of the inner loop
     reset::Function # reset some parameters of the method
-    sampling::AbstractString # b-nice or independent sampling
+    sampling::Sampling # b-nice or independent sampling
 end
 
 mutable struct SPIN
@@ -242,6 +249,8 @@ include("load_ridge_regression.jl")
 include("minimizeFunc.jl") # minimizing a given prob::Prob using a method
 include("minimizeFunc_grid_stepsize.jl")  # minimizing a given prob::Prob using a method and determines the stepsize using a grid search
 include("boot_method.jl")
+#Including sampling methods
+include("samplings.jl");
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
@@ -267,7 +276,6 @@ include("../util/matrix_scaling.jl");
 include("../util/matrix_rotation.jl");
 include("../util/preprocessing.jl");
 include("../util/power_iteration.jl");
-include("../util/independent_sampling.jl");
 
 #Additional
 include("BFGS_update!.jl");
