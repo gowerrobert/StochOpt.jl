@@ -23,7 +23,7 @@ function initiate_SVRG_bubeck(prob::Prob, options::MyOptions, sampling::Sampling
     epocsperiter = b/n
     gradsperiter = b
 
-    name = string("SVRG-vanilla-", sampling.name)
+    name = string("SVRG-Bubeck-", sampling.name)
 
     stepmethod = descent_SVRG_bubeck!
     bootmethod = boot_SVRG_bubeck!
@@ -35,7 +35,7 @@ function initiate_SVRG_bubeck(prob::Prob, options::MyOptions, sampling::Sampling
     mu = prob.mu
 
     if numinneriters == -1
-        numinneriters = 2*n # heuristic
+        numinneriters = round(Int64, 20*Lmax/mu)
     end
     reference_point = zeros(prob.numfeatures)
     new_reference_point = zeros(prob.numfeatures)
@@ -94,7 +94,7 @@ Reset the original SVRG method (option I), especially the step size, the point a
 - **NONE**
 """
 function reset_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyOptions)
-    println("\n---- RESET SVRG VANILLA ----\n")
+    println("\n---- RESET SVRG BUBECK ----\n")
 
     method.batchsize = options.batchsize
     method.stepsize = options.stepsize_multiplier

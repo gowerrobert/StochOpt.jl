@@ -25,9 +25,8 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
             else
                 method.reference_point[:] = method.new_reference_point; # Reference point set to the weighted average of iterates from x^0 to x^{m-1}
             end
-            # println("Resetting new_reference_point to zero")
-            # println("        idx weights: 1")
-            method.new_reference_point[:] = method.averaging_weights[1] .* x;
+            println("Resetting new_reference_point to zero")
+            method.new_reference_point[:] = zeros(prob.numfeatures)
         end
 
         if prob.numdata > 10000 || prob.numfeatures > 10000
@@ -40,28 +39,27 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata); # reset reference gradient
         end
 
-        d[:] = -method.reference_grad; # WRONG: the first iteratation of the inner loop is equivalent to a gradient step
-    else
-        ## SVRG inner step
-        # println("---- SVRG inner loop at iteration: ", iter)
-        if !isempty(method.averaging_weights)
-            if iter % method.numinneriters == 0 # small index shift
-                idx_weights = method.numinneriters;
-            else
-                idx_weights = iter % method.numinneriters;
-            end
-            # println("        idx weights: ", idx_weights)
-            method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x;
-        end
-
-        ## Sampling method
-        s = method.sampling.sampleindices(method.sampling)
-        # println("s: ", s)
-        if isempty(s) # if no point is sampled
-            d[:] = -method.reference_grad
+        # d[:] = -method.reference_grad; # WRONG: the first iteration of the inner loop is equivalent to a gradient step
+    end
+    ## SVRG inner step
+    # println("---- SVRG inner loop at iteration: ", iter)
+    if !isempty(method.averaging_weights)
+        if iter % method.numinneriters == 0 # small index shift
+            idx_weights = method.numinneriters; # i = m
         else
-            d[:] = -prob.g_eval(x, s) + prob.g_eval(method.reference_point, s) - method.reference_grad
+            idx_weights = iter % method.numinneriters; # for i = 1, ..., m-1
         end
+        # println("        idx weights: ", idx_weights)
+        method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x;
+    end
+
+    ## Sampling method
+    s = method.sampling.sampleindices(method.sampling)
+    # println("s: ", s)
+    if isempty(s) # if no point is sampled
+        d[:] = -method.reference_grad
+    else
+        d[:] = -prob.g_eval(x, s) + prob.g_eval(method.reference_point, s) - method.reference_grad
     end
     #  println("|d| ", norm(d))
 end
