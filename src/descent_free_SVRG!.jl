@@ -23,7 +23,7 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
             if iter == 1
                 method.reference_point[:] = x; # Reference point set to initial point x_0^m
             else
-                method.reference_point[:] = method.new_reference_point; # Reference point set to the average of iterates from x^0 to x^{m-1}
+                method.reference_point[:] = method.new_reference_point; # Reference point set to the weighted average of iterates from x^0 to x^{m-1}
             end
             # println("Resetting new_reference_point to zero")
             # println("        idx weights: 1")
@@ -31,16 +31,16 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         end
 
         if prob.numdata > 10000 || prob.numfeatures > 10000
-            if iter==1
+            if iter == 1
                 println("Dimensions are too large too compute the full gradient")
             end
             s = sample(1:prob.numdata, 100, replace=false);
-            method.reference_grad[:] = prob.g_eval(x, s); # reset a stochastic reference gradient
+            method.reference_grad[:] = prob.g_eval(method.reference_point, s); # reset a stochastic reference gradient
         else
-            method.reference_grad[:] = prob.g_eval(x, 1:prob.numdata); # reset reference gradient
+            method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata); # reset reference gradient
         end
 
-        d[:] = -method.reference_grad; # the first iteratation of the inner loop is equivalent to a gradient step
+        d[:] = -method.reference_grad; # WRONG: the first iteratation of the inner loop is equivalent to a gradient step
     else
         ## SVRG inner step
         # println("---- SVRG inner loop at iteration: ", iter)
@@ -58,7 +58,7 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         s = method.sampling.sampleindices(method.sampling)
         # println("s: ", s)
         if isempty(s) # if no point is sampled
-            d[:] = - method.reference_grad
+            d[:] = -method.reference_grad
         else
             d[:] = -prob.g_eval(x, s) + prob.g_eval(method.reference_point, s) - method.reference_grad
         end

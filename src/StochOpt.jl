@@ -157,13 +157,33 @@ mutable struct SVRG_vanilla_method
     bootmethod::Function # /!\ mutating function
     batchsize::Int64
     stepsize::Float64 # step size
-    probs::Array{Float64} # probability of selecting a coordinate
     Lmax::Float64 # max of the smoothness constant of the f_i functions
     mu::Float64 # strong-convexity constant
     numinneriters::Int64 # number of inner iterations, usually denoted m
     reference_point::Array{Float64}
     reference_grad::Array{Float64}
     reset::Function # reset some parameters of the method
+    sampling::Sampling # b-nice or independent sampling
+end
+
+mutable struct SVRG_bubeck_method
+    ## Other analysis of SVRG with the reference set to the average of previous iterates
+    ## Ref: Convex optimization: Algorithms and complexity, S. Bubeck, Foundations and Trends in Machine Learning (2015)
+    epocsperiter::Float64
+    gradsperiter::Float64
+    name::AbstractString
+    stepmethod::Function # /!\ mutating function
+    bootmethod::Function # /!\ mutating function
+    batchsize::Int64
+    stepsize::Float64 # step size
+    Lmax::Float64 # max of the smoothness constant of the f_i functions
+    mu::Float64 # strong-convexity constant
+    numinneriters::Int64 # number of inner iterations, usually denoted m
+    reference_point::Array{Float64}
+    new_reference_point::Array{Float64} # average on the fly of the inner loop iterates
+    reference_grad::Array{Float64}
+    reset::Function # reset some parameters of the method
+    sampling::Sampling # b-nice or independent sampling
 end
 
 mutable struct free_SVRG_method
@@ -250,12 +270,12 @@ include("minimizeFunc.jl") # minimizing a given prob::Prob using a method
 include("minimizeFunc_grid_stepsize.jl")  # minimizing a given prob::Prob using a method and determines the stepsize using a grid search
 include("boot_method.jl")
 #Including sampling methods
-include("samplings.jl");
+include("samplings.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
-recentmethods = ["free_SVRG", "SVRG_vanilla", "SAGA_nice"]
+allmethods = ["SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
+recentmethods = ["SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice"]
 for method in allmethods
     if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function
@@ -270,16 +290,16 @@ include("descent_SAGApartition.jl")
 #Including utilities, plotting, data analysis
 include("plot_outputs_Plots.jl")
 include("plot_SAGA_nice_Plots.jl")
-include("get_saved_stepsize.jl");
-include("load_fsol.jl");
-include("../util/matrix_scaling.jl");
-include("../util/matrix_rotation.jl");
-include("../util/preprocessing.jl");
-include("../util/power_iteration.jl");
+include("get_saved_stepsize.jl")
+include("load_fsol.jl")
+include("../util/matrix_scaling.jl")
+include("../util/matrix_rotation.jl")
+include("../util/preprocessing.jl")
+include("../util/power_iteration.jl")
 
 #Additional
-include("BFGS_update!.jl");
-include("calculate_SAGA_rates_and_complexities.jl");
-include("free_SVRG_settings.jl");
-include("get_saved_stepsize.jl");
+include("BFGS_update!.jl")
+include("calculate_SAGA_rates_and_complexities.jl")
+include("free_SVRG_settings.jl")
+include("get_saved_stepsize.jl")
 # include("../tmp/parallel_minimizeFunc_grid_stepsize.jl")

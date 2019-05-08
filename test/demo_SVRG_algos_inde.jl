@@ -34,8 +34,7 @@ end
 Random.seed!(1)
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation = 1000,
-                      repeat_stepsize_calculation=false)
+options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation=1000, repeat_stepsize_calculation=false)
 
 ## Load problem
 datapath = "./data/"
@@ -48,7 +47,7 @@ OUTPUTS = [] # list of saved outputs
 
 ## Vanilla-SVRG with 1-nice sampling (m = 2n, b = 1, step size = gamma^*)
 options.batchsize = 1
-sampling = build_sampling("nice", prob.numdata, options)
+sampling = build_sampling("independent", prob.numdata, options)
 options.stepsize_multiplier = -1.0 # 1/10Lmax
 SVRG_vanilla = initiate_SVRG_vanilla(prob, options, sampling, numinneriters=2*prob.numdata) # 2n
 
@@ -67,7 +66,7 @@ OUTPUTS = [OUTPUTS; output]
 
 ## Free-SVRG with b-nice sampling (m = m^*, b = b^*, step size = gamma^*)
 options.batchsize = optimal_minibatch_free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
-sampling = build_sampling("nice", prob.numdata, options)
+sampling = build_sampling("independent", prob.numdata, options)
 options.stepsize_multiplier = -1.0 # Theoretical step size in boot_free_SVRG
 free_SVRG = initiate_free_SVRG(prob, options, sampling, numinneriters=-1, averaged_reference_point=true)
 output = minimizeFunc(prob, free_SVRG, options)
@@ -79,8 +78,8 @@ OUTPUTS = [OUTPUTS; output]
 
 ## Saving outputs and plots
 savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-savename = string(savename, "-", "demo_SVRG_algos_nice")
+savename = string(savename, "-", "demo_SVRG_algos_inde")
 save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
 pyplot() # gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options, methodname="demo_SVRG_algos_nice", path=save_path) # Plot and save output
+plot_outputs_Plots(OUTPUTS, prob, options, methodname="demo_SVRG_algos_inde", path=save_path) # Plot and save output

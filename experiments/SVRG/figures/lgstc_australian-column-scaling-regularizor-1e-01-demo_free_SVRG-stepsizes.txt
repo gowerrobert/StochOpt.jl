@@ -1,4 +1,0 @@
-lgstc_australian-column-scaling-regularizor-1e-01-demo_free_SVRG stepsize_multiplier 
-$m^* = 630, b^* = 1, \gamma^* = 1.64e-03$ : 2^ -9.255299687235764
-$m^* = 630, b^* = 1, \gamma_\mathrm{grid search} = 3.13e-02$ : 2^ -5.0
-$m^* = 1380, b = 1, \gamma^* = 1.64e-03$ : 2^ -9.255299687235764

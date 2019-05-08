@@ -7,9 +7,8 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 # INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
-- **AbstractString** sampling: type of sampling b-nice (if set to "nice") or independent (if set to "independent")
+- **Sampling** sampling: sampling object (b-nice or independent sampling)
 - **Int64** numinneriters: size of the inner loop (theoretical value m^* if set to -1, number of data samples n if set to 0)
-- **Array{Float64}** probs: probability of selecting each coordinate (used for independent sampling)
 - **Bool** averaged_reference_point: select if the reference point is an average of the iterates of the inner loop or the last one
 # OUTPUTS
 - **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`

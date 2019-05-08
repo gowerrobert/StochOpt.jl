@@ -35,8 +35,6 @@ Random.seed!(1)
 
 ## Basic parameters and options for solvers
 options = set_options(max_iter=10^8, max_time=10000.0, max_epocs=50, force_continue=false, initial_point="zeros", skip_error_calculation=100, repeat_stepsize_calculation=false)
-# options = set_options(max_iter=10^8, max_time=0.1, max_epocs=50, force_continue=false, initial_point="zeros", skip_error_calculation=1, repeat_stepsize_calculation=false)
-
 
 ## Load problem
 datapath = "./data/"
@@ -48,6 +46,7 @@ prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-1, scaling="co
 OUTPUTS = []  # List of saved outputs
 
 ## Sampling procedure
+#region
 # b-nice sampling
 # options.batchsize = 1
 # sampling = build_sampling("nice", prob.numdata, options)
@@ -61,13 +60,20 @@ OUTPUTS = []  # List of saved outputs
 # sampling.sampleindices(sampling)
 # sampling.batchsize
 # sampling.name
+#endregion
 
 ## m = m^*, b = b^*, step size = gamma^*
 options.batchsize = optimal_minibatch_free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
 sampling = build_sampling("nice", prob.numdata, options)
 free_SVRG1 = initiate_free_SVRG(prob, options, sampling, numinneriters=-1, averaged_reference_point=true)
 options.stepsize_multiplier = -1.0 # Theoretical step size in boot_free_SVRG
-# output = minimizeFunc(prob, free_SVRG1, options) # Warm up
+
+println("-------------------- WARM UP --------------------")
+options.max_iter = 3
+minimizeFunc(prob, free_SVRG1, options) # Warm up
+options.max_iter = 10^8
+println("-------------------------------------------------")
+
 output = minimizeFunc(prob, free_SVRG1, options)
 str_m_1 = @sprintf "%d" free_SVRG1.numinneriters
 str_b_1 = @sprintf "%d" free_SVRG1.batchsize
@@ -76,7 +82,6 @@ output.name = latexstring("\$m^* = $str_m_1, b^* = $str_b_1, \\gamma^* = $str_st
 OUTPUTS = [OUTPUTS; output]
 println("Theoretical mini-batch size: ", free_SVRG1.batchsize)
 println("Theoretical inner loop size: ", free_SVRG1.numinneriters)
-
 
 ## m = m^*, b = b^*, step size = grid searched
 options.batchsize = optimal_minibatch_free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
@@ -93,7 +98,6 @@ str_b_2 = @sprintf "%d" free_SVRG2.batchsize
 str_step_2 = @sprintf "%.2e" free_SVRG2.stepsize
 output.name = latexstring("\$m^* = $str_m_2, b^* = $str_b_2, \\gamma_\\mathrm{grid search} = $str_step_2\$")
 OUTPUTS = [OUTPUTS; output]
-
 
 ## m = 2*n, b = 1, step size = gamma^* (corresponding to m^*)
 options.batchsize = 1

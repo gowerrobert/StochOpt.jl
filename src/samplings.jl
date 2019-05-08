@@ -4,7 +4,7 @@
 Sample the indices of b (batchsize) points out of n (number of data points) at random without replacement.
 
 # INPUTS
-- **Sampling** sampling: sampling object
+- **Sampling** sampling: sampling object (b-nice or independent sampling)
 # OUTPUTS
 - **Array{Int64}** indices: array of selected indices
 """
@@ -20,7 +20,7 @@ end
 Sample the indices of the randomly selected coordinates according to the independent probabilities probas. It boils down to b-independent sampling if sum(probas) = b, for instance with p_i = b/n for all data points i.
 
 # INPUTS
-- **Sampling** sampling: sampling object
+- **Sampling** sampling: sampling object (b-nice or independent sampling)
 # OUTPUTS
 - **Array{Int64}** indices: array of selected indices
 """
@@ -42,7 +42,7 @@ Construtor of a sampling, "independent" or "nice".
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
 - **Array{Float64}** probas: vector of probabilities of selecting each coordinate (size: number of data points)
 # OUTPUTS
-- **Sampling** sampling: sampling object
+- **Sampling** sampling: sampling object (b-nice or independent sampling)
 """
 function build_sampling(type::AbstractString, numdata::Int64, options::MyOptions ; probas::Array{Float64}=Float64[])
     if type == "nice"
@@ -55,7 +55,7 @@ function build_sampling(type::AbstractString, numdata::Int64, options::MyOptions
         probas = []
         sampleindices = nice_sampling
     elseif type == "independent"
-        name = "indep"
+        name = "inde"
         if isempty(probas)
             name = string("unif-", name)
             println("No probabilities given: sampling set to uniform b-independent sampling")
@@ -70,6 +70,8 @@ function build_sampling(type::AbstractString, numdata::Int64, options::MyOptions
             name = string(batchsize, "-", name)
         end
         sampleindices = independent_sampling2
+    else
+        error("Undefined sampling procedure")
     end
 
     return Sampling(name, numdata, batchsize, probas, sampleindices)
