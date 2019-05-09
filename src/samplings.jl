@@ -25,7 +25,7 @@ Sample the indices of the randomly selected coordinates according to the indepen
 - **Array{Int64}** indices: array of selected indices
 """
 function independent_sampling2(sampling::Sampling)
-    D = [Binomial(1, i) for i in sampling.probas]
+    D = [Bernoulli(i) for i in sampling.probas]
     indices = [rand(d) for d in D]
     indices = findall(x->x==1, vec(indices))
     return indices
@@ -99,7 +99,7 @@ julia> indices = independent_sampling(probas)
 ```
 """
 function independent_sampling(probas::Array{Float64})
-    D = [Binomial(1, i) for i in probas]
+    D = [Bernoulli(i) for i in probas]
     indices = [rand(d) for d in D]
     indices = findall(x->x==1, vec(indices))
     return indices

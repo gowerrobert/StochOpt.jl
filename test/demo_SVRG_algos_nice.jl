@@ -44,7 +44,7 @@ options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continu
 datapath = "./data/"
 data = "australian"
 X, y = loadDataset(datapath, data)
-prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-1, scaling="column-scaling")
+prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="column-scaling")
 
 ## Running methods
 OUTPUTS = [] # list of saved outputs

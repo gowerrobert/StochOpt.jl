@@ -201,9 +201,28 @@ mutable struct free_SVRG_method
     expected_residual::Float64 # expected residual
     numinneriters::Int64 # number of inner iterations, usually denoted m
     reference_point::Array{Float64}
-    new_reference_point::Array{Float64} # average on the fly of the inner loop iterates
+    new_reference_point::Array{Float64} # weighted average on the fly of the inner loop iterates
     reference_grad::Array{Float64}
     averaging_weights::Array{Float64} # averaging weights of the output of the inner loop
+    reset::Function # reset some parameters of the method
+    sampling::Sampling # b-nice or independent sampling
+end
+
+mutable struct L_SVRG_method
+    ## Loopless-SVRG without outer loop but a coin tossing at each iteration to decide whether te reference is updated or not
+    ## Ref: Don't Jump Through Hoops and Remove Those Loops: SVRG and Katyusha are Better Without the Outer Loop, D. Kovalev, S. Horvath and P. Richtarik, arXiv:1901.08689 (2019)
+    epocsperiter::Float64
+    gradsperiter::Float64
+    name::AbstractString
+    stepmethod::Function # /!\ mutating function
+    bootmethod::Function # /!\ mutating function
+    stepsize::Float64 # step size
+    Lmax::Float64 # max of the smoothness constant of the f_i functions
+    # numinneriters::Int64 # number of inner iterations, usually denoted m
+    # reference_update_proba::Float64 # probability of updating the reference point and gradient (denoted p in the paper)
+    reference_update_distrib::Bernoulli{Float64} # Bernoulli distribution controlling the frequence of update of the reference point and gradient
+    reference_point::Array{Float64}
+    reference_grad::Array{Float64}
     reset::Function # reset some parameters of the method
     sampling::Sampling # b-nice or independent sampling
 end
@@ -274,8 +293,8 @@ include("samplings.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"];
-recentmethods = ["SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice"]
+allmethods = ["L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"]
+recentmethods = ["L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice"]
 for method in allmethods
     if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function
