@@ -18,6 +18,7 @@ Launch the  Julia REPL and press `]` to enter the package REPL mode, then instal
 (v1.0) pkg> add Formatting
 (v1.0) pkg> add LaTeXStrings
 (v1.0) pkg> add PyPlot
+(v1.0) pkg> add Distributions
 ...
 (v1.0) pkg> add Distributed
 ```
