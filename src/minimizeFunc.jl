@@ -111,6 +111,8 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # end
             if(options.printiters)
                 if(options.exacterror == false)
+                    ## ERROR: method.epocsperiter is not a constant value for independent sampling since the number or sampled point at each iteration is random
+                    ## Solution: monitor the number of computed gradient in the method in an attribute and create an if occursin("inde", sampling.name) clause to compute the correct number of epochs
                     @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];
                 else
                     @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
