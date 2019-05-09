@@ -194,6 +194,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         end
     end # End of For loop
     outputname = method.name;
-    output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, options.stepsize_multiplier); #./(f0.-prob.fsol)
+    # output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, options.stepsize_multiplier); #./(f0.-prob.fsol) # old
+    output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, method.stepsize); # taking step size from method not options
     return output
 end

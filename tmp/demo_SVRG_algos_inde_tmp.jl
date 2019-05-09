@@ -8,7 +8,7 @@ using Printf
 using LinearAlgebra
 using Statistics
 using Base64
-include("../src/StochOpt.jl")
+include("./src/StochOpt.jl")
 
 ## Path settings
 #region
@@ -36,6 +36,10 @@ Random.seed!(1)
 ## Basic parameters and options for solvers
 options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation=1000, repeat_stepsize_calculation=false)
 
+## Debugging settings
+# options = set_options(max_iter=10^8, max_time=0.005, max_epocs=1, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
+# numinneriters = 5
+
 ## Load problem
 datapath = "./data/"
 data = "australian"
@@ -49,7 +53,8 @@ OUTPUTS = [] # list of saved outputs
 options.batchsize = 1
 sampling = build_sampling("independent", prob.numdata, options)
 options.stepsize_multiplier = -1.0 # 1/10Lmax
-SVRG_vanilla = initiate_SVRG_vanilla(prob, options, sampling, numinneriters=2*prob.numdata) # 2n
+numinneriters = 2*prob.numdata # 2*n
+SVRG_vanilla = initiate_SVRG_vanilla(prob, options, sampling, numinneriters=numinneriters)
 
 println("-------------------- WARM UP --------------------")
 options.max_iter = 3
@@ -64,17 +69,32 @@ output = minimizeFunc(prob, SVRG_vanilla, options)
 # output.name = latexstring("Vanilla SVRG \$(m = 2n = $str_m_1, b = $str_b_1 , \\gamma^* = $str_step_1\$)")
 OUTPUTS = [OUTPUTS; output]
 
-## Free-SVRG with b-nice sampling (m = m^*, b = b^*, step size = gamma^*)
-options.batchsize = optimal_minibatch_free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+## SVRG-Bubeck with b-nice sampling (m = m^*, b = 1, step size = gamma^*)
+options.batchsize = 1
+sampling = build_sampling("independent", prob.numdata, options)
+options.stepsize_multiplier = -1.0 # Theoretical step size in boot_SVRG_bubeck
+numinneriters = 2*prob.numdata # 2*n
+SVRG_bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
+output = minimizeFunc(prob, SVRG_bubeck, options)
+# str_m_2 = @sprintf "%d" SVRG_bubeck.numinneriters
+# str_b_2 = @sprintf "%d" SVRG_bubeck.batchsize
+# str_step_2 = @sprintf "%.2e" SVRG_bubeck.stepsize
+# output.name = latexstring("SVRG-Bubeck \$(m^* = $str_m_2, b = $str_b_2 , \\gamma^* = $str_step_2)\$")
+OUTPUTS = [OUTPUTS; output]
+
+## Free-SVRG with 1-uniform independent sampling (m = m^*, b = 1, step size = gamma^*)
+options.batchsize = 1
 sampling = build_sampling("independent", prob.numdata, options)
 options.stepsize_multiplier = -1.0 # Theoretical step size in boot_free_SVRG
-free_SVRG = initiate_free_SVRG(prob, options, sampling, numinneriters=-1, averaged_reference_point=true)
+numinneriters = 2*prob.numdata # 2*n
+free_SVRG = initiate_free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
 output = minimizeFunc(prob, free_SVRG, options)
-# str_m_2 = @sprintf "%d" free_SVRG.numinneriters
-# str_b_2 = @sprintf "%d" free_SVRG.batchsize
-# str_step_2 = @sprintf "%.2e" free_SVRG.stepsize
-# output.name = latexstring("Free-SVRG \$(m^* = $str_m_2, b^* = $str_b_2 , \\gamma^* = $str_step_2)\$")
+# str_m_3 = @sprintf "%d" free_SVRG.numinneriters
+# str_b_3 = @sprintf "%d" free_SVRG.batchsize
+# str_step_3 = @sprintf "%.2e" free_SVRG.stepsize
+# output.name = latexstring("Free-SVRG \$(m^* = $str_m_3, b^* = $str_b_3 , \\gamma^* = $str_step_3)\$")
 OUTPUTS = [OUTPUTS; output]
+
 
 ## Saving outputs and plots
 savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")

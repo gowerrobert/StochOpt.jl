@@ -16,7 +16,7 @@ Compute the descent direction (d)
 function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, method::free_SVRG_method, iter::Int64, d::Array{Float64})
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        # println("SVRG outer loop at iteration: ", iter)
+        println("SVRG outer loop at iteration: ", iter)
         if isempty(method.averaging_weights)
             method.reference_point[:] = x; # Reference point set to last iterate iterates x^m
         else
@@ -25,7 +25,7 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
             else
                 method.reference_point[:] = method.new_reference_point; # Reference point set to the weighted average of iterates from x^0 to x^{m-1}
             end
-            println("Resetting new_reference_point to zero")
+            # println("Resetting new_reference_point to zero")
             method.new_reference_point[:] = zeros(prob.numfeatures)
         end
 
@@ -44,7 +44,7 @@ function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
     ## SVRG inner step
     # println("---- SVRG inner loop at iteration: ", iter)
     if !isempty(method.averaging_weights)
-        if iter % method.numinneriters == 0 # small index shift
+        if iter % method.numinneriters == 0 # small index shift: weight a_m times point x_{s+1}^{m-1}
             idx_weights = method.numinneriters; # i = m
         else
             idx_weights = iter % method.numinneriters; # for i = 1, ..., m-1

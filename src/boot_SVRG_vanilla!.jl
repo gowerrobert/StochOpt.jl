@@ -35,8 +35,12 @@ function initiate_SVRG_vanilla(prob::Prob, options::MyOptions, sampling::Samplin
     mu = prob.mu
 
     if numinneriters == -1
-        numinneriters = 2*n # heuristic
+        error("No theoretical inner loop size available for SVRG vanilla with this sampling") # no theoretical value given by Johnson & Zhang
+        # Heuristic proposed is: m = 2*n
+    elseif numinneriters < -1 || numinneriters == 0
+        error("Invalid inner loop size")
     end
+
     reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
@@ -63,9 +67,13 @@ function boot_SVRG_vanilla!(prob::Prob, method::SVRG_vanilla_method, options::My
         println("Manually set step size")
         method.stepsize = options.stepsize_multiplier
     elseif options.stepsize_multiplier == -1.0
-        println("Automatically set SVRG step size")
-        method.stepsize = 1/(10*method.Lmax)
-        options.stepsize_multiplier = method.stepsize # /!\ Modifies the options
+        if method.sampling.name == "nice"
+            method.stepsize = 1/(10*method.Lmax) # theoretical optimal value for 1-nice sampling by Johnson & Zhang
+            println("Automatically set SVRG vanilla step size: ", method.stepsize)
+        else
+            error("No theoretical step size available for SVRG vanilla with this sampling")
+        end
+
         println("Theoretical step size: ", method.stepsize)
     else
         error("Invalid options.stepsize_multiplier")
@@ -96,7 +104,7 @@ function reset_SVRG_vanilla!(prob::Prob, method::SVRG_vanilla_method, options::M
     println("\n---- RESET SVRG VANILLA ----\n")
 
     method.batchsize = options.batchsize
-    method.stepsize = options.stepsize_multiplier
+    method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)
     method.reference_grad = zeros(prob.numfeatures)

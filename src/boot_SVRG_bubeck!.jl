@@ -35,8 +35,15 @@ function initiate_SVRG_bubeck(prob::Prob, options::MyOptions, sampling::Sampling
     mu = prob.mu
 
     if numinneriters == -1
-        numinneriters = round(Int64, 20*Lmax/mu)
+        if sampling.name == "nice"
+            numinneriters = round(Int64, 20*Lmax/mu) # theoretical value given by Bubeck when b=1
+        else
+            error("No theoretical inner loop size available for SVRG Bubeck with this sampling")
+        end
+    elseif numinneriters < -1 || numinneriters == 0
+        error("Invalid inner loop size")
     end
+
     reference_point = zeros(prob.numfeatures)
     new_reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
@@ -64,7 +71,13 @@ function boot_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyOp
         println("Manually set step size")
         method.stepsize = options.stepsize_multiplier
     elseif options.stepsize_multiplier == -1.0
-        println("Automatically set SVRG step size")
+        if method.sampling.name == "nice"
+            method.stepsize = 1/(10*method.Lmax) # theoretical optimal value for 1-nice sampling by Bubeck
+            println("Automatically set SVRG Bubeck step size: ", method.stepsize)
+        else
+            error("No theoretical step size available for SVRG Bubeck with this sampling")
+        end
+
         method.stepsize = 1/(10*method.Lmax)
         options.stepsize_multiplier = method.stepsize # /!\ Modifies the options
         println("Theoretical step size: ", method.stepsize)
@@ -97,7 +110,7 @@ function reset_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyO
     println("\n---- RESET SVRG BUBECK ----\n")
 
     method.batchsize = options.batchsize
-    method.stepsize = options.stepsize_multiplier
+    method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)
     method.new_reference_point = zeros(prob.numfeatures)

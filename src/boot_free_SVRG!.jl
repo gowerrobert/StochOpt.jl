@@ -35,8 +35,15 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ;
     expected_residual = ((n-b)/(b*(n-1)))*Lmax
 
     if numinneriters == -1
-        numinneriters = floor(Int, (expected_smoothness + 2*expected_residual) / mu) # theoretical optimal value
+        if occursin("nice", sampling.name)
+            numinneriters = floor(Int, (expected_smoothness + 2*expected_residual) / mu) # theoretical optimal value for b-nice sampling
+        else
+            error("No theoretical inner loop size available for Free-SVRG with this sampling")
+        end
+    elseif numinneriters < -1 || numinneriters == 0
+        error("Invalid inner loop size")
     end
+
     reference_point = zeros(prob.numfeatures)
     new_reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
@@ -69,10 +76,12 @@ function boot_free_SVRG!(prob::Prob, method::free_SVRG_method, options::MyOption
         println("Manually set step size")
         method.stepsize = options.stepsize_multiplier
     elseif options.stepsize_multiplier == -1.0
-        println("Automatically set Free-SVRG step size")
-        method.stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual))
-        options.stepsize_multiplier = method.stepsize # /!\ Modifies the options
-        println("Theoretical step size: ", method.stepsize)
+        if occursin("nice", method.sampling.name)
+            method.stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual)) # theoretical optimal value for b-nice sampling
+            println("Automatically set Free-SVRG step size: ", method.stepsize)
+        else
+            error("No theoretical step size available for Free-SVRG with this sampling")
+        end
     else
         error("Invalid options.stepsize_multiplier")
     end
@@ -109,7 +118,7 @@ function reset_free_SVRG!(prob::Prob, method::free_SVRG_method, options::MyOptio
     println("\n---- RESET FREE-SVRG ----\n")
 
     method.batchsize = options.batchsize
-    method.stepsize = options.stepsize_multiplier
+    method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)
     method.reference_grad = zeros(prob.numfeatures)

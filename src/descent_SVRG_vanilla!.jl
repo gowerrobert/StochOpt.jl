@@ -16,11 +16,11 @@ Compute the descent direction (d).
 function descent_SVRG_vanilla!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_vanilla_method, iter::Int64, d::Array{Float64})
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        # println("SVRG outer loop at iteration: ", iter)
+        println("SVRG outer loop at iteration: ", iter)
         method.reference_point[:] = x; # option I: the reference is the last iterate
 
         if prob.numdata > 10000 || prob.numfeatures > 10000
-            if iter==1
+            if iter == 1
                 println("Dimensions are too large too compute the full gradient")
             end
             s = sample(1:prob.numdata, 100, replace=false);
@@ -29,7 +29,7 @@ function descent_SVRG_vanilla!(x::Array{Float64}, prob::Prob, options::MyOptions
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata); # reset reference gradient
         end
 
-        d[:] = -method.reference_grad; # the first iteratation of the inner loop is equivalent to a gradient step
+        d[:] = -method.reference_grad # the first iteration of the inner loop is equivalent to a gradient step because x = reference_point
     else
         ## SVRG inner step
         # println("        SVRG inner loop at iteration: ", iter)
