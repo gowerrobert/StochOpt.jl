@@ -16,7 +16,7 @@ Compute the descent direction (d).
 function descent_SVRG_vanilla!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_vanilla_method, iter::Int64, d::Array{Float64})
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        println("SVRG outer loop at iteration: ", iter)
+        # println("SVRG outer loop at iteration: ", iter)
         method.reference_point[:] = x; # option I: the reference is the last iterate
 
         if prob.numdata > 10000 || prob.numfeatures > 10000

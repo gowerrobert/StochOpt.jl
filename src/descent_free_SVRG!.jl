@@ -16,7 +16,7 @@ Compute the descent direction (d)
 function descent_free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, method::free_SVRG_method, iter::Int64, d::Array{Float64})
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        println("SVRG outer loop at iteration: ", iter)
+        # println("SVRG outer loop at iteration: ", iter)
         if isempty(method.averaging_weights)
             method.reference_point[:] = x; # Reference point set to last iterate iterates x^m
         else

@@ -8,7 +8,7 @@ using Printf
 using LinearAlgebra
 using Statistics
 using Base64
-include("./src/StochOpt.jl")
+include("../src/StochOpt.jl")
 
 ## Path settings
 #region
@@ -76,6 +76,14 @@ sampling = build_sampling("nice", prob.numdata, options)
 options.stepsize_multiplier = -1.0 # Theoretical step size in boot_SVRG_bubeck
 numinneriters = -1 # 20*Lmax/mu
 SVRG_bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
+
+# println("-------------------- WARM UP --------------------")
+# options.max_iter = 3
+# minimizeFunc(prob, SVRG_bubeck, options) # Warm up
+# options.max_iter = 10^8
+# SVRG_bubeck.reset(prob, SVRG_bubeck, options)
+# println("-------------------------------------------------")
+
 output2 = minimizeFunc(prob, SVRG_bubeck, options)
 str_m_2 = @sprintf "%d" SVRG_bubeck.numinneriters
 str_b_2 = @sprintf "%d" SVRG_bubeck.batchsize
@@ -102,5 +110,4 @@ savename = string(savename, "-", "demo_SVRG_algos_nice")
 save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
 pyplot() # gr() pyplot() # pgfplots() #plotly()
-# plot_outputs_Plots(OUTPUTS, prob, options, methodname="demo_SVRG_algos_nice", path=save_path) # Plot and save output
 plot_outputs_Plots(OUTPUTS, prob, options, methodname="demo_SVRG_algos_nice", path=save_path, legendfont=8) # Plot and save output
