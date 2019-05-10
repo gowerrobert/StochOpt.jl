@@ -33,7 +33,7 @@ all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (tru
 using Distributed
 
 @everywhere begin
-    # path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
     path = "/cal/homes/ngazagnadou/StochOpt.jl/"
 
     using JLD
@@ -57,9 +57,9 @@ end
 
 ## Experiments settings
 if all_problems
-    problems = 1:42;
+    problems = 1:42
 else
-    problems = 1:1;
+    problems = 1:1
 end
 
 datasets = collect(Iterators.flatten([fill("gauss-50-24-0.0_seed-1", 4),

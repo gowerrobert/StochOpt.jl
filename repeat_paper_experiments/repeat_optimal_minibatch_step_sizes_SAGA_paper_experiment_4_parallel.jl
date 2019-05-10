@@ -35,7 +35,7 @@ all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (tru
 using Distributed
 
 @everywhere begin
-    # path = "/home/nidham/phd/StochOpt.jl/"; # Change the full path here
+    # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
     path = "/cal/homes/ngazagnadou/StochOpt.jl/"
 
     using JLD
@@ -73,7 +73,7 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 if all_problems
     problems = 1:12;
 else
-    problems = 9:9;
+    problems = 1:1;
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
