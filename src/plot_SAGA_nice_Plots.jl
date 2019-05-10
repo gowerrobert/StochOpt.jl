@@ -227,11 +227,12 @@ Saves the plot of the empirical total complexity.
     - **Int64** b_practical: heuristic optimal mini-batch size\\
     - **Int64** b_empirical: empirical optimal mini-batch size\\
     - **AbstractString** path: path to the folder where the plots are saved\\
+    - **Symbol** legendpos: position of the legend
 #OUTPUTS:\\
     - None
 """
 function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", skip_multiplier::Float64=0.0)
+                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", skip_multiplier::Float64=0.0, legendpos::Symbol=:best)
     numsimu = 1
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
@@ -258,7 +259,7 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
          guidefont=font(fontbig), linewidth=3, grid=false)
         #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
     vline!([b_empirical], line=(:dash, 3), color=:blue, label=labellist[1],
-           legendfont=font(fontbig), legend=:best) #:legend
+           legendfont=font(fontbig), legend=legendpos) #:legend
     #legendtitle="Optimal mini-batch size")
     vline!([b_practical], line=(:dot, 3), color=:red, label=labellist[2])
     savename = "-exp4-empcomplex-$(numsimu)-avg"

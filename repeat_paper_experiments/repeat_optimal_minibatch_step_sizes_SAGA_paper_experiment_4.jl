@@ -158,7 +158,7 @@ for idx_prob in problems
     println("---------------------------------------------------------------------------------------------");
 
     numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path);
+    OUTPUTS, itercomplex = simulate_SAGA_nice(prob, minibatchgrid, options, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path);
 
     ## Checking that all simulations reached tolerance
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];
@@ -186,7 +186,12 @@ for idx_prob in problems
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob]);
+    if idx_prob == 11
+        legendpos = :bottomleft
+    else
+        legendpos = :topleft
+    end
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos)
 
     println("Practical optimal mini-batch = ", b_practical)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
