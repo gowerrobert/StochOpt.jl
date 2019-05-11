@@ -241,7 +241,8 @@ mutable struct Leap_SVRG_method
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
-    stepsize::Float64 # stochastic step size (alpha)
+    stepsize::Float64 # step size
+    stochastic_stepsize::Float64 # stochastic step size (alpha)
     gradient_stepsize::Float64 # step size when updating the full gradient (eta)
     L::Float64 # smoothness constant of the whole objective function f
     Lmax::Float64 # max of the smoothness constant of the f_i functions
@@ -249,6 +250,7 @@ mutable struct Leap_SVRG_method
     expected_residual::Float64 # expected residual
     reference_update_distrib::Bernoulli{Float64} # Bernoulli distribution controlling the frequence of update of the reference point and gradient
     reference_point::Array{Float64}
+    next_reference_point::Array{Float64}
     reference_grad::Array{Float64}
     reset::Function # reset some parameters of the method
     sampling::Sampling # b-nice or independent sampling
