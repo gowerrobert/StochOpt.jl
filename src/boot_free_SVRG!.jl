@@ -15,9 +15,12 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 """
 function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
     n = prob.numdata
-    b = options.batchsize
-    epocsperiter = b/n
-    gradsperiter = b
+
+    ## No deterministic number of computed gradients per iteration because of the inner and outer loop scheme
+    b = sampling.batchsize # deterministic or average mini-batch size
+    epocsperiter = 0
+    gradsperiter = 0
+    number_computed_gradients = 0 # dynamic counter of computed gradients
 
     name = string("Free-SVRG-", sampling.name)
 
@@ -53,7 +56,7 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ;
         averaging_weights = []
     end
 
-    method = free_SVRG_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, b, stepsize, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
+    method = free_SVRG_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, b, stepsize, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
 
     return method
 end
@@ -117,7 +120,7 @@ Reset the Free-SVRG method with b-nice sampling, especially the step size, the p
 function reset_free_SVRG!(prob::Prob, method::free_SVRG_method, options::MyOptions)
     println("\n---- RESET FREE-SVRG ----\n")
 
-    method.batchsize = options.batchsize
+    method.number_computed_gradients = 0
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)

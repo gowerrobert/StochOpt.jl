@@ -152,6 +152,7 @@ mutable struct SVRG_vanilla_method
     ## Ref: Accelerating stochastic gradient descent using predictive variance reduction, R. Johnson and T. Zhang, NIPS (2013)
     epocsperiter::Float64
     gradsperiter::Float64
+    number_computed_gradients::Int64 # counter of computed stochastic gradients
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -171,6 +172,7 @@ mutable struct SVRG_bubeck_method
     ## Ref: Convex optimization: Algorithms and complexity, S. Bubeck, Foundations and Trends in Machine Learning (2015)
     epocsperiter::Float64
     gradsperiter::Float64
+    number_computed_gradients::Int64 # counter of computed stochastic gradients
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -189,6 +191,7 @@ end
 mutable struct free_SVRG_method
     epocsperiter::Float64
     gradsperiter::Float64
+    number_computed_gradients::Int64 # counter of computed stochastic gradients
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -213,6 +216,7 @@ mutable struct L_SVRG_method
     ## Ref: Don't Jump Through Hoops and Remove Those Loops: SVRG and Katyusha are Better Without the Outer Loop, D. Kovalev, S. Horvath and P. Richtarik, arXiv:1901.08689 (2019)
     epocsperiter::Float64
     gradsperiter::Float64
+    number_computed_gradients::Int64 # counter of computed stochastic gradients
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -271,8 +275,9 @@ mutable struct Output
     iterations::Int
     epocsperiter::Float64 #Array{Float64}
     gradsperiter::Float64
+    number_computed_gradients::Int64 # counter of computed stochastic gradients
     times::Array{Float64}
-    fs::Array{Float64}   # recorded function values
+    fs::Array{Float64} # recorded function values
     testerrors::Array{Float64}
     xfinal::Array{Float64}  #The final x of the method
     fail::AbstractString

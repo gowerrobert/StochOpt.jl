@@ -18,9 +18,12 @@ arXiv:1901.08689, 2019.
 """
 function initiate_L_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, reference_update_proba::Float64)
     n = prob.numdata
-    b = sampling.batchsize # sampling instead of options
-    epocsperiter = b/n
-    gradsperiter = b
+
+    ## No deterministic number of computed gradients per iteration because of the inner and outer loop scheme
+    b = sampling.batchsize # deterministic or average mini-batch size
+    epocsperiter = 0
+    gradsperiter = 0
+    number_computed_gradients = 0 # dynamic counter of computed gradients
 
     name = string("L-SVRG-", sampling.name)
 
@@ -47,7 +50,7 @@ function initiate_L_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, ref
     reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
-    method = L_SVRG_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, stepsize, Lmax, reference_update_distrib, reference_point, reference_grad, reset, sampling)
+    method = L_SVRG_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, stepsize, Lmax, reference_update_distrib, reference_point, reference_grad, reset, sampling)
 
     return method
 end
@@ -105,6 +108,7 @@ Reset the Loopless-SVRG, especially the step size, the point and gradient refere
 function reset_L_SVRG!(prob::Prob, method::L_SVRG_method, options::MyOptions)
     println("\n---- RESET LOOPLESS-SVRG ----\n")
 
+    method.number_computed_gradients = 0
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)

@@ -19,9 +19,12 @@ Advances in neural information processing systems. 2013.
 """
 function initiate_SVRG_vanilla(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0)
     n = prob.numdata
-    b = options.batchsize
-    epocsperiter = b/n
-    gradsperiter = b
+
+    ## No deterministic number of computed gradients per iteration because of the inner and outer loop scheme
+    b = sampling.batchsize # deterministic or average mini-batch size
+    epocsperiter = 0
+    gradsperiter = 0
+    number_computed_gradients = 0 # dynamic counter of computed gradients
 
     name = string("SVRG-vanilla-", sampling.name)
 
@@ -44,7 +47,7 @@ function initiate_SVRG_vanilla(prob::Prob, options::MyOptions, sampling::Samplin
     reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
-    method = SVRG_vanilla_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, b, stepsize, Lmax, mu, numinneriters, reference_point, reference_grad, reset, sampling)
+    method = SVRG_vanilla_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, b, stepsize, Lmax, mu, numinneriters, reference_point, reference_grad, reset, sampling)
 
     return method
 end
@@ -103,7 +106,7 @@ Reset the original SVRG method (option I), especially the step size, the point a
 function reset_SVRG_vanilla!(prob::Prob, method::SVRG_vanilla_method, options::MyOptions)
     println("\n---- RESET SVRG VANILLA ----\n")
 
-    method.batchsize = options.batchsize
+    method.number_computed_gradients = 0
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)

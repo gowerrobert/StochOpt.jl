@@ -19,9 +19,12 @@ Foundations and Trends in Machine Learning. 2015.
 """
 function initiate_SVRG_bubeck(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0)
     n = prob.numdata
-    b = options.batchsize
-    epocsperiter = b/n
-    gradsperiter = b
+
+    ## No deterministic number of computed gradients per iteration because of the inner and outer loop scheme
+    b = sampling.batchsize # deterministic or average mini-batch size
+    epocsperiter = 0
+    gradsperiter = 0
+    number_computed_gradients = 0 # dynamic counter of computed gradients
 
     name = string("SVRG-Bubeck-", sampling.name)
 
@@ -48,7 +51,7 @@ function initiate_SVRG_bubeck(prob::Prob, options::MyOptions, sampling::Sampling
     new_reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
-    method = SVRG_bubeck_method(epocsperiter, gradsperiter, name, stepmethod, bootmethod, b, stepsize, Lmax, mu, numinneriters, reference_point, new_reference_point, reference_grad, reset, sampling)
+    method = SVRG_bubeck_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, b, stepsize, Lmax, mu, numinneriters, reference_point, new_reference_point, reference_grad, reset, sampling)
 
     return method
 end
@@ -109,7 +112,7 @@ Reset the original SVRG method (option I), especially the step size, the point a
 function reset_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyOptions)
     println("\n---- RESET SVRG BUBECK ----\n")
 
-    method.batchsize = options.batchsize
+    method.number_computed_gradients = 0
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)

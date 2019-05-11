@@ -75,8 +75,8 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     end
     for iter = 1:options.max_iter
         if iter == 1
-            ## "Warm up" to avoid error on the elpased time at the first iteration of the first launch
-            println("Warm up")
+            ## "Warm up" to avoid error on the elpased time at the first iteration of the first launch: does not work
+            # println("Warm up")
             time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d);
 
             ## Resetting back the method
@@ -87,18 +87,34 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                     return
                 end
             else
-                method = method_input;
-                method.bootmethod(prob, method, options); # SAGA_nice and SVRG_nice implementation
+                method = method_input
+                println("\nIn minimizeFunc number_computed_gradients: ", method.number_computed_gradients)
+                method.reset(prob, method, options)
+                method.bootmethod(prob, method, options) # SAGA_nice and SVRG implementations
+                println("In minimizeFunc number_computed_gradients: ", method.number_computed_gradients,"\n")
             end
             d = zeros(prob.numfeatures); # Search direction vector
             fail = "failed";
         end
-        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d); # mutating function
-        x[:] = x + method.stepsize * d;
+
+        ## Taking a step
+        time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d) # mutating function
+        x[:] = x + method.stepsize * d
+
         # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));
-        timeaccum = timeaccum + time_elapsed; # Keeps track of time accumulated at every iteration
-        if(mod(iter, skip_error_calculation) == 0)
+
+        timeaccum += time_elapsed # Keeps track of time accumulated at every iteration
+
+        ## ERROR: method.epocsperiter is not a constant value for independent sampling since the number or sampled point at each iteration is random
+        ## SOLUTION: monitor the number of computed gradient in the method in an attribute and create an if occursin("inde", sampling.name) clause tcompute the correct number of epochs
+        if method.epocsperiter == 0
+            epochs = method.number_computed_gradients/prob.numdata
+        else
+            epochs = iter*method.epocsperiter
+        end
+
+        if mod(iter, skip_error_calculation) == 0
             fs = [fs prob.f_eval(x, 1:prob.numdata)];
             # println("fs[end] = ", fs[end]);
             if(testprob != nothing) # calculating the test error
@@ -109,13 +125,11 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             # if(options.printiters)   ## printing iterations info
             #     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
             # end
-            if(options.printiters)
-                if(options.exacterror == false)
-                    ## ERROR: method.epocsperiter is not a constant value for independent sampling since the number or sampled point at each iteration is random
-                    ## Solution: monitor the number of computed gradient in the method in an attribute and create an if occursin("inde", sampling.name) clause to compute the correct number of epochs
-                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];
+            if options.printiters
+                if options.exacterror == false
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] epochs times[end]
                 else
-                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) epochs times[end]
                 end
             end
             if options.force_continue == false || stop_at_tol # CHANGE ALL "if var == false" with "if !var"
@@ -170,33 +184,48 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                 skip_decrease = false;
             end
         end # End printing and function evaluation if
-        if(timeaccum > options.max_time || iter*method.epocsperiter > options.max_epocs)
+
+        if timeaccum > options.max_time || epochs > options.max_epocs
             if(timeaccum > options.max_time)
                 fail = "max_time";
-            elseif(iter*method.epocsperiter > options.max_epocs)
+            elseif epochs > options.max_epocs
                 fail = "max_epocs"
             end
             iterations = iter;
             fs = [fs prob.f_eval(x, 1:prob.numdata)];
             if(testprob != nothing)   # calculating the test error
-                testerrors = [testerrors testerror(testprob, x)];
+                testerrors = [testerrors testerror(testprob, x)]
             end
             times = [times timeaccum];
             # if(options.printiters)
-            #     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+            #     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end]
             # end
-            if(options.printiters)
-                if(options.exacterror == false)
-                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] iter*method.epocsperiter times[end];
+            if options.printiters
+                if options.exacterror == false
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] epochs times[end]
                 else
-                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end];
+                    @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) epochs times[end]
                 end
             end
-            break;
+            break
         end
     end # End of For loop
-    outputname = method.name;
+    outputname = method.name
     # output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, options.stepsize_multiplier); #./(f0.-prob.fsol) # old
-    output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, method.stepsize); # taking step size from method not options
+    # output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, method.stepsize); # taking step size from method not options
+
+    ## To change: implementation not satisfying
+    if method.epocsperiter == 0
+        number_computed_gradients = method.number_computed_gradients
+    else
+        number_computed_gradients = -1
+    end
+    # try
+    #     number_computed_gradients = method.number_computed_gradients
+    # catch
+    #     number_computed_gradients = -1
+    # end
+    output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, number_computed_gradients, times, fs, testerrors, x, fail, method.stepsize) # Adding the number of computed gradients
+
     return output
 end

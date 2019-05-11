@@ -22,96 +22,130 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     fontbig = 14;
     xlabeltxt = "epochs";
 
-    # plotting epocs per iteration
+    ## Plotting epochs
     output = OUTPUTS[1];
 
-    # Select the desired number of epochs if "datapassbnd" is gvien
-    truncatefigure = true;
-    if (datapassbnd == 0) # Setting the datapassbnd to the number of datapasses available
-        truncatefigure = false;
-        datapassbnd = output.iterations*output.epocsperiter;
+    if output.epocsperiter == 0
+        number_epochs = output.number_computed_gradients/prob.numdata
+    else
+        number_epochs = output.iterations*output.epocsperiter
     end
-
-    numepochs = output.iterations*output.epocsperiter;
+    # Select the desired number of epochs if "datapassbnd" is gvien
+    truncatefigure = true
+    if datapassbnd == 0 # Setting the datapassbnd to the number of datapasses available
+        truncatefigure = false
+        datapassbnd = number_epochs
+    end
+    # numepochs = output.iterations*output.epocsperiter;
     lf_all = length(output.fs);
-    epochs = (numepochs/(lf_all-1)).*(0:(lf_all-1));
+    epochs = (number_epochs/(lf_all-1)).*(0:(lf_all-1));
 
     rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol); # the relative loss might be negative if we reach a better solution
     fs = output.fs[rel_loss.>0];
     lf = length(fs);
-    bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
+    # bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf))
+    bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf))
+
     plt = plot(epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol),
                xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
                linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont),
                legend=legendpos, markersize=6, linewidth=4, marker=:auto, grid=false)
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
-        if (!truncatefigure) # Setting the datapassbnd to the maximum number of epochs if no truncation is given
-            datapassbnd = output.iterations*output.epocsperiter;
+
+        if output.epocsperiter == 0
+            number_epochs = output.number_computed_gradients/prob.numdata
+        else
+            number_epochs = output.iterations*output.epocsperiter
         end
+        if !truncatefigure # Setting the datapassbnd to the maximum number of epochs if no truncation is given
+            datapassbnd = number_epochs
+        end
+        # numepochs = output.iterations*output.epocsperiter
+        lf_all = length(output.fs)
+        epochs = (number_epochs/(lf_all-1)).*(0:(lf_all-1))
 
-        numepochs = output.iterations*output.epocsperiter;
-        lf_all = length(output.fs);
-        epochs = (numepochs/(lf_all-1)).*(0:(lf_all-1));
-
-        rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol); # the relative loss might be negative if we reach a better solution
-        fs = output.fs[rel_loss.>0];
-        lf = length(fs);
-        bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
+        rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol) # the relative loss might be negative if we reach a better solution
+        fs = output.fs[rel_loss.>0]
+        lf = length(fs)
+        bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf))
         plot!(plt, epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol),
               xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
-              guidefont=font(fontbig), legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto,  grid=false)
+              guidefont=font(fontbig), legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
     end
-    println("$(path)figures/$(probname)-epoc.pdf");
-    savefig(plt, "$(path)figures/$(probname)-epoc.pdf");
+    println("$(path)figures/$(probname)-epoc.pdf")
+    savefig(plt, "$(path)figures/$(probname)-epoc.pdf")
 
     ## Plotting times
-    output = OUTPUTS[1];
-    datapassbnd = output.iterations*output.epocsperiter; # no truncation option available for time
+    output = OUTPUTS[1]
+
+    if output.epocsperiter == 0
+        number_epochs = output.number_computed_gradients/prob.numdata
+    else
+        number_epochs = output.iterations*output.epocsperiter
+    end
+    datapassbnd = number_epochs # no truncation option available for time
     rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
     fs = output.fs[rel_loss.>0];
     lf = length(fs);
-    bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
+    bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf));
     plot(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name,
          linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont),
          legend=legendpos, markersize=6, linewidth=4, marker=:auto, grid=false)
     println(output.name, ": 2^", log(2, output.stepsize_multiplier))
     for jiter=2:length(OUTPUTS)
-        output = OUTPUTS[jiter];
-        datapassbnd = output.iterations*output.epocsperiter;
+        output = OUTPUTS[jiter]
+
+        if output.epocsperiter == 0
+            number_epochs = output.number_computed_gradients/prob.numdata
+        else
+            number_epochs = output.iterations*output.epocsperiter
+        end
+        datapassbnd = number_epochs
         rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
         fs = output.fs[rel_loss.>0];
         lf = length(fs);
-        bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
+        bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf));
         plot!(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
             guidefont=font(fontbig), legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2,output.stepsize_multiplier))
     end
-    println("$(path)figures/$(probname)-time.pdf");
-    savefig("$(path)figures/$(probname)-time.pdf");
-
+    println("$(path)figures/$(probname)-time.pdf")
+    savefig("$(path)figures/$(probname)-time.pdf")
 
     if(!isempty(OUTPUTS[1].testerrors)) # plot test error as well
-        output = OUTPUTS[1];
-        datapassbnd = output.iterations*output.epocsperiter;
+        output = OUTPUTS[1]
+
+        if output.epocsperiter == 0
+            number_epochs = output.number_computed_gradients/prob.numdata
+        else
+            number_epochs = output.iterations*output.epocsperiter
+        end
+        datapassbnd = number_epochs
         lf = length(output.testerrors);
-        bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
+        bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf));
         plot(output.times[1:bnd], output.testerrors[1:bnd], xlabel="time", ylabel="residual", label=string(output.name, "-t"), linestyle=:auto,
              tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont), legend=legendpos, markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2, output.stepsize_multiplier))
         println(output.testerrors[1:bnd])
         for jiter=2:length(OUTPUTS)
-            output = OUTPUTS[jiter];
-            datapassbnd = output.iterations*output.epocsperiter;
+            output = OUTPUTS[jiter]
+
+            if output.epocsperiter == 0
+                number_epochs = output.number_computed_gradients/prob.numdata
+            else
+                number_epochs = output.iterations*output.epocsperiter
+            end
+            datapassbnd = number_epochs
             lf = length(output.testerrors);
-            bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf));
+            bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf));
             plot!(output.times[1:bnd], output.testerrors[1:bnd], xlabel="time", ylabel="residual", label=string(output.name, "-t"), linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig),
                 legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
             println(output.testerrors[1:bnd])
             println(output.name, ": 2^", log(2, output.stepsize_multiplier))
         end
         println(probname)
-        savefig("$(path)figures/$(probname)-t-time.pdf");
+        savefig("$(path)figures/$(probname)-t-time.pdf")
     end
 
     open("$(path)figures/$(probname)-stepsizes.txt", "w") do f
