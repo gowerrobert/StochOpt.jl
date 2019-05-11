@@ -131,7 +131,7 @@ precision = 10.0^(-4)
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---");
     options = set_options(tol=precision, max_iter=10^8, max_epocs=10^8,
-                          max_time=60.0*60.0*5.0,
+                          max_time=60.0*60.0*10.0,
                           skip_error_calculation=10^4,
                           batchsize=1,
                           regularizor_parameter = "normalized",

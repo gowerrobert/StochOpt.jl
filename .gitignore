@@ -34,3 +34,5 @@ outputs/*
 figures/\.directory
 
 \.directory
+tmp/to_delete.jl
+util/warmup.jl
