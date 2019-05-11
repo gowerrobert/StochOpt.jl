@@ -231,6 +231,29 @@ mutable struct L_SVRG_method
     sampling::Sampling # b-nice or independent sampling
 end
 
+mutable struct Leap_SVRG_method
+    ## Leap-SVRG without outer loop but a coin tossing at each iteration to decide whether te reference is updated or not
+    ## The user take a larger step when updating the reference point and gradient
+    ## Ref: Our Title, O. Sebbouh, R. M. Gower and N. Gazagnadou, arXiv:????? (2019)
+    epocsperiter::Float64
+    gradsperiter::Float64
+    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    name::AbstractString
+    stepmethod::Function # /!\ mutating function
+    bootmethod::Function # /!\ mutating function
+    stepsize::Float64 # stochastic step size (alpha)
+    gradient_stepsize::Float64 # step size when updating the full gradient (eta)
+    L::Float64 # smoothness constant of the whole objective function f
+    Lmax::Float64 # max of the smoothness constant of the f_i functions
+    expected_smoothness::Float64 # Expected smoothness constant
+    expected_residual::Float64 # expected residual
+    reference_update_distrib::Bernoulli{Float64} # Bernoulli distribution controlling the frequence of update of the reference point and gradient
+    reference_point::Array{Float64}
+    reference_grad::Array{Float64}
+    reset::Function # reset some parameters of the method
+    sampling::Sampling # b-nice or independent sampling
+end
+
 mutable struct SPIN
     epocsperiter::Float64
     gradsperiter::Float64
@@ -298,8 +321,8 @@ include("samplings.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"]
-recentmethods = ["L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice"]
+allmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"]
+recentmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice"]
 for method in allmethods
     if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function
