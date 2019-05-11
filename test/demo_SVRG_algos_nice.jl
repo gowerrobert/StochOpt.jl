@@ -34,7 +34,7 @@ end
 Random.seed!(1)
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation = 1000, repeat_stepsize_calculation=false)
+options = set_options(max_iter=10^8, max_time=100.0, max_epocs=100, force_continue=true, initial_point="zeros", skip_error_calculation = 1000, repeat_stepsize_calculation=false)
 
 ## Debugging settings
 # options = set_options(max_iter=10^8, max_time=0.005, max_epocs=1, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
@@ -44,7 +44,7 @@ options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continu
 datapath = "./data/"
 data = "australian"
 X, y = loadDataset(datapath, data)
-prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="column-scaling")
+prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-1, scaling="column-scaling")
 
 ## Running methods
 OUTPUTS = [] # list of saved outputs
@@ -57,9 +57,9 @@ numinneriters = 2*prob.numdata # 2*n
 SVRG_vanilla = initiate_SVRG_vanilla(prob, options, sampling, numinneriters=numinneriters)
 
 println("-------------------- WARM UP --------------------")
-options.max_iter = 3
+# options.max_epocs = 10
 minimizeFunc(prob, SVRG_vanilla, options) # Warm up
-options.max_iter = 10^8
+# options.max_epocs = 100
 SVRG_vanilla.reset(prob, SVRG_vanilla, options)
 println("-------------------------------------------------")
 
@@ -77,12 +77,12 @@ options.stepsize_multiplier = -1.0 # Theoretical step size in boot_SVRG_bubeck
 numinneriters = -1 # 20*Lmax/mu
 SVRG_bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
 
-# println("-------------------- WARM UP --------------------")
-# options.max_iter = 3
-# minimizeFunc(prob, SVRG_bubeck, options) # Warm up
-# options.max_iter = 10^8
-# SVRG_bubeck.reset(prob, SVRG_bubeck, options)
-# println("-------------------------------------------------")
+println("-------------------- WARM UP --------------------")
+# options.max_epocs = 10
+minimizeFunc(prob, SVRG_bubeck, options) # Warm up
+# options.max_epocs = 100
+SVRG_bubeck.reset(prob, SVRG_bubeck, options)
+println("-------------------------------------------------")
 
 output2 = minimizeFunc(prob, SVRG_bubeck, options)
 str_m_2 = @sprintf "%d" SVRG_bubeck.numinneriters
