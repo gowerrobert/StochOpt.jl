@@ -86,12 +86,10 @@ function boot_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOption
         else
             println("Manually set gradient step size")
         end
-        method.stepsize = method.gradient_stepsize
     elseif options.stepsize_multiplier == -1.0
         if method.sampling.name == "nice"
             method.stochastic_stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual)) # theoretical optimal value for b-nice sampling
             method.gradient_stepsize = 1/method.L
-            method.stepsize = method.gradient_stepsize
             @printf "Automatically set Leap-SVRG theoretical stochastic step size: %1.3e and gradient step size: %1.3e\n" method.stochastic_stepsize method.gradient_stepsize
         else
             error("No theoretical step size available for Leap-SVRG with this sampling")
@@ -99,6 +97,7 @@ function boot_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOption
     else
         error("Invalid options stepsize")
     end
+    method.stepsize = method.gradient_stepsize # \alpha_0 = \eta
 
     # WARNING: The following if statement does not seem to modify the method that is returned afterwards...
     if options.skip_error_calculation == 0.0
