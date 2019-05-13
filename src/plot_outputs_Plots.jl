@@ -25,24 +25,26 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     ## Plotting epochs
     output = OUTPUTS[1];
 
-    if output.epocsperiter == 0
-        number_epochs = output.number_computed_gradients/prob.numdata
-    else
+    if output.epochs == [0.0]
         number_epochs = output.iterations*output.epocsperiter
+        lf_all = length(output.fs)
+        epochs = (number_epochs/(lf_all-1)).*(0:(lf_all-1))
+    else
+        number_epochs = output.epochs[end]
+        epochs = output.epochs
+        # println("\nIn plot_outputs_Plots output.epochs: ", output.epochs, "\n")
     end
+
     # Select the desired number of epochs if "datapassbnd" is gvien
     truncatefigure = true
     if datapassbnd == 0 # Setting the datapassbnd to the number of datapasses available
         truncatefigure = false
         datapassbnd = number_epochs
     end
-    # numepochs = output.iterations*output.epocsperiter;
-    lf_all = length(output.fs);
-    epochs = (number_epochs/(lf_all-1)).*(0:(lf_all-1));
 
-    rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol); # the relative loss might be negative if we reach a better solution
-    fs = output.fs[rel_loss.>0];
-    lf = length(fs);
+    rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol) # the relative loss might be negative if we reach a better solution
+    fs = output.fs[rel_loss.>0]
+    lf = length(fs)
     # bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf))
     bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf))
 
@@ -53,22 +55,26 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
 
-        if output.epocsperiter == 0
-            number_epochs = output.number_computed_gradients/prob.numdata
-        else
+        if output.epochs == [0.0]
             number_epochs = output.iterations*output.epocsperiter
+            lf_all = length(output.fs)
+            epochs = (number_epochs/(lf_all-1)).*(0:(lf_all-1))
+        else
+            number_epochs = output.epochs[end]
+            epochs = output.epochs
+            # println("\nIn plot_outputs_Plots output.epochs: ", output.epochs, "\n")
         end
+
         if !truncatefigure # Setting the datapassbnd to the maximum number of epochs if no truncation is given
             datapassbnd = number_epochs
         end
-        # numepochs = output.iterations*output.epocsperiter
-        lf_all = length(output.fs)
-        epochs = (number_epochs/(lf_all-1)).*(0:(lf_all-1))
 
         rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol) # the relative loss might be negative if we reach a better solution
         fs = output.fs[rel_loss.>0]
         lf = length(fs)
+        # bnd = convert(Int64, min(ceil(datapassbnd*lf/(output.iterations*output.epocsperiter)), lf))
         bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf))
+
         plot!(plt, epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol),
               xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
               guidefont=font(fontbig), legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
@@ -79,10 +85,10 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     ## Plotting times
     output = OUTPUTS[1]
 
-    if output.epocsperiter == 0
-        number_epochs = output.number_computed_gradients/prob.numdata
-    else
+    if output.epochs == [0.0]
         number_epochs = output.iterations*output.epocsperiter
+    else
+        number_epochs = output.epochs[end]
     end
     datapassbnd = number_epochs # no truncation option available for time
     rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
@@ -96,10 +102,10 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     for jiter=2:length(OUTPUTS)
         output = OUTPUTS[jiter]
 
-        if output.epocsperiter == 0
-            number_epochs = output.number_computed_gradients/prob.numdata
-        else
+        if output.epochs == [0.0]
             number_epochs = output.iterations*output.epocsperiter
+        else
+            number_epochs = output.epochs[end]
         end
         datapassbnd = number_epochs
         rel_loss = (output.fs.-prob.fsol)./(output.fs[1].-prob.fsol);
@@ -113,13 +119,14 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     println("$(path)figures/$(probname)-time.pdf")
     savefig("$(path)figures/$(probname)-time.pdf")
 
-    if(!isempty(OUTPUTS[1].testerrors)) # plot test error as well
+    ## Plot test error as well
+    if(!isempty(OUTPUTS[1].testerrors))
         output = OUTPUTS[1]
 
-        if output.epocsperiter == 0
-            number_epochs = output.number_computed_gradients/prob.numdata
-        else
+        if output.epochs == [0.0]
             number_epochs = output.iterations*output.epocsperiter
+        else
+            number_epochs = output.epochs[end]
         end
         datapassbnd = number_epochs
         lf = length(output.testerrors);
@@ -131,10 +138,10 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         for jiter=2:length(OUTPUTS)
             output = OUTPUTS[jiter]
 
-            if output.epocsperiter == 0
-                number_epochs = output.number_computed_gradients/prob.numdata
-            else
+            if output.epochs == [0.0]
                 number_epochs = output.iterations*output.epocsperiter
+            else
+                number_epochs = output.epochs[end]
             end
             datapassbnd = number_epochs
             lf = length(output.testerrors);

@@ -18,41 +18,42 @@ function descent_Leap_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         flipped_coin = rand(method.reference_update_distrib)
     end
 
+    gradient_counter = 0 # number of stochastic gradients computed during this iteration
+
     ## Initialization
     if iter == 1
         println("Initialization of the reference point and gradient")
         method.reference_point[:] = x # initialize reference point
 
         # update reference gradient: mu = \nabla f(w^0)
-        if prob.numdata > 10000 || prob.numfeatures > 10000
+        if prob.numdata > 10^8 || prob.numfeatures > 10^8
             println("Dimensions are too large too compute the full gradient")
             sampled_indices = sample(1:prob.numdata, 100, replace=false)
-            method.reference_grad[:] = prob.g_eval(method.reference_point, sampled_indices) # initialize stochastic reference gradient
-            method.number_computed_gradients += 100
+            gradient_counter += 100
         else
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # initialize full reference gradient
-            method.number_computed_gradients += prob.numdata
+            gradient_counter += prob.numdata
         end
 
         # method.stepsize = method.gradient_stepsize # \alpha_0 = \eta, should already be set in boot
     ## Stochastic update of the reference and the step size
     elseif flipped_coin
-        println("Update the reference point, gradient and step size")
+        # println("Update the reference point, gradient and step size")
         method.reference_point[:] = x # update reference point: w^{k+1} = x^{k+1}
 
         # update reference gradient: mu = \nabla f(w^{k+1})
-        if prob.numdata > 10000 || prob.numfeatures > 10000
+        if prob.numdata > 10^8 || prob.numfeatures > 10^8
             sampled_indices = sample(1:prob.numdata, 100, replace=false)
             method.reference_grad[:] = prob.g_eval(method.reference_point, sampled_indices) # update stochastic reference gradient
-            method.number_computed_gradients += 100
+            gradient_counter += 100
         else
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # update full reference gradient
-            method.number_computed_gradients += prob.numdata
+            gradient_counter += prob.numdata
         end
 
         method.stepsize = method.gradient_stepsize # \alpha_{k+1} = \eta
     else
-        println("Update only the step size")
+        # println("Update only the step size")
         method.stepsize = method.stochastic_stepsize # \alpha_{k+1} = \alpha
     end
 
@@ -62,7 +63,13 @@ function descent_Leap_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
     if isempty(sampled_indices) # if no point is sampled
         d[:] = -method.reference_grad
     else
+        if norm(x-method.reference_point) < 1e-3
+            println("x = ref point")
+        end
         d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
     end
-    method.number_computed_gradients += 2*length(sampled_indices)
+    gradient_counter += 2*length(sampled_indices)
+
+    ## Monitoring the number of computed gradient during this iteration
+    method.number_computed_gradients = [method.number_computed_gradients method.number_computed_gradients[end] + gradient_counter]
 end

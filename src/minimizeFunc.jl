@@ -40,6 +40,9 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     end
     # println("---> fsol set (", prob.fsol, ")")
 
+    # Initiate the epochs vector
+    output_epochs = Float64[0.0]
+
     # load a pre-calculated best  solution
     # println("size of X: ", size(X), " ", "prob.numdata ",prob.numdata, " length(1:prob.numdata): ",length(1:prob.numdata) )
     f0 = prob.f_eval(x, 1:prob.numdata);
@@ -106,16 +109,17 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
 
         timeaccum += time_elapsed # Keeps track of time accumulated at every iteration
 
-        ## ERROR: method.epocsperiter is not a constant value for independent sampling since the number or sampled point at each iteration is random
-        ## SOLUTION: monitor the number of computed gradient in the method in an attribute and create an if occursin("inde", sampling.name) clause tcompute the correct number of epochs
+        # Monitor the number of computed gradient in an attribute of the method
+        # if clause to compute the correct number of epochs
         if method.epocsperiter == 0
-            epochs = method.number_computed_gradients/prob.numdata
+            epochs = method.number_computed_gradients[end]/prob.numdata
         else
             epochs = iter*method.epocsperiter
         end
 
         if mod(iter, skip_error_calculation) == 0
-            fs = [fs prob.f_eval(x, 1:prob.numdata)];
+            output_epochs = [output_epochs epochs] # saves the epochs at which the error is computed
+            fs = [fs prob.f_eval(x, 1:prob.numdata)]
             # println("fs[end] = ", fs[end]);
             if(testprob != nothing) # calculating the test error
                 testerrors = [testerrors testerror(testprob, x)];
@@ -191,8 +195,9 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             elseif epochs > options.max_epocs
                 fail = "max_epocs"
             end
-            iterations = iter;
-            fs = [fs prob.f_eval(x, 1:prob.numdata)];
+            iterations = iter
+            output_epochs = [output_epochs epochs] # saves the epochs at which the error is computed
+            fs = [fs prob.f_eval(x, 1:prob.numdata)]
             if(testprob != nothing)   # calculating the test error
                 testerrors = [testerrors testerror(testprob, x)]
             end
@@ -201,6 +206,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             #     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end]
             # end
             if options.printiters
+                println("\n-------------------------------- End of minimization ---------------------------------")
                 if options.exacterror == false
                     @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] epochs times[end]
                 else
@@ -214,18 +220,11 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     # output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, options.stepsize_multiplier); #./(f0.-prob.fsol) # old
     # output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, times, fs, testerrors, x, fail, method.stepsize); # taking step size from method not options
 
-    ## To change: implementation not satisfying
-    if method.epocsperiter == 0
-        number_computed_gradients = method.number_computed_gradients
-    else
-        number_computed_gradients = -1
+    if occursin("Leap-SVRG", method.name)
+        # reseting method step size to stochastic step size because the gradient step size is always 1/L
+        method.stepsize = method.stochastic_stepsize
     end
-    # try
-    #     number_computed_gradients = method.number_computed_gradients
-    # catch
-    #     number_computed_gradients = -1
-    # end
-    output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, number_computed_gradients, times, fs, testerrors, x, fail, method.stepsize) # Adding the number of computed gradients
+    output = Output(outputname, iterations, method.epocsperiter, method.gradsperiter, output_epochs, times, fs, testerrors, x, fail, method.stepsize) # Adding the number of computed gradients
 
     return output
 end

@@ -237,7 +237,7 @@ mutable struct Leap_SVRG_method
     ## Ref: Our Title, O. Sebbouh, R. M. Gower and N. Gazagnadou, arXiv:????? (2019)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -250,7 +250,6 @@ mutable struct Leap_SVRG_method
     expected_residual::Float64 # expected residual
     reference_update_distrib::Bernoulli{Float64} # Bernoulli distribution controlling the frequence of update of the reference point and gradient
     reference_point::Array{Float64}
-    next_reference_point::Array{Float64}
     reference_grad::Array{Float64}
     reset::Function # reset some parameters of the method
     sampling::Sampling # b-nice or independent sampling
@@ -300,7 +299,7 @@ mutable struct Output
     iterations::Int
     epocsperiter::Float64 #Array{Float64}
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    epochs::Array{Float64} # epochs at which the error is computed if epocsperiter and gradsperiter are not constant
     times::Array{Float64}
     fs::Array{Float64} # recorded function values
     testerrors::Array{Float64}

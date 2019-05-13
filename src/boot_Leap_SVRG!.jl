@@ -23,7 +23,7 @@ function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, 
     b = sampling.batchsize # deterministic or average mini-batch size
     epocsperiter = 0
     gradsperiter = 0
-    number_computed_gradients = 0 # dynamic counter of computed gradients
+    number_computed_gradients = Int64[0] # dynamic table of the number of computed gradients at each iteration
 
     name = string("Leap-SVRG-", sampling.name)
 
@@ -53,10 +53,9 @@ function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, 
     end
 
     reference_point = zeros(prob.numfeatures)
-    next_reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
-    method = Leap_SVRG_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, stepsize, stochastic_stepsize, gradient_stepsize, L, Lmax, expected_smoothness, expected_residual, reference_update_distrib, reference_point, next_reference_point, reference_grad, reset, sampling)
+    method = Leap_SVRG_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, stepsize, stochastic_stepsize, gradient_stepsize, L, Lmax, expected_smoothness, expected_residual, reference_update_distrib, reference_point, reference_grad, reset, sampling)
 
     return method
 end
@@ -87,12 +86,12 @@ function boot_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOption
             println("Manually set gradient step size")
         end
     elseif options.stepsize_multiplier == -1.0
-        if method.sampling.name == "nice"
+        if occursin("nice", method.sampling.name)
             method.stochastic_stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual)) # theoretical optimal value for b-nice sampling
             method.gradient_stepsize = 1/method.L
             @printf "Automatically set Leap-SVRG theoretical stochastic step size: %1.3e and gradient step size: %1.3e\n" method.stochastic_stepsize method.gradient_stepsize
         else
-            error("No theoretical step size available for Leap-SVRG with this sampling")
+            error("No theoretical step sizes available for Leap-SVRG with this sampling")
         end
     else
         error("Invalid options stepsize")
@@ -123,10 +122,9 @@ Reset the Loopless-SVRG, especially the step size, the point and gradient refere
 function reset_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOptions)
     println("\n---- RESET LEAP-SVRG ----\n")
 
-    method.number_computed_gradients = 0
+    method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)
-    method.next_reference_point = zeros(prob.numfeatures)
     method.reference_grad = zeros(prob.numfeatures)
 end
