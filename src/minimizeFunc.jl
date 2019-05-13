@@ -91,10 +91,10 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                 end
             else
                 method = method_input
-                println("\nIn minimizeFunc number_computed_gradients: ", method.number_computed_gradients)
+                # println("\nIn minimizeFunc number_computed_gradients: ", method.number_computed_gradients) # for debugging SVRG codes
                 method.reset(prob, method, options)
                 method.bootmethod(prob, method, options) # SAGA_nice and SVRG implementations
-                println("In minimizeFunc number_computed_gradients: ", method.number_computed_gradients,"\n")
+                # println("In minimizeFunc number_computed_gradients: ", method.number_computed_gradients,"\n") # for debugging SVRG codes
             end
             d = zeros(prob.numfeatures); # Search direction vector
             fail = "failed";
@@ -206,7 +206,6 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             #     @printf "  %8.0d  |           %5.2f           |  %7.2f  |  %8.4f  |\n" iter 100*(fs[end]-prob.fsol)/(f0-prob.fsol) iter*method.epocsperiter times[end]
             # end
             if options.printiters
-                println("\n-------------------------------- End of minimization ---------------------------------")
                 if options.exacterror == false
                     @printf "  %8.0d  |           %5.20f           |  %7.2f  |  %8.4f  |\n" iter fs[end] epochs times[end]
                 else
