@@ -20,7 +20,7 @@ function  logistic_hessv!(X, y::Array{Float64}, w::Array{Float64}, v::Array{Floa
 end
 
 function  logistic_hessvv(X, y::Array{Float64}, w::Array{Float64}, v::Array{Float64})
-    # Hessian-vector product of logisitc function.
+    # Hessian-vector-vector product of logisitc function.
     # remember! y_i^2 =1, and that is why y_i^2 terms do not appear.
     Xx  = X'*w;
     yXx = y.*Xx;
