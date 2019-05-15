@@ -54,7 +54,7 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
             idx_weights = iter % method.numinneriters; # for i = 1, ..., m-1
         end
         # println("        idx weights: ", idx_weights)
-        method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x;
+        method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x
     end
 
     ## Sampling method
