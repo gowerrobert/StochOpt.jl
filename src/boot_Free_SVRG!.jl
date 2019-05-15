@@ -37,13 +37,17 @@ function initiate_Free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ;
     expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L
     expected_residual = ((n-b)/(b*(n-1)))*Lmax
 
-    if numinneriters == -1
-        if occursin("nice", sampling.name)
-            numinneriters = floor(Int, (expected_smoothness + 2*expected_residual) / mu) # theoretical optimal value for b-nice sampling
-        else
-            error("No theoretical inner loop size available for Free-SVRG with this sampling")
-        end
-    elseif numinneriters < -1 || numinneriters == 0
+    # if numinneriters == -1
+    #     if occursin("nice", sampling.name)
+    #         numinneriters = floor(Int, (expected_smoothness + 2*expected_residual) / mu) # theoretical optimal value for b-nice sampling
+    #     else
+    #         error("No theoretical inner loop size available for Free-SVRG with this sampling")
+    #     end
+    # elseif numinneriters < -1 || numinneriters == 0
+    #     error("Invalid inner loop size")
+    # end
+
+    if numinneriters < 1
         error("Invalid inner loop size")
     end
 
@@ -92,6 +96,8 @@ function boot_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOption
     if !isempty(method.averaging_weights)
         averaging_weights = [(1-method.stepsize*method.mu)^(method.numinneriters-1-t) for t in 0:(method.numinneriters-1)]
         method.averaging_weights = averaging_weights ./ sum(averaging_weights)
+
+        println("Sanity check: weights sum to 1 ? ---> ", sum(method.averaging_weights))
     end
     # println("Averaging weights")
     # println(method.averaging_weights)
