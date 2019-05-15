@@ -16,6 +16,9 @@ Compute the descent direction (d).
 function descent_SVRG_bubeck!(x::Array{Float64}, prob::Prob, options::MyOptions, method::SVRG_bubeck_method, iter::Int64, d::Array{Float64})
     gradient_counter = 0 # number of stochastic gradients computed during this iteration
 
+    # println("ref point norm: ", norm(method.reference_point))
+    # println("new ref point norm / m: ", norm(method.new_reference_point ./ method.numinneriters))
+
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
         println("\n\nSVRG outer loop at iteration: ", iter)
