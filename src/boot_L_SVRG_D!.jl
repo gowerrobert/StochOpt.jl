@@ -13,7 +13,7 @@ Initiate the Loopless-SVRG-Decreasing method.
 
 # REFERENCES
 __Our Title__\\
-Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
+Francis Bach, Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
 arXiv:??????, 2019
 """
 function initiate_L_SVRG_D(prob::Prob, options::MyOptions, sampling::Sampling, reference_update_proba::Float64)

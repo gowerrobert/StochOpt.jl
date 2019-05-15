@@ -32,6 +32,10 @@ function descent_L_SVRG_D!(x::Array{Float64}, prob::Prob, options::MyOptions, me
         end
     end
 
+    if norm(x - method.reference_point) < 1e-7
+        println("iter: ", iter, ", x = ref point")
+    end
+
     ## Sampling method
     sampled_indices = method.sampling.sampleindices(method.sampling)
     # println("sampled_indices: ", sampled_indices)
@@ -58,7 +62,7 @@ function descent_L_SVRG_D!(x::Array{Float64}, prob::Prob, options::MyOptions, me
         end
 
         ## Decrease the step size
-        method.stepsize = sqrt(1-method.reference_update_proba)*method.stepsize
+        method.stepsize *= sqrt(1-method.reference_update_proba)
     end
 
     ## Monitoring the number of computed gradient during this iteration

@@ -42,8 +42,8 @@ options = set_options(max_iter=10^8, max_time=10000.0, max_epocs=30, initial_poi
 
 ## Load problem
 datapath = "./data/"
-data = "australian"     # n =     690, d = 22
-# data = "ijcnn1_full"    # n = 141,691, d =
+# data = "australian"     # n =     690, d = 22
+data = "ijcnn1_full"    # n = 141,691, d =
 # data = "covtype_binary" # n = 581,012, d = 55
 X, y = loadDataset(datapath, data)
 prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="column-scaling")
@@ -51,8 +51,8 @@ prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="co
 ## Running methods
 OUTPUTS = [] # list of saved outputs
 
-# proba_grid = [1.0, 0.8, 0.5, 0.2, 0.0]
-proba_grid = [1.0, 0.8, 0.05, 0.01]
+proba_grid = [0.01, 0.008, 0.004, 0.001]
+# proba_grid = [1.0, 0.8, 0.05, 0.01]
 # skip_errors = [1000, 100, 10, 5, 1]
 # proba_grid = [0.0, 1.0]
 # proba_grid = [1.0] # full gradient descent

@@ -35,7 +35,7 @@ Random.seed!(1)
 
 ## Basic parameters and options for solvers
 # options = set_options(max_iter=10^8, max_time=10000.0, max_epocs=50, force_continue=false, initial_point="zeros", skip_error_calculation=1000)
-options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=3, force_continue=false, initial_point="zeros", skip_error_calculation=100)
+options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=10, force_continue=false, initial_point="zeros", skip_error_calculation=1)
 
 ## Load problem
 datapath = "./data/"
@@ -50,6 +50,7 @@ OUTPUTS = []  # List of saved outputs
 ## nice sampling with p = 1/n
 options.batchsize = 1
 sampling = build_sampling("nice", prob.numdata, options)
+# proba_1 = 0.1
 proba_1 = 1/prob.numdata
 L_SVRG_D_1 = initiate_L_SVRG_D(prob, options, sampling, proba_1)
 options.stepsize_multiplier = -1.0 # Theoretical step size in boot_L_SVRG_D

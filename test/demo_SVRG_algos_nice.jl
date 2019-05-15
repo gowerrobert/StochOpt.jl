@@ -37,7 +37,7 @@ Random.seed!(1)
 # options = set_options(max_iter=10^8, max_time=100.0, max_epocs=20, initial_point="zeros", skip_error_calculation = 1000)
 
 ## Debugging settings
-options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=2, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
+options = set_options(max_iter=25, max_time=10.0^5, max_epocs=20, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
 # numinneriters = 5
 
 ## Load problem
@@ -76,7 +76,8 @@ OUTPUTS = [] # list of saved outputs
 options.batchsize = 1
 sampling = build_sampling("nice", prob.numdata, options)
 options.stepsize_multiplier = -1.0 # Theoretical step size in boot_SVRG_bubeck
-numinneriters = -1 # 20*Lmax/mu
+# numinneriters = -1 # 20*Lmax/mu
+numinneriters = 5
 bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
 
 # println("-------------------- WARM UP --------------------")

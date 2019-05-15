@@ -54,7 +54,7 @@ using Distributed
     pyplot() # No problem with pyplot when called in @everywhere statement
 end
 
-save_path = "$(path)experiments/sharp_SVRG/exp1a/";
+save_path = "$(path)experiments/free_leap_SVRG/exp1a/";
 # Create saving directories if not existing
 if !isdir("$(save_path)data/")
     mkdir("$(save_path)data/")

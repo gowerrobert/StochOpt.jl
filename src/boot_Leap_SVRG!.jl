@@ -13,7 +13,7 @@ Initiate the Loopless-SVRG method.
 
 # REFERENCES
 __Our Title__\\
-Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
+Francis Bach, Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
 arXiv:??????, 2019
 """
 function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, reference_update_proba::Float64 ; stochastic_stepsize::Float64=0.0, gradient_stepsize::Float64=0.0)
@@ -34,7 +34,7 @@ function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, 
     L = prob.L
     Lmax = prob.Lmax
 
-    if occursin("nice", method.sampling.name)
+    if occursin("nice", sampling.name)
         expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L
         expected_residual = ((n-b)/(b*(n-1)))*Lmax
     else

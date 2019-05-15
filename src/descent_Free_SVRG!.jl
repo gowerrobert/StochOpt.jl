@@ -60,7 +60,12 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
     ## Sampling method
     sampled_indices = method.sampling.sampleindices(method.sampling)
     # println("sampled_indices: ", sampled_indices)
-    if isempty(sampled_indices) # if no point is sampled
+
+    if norm(x - method.reference_point) < 1e-7
+        println("iter: ", iter, ", x = ref point")
+    end
+
+    if iter == 1 || isempty(sampled_indices) # if no point is sampled
         d[:] = -method.reference_grad
     else
         d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad

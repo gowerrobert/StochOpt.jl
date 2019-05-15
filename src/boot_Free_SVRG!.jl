@@ -15,7 +15,7 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 
 # REFERENCES
 __Our Title__\\
-Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
+Francis Bach, Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
 arXiv:??????, 2019
 """
 function initiate_Free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
