@@ -20,11 +20,12 @@ function descent_SVRG_bubeck!(x::Array{Float64}, prob::Prob, options::MyOptions,
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
         println("\n\nSVRG outer loop at iteration: ", iter)
         if iter == 1
-            method.reference_point[:] = x # Reference point set to initial point x_0^m
+            method.reference_point[:] = x # Reference point and initial point x_0^m are equal
         else
             method.reference_point[:] = method.new_reference_point ./ method.numinneriters # Reference point set to the average of iterates from x^0 to x^{m-1}
+            x[:] = method.reference_point # Current point set to the reference x_{s+1}^0 <- w_s
         end
-        method.new_reference_point[:] = x
+        method.new_reference_point[:] = x # Starting the new sum on the fly by adding x_{s+1}^0
 
         if prob.numdata > 10^8 || prob.numfeatures > 10^8
             if iter == 1
@@ -38,6 +39,10 @@ function descent_SVRG_bubeck!(x::Array{Float64}, prob::Prob, options::MyOptions,
             gradient_counter += prob.numdata
         end
 
+        if norm(x - method.reference_point) < 1e-7
+            println("Outerloop, iter: ", iter, ", x = ref point")
+        end
+
         d[:] = -method.reference_grad # the first iteration of the inner loop is equivalent to a gradient step because x = reference_point
     else
         ## SVRG inner step
@@ -47,6 +52,11 @@ function descent_SVRG_bubeck!(x::Array{Float64}, prob::Prob, options::MyOptions,
         ## Sampling method
         sampled_indices = method.sampling.sampleindices(method.sampling)
         # println("sampled_indices: ", sampled_indices)
+
+        if norm(x - method.reference_point) < 1e-7
+            println("Innerloop, iter: ", iter, ", x = ref point")
+        end
+
         if isempty(sampled_indices) # if no point is sampled
             d[:] = -method.reference_grad
         else
