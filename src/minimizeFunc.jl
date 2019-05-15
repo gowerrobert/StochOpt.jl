@@ -143,7 +143,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
                     break;
                 end
             end
-            if(options.force_continue == false)
+            if options.force_continue == false
                 # if((fs[end]-prob.fsol)/(f0-prob.fsol) < options.tol)
                 #     fail = "tol-reached";
                 #     iterations = iter;

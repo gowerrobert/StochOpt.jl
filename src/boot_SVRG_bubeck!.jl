@@ -24,7 +24,7 @@ function initiate_SVRG_bubeck(prob::Prob, options::MyOptions, sampling::Sampling
     b = sampling.batchsize # deterministic or average mini-batch size
     epocsperiter = 0
     gradsperiter = 0
-    number_computed_gradients = 0 # dynamic counter of computed gradients
+    number_computed_gradients = Int64[0] # dynamic table of the number of computed gradients at each iteration
 
     name = string("SVRG-Bubeck-", sampling.name)
 
@@ -112,7 +112,7 @@ Reset the original SVRG method (option I), especially the step size, the point a
 function reset_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyOptions)
     println("\n---- RESET SVRG BUBECK ----\n")
 
-    method.number_computed_gradients = 0
+    method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)

@@ -92,15 +92,15 @@ output2.name = latexstring("$(output2.name) \$(m^* = $str_m_2, b = $str_b_2 , \\
 OUTPUTS = [OUTPUTS; output2]
 
 ## Free-SVRG with b-nice sampling (m = m^*, b = b^*, step size = gamma^*)
-options.batchsize = optimal_minibatch_free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
 sampling = build_sampling("nice", prob.numdata, options)
-options.stepsize_multiplier = -1.0 # Theoretical step size in boot_free_SVRG
+options.stepsize_multiplier = -1.0 # Theoretical step size in boot_Free_SVRG
 numinneriters = -1 # (\cL + 2\rho)/mu
-free_SVRG = initiate_free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
-output3 = minimizeFunc(prob, free_SVRG, options)
-str_m_3 = @sprintf "%d" free_SVRG.numinneriters
-str_b_3 = @sprintf "%d" free_SVRG.batchsize
-str_step_3 = @sprintf "%.2e" free_SVRG.stepsize
+Free_SVRG = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+output3 = minimizeFunc(prob, Free_SVRG, options)
+str_m_3 = @sprintf "%d" Free_SVRG.numinneriters
+str_b_3 = @sprintf "%d" Free_SVRG.batchsize
+str_step_3 = @sprintf "%.2e" Free_SVRG.stepsize
 output3.name = latexstring("$(output3.name) \$(m^* = $str_m_3, b^* = $str_b_3 , \\gamma^* = $str_step_3)\$")
 OUTPUTS = [OUTPUTS; output3]
 

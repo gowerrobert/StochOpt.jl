@@ -152,7 +152,7 @@ mutable struct SVRG_vanilla_method
     ## Ref: Accelerating stochastic gradient descent using predictive variance reduction, R. Johnson and T. Zhang, NIPS (2013)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -172,7 +172,7 @@ mutable struct SVRG_bubeck_method
     ## Ref: Convex optimization: Algorithms and complexity, S. Bubeck, Foundations and Trends in Machine Learning (2015)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -188,10 +188,10 @@ mutable struct SVRG_bubeck_method
     sampling::Sampling # b-nice or independent sampling
 end
 
-mutable struct free_SVRG_method
+mutable struct Free_SVRG_method
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -216,7 +216,7 @@ mutable struct L_SVRG_method
     ## Ref: Don't Jump Through Hoops and Remove Those Loops: SVRG and Katyusha are Better Without the Outer Loop, D. Kovalev, S. Horvath and P. Richtarik, arXiv:1901.08689 (2019)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -322,8 +322,8 @@ include("samplings.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"]
-recentmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice"]
+allmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "Free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"]
+recentmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "Free_SVRG", "SVRG_vanilla", "SAGA_nice"]
 for method in allmethods
     if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function
@@ -348,6 +348,6 @@ include("../util/power_iteration.jl")
 #Additional
 include("BFGS_update!.jl")
 include("calculate_SAGA_rates_and_complexities.jl")
-include("free_SVRG_settings.jl")
+include("Free_SVRG_settings.jl")
 include("get_saved_stepsize.jl")
 # include("../tmp/parallel_minimizeFunc_grid_stepsize.jl")

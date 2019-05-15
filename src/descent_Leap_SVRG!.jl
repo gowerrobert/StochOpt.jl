@@ -14,11 +14,11 @@ Compute the descent direction (d).
 - **NONE**
 """
 function descent_Leap_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, method::Leap_SVRG_method, iter::Int64, d::Array{Float64})
+    gradient_counter = 0 # number of stochastic gradients computed during this iteration
+
     if iter > 1
         flipped_coin = rand(method.reference_update_distrib)
     end
-
-    gradient_counter = 0 # number of stochastic gradients computed during this iteration
 
     ## Initialization
     if iter == 1
@@ -63,7 +63,7 @@ function descent_Leap_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
     if isempty(sampled_indices) # if no point is sampled
         d[:] = -method.reference_grad
     else
-        if norm(x-method.reference_point) < 1e-3
+        if norm(x - method.reference_point) < 1e-7
             println("x = ref point")
         end
         d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad

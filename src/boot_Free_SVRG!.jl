@@ -1,5 +1,5 @@
 """
-    initiate_free_SVRG(prob, options ; numinneriters=0, averaged_reference_point=false)
+    initiate_Free_SVRG(prob, options ; numinneriters=0, averaged_reference_point=false)
 
 Initiate the Free-SVRG method for b-nice sampling.
 It uniformly picks b data points out of n at each iteration to build an estimate of the gradient.
@@ -11,22 +11,22 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 - **Int64** numinneriters: size of the inner loop (theoretical value m^* if set to -1, number of data samples n if set to 0)
 - **Bool** averaged_reference_point: select if the reference point is an average of the iterates of the inner loop or the last one
 # OUTPUTS
-- **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`
+- **Free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_Free_SVRG`
 """
-function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
+function initiate_Free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
     n = prob.numdata
 
     ## No deterministic number of computed gradients per iteration because of the inner and outer loop scheme
     b = sampling.batchsize # deterministic or average mini-batch size
     epocsperiter = 0
     gradsperiter = 0
-    number_computed_gradients = 0 # dynamic counter of computed gradients
+    number_computed_gradients = Int64[0] # dynamic table of the number of computed gradients at each iteration
 
     name = string("Free-SVRG-", sampling.name)
 
-    stepmethod = descent_free_SVRG!
-    bootmethod = boot_free_SVRG!
-    reset = reset_free_SVRG!
+    stepmethod = descent_Free_SVRG!
+    bootmethod = boot_Free_SVRG!
+    reset = reset_Free_SVRG!
 
     stepsize = 0.0
 
@@ -56,25 +56,25 @@ function initiate_free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ;
         averaging_weights = []
     end
 
-    method = free_SVRG_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, b, stepsize, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
+    method = Free_SVRG_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, b, stepsize, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
 
     return method
 end
 
 
 """
-    boot_free_SVRG!(prob, method, options)
+    boot_Free_SVRG!(prob, method, options)
 
-Modify the method to set the stepsize based on the smoothness constants of the problem stored in **free\\_SVRG\\_method** and possibly sets the number of skipped error calculation if not specfied such that 30 points are to be plotted.
+Modify the method to set the stepsize based on the smoothness constants of the problem stored in **Free\\_SVRG\\_method** and possibly sets the number of skipped error calculation if not specfied such that 30 points are to be plotted.
 
 # INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
-- **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`
+- **Free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_Free_SVRG`
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
 # OUTPUTS
 - **NONE**
 """
-function boot_free_SVRG!(prob::Prob, method::free_SVRG_method, options::MyOptions)
+function boot_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOptions)
     if options.stepsize_multiplier > 0.0
         println("Manually set step size")
         method.stepsize = options.stepsize_multiplier
@@ -106,21 +106,21 @@ end
 
 
 """
-    reset_free_SVRG(prob, method, options)
+    reset_Free_SVRG(prob, method, options)
 
 Reset the Free-SVRG method with b-nice sampling, especially the step size, the point and gradient reference.
 
 # INPUTS
 - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...
-- **free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_free_SVRG`
+- **Free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_Free_SVRG`
 - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...
 # OUTPUTS
 - **NONE**
 """
-function reset_free_SVRG!(prob::Prob, method::free_SVRG_method, options::MyOptions)
+function reset_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOptions)
     println("\n---- RESET FREE-SVRG ----\n")
 
-    method.number_computed_gradients = 0
+    method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)
