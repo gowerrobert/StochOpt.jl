@@ -39,12 +39,12 @@ Random.seed!(1)
 
 ## Settings to monitor leaping (error computed at each iteration, very few epochs)
 # options = set_options(max_iter=20, max_time=10.0^8, max_epocs=10^8, initial_point="zeros", skip_error_calculation = 1)
-options = set_options(max_iter=10^8, max_time=10.0^8, max_epocs=10, initial_point="zeros", skip_error_calculation = 5000, repeat_stepsize_calculation=true)
+options = set_options(max_iter=10^8, max_time=10.0^8, max_epocs=10, initial_point="zeros", skip_error_calculation = 5000, repeat_stepsize_calculation=true, rep_number=3)
 
 ## Load problem
 datapath = "./data/"
-# data = "australian"     # n =     690, d = 22
-data = "ijcnn1_full"    # n = 141,691, d =
+# data = "australian"     # n =     690, d = 15
+data = "ijcnn1_full"    # n = 141,691, d = 23
 # data = "covtype_binary" # n = 581,012, d = 55
 X, y = loadDataset(datapath, data)
 prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="column-scaling")

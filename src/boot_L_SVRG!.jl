@@ -14,11 +14,9 @@ Initiate the Loopless-SVRG method.
 # REFERENCES
 __Don't Jump Through Hoops and Remove Those Loops: SVRG and Katyusha are Better Without the Outer Loop__\\
 Dmitry Kovalev, Samuel Horvath and Peter Richtarik\\
-arXiv:1901.08689, 2019.
+arXiv:1901.08689, 2019
 """
 function initiate_L_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, reference_update_proba::Float64)
-    n = prob.numdata
-
     ## No deterministic number of computed gradients per iteration because of the inner and outer loop scheme
     b = sampling.batchsize # deterministic or average mini-batch size
     epocsperiter = 0
