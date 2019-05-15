@@ -12,6 +12,11 @@ It uniformly picks b data points out of n at each iteration to build an estimate
 - **Bool** averaged_reference_point: select if the reference point is an average of the iterates of the inner loop or the last one
 # OUTPUTS
 - **Free\\_SVRG\\_method** method: Free-SVRG method created by `initiate_Free_SVRG`
+
+# REFERENCES
+__Our Title__\\
+Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
+arXiv:??????, 2019
 """
 function initiate_Free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ; numinneriters::Int64=0, averaged_reference_point::Bool=false)
     n = prob.numdata
