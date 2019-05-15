@@ -62,7 +62,7 @@ function initiate_Free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ;
     if averaged_reference_point
         averaging_weights = zeros(numinneriters)
     else
-        averaging_weights = []
+        averaging_weights = Float64[]
     end
 
     method = Free_SVRG_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, b, stepsize, L, Lmax, mu, expected_smoothness, expected_residual, numinneriters, reference_point, new_reference_point, reference_grad, averaging_weights, reset, sampling)
@@ -102,7 +102,7 @@ function boot_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOption
         averaging_weights = [(1-method.stepsize*method.mu)^(method.numinneriters-1-t) for t in 0:(method.numinneriters-1)]
         method.averaging_weights = averaging_weights ./ sum(averaging_weights)
 
-        println("Sanity check: weights sum to 1 ? ---> ", sum(method.averaging_weights))
+        println("Sanity check: weights sum to 1 ? ---> ", sum(method.averaging_weights),"\n\n")
     end
     # println("Averaging weights")
     # println(method.averaging_weights)
@@ -136,5 +136,9 @@ function reset_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOptio
 
     method.reference_point = zeros(prob.numfeatures)
     method.reference_grad = zeros(prob.numfeatures)
-    method.averaging_weights = []
+    if !isempty(method.averaging_weights)
+        averaging_weights = zeros(method.numinneriters)
+    else
+        method.averaging_weights = Float64[]
+    end
 end
