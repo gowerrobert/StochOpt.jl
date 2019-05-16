@@ -190,11 +190,10 @@ precision = 10.0^(-4) # 10.0^(-6)
     optimal_minibatch_free = optimal_minibatch_Free_SVRG_nice(n, mu, L, Lmax) # optimal b for m = n or equivalently p = 1/n (Free- et Leap-SVRG)
     optimal_minibatch_decreasing = optimal_minibatch_L_SVRG_D_nice(n, mu, L, Lmax) # work in progress for L-SVRG-D
 
-
     ## Free-SVRG with optimal b-nice sampling ( m = n, b = b^*(n), step size = gamma^*(b^*) )
-    numinneriters = n                      # inner loop size set to the number of data points
-    options.batchsize = optimal_minibatch  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    options.stepsize_multiplier = -1.0     # theoretical step size set in boot_Free_SVRG
+    numinneriters = n                           # inner loop size set to the number of data points
+    options.batchsize = optimal_minibatch_free  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
+    options.stepsize_multiplier = -1.0          # theoretical step size set in boot_Free_SVRG
 
     sampling = build_sampling("nice", n, options)
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
@@ -212,9 +211,9 @@ precision = 10.0^(-4) # 10.0^(-6)
     ################################################################################
 
     ## Leap-SVRG with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step sizes = {eta^*=1/L, alpha^*(b^*)} )
-    proba = 1/n                            # update probability set to the inverse of the number of data points
-    options.batchsize = optimal_minibatch  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    options.stepsize_multiplier = -1.0     # theoretical step sizes set in boot_Leap_SVRG
+    proba = 1/n                                       # update probability set to the inverse of the number of data points
+    options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
+    options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_Leap_SVRG
     sampling = build_sampling("nice", n, options)
     leap = initiate_Leap_SVRG(prob, options, sampling, proba)
 
