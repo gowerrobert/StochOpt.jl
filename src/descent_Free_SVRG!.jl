@@ -57,14 +57,14 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         # d[:] = -method.reference_grad; # WRONG: the first iteration of the inner loop is equivalent to a gradient step
     end
     ## SVRG inner step
-    println("---- SVRG inner loop at iteration: ", iter)
+    # println("---- SVRG inner loop at iteration: ", iter)
     if !isempty(method.averaging_weights)
         if iter % method.numinneriters == 0 # small index shift: weight a_m times point x_{s+1}^{m-1}
             idx_weights = method.numinneriters; # i = m
         else
             idx_weights = iter % method.numinneriters; # for i = 1, ..., m-1
         end
-        println("        idx weights: ", idx_weights)
+        # println("        idx weights: ", idx_weights)
         method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x
     end
 
@@ -76,6 +76,7 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         println("Innerloop, iter: ", iter, ", x = ref point")
     end
 
+    # TO CORRECT: no additional gradients computed for iter ==1
     if iter == 1 || isempty(sampled_indices) # if no point is sampled
         d[:] = -method.reference_grad
     else
