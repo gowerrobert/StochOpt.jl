@@ -187,8 +187,8 @@ precision = 10.0^(-4) # 10.0^(-6)
     ################################################################################
     ########################### OPTIMAL MINI-BATCH SIZE ############################
     ################################################################################
-    optimal_minibatch = optimal_minibatch_variants_SVRG_nice(n, mu, L, Lmax) # optimal b for m = n or equivalently p = 1/n (Free- et Leap-SVRG)
-    # optimal_minibatch_decreasing = optimal_minibatch_L_SVRG_D_nice(n, mu, L, Lmax) # work in progress for L-SVRG-D
+    optimal_minibatch_free = optimal_minibatch_Free_SVRG_nice(n, mu, L, Lmax) # optimal b for m = n or equivalently p = 1/n (Free- et Leap-SVRG)
+    optimal_minibatch_decreasing = optimal_minibatch_L_SVRG_D_nice(n, mu, L, Lmax) # work in progress for L-SVRG-D
 
 
     ## Free-SVRG with optimal b-nice sampling ( m = n, b = b^*(n), step size = gamma^*(b^*) )

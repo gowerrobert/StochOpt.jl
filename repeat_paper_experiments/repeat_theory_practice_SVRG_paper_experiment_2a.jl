@@ -81,7 +81,7 @@ end
 if all_problems
     problems = 1:10
 else
-    problems = 1:1
+    problems =  [1 3] # 1:1
 end
 
 datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
@@ -97,25 +97,36 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_error = [10000,         # XXmin with XXX
-              10000,         # XXmin with XXX
-              20000,        # XXmin with XXX
-              20000,        # XXmin with XXX
-              10000,         # XXmin with XXX
-              20000,         # XXmin with XXX
-              20000,        # XXmin with XXX
-              20000,        # XXmin with XXX
-              50000,        # XXmin with XXX
-              50000]        # XXmin with XXX
+skip_errors = [[10^2 10^3 10^3 10^3],  # ijcnn1_full + scaled + 1e-1
+               [10^4 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-3
+               [10^4 10^4 10^4 10^4],  # slice + scaled + 1e-1
+               [10^4 10^4 10^4 10^4],  # slice + scaled + 1e-3
+               [10^4 10^4 10^4 10^4],  # YearPredictionMSD_full + scaled + 1e-1
+               [10^4 10^4 10^4 10^4],  # YearPredictionMSD_full + scaled + 1e-3
+               [10^4 10^4 10^4 10^4],  # covtype_binary + scaled + 1e-1
+               [10^4 10^4 10^4 10^4],  # covtype_binary + scaled + 1e-3
+               [10^4 10^4 10^4 10^4],  # real-sim + scaled + 1e-1
+               [10^4 10^4 10^4 10^4]]  # real-sim + scaled + 1e-3
 
-max_epochs = 20
-precision = 10.0^(-12) # 10.0^(-6)
+# skip_error = [10000,         # XXmin with XXX
+#               10000,         # XXmin with XXX
+#               20000,        # XXmin with XXX
+#               20000,        # XXmin with XXX
+#               750,         # XXmin with XXX
+#               20000,         # XXmin with XXX
+#               20000,        # XXmin with XXX
+#               20000,        # XXmin with XXX
+#               50000,        # XXmin with XXX
+#               50000]        # XXmin with XXX
+
+max_epochs = 10
+precision = 10.0^(-4) # 10.0^(-6)
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
     scaling = "column-scaling"
     lambda = lambdas[idx_prob]
-    skip_parameter = skip_error[idx_prob]
+    skip_error = skip_errors[idx_prob]
     println("EXPERIMENT : ", idx_prob, " over ", length(problems))
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
@@ -130,8 +141,8 @@ precision = 10.0^(-12) # 10.0^(-6)
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8,
                           max_epocs=max_epochs,
-                          max_time=60.0*60.0, # 60.0*60.0*10.0
-                          skip_error_calculation=skip_parameter,
+                          max_time=60.0*60.0*10.0,
+                          skip_error_calculation=10^5,
                           batchsize=1,
                           regularizor_parameter="normalized",
                           initial_point="zeros", # is fixed not to add more randomness
@@ -161,6 +172,7 @@ precision = 10.0^(-12) # 10.0^(-6)
     ################################################################################
 
     ## SVRG-Bubeck with 1-nice sampling ( m = m^*, b = 1, step size = gamma^* )
+    options.skip_error_calculation = skip_error[1] # skip error different for each algo
     numinneriters = -1                 # theoretical inner loop size (m^* = 20*Lmax/mu) set in initiate_SVRG_bubeck
     options.batchsize = 1              # mini-batch size set to 1
     options.stepsize_multiplier = -1.0 # theoretical step size (gamma^* = 1/10*Lmax) set in boot_SVRG_bubeck
@@ -183,6 +195,7 @@ precision = 10.0^(-12) # 10.0^(-6)
     OUTPUTS = [OUTPUTS; out_bubeck]
 
     ## Free-SVRG with 1-nice sampling ( m = n, b = 1, step size = gamma^*(1) )
+    options.skip_error_calculation = skip_error[2] # skip error different for each algo
     numinneriters = n                  # inner loop size set to the number of data points
     options.batchsize = 1              # mini-batch size set to 1
     options.stepsize_multiplier = -1.0 # theoretical step size set in boot_Free_SVRG
@@ -201,23 +214,25 @@ precision = 10.0^(-12) # 10.0^(-6)
     ############################ LOOPLESS SVRG VARIANTS ############################
     ################################################################################
 
-    ## Leap-SVRG with 1-nice sampling ( p = 1/n, b = 1, step sizes = {eta^*=1/L, alpha^*(b)} )
-    proba = 1/n                        # update probability set to the inverse of the number of data points
-    options.batchsize = 1              # mini-batch size set to 1
-    options.stepsize_multiplier = -1.0 # theoretical step sizes set in boot_Leap_SVRG
-    sampling = build_sampling("nice", n, options)
-    leap = initiate_Leap_SVRG(prob, options, sampling, proba)
+    # ## Leap-SVRG with 1-nice sampling ( p = 1/n, b = 1, step sizes = {eta^*=1/L, alpha^*(b)} )
+    # options.skip_error_calculation = skip_error[3] # skip error different for each algo
+    # proba = 1/n                        # update probability set to the inverse of the number of data points
+    # options.batchsize = 1              # mini-batch size set to 1
+    # options.stepsize_multiplier = -1.0 # theoretical step sizes set in boot_Leap_SVRG
+    # sampling = build_sampling("nice", n, options)
+    # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
 
-    out_leap = minimizeFunc(prob, leap, options)
+    # out_leap = minimizeFunc(prob, leap, options)
 
-    str_proba_leap = @sprintf "%.2e" proba
-    str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
-    str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
-    out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b = 1, \\eta^* = $str_step_grad_leap, \\alpha^*(1) = $str_step_sto_leap)\$")
-    OUTPUTS = [OUTPUTS; out_leap]
+    # str_proba_leap = @sprintf "%.2e" proba
+    # str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
+    # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
+    # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b = 1, \\eta^* = $str_step_grad_leap, \\alpha^*(1) = $str_step_sto_leap)\$")
+    # OUTPUTS = [OUTPUTS; out_leap]
 
 
     ## L_SVRG_D with 1-nice sampling ( p = 1/n, b = 1, step size = gamma^*(b) )
+    options.skip_error_calculation = skip_error[4] # skip error different for each algo
     proba = 1/n                        # update probability set to the inverse of the number of data points
     options.batchsize = 1              # mini-batch size set to 1
     options.stepsize_multiplier = -1.0 # theoretical step sizes set in boot_L_SVRG_D
@@ -233,10 +248,10 @@ precision = 10.0^(-12) # 10.0^(-6)
 
     ## Saving outputs and plots
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp2a")
+    savename = string(savename, "-exp2a-$(max_epochs)_epochs-new")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(max_epochs)_epochs-new", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
 
 end

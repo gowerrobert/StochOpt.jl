@@ -175,7 +175,7 @@ problems = 4:8
     ## m = n, b = b^*(n), step size = gamma^*(b^*(n))
     # numinneriters = prob.numdata
     # if numinneriters == prob.numdata
-    #     options.batchsize = optimal_minibatch_variants_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+    #     options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
     # else
     #     options.batchsize = 1 # default value for other inner loop sizes
     # end
@@ -205,7 +205,7 @@ problems = 4:8
     ## p = 1/n, b = b^*(1/n), step sizes = {eta^*, alpha^*(b^*(1/n))}
     # proba = 1/prob.numdata
     # if abs(proba - 1/prob.numdata) < 1e-7
-    #     options.batchsize = optimal_minibatch_variants_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+    #     options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
     # else
     #     options.batchsize = 1 # default value for other inner loop sizes
     # end
@@ -232,7 +232,7 @@ problems = 4:8
     ## p = 1/n, b = b^*(1/n), step size = gamma^*(b^*(1/n))
     # proba = 1/prob.numdata
     # if abs(proba - 1/prob.numdata) < 1e-7
-    #     options.batchsize = optimal_minibatch_variants_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+    #     options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
     # else
     #     options.batchsize = 1 # default value for other inner loop sizes
     # end
@@ -309,7 +309,7 @@ end
 # options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
 # # numinneriters = prob.numdata
 # # if numinneriters == prob.numdata
-# #     options.batchsize = optimal_minibatch_variants_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+# #     options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
 # # else
 # #     options.batchsize = 1 # default value for other inner loop sizes
 # # end
