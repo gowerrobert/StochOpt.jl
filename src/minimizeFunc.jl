@@ -102,10 +102,10 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
 
         ## Taking a step
         time_elapsed = @elapsed method.stepmethod(x, prob, options, method, iter, d) # mutating function
-        if typeof(method) == L_SVRG_D_method
-            println("Current stepsize: ", method.stepsize)
-        end
         x[:] = x + method.stepsize * d
+        # if typeof(method) == L_SVRG_D_method
+        #     println("Current stepsize: ", method.stepsize)
+        # end
 
         # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));

@@ -1,7 +1,7 @@
 """
 ### "Our Title", Othmane Sebbouh, Nidham Gazagnadou, Robert M. Gower (2019)
 
-## --- EXPERIMENT 1 ---
+## --- EXPERIMENT 1.A ---
 Goal: Testing the optimality of our optimal mini-batch size b* with m = n and corresponding step size gamma (b).
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
@@ -9,7 +9,7 @@ Goal: Testing the optimality of our optimal mini-batch size b* with m = n and co
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_sharp_SVRG_paper_experiment_1.jl <boolean>
+>julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a.jl <boolean>
 where <number_of_processor_to_add> has to be replaced by the user.
 -If <boolean> == false, only the first problem (ijcnn1_full + column-scaling + lambda=1e-1) is launched
 -Elseif <boolean> == true, all XX problems are launched
@@ -54,8 +54,14 @@ using Distributed
     pyplot() # No problem with pyplot when called in @everywhere statement
 end
 
-save_path = "$(path)experiments/free_leap_SVRG/exp1a/";
-# Create saving directories if not existing
+## Create saving directories if not existing
+save_path = "$(path)experiments/theory_practice_SVRG/"
+#region
+if !isdir(save_path)
+    mkdir(save_path)
+    mkdir("$(save_path)exp1a/")
+end
+save_path = "$(save_path)exp1a/"
 if !isdir("$(save_path)data/")
     mkdir("$(save_path)data/")
 end
@@ -65,49 +71,45 @@ end
 if !isdir("$(save_path)outputs/")
     mkdir("$(save_path)outputs/")
 end
+#endregion
 
 ## Experiments settings
 numsimu = 1 # number of runs of mini-batch SAGA for averaging the empirical complexity
 if all_problems
-    problems = 1:12
+    problems = 1:10
 else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
-            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
-            "slice", "slice",                                   # unscaled, n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
+            "real-sim", "real-sim"]                             # scaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
-            "none", "none",
-            "none", "none"]
+            "column-scaling", "column-scaling"]
 
 lambdas = [10^(-1), 10^(-3),
-           10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [0.01,        # XXmin with XXX
-                    0.01,        # XXmin with XXX
-                    0.01,        # XXmin with XXX
-                    0.01,        # XXmin with XXX
-                    0.05,        # XXmin with XXX
-                    1.0,         # XXmin with XXX
-                    0.1,         # XXmin with XXX
-                    1.0,         # XXmin with XXX
-                    0.1,         # XXmin with XXX
-                    1.0,         # XXmin with XXX
-                    0.1,         # XXmin with XXX
-                    0.1];        # XXmin with XXX
+skip_error = [10000,         # XXmin with XXX
+              10000,         # XXmin with XXX
+              100000,        # XXmin with XXX
+              100000,        # XXmin with XXX
+              50000,         # XXmin with XXX
+              50000,        # XXmin with XXX
+              100000,        # XXmin with XXX
+              100000,        # XXmin with XXX
+              100000,        # XXmin with XXX
+              100000]        # XXmin with XXX
 
 precision = 10.0^(-2) # 10.0^(-4)
 

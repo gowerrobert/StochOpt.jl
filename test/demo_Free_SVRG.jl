@@ -74,7 +74,7 @@ OUTPUTS = []  # List of saved outputs
 
 numinneriters = prob.numdata
 if numinneriters == prob.numdata
-    options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+    options.batchsize = optimal_minibatch_variants_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
 else
     options.batchsize = 1 # default value for other inner loop sizes
 end
@@ -104,7 +104,7 @@ println("Theoretical optimal mini-batch size: ", f1.batchsize)
 
 numinneriters = prob.numdata
 if numinneriters == prob.numdata
-    options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+    options.batchsize = optimal_minibatch_variants_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
 else
     options.batchsize = 1 # default value for other inner loop sizes
 end
