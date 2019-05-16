@@ -81,7 +81,7 @@ end
 if all_problems
     problems = 1:10
 else
-    problems =  [1 3] # 1:1
+    problems = 9:9
 end
 
 datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
@@ -97,15 +97,15 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[10^2 10^3 10^3 10^3],  # ijcnn1_full + scaled + 1e-1
+skip_errors = [[10^2 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-1
                [10^4 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-3
                [10^4 10^4 10^4 10^4],  # slice + scaled + 1e-1
                [10^4 10^4 10^4 10^4],  # slice + scaled + 1e-3
-               [10^4 10^4 10^4 10^4],  # YearPredictionMSD_full + scaled + 1e-1
-               [10^4 10^4 10^4 10^4],  # YearPredictionMSD_full + scaled + 1e-3
-               [10^4 10^4 10^4 10^4],  # covtype_binary + scaled + 1e-1
-               [10^4 10^4 10^4 10^4],  # covtype_binary + scaled + 1e-3
-               [10^4 10^4 10^4 10^4],  # real-sim + scaled + 1e-1
+               [10^3 10^3 10^3 10^3],  # YearPredictionMSD_full + scaled + 1e-1
+               [10^3 10^3 10^3 10^3],  # YearPredictionMSD_full + scaled + 1e-3
+               [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-1
+               [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-3
+               [10^2 10^1 10^1 10^1],  # real-sim + scaled + 1e-1
                [10^4 10^4 10^4 10^4]]  # real-sim + scaled + 1e-3
 
 # skip_error = [10000,         # XXmin with XXX
@@ -248,10 +248,10 @@ precision = 10.0^(-4) # 10.0^(-6)
 
     ## Saving outputs and plots
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp2a-$(max_epochs)_epochs-new")
+    savename = string(savename, "-exp2a-$(max_epochs)_epochs-new-new")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(max_epochs)_epochs-new", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(max_epochs)_epochs-new-new", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
 
 end

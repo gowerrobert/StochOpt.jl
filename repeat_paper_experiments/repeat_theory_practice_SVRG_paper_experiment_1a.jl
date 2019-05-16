@@ -111,7 +111,7 @@ skip_multipliers = [1.0,        #
                     1.0,        #
                     1.0]        #
 
-precision = 10.0^(-1) # 10.0^(-4)
+precision = 10.0^(-4)
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -131,7 +131,7 @@ precision = 10.0^(-1) # 10.0^(-4)
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8, max_epocs=10^8,
-                          max_time=60.0*10.0, # 60.0*60.0*10.0
+                          max_time=60.0*60.0*3.0,
                           skip_error_calculation=10^4,
                           batchsize=1,
                           regularizor_parameter = "normalized",
@@ -173,8 +173,8 @@ precision = 10.0^(-1) # 10.0^(-4)
     # end
 
     ## Try first a unique grid
-    minibatchgrid = [2^0, 2^1]
-    # minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
+    # minibatchgrid = [2^0, 2^1, 2^2]
+    minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
 
     println("---------------------------------- MINI-BATCH GRID ------------------------------------------")
     println(minibatchgrid)
@@ -207,8 +207,9 @@ precision = 10.0^(-1) # 10.0^(-4)
     end
 
     ## Plotting total complexity vs mini-batch size
+    legendpos = :topleft
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_theoretical, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos)
+    plot_empirical_complexity_SVRG(prob, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos)
 
     println("Theoretical optimal mini-batch = ", b_theoretical)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")

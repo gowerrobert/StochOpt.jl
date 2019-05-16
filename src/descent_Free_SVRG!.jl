@@ -25,7 +25,7 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
 
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        println("\n\nSVRG outer loop at iteration: ", iter)
+        # println("\n\nSVRG outer loop at iteration: ", iter)
         if isempty(method.averaging_weights)
             method.reference_point[:] = x # Reference point set to last iterate iterates x^m
         else
@@ -72,9 +72,9 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
     sampled_indices = method.sampling.sampleindices(method.sampling)
     # println("sampled_indices: ", sampled_indices)
 
-    if norm(x - method.reference_point) < 1e-7
-        println("Innerloop, iter: ", iter, ", x = ref point")
-    end
+    # if norm(x - method.reference_point) < 1e-7
+    #     println("Innerloop, iter: ", iter, ", x = ref point")
+    # end
 
     # TO CORRECT: no additional gradients computed for iter ==1
     if iter == 1 || isempty(sampled_indices) # if no point is sampled
