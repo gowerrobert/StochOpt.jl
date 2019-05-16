@@ -91,7 +91,7 @@ scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
-            "column-scaling", "column-scaling"]
+            "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),

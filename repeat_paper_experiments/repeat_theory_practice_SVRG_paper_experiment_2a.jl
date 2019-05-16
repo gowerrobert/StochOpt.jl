@@ -90,6 +90,12 @@ datasets = ["slice", "slice",                                   # scaled,   n = 
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
             "real-sim", "real-sim"]                             # scaled, n =  72,309, d = 20,958
 
+scalings = ["column-scaling", "column-scaling",
+            "column-scaling", "column-scaling",
+            "column-scaling", "column-scaling",
+            "column-scaling", "column-scaling",
+            "none", "none"]
+
 lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
@@ -124,7 +130,7 @@ precision = 10.0^(-4) # 10.0^(-6)
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
-    scaling = "column-scaling"
+    scaling = scalings[idx_prob]
     lambda = lambdas[idx_prob]
     skip_error = skip_errors[idx_prob]
     println("EXPERIMENT : ", idx_prob, " over ", length(problems))
