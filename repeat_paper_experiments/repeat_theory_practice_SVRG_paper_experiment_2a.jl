@@ -55,13 +55,15 @@ end
 
 ## Path settings
 #region
-save_path = "$(path)experiments/theory_practice_SVRG/"
+save_path = "$(path)experiments/theory_practice_SVRG/exp2a/"
+
+# Create saving directories if not existing
+if !isdir("$(path)experiments/theory_practice_SVRG/")
+    mkdir("$(path)experiments/theory_practice_SVRG/")
+end
 if !isdir(save_path)
     mkdir(save_path)
-    mkdir("$(save_path)exp2a/")
 end
-save_path = "$(save_path)exp2a/"
-# Create saving directories if not existing
 if !isdir("$(save_path)data/")
     mkdir("$(save_path)data/")
 end
