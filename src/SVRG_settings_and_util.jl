@@ -184,3 +184,58 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
 
     return OUTPUTS, itercomplex
 end
+
+
+"""
+    plot_empirical_complexity_SVRG(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
+                              b_practical::Int64, b_empirical::Int64, save_path::AbstractString ;
+                              numsimu=1, skip_multiplier=0.0, legendpos=:best)
+
+Saves the plot of the empirical total complexity vs the minibatch size or the inner loop size.
+
+#INPUTS:\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
+    - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
+    - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity)
+      for each of the mini-batch size (tau) over numsimu samples\\
+    - **Int64** b_practical: heuristic optimal mini-batch size\\
+    - **Int64** b_empirical: empirical optimal mini-batch size\\
+    - **AbstractString** save_path: path to the experiment directory\\
+    - **Int64** numsimu: number of simulations on which the total complexity is average\\
+    - **Symbol** legendpos: position of the legend
+#OUTPUTS:\\
+    - None
+"""
+function plot_empirical_complexity_SVRG(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1}, b_practical::Int64, b_empirical::Int64, save_path::AbstractString ;                                                     numsimu::Int64=1, skip_multiplier::Float64=0.0, legendpos::Symbol=:best)
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+
+    fontmed = 12
+    fontbig = 15
+    xlabeltxt = "mini-batch size"
+    ylabeltxt = "empirical total complexity"
+
+    n = prob.numdata
+    d = prob.numfeatures
+
+    labellist = [latexstring("\$b_\\mathrm{empirical} = $b_empirical\$"),
+                 latexstring("\$b_\\mathrm{practical} \\; = $b_practical\$")]
+
+    plot(minibatchgrid, empcomplex, linestyle=:solid, color=:black,
+         xaxis=:log, yaxis=:log,
+         xlabel=xlabeltxt, ylabel=ylabeltxt, label="",
+         xticks=(minibatchgrid, minibatchgrid),
+         xrotation = 45,
+         tickfont=font(fontmed),
+         guidefont=font(fontbig), linewidth=3, grid=false)
+        #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
+    vline!([b_empirical], line=(:dash, 3), color=:blue, label=labellist[1],
+           legendfont=font(fontbig), legend=legendpos) #:legend
+    #legendtitle="Optimal mini-batch size")
+    vline!([b_practical], line=(:dot, 3), color=:red, label=labellist[2])
+
+    savename = "-exp1a-empcomplex-$(numsimu)-avg"
+    if skip_multiplier > 0.0
+        savename = string(savename, "_skip_mult_", replace(string(skip_multiplier), "." => "_")); # Extra suffix to check which skip values to keep
+    end
+    savefig("$(save_path)figures/$(probname)$(savename).pdf")
+end

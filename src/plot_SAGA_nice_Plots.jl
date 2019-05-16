@@ -217,7 +217,7 @@ end
 
 """
     plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                              b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./")
+                              b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", legendpos=:best)
 
 Saves the plot of the empirical total complexity.
 

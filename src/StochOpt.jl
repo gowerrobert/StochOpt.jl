@@ -373,6 +373,6 @@ include("../util/power_iteration.jl")
 #Additional
 include("BFGS_update!.jl")
 include("calculate_SAGA_rates_and_complexities.jl")
-include("Free_SVRG_settings.jl")
+include("SVRG_settings_and_util.jl")
 include("get_saved_stepsize.jl")
 # include("../tmp/parallel_minimizeFunc_grid_stepsize.jl")
