@@ -33,23 +33,149 @@ end
 
 Random.seed!(1)
 
+lambda = 1e-1
+scaling = "column-scaling"
+
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=20, initial_point="zeros", skip_error_calculation = 100)
+# options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=20, initial_point="zeros", skip_error_calculation = 100)
+# options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=10, initial_point="zeros", skip_error_calculation = 1000)
+# options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=15, initial_point="zeros", skip_error_calculation = 1)
 
 ## Debugging settings
-# options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=10, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
-# numinneriters = 5
-# proba = 0.2
+options = set_options(max_iter=20, max_time=10.0^5, max_epocs=10^5, initial_point="zeros", skip_error_calculation=1)
+numinneriters = 5
+proba = 1/numinneriters
 
 ## Load problem
 datapath = "./data/"
 # data = "australian"
 data = "ijcnn1_full"    # n = 141,691, d = 23
+# data = "YearPredictionMSD_full"
 X, y = loadDataset(datapath, data)
-prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-1, scaling="column-scaling")
+
+u = unique(y)
+if length(u) < 2
+    error("Wrong number of possible outputs")
+elseif length(u) == 2
+    println("Binary output detected: the problem is set to logistic regression")
+    prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling)
+else
+    println("More than three modalities in the outputs: the problem is set to ridge regression")
+    prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling)
+end
+
+X = nothing
+y = nothing
+
 
 ## Running methods
 OUTPUTS = [] # list of saved outputs
+
+################################################################################
+########################## DOUBLE-LOOP SVRG VARIANTS ###########################
+################################################################################
+
+## SVRG-Bubeck with b-nice sampling (m = m^*, b = 1, step size = gamma^*)
+options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
+options.batchsize = 1
+sampling = build_sampling("nice", prob.numdata, options)
+options.stepsize_multiplier = -1.0 # Theoretical step size in boot_SVRG_bubeck
+# numinneriters = -1 # 20*Lmax/mu
+bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
+
+println("-------------------- WARM UP --------------------")
+# options.max_epocs = 10
+minimizeFunc(prob, bubeck, options) # Warm up
+# options.max_epocs = 100
+bubeck.reset(prob, bubeck, options)
+println("-------------------------------------------------")
+
+output2 = minimizeFunc(prob, bubeck, options)
+str_m_2 = @sprintf "%d" bubeck.numinneriters
+str_b_2 = @sprintf "%d" bubeck.batchsize
+str_step_2 = @sprintf "%.2e" bubeck.stepsize
+# output2.name = latexstring("$(output2.name) \$(m^* = $str_m_2, b = $str_b_2 , \\gamma^*(b) = $str_step_2)\$") # if we want to set b > 1 in Bubeck SVRG
+output2.name = latexstring("$(output2.name) \$(m^* = $str_m_2, b = $str_b_2, \\gamma^*(b) = $str_step_2)\$")
+OUTPUTS = [OUTPUTS; output2]
+
+## Free-SVRG with b-nice sampling (m = n, b = b^*(n), step size = gamma^*(b^*(n)))
+options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
+# numinneriters = prob.numdata
+# if numinneriters == prob.numdata
+#     options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+# else
+#     options.batchsize = 1 # default value for other inner loop sizes
+# end
+options.batchsize = 1
+sampling = build_sampling("nice", prob.numdata, options)
+free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+output3 = minimizeFunc(prob, free, options)
+str_m_3 = @sprintf "%d" free.numinneriters
+str_b_3 = @sprintf "%d" free.batchsize
+str_step_3 = @sprintf "%.2e" free.stepsize
+# output3.name = latexstring("$(output3.name) \$(m = n = $str_m_3, b^*(n) = $str_b_3 , \\gamma^*(b^*(n)) = $str_step_3)\$") # optimal b^*
+output3.name = latexstring("$(output3.name) \$(m = n = $str_m_3, b = $str_b_3, \\gamma^*(b) = $str_step_3)\$")
+OUTPUTS = [OUTPUTS; output3]
+
+
+################################################################################
+############################ LOOPLESS SVRG VARIANTS ############################
+################################################################################
+
+## Leap-SVRG with b-nice sampling (m = n, b = b^*(n), step size = gamma^*(b^*(n)))
+options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
+# if numinneriters == prob.numdata
+#     options.batchsize = optimal_minibatch_Leap_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+# else
+#     options.batchsize = 1 # default value for other inner loop sizes
+# end
+options.batchsize = 1
+sampling = build_sampling("nice", prob.numdata, options)
+# proba = 1/prob.numdata
+leap = initiate_Leap_SVRG(prob, options, sampling, proba)
+output4 = minimizeFunc(prob, leap, options)
+str_b_4 = @sprintf "%d" sampling.batchsize
+str_proba_4 = @sprintf "%.3f" proba
+str_step_sto_4 = @sprintf "%.2e" leap.stochastic_stepsize
+str_step_grad_4 = @sprintf "%.2e" leap.gradient_stepsize
+# output4.name = latexstring("$(output4.name) \$(p = $str_proba_4, b^*(n) = $str_b_4, \\eta^* = $str_step_grad_4, \\alpha^*(b^*(n)) = $str_step_sto_4)\$") # optimal b^*
+output4.name = latexstring("$(output4.name) \$(p = $str_proba_4, b = $str_b_4, \\eta^* = $str_step_grad_4, \\alpha^*(b) = $str_step_sto_4)\$")
+OUTPUTS = [OUTPUTS; output4]
+
+## L_SVRG_D with b-nice sampling (b = 1, proba=1/n, step sizes = gamma^*)
+options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
+# if numinneriters == prob.numdata
+#     options.batchsize = optimal_minibatch_L_SVRG_D_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+# else
+#     options.batchsize = 1 # default value for other inner loop sizes
+# end
+options.batchsize = 1
+sampling = build_sampling("nice", prob.numdata, options)
+# proba = 1/prob.numdata
+decreasing = initiate_L_SVRG_D(prob, options, sampling, proba)
+output5 = minimizeFunc(prob, decreasing, options)
+str_b_5 = @sprintf "%d" sampling.batchsize
+str_proba_5 = @sprintf "%.3f" proba
+str_step_5 = @sprintf "%.2e" decreasing.stepsize
+# output5.name = latexstring("$(output5.name) \$(p = $str_proba_5, b^*(n) = $str_b_5, \\gamma^*(b^*(n)) = $str_step_5)\$") # optimal b^*
+output5.name = latexstring("$(output5.name) \$(p = $str_proba_5, b = $str_b_5, \\gamma^*(b) = $str_step_5)\$")
+OUTPUTS = [OUTPUTS; output5]
+
+## Saving outputs and plots
+# savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+# savename = string(savename, "-", "demo_SVRG_algos_nice")
+# save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+
+pyplot() # gr() pyplot() # pgfplots() #plotly()
+plot_outputs_Plots(OUTPUTS, prob, options, methodname="comparison_SVRG_algos_nice", path=save_path, legendfont=8) # Plot and save output
+
+
+
+
+
+
+
+
 
 #region
 # ## Vanilla-SVRG with 1-nice sampling (m = n, b = 1, step size = gamma^*)
@@ -73,70 +199,3 @@ OUTPUTS = [] # list of saved outputs
 # output1.name = latexstring("$(output1.name) \$(m = 2n = $str_m_1, b = $str_b_1 , \\gamma^* = $str_step_1\$)")
 # OUTPUTS = [OUTPUTS; output1]
 #endregion
-
-## SVRG-Bubeck with b-nice sampling (m = m^*, b = 1, step size = gamma^*)
-options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
-options.batchsize = 1
-sampling = build_sampling("nice", prob.numdata, options)
-options.stepsize_multiplier = -1.0 # Theoretical step size in boot_SVRG_bubeck
-numinneriters = -1 # 20*Lmax/mu
-bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
-
-println("-------------------- WARM UP --------------------")
-# options.max_epocs = 10
-minimizeFunc(prob, bubeck, options) # Warm up
-# options.max_epocs = 100
-bubeck.reset(prob, bubeck, options)
-println("-------------------------------------------------")
-
-output2 = minimizeFunc(prob, bubeck, options)
-str_m_2 = @sprintf "%d" bubeck.numinneriters
-str_b_2 = @sprintf "%d" bubeck.batchsize
-str_step_2 = @sprintf "%.2e" bubeck.stepsize
-output2.name = latexstring("$(output2.name) \$(m^* = $str_m_2, b = $str_b_2 , \\gamma^* = $str_step_2)\$")
-OUTPUTS = [OUTPUTS; output2]
-
-## Free-SVRG with b-nice sampling (m = n, b = b^*(n), step size = gamma^*(b^*(n)))
-options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
-numinneriters = prob.numdata
-if numinneriters == prob.numdata
-    options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
-else
-    options.batchsize = 1 # default value for other inner loop sizes
-end
-sampling = build_sampling("nice", prob.numdata, options)
-free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
-output3 = minimizeFunc(prob, free, options)
-str_m_3 = @sprintf "%d" free.numinneriters
-str_b_3 = @sprintf "%d" free.batchsize
-str_step_3 = @sprintf "%.2e" free.stepsize
-output3.name = latexstring("$(output3.name) \$(m = n = $str_m_3, b^*(n) = $str_b_3 , \\gamma^*(b^*(n)) = $str_step_3)\$")
-OUTPUTS = [OUTPUTS; output3]
-
-
-## Leap-SVRG with b-nice sampling (m = n, b = b^*(n), step size = gamma^*(b^*(n)))
-options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
-# if numinneriters == prob.numdata
-#     options.batchsize = optimal_minibatch_Leap_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
-# else
-#     options.batchsize = 1 # default value for other inner loop sizes
-# end
-options.batchsize = 1
-sampling = build_sampling("nice", prob.numdata, options)
-proba = 1/prob.numdata
-leap = initiate_Leap_SVRG(prob, options, sampling, proba)
-output4 = minimizeFunc(prob, leap, options)
-str_b_4 = @sprintf "%d" sampling.batchsize
-str_proba_4 = @sprintf "%.3f" proba
-str_step_sto_4 = @sprintf "%.2e" leap.stochastic_stepsize
-str_step_grad_4 = @sprintf "%.2e" leap.gradient_stepsize
-output4.name = latexstring("$(output4.name) \$p = $str_proba_4, b = $str_b_4, \\eta^* = $str_step_grad_4, \\alpha^* = $str_step_sto_4 \$")
-OUTPUTS = [OUTPUTS; output4]
-
-## Saving outputs and plots
-# savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-# savename = string(savename, "-", "demo_SVRG_algos_nice")
-# save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
-
-pyplot() # gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options, methodname="demo_SVRG_algos_nice", path=save_path, legendfont=8) # Plot and save output
