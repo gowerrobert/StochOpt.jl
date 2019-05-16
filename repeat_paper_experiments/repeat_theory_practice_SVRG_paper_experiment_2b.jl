@@ -54,14 +54,18 @@ using Distributed
 end
 
 ## Path settings
+save_path = "$(path)experiments/theory_practice_SVRG/exp2b/"
 #region
-save_path = "$(path)experiments/theory_practice_SVRG/"
+# Create saving directories if not existing
+if !isdir("$(path)experiments/")
+    mkdir("$(path)experiments/")
+end
+if !isdir("$(path)experiments/theory_practice_SVRG/")
+    mkdir("$(path)experiments/theory_practice_SVRG/")
+end
 if !isdir(save_path)
     mkdir(save_path)
-    mkdir("$(save_path)exp2b/")
 end
-save_path = "$(save_path)exp2b/"
-# Create saving directories if not existing
 if !isdir("$(save_path)data/")
     mkdir("$(save_path)data/")
 end
@@ -125,7 +129,7 @@ precision = 10.0^(-4) # 10.0^(-6)
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8,
                           max_epocs=max_epochs,
-                          max_time=60.0*2.0, # 60.0*60.0*10.0
+                          max_time=60.0*10.0, # 60.0*60.0*10.0
                           skip_error_calculation=skip_parameter,
                           batchsize=1,
                           regularizor_parameter="normalized",
@@ -183,7 +187,8 @@ precision = 10.0^(-4) # 10.0^(-6)
     ################################################################################
     ########################### OPTIMAL MINI-BATCH SIZE ############################
     ################################################################################
-    optimal_minibatch = optimal_minibatch_variants_SVRG_nice(n, mu, L, Lmax) # optimal b for m = n or equivalently p = 1/n
+    optimal_minibatch = optimal_minibatch_variants_SVRG_nice(n, mu, L, Lmax) # optimal b for m = n or equivalently p = 1/n (Free- et Leap-SVRG)
+    # optimal_minibatch_decreasing = optimal_minibatch_L_SVRG_D_nice(n, mu, L, Lmax) # work in progress for L-SVRG-D
 
 
     ## Free-SVRG with optimal b-nice sampling ( m = n, b = b^*(n), step size = gamma^*(b^*) )
@@ -224,9 +229,9 @@ precision = 10.0^(-4) # 10.0^(-6)
 
 
     ## L_SVRG_D with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step size = gamma^*(b^*) )
-    proba = 1/n                            # update probability set to the inverse of the number of data points
-    options.batchsize = optimal_minibatch  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    options.stepsize_multiplier = -1.0     # theoretical step sizes set in boot_L_SVRG_D
+    proba = 1/n                                       # update probability set to the inverse of the number of data points
+    options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
+    options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_L_SVRG_D
     sampling = build_sampling("nice", n, options)
     decreasing = initiate_L_SVRG_D(prob, options, sampling, proba)
 
@@ -244,6 +249,6 @@ precision = 10.0^(-4) # 10.0^(-6)
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, methodname="SVRG", suffix="-exp2b", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
 
 end

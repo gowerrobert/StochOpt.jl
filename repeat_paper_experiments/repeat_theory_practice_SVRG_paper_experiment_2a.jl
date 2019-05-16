@@ -54,10 +54,12 @@ using Distributed
 end
 
 ## Path settings
-#region
 save_path = "$(path)experiments/theory_practice_SVRG/exp2a/"
-
+#region
 # Create saving directories if not existing
+if !isdir("$(path)experiments/")
+    mkdir("$(path)experiments/")
+end
 if !isdir("$(path)experiments/theory_practice_SVRG/")
     mkdir("$(path)experiments/theory_practice_SVRG/")
 end
@@ -91,22 +93,23 @@ datasets = ["slice", "slice",                                   # scaled,   n = 
 lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
 skip_error = [10000,         # XXmin with XXX
               10000,         # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000,        # XXmin with XXX
-              50000,         # XXmin with XXX
-              50000,         # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000]        # XXmin with XXX
+              20000,        # XXmin with XXX
+              20000,        # XXmin with XXX
+              10000,         # XXmin with XXX
+              20000,         # XXmin with XXX
+              20000,        # XXmin with XXX
+              20000,        # XXmin with XXX
+              50000,        # XXmin with XXX
+              50000]        # XXmin with XXX
 
-max_epochs = 2
-precision = 10.0^(-4) # 10.0^(-6)
+max_epochs = 20
+precision = 10.0^(-12) # 10.0^(-6)
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -127,7 +130,7 @@ precision = 10.0^(-4) # 10.0^(-6)
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8,
                           max_epocs=max_epochs,
-                          max_time=60.0*2.0, # 60.0*60.0*10.0
+                          max_time=60.0*60.0, # 60.0*60.0*10.0
                           skip_error_calculation=skip_parameter,
                           batchsize=1,
                           regularizor_parameter="normalized",
@@ -234,6 +237,6 @@ precision = 10.0^(-4) # 10.0^(-6)
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, methodname="SVRG", suffix="-exp2a", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
 
 end
