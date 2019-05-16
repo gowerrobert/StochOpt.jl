@@ -36,3 +36,10 @@ figures/\.directory
 \.directory
 tmp/to_delete.jl
 util/warmup.jl
+
+experiments/Bubeck/*
+experiments/free_leap_SVRG/*
+experiments/Free_SVRG/*
+experiments/L_SVRG_D/*
+experiments/Leap_SVRG/*
+experiments/SVRG/*
