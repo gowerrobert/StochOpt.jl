@@ -30,26 +30,27 @@ function descent_L_SVRG_D!(x::Array{Float64}, prob::Prob, options::MyOptions, me
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # initialize reference gradient
             gradient_counter += prob.numdata
         end
+        d[:] = -method.reference_grad # at first iteration x^0 = w^0, so sampling points and computing stochastic gradients is useless
+    else
+        ## Sampling method
+        sampled_indices = method.sampling.sampleindices(method.sampling)
+        # println("sampled_indices: ", sampled_indices)
+        if isempty(sampled_indices) # if no point is sampled
+            d[:] = -method.reference_grad
+        else
+            d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
+        end
+        gradient_counter += 2*length(sampled_indices)
     end
 
     if norm(x - method.reference_point) < 1e-7
         println("iter: ", iter, ", x = ref point")
     end
 
-    ## Sampling method
-    sampled_indices = method.sampling.sampleindices(method.sampling)
-    # println("sampled_indices: ", sampled_indices)
-    if isempty(sampled_indices) # if no point is sampled
-        d[:] = -method.reference_grad
-    else
-        d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
-    end
-    gradient_counter += 2*length(sampled_indices)
-
     ## Stochastic update of the reference
     flipped_coin = rand(method.reference_update_distrib)
     if flipped_coin
-        println("Update the reference point and gradient")
+        println("\n\nUpdate the step size, the reference point and gradient")
         method.reference_point[:] = x # update reference point
 
         if prob.numdata > 10^8 || prob.numfeatures > 10^8
@@ -60,8 +61,11 @@ function descent_L_SVRG_D!(x::Array{Float64}, prob::Prob, options::MyOptions, me
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # update reference gradient
             gradient_counter += prob.numdata
         end
-
-        ## Decrease the step size
+        # Reset the step size
+        method.stepsize = method.initial_stepsize
+    else
+        # Decrease the step size
+        # println("Decrease the step size")
         method.stepsize *= sqrt(1-method.reference_update_proba)
     end
 
