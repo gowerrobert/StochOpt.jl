@@ -39,35 +39,69 @@ options = set_options(max_iter=10^8, max_time=10.0^5, max_epocs=10, force_contin
 
 ## Load problem
 datapath = "./data/"
-# data = "australian"
-data = "ijcnn1_full"    # n = 141,691, d =
+data = "australian"
+# data = "ijcnn1_full"    # n = 141,691, d =
 X, y = loadDataset(datapath, data)
 prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="column-scaling")
 
 ## Running methods
 OUTPUTS = []  # List of saved outputs
 
-## nice sampling with p = 1/n
-options.batchsize = 1
+proba_grid = [0.1]
+# proba_grid = [0.1, 0.01, 0.005, 1/prob.numdata]
+
+## L_SVRG_D with b-nice sampling (b = 1, proba= several values, step sizes = gamma^*)
+options.batchsize = 1 # prob.numdata
 sampling = build_sampling("nice", prob.numdata, options)
-# proba_1 = 0.1
-proba_1 = 1/prob.numdata
-L_SVRG_D_1 = initiate_L_SVRG_D(prob, options, sampling, proba_1)
-options.stepsize_multiplier = -1.0 # Theoretical step size in boot_L_SVRG_D
 
-println("-------------------- WARM UP --------------------")
-options.max_iter = 3
-minimizeFunc(prob, L_SVRG_D_1, options) # Warm up
-options.max_iter = 10^8
-L_SVRG_D_1.reset(prob, L_SVRG_D_1, options)
-println("-------------------------------------------------")
+for idx_expe=1:length(proba_grid)
+    proba = proba_grid[idx_expe]
+    options.stepsize_multiplier = -1.0 # theoretical step sizes in boot_Leap_SVRG
+    decreasing = initiate_L_SVRG_D(prob, options, sampling, proba)
 
-output = minimizeFunc(prob, L_SVRG_D_1, options)
-str_b_1 = @sprintf "%d" sampling.batchsize
-str_proba_1 = @sprintf "%.3f" proba_1
-str_step_1 = @sprintf "%.2e" L_SVRG_D_1.stepsize
-output.name = latexstring("\$b = $str_b_1, p = $str_proba_1 , \\gamma^* = $str_step_1\$")
-OUTPUTS = [OUTPUTS; output]
+    if idx_expe == 1
+        println("-------------------- WARM UP --------------------")
+        tmp = options.max_epocs
+        options.max_epocs = 2
+        minimizeFunc(prob, decreasing, options) # Warm up
+        options.max_epocs = tmp
+        decreasing.reset(prob, decreasing, options)
+        println("-------------------------------------------------")
+    end
+
+    output = minimizeFunc(prob, decreasing, options)
+    str_b = @sprintf "%d" sampling.batchsize
+    str_proba = @sprintf "%.3f" proba
+    str_step = @sprintf "%.2e" decreasing.stepsize
+    output.name = latexstring("L_SVRG_D \$b = $str_b, p = $str_proba, \\gamma^* = $str_step\$")
+
+    global OUTPUTS = [OUTPUTS; output]
+end
+
+pyplot() # gr() pyplot() # pgfplots() #plotly()
+plot_outputs_Plots(OUTPUTS, prob, options, methodname="debug_L_SVRG_D", path=save_path) # Plot and save output
+
+# ## nice sampling with p = 1/n
+# options.batchsize = 1
+# sampling = build_sampling("nice", prob.numdata, options)
+# proba = 0.5
+# # proba = 1/prob.numdata
+# L_SVRG_D_1 = initiate_L_SVRG_D(prob, options, sampling, proba)
+# options.stepsize_multiplier = -1.0 # Theoretical step size in boot_L_SVRG_D
+
+# println("-------------------- WARM UP --------------------")
+# options.max_iter = 3
+# minimizeFunc(prob, L_SVRG_D_1, options) # Warm up
+# options.max_iter = 10^8
+# L_SVRG_D_1.reset(prob, L_SVRG_D_1, options)
+# println("-------------------------------------------------")
+
+# output = minimizeFunc(prob, L_SVRG_D_1, options)
+# str_b_1 = @sprintf "%d" sampling.batchsize
+# str_proba_1 = @sprintf "%.3f" proba
+# str_step_1 = @sprintf "%.2e" L_SVRG_D_1.stepsize
+# output.name = latexstring("\$b = $str_b_1, p = $str_proba_1 , \\gamma^* = $str_step_1\$")
+# OUTPUTS = [OUTPUTS; output]
 
 
 # ## nice sampling with p = 1/10, step size = grid searched
@@ -106,5 +140,5 @@ OUTPUTS = [OUTPUTS; output]
 # savename = string(savename, "-", "demo_L_SVRG_D")
 # save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
-pyplot() # gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options, methodname="debug_L_SVRG_D", path=save_path) # Plot and save output
+# pyplot() # gr() pyplot() # pgfplots() #plotly()
+# plot_outputs_Plots(OUTPUTS, prob, options, methodname="debug_L_SVRG_D", path=save_path) # Plot and save output
