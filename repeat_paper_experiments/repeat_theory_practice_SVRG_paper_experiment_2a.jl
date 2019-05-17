@@ -213,9 +213,9 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     numinneriters = n                  # inner loop size set to the number of data points
     options.batchsize = 1              # mini-batch size set to 1
     options.stepsize_multiplier = -1.0 # theoretical step size set in boot_Free_SVRG
-
     sampling = build_sampling("nice", n, options)
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+
     out_free = minimizeFunc(prob, free, options)
 
     str_m_free = @sprintf "%d" free.numinneriters
@@ -262,11 +262,6 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     OUTPUTS = [OUTPUTS; out_decreasing]
 
     ## Saving outputs and plots
-    savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp2a-$(max_epochs)_epochs-new-new")
-    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
-
-    pyplot()
     if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
         suffix = "lame10"
     elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
@@ -274,6 +269,12 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     else
         suffix = ""
     end
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(max_epochs)-$(suffix)_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
+    savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+    savename = string(savename, "-exp2a-$(suffix)-$(max_epochs)_max_epochs")
+    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+
+    pyplot()
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
 
 end
+println("\n\n--- EXPERIMENT 2.A FINISHED ---")

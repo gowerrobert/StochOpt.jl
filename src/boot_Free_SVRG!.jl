@@ -42,15 +42,15 @@ function initiate_Free_SVRG(prob::Prob, options::MyOptions, sampling::Sampling ;
     expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L
     expected_residual = ((n-b)/(b*(n-1)))*Lmax
 
-    # if numinneriters == -1
-    #     if occursin("nice", sampling.name)
-    #         numinneriters = floor(Int, (expected_smoothness + 2*expected_residual) / mu) # theoretical optimal value for b-nice sampling
-    #     else
-    #         error("No theoretical inner loop size available for Free-SVRG with this sampling")
-    #     end
-    # elseif numinneriters < -1 || numinneriters == 0
-    #     error("Invalid inner loop size")
-    # end
+    if numinneriters == -1
+        if occursin("nice", sampling.name)
+            numinneriters = round(Int, 3*expected_smoothness / mu) # theoretical optimal value for b-nice sampling
+        else
+            error("No theoretical inner loop size available for Free-SVRG with this sampling")
+        end
+    elseif numinneriters < -1 || numinneriters == 0
+        error("Invalid inner loop size")
+    end
 
     if numinneriters < 1
         error("Invalid inner loop size")

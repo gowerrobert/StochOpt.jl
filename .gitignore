@@ -44,5 +44,7 @@ experiments/L_SVRG_D/*
 experiments/Leap_SVRG/*
 experiments/SVRG/*
 
-# Temporary
+# Temporary files
 experiments/theory_practice_SVRG/*
+retrieve_from_lame23.sh
+sync_to_lame23.sh

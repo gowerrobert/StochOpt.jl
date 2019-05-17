@@ -222,20 +222,20 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
 
     n = prob.numdata
 
+    if skipped_errors < -1 || skipped_errors == 0
+        error("skipped_errors has to be set to -1 (auto) or to a positive integer")
+    elseif skipped_errors == -1
+        options.skip_error_calculation = compute_skip_error_SVRG(n, 1, skip_multiplier)
+        println("The number of skipped calculations of the error has been automatically set to ", options.skip_error_calculation)
+    else
+        options.skip_error_calculation = skipped_errors
+    end
+
     itercomplex = zeros(length(inner_loop_grid), 1) # List of saved outputs
     OUTPUTS = []
     for idx_m in 1:length(inner_loop_grid)
         m = inner_loop_grid[idx_m]
         println("\nCurrent inner loop size: ", m)
-
-        if skipped_errors < -1 || skipped_errors == 0
-            error("skipped_errors has to be set to -1 (auto) or to a positive integer")
-        elseif skipped_errors == -1
-            options.skip_error_calculation = compute_skip_error_SVRG(n, 1, skip_multiplier)
-            println("The number of skipped calculations of the error has been automatically set to ", options.skip_error_calculation)
-        else
-            options.skip_error_calculation = skipped_errors
-        end
 
         println("-------------------------------- INNER LOOP SIZE ---------------------------------------")
         println(m)
@@ -319,12 +319,12 @@ function plot_empirical_complexity_Free_SVRG(prob::Prob, exp_number::Int64, grid
     if exp_number == 1
         xlabeltxt = "mini-batch size"
         labellist = [latexstring("\$b_\\mathrm{empirical} = $empirical_value\$"),
-                     latexstring("\$b_\\mathrm{practical} \\; = $theoretical_value\$")]
+                     latexstring("\$b_\\mathrm{theory} \\; = $theoretical_value\$")]
         savename = "-exp1a-empcomplex-$(numsimu)-avg"
     elseif exp_number == 2
         xlabeltxt = "inner loop size"
         labellist = [latexstring("\$m_\\mathrm{empirical} = $empirical_value\$"),
-                     latexstring("\$m_\\mathrm{practical} \\; = $theoretical_value\$")]
+                     latexstring("\$m_\\mathrm{theory} \\; = $theoretical_value\$")]
         savename = "-exp1b-empcomplex-$(numsimu)-avg"
     end
 

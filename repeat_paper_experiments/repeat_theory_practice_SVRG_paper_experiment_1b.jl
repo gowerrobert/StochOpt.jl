@@ -1,11 +1,11 @@
 """
-### "Our Title", Othmane Sebbouh, Nidham Gazagnadou, Robert M. Gower (2019)
+### "Towards closing the gap between the theory and practice of SVRG", O. Sebbouh, S. Jelassi, N. Gazagnadou, F. Bach, R. M. Gower (2019)
 
 ## --- EXPERIMENT 1.B ---
 Goal: Testing the optimality of our optimal inner loop size m* with b = 1 and corresponding step size gamma^*(b).
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
-- line XX: enter your full path to the "StochOpt.jl/" repository in the *path* variable
+- line 44-50: enter your full path to the "StochOpt.jl/" repository in the *path* variable
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 5.0 #60.0*60.0*10.0
+max_time = 60.0*60.0 #60.0*60.0*10.0
 precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
@@ -117,7 +117,7 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
+skip_multipliers = [0.001,      # ijcnn1_full + scaled + 1e-1
                     1.0,        # ijcnn1_full + scaled + 1e-3
                     0.01,       # YearPredictionMSD_full + scaled + 1e-1
                     0.01,       # YearPredictionMSD_full + scaled + 1e-3
@@ -179,7 +179,11 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
     m_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
 
     ## Computing the optimal empirical inner loop size over a grid
-    inner_loop_grid = [max(round(Int, m_theoretical*2^(-4)), 1), m_theoretical, round(Int, m_theoretical*2^4)]
+    if m_theoretical == 1
+        inner_loop_grid = [m_theoretical, round(Int, m_theoretical*2^2), round(Int, m_theoretical*2^4), round(Int, m_theoretical*2^6)]
+    else
+        inner_loop_grid = [max(round(Int, m_theoretical*2^(-4)), 1), m_theoretical, round(Int, m_theoretical*2^4)]
+    end
 
     println("---------------------------------- INNER LOOP GRID ------------------------------------------")
     println(inner_loop_grid)
@@ -222,4 +226,4 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
 end
 end
 
-println("\n\n--- EXPERIMENT 1B FINISHED ---")
+println("\n\n--- EXPERIMENT 1.B FINISHED ---")

@@ -1,5 +1,5 @@
 """
-### "Our Title", Othmane Sebbouh, Nidham Gazagnadou, Robert M. Gower (2019)
+### "Towards closing the gap between the theory and practice of SVRG", O. Sebbouh, S. Jelassi, N. Gazagnadou, F. Bach, R. M. Gower (2019)
 
 ## --- EXPERIMENT 1 ---
 Goal: Testing the optimality of our optimal mini-batch size b* with m = n and corresponding step size gamma (b).

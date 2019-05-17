@@ -31,6 +31,7 @@ function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, 
     bootmethod = boot_Leap_SVRG!
     reset = reset_Leap_SVRG!
 
+    mu = prob.mu
     L = prob.L
     Lmax = prob.Lmax
 
@@ -50,7 +51,9 @@ function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, 
         error("Negative stochastic or gradient step size")
     end
 
-    if 0 <= reference_update_proba <= 1
+    if reference_update_proba == -1
+        reference_update_distrib = Bernoulli( mu/(3*expected_smoothness) )
+    elseif 0 <= reference_update_proba <= 1
         reference_update_distrib = Bernoulli(reference_update_proba)
     else
         error("Invalid reference update probability")
