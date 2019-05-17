@@ -111,7 +111,7 @@ end
                        numsimu=1, skipped_errors=1, skip_multiplier=0.02, path="./")
 
 Runs several times (numsimu) mini-batch Free-SVRG with nice sampling for each
-mini-batch size in the give list (minibatchgrid) in order to evaluate the
+mini-batch size in the given list (minibatchgrid) in order to evaluate the
 correpsonding average iteration complexity.
 
 #INPUTS:\\
@@ -167,25 +167,17 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
         options.batchsize = b
         for i=1:numsimu
             println("----- Simulation #", i, " -----")
+            ################################################################################
+            ############################## OPTIMAL FREE-SVRG ###############################
+            ################################################################################
             ## Free-SVRG with optimal b-nice sampling ( m = n, b = b_grid, step size = gamma^*(b) )
-            numinneriters = n                                                           # inner loop size set to the number of data points
-            options.stepsize_multiplier = -1.0                                          # theoretical step size set in boot_Free_SVRG
+            numinneriters = n                              # inner loop size set to the number of data points
+            options.stepsize_multiplier = -1.0             # theoretical step size set in boot_Free_SVRG
             sampling = build_sampling("nice", n, options)
             free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
-
-            ## Step size computed externally for monitoring
-            stepsize = 1.0/(2.0*(free.expected_smoothness + 2.0*free.expected_residual))
-            println("----------------------------- PRACTICAL STEP SIZE --------------------------------------")
-            println(stepsize)
-            println("----------------------------------------------------------------------------------------")
-
             output = minimizeFunc(prob, free, options)
             println("Output fail = ", output.fail, "\n")
             itercomplex[idx_b] += output.iterations
-            # str_m_free = @sprintf "%d" free.numinneriters
-            # str_b_free = @sprintf "%d" free.batchsize
-            # str_step_free = @sprintf "%.2e" free.stepsize
-            # output.name = latexstring("\$m = n = $str_m_free, b = $str_b_free, \\gamma^*(b) = $str_step_free\$")
 
             output.name = string("b=", b)
             OUTPUTS = [OUTPUTS; output]
@@ -203,57 +195,154 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
     return OUTPUTS, itercomplex
 end
 
+"""
+    simulate_Free_SVRG_nice_inner_loop(prob, inner_loop_grid, options,
+                       numsimu=1, skipped_errors=1, skip_multiplier=0.02, path="./")
+
+Runs several times (numsimu) Free-SVRG with 1-nice sampling for each
+inner loop size m in the given list (inner_loop_grid) in order to evaluate the
+correpsonding average iteration complexity.
+
+#INPUTS:\\
+    - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
+    - **Array{Int64,1}** inner_loop_grid: list of the different inner loop sizes\\
+    - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
+    - **Int64** numsimu: number of runs of 1-nice Free-SVRG\\
+    - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
+    - **Float64** skip\\_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
+    - **AbstractString** path: path to the folder where the plots are saved\\
+#OUTPUTS:\\
+    - OUTPUTS: output of each run, size length(inner_loop_grid)*numsimu\\
+    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the inner loop size over numsimu samples
+"""
+function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{Int64,1}, options::MyOptions ;
+                                           numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
+    path = string(path, "data/")
+
+    n = prob.numdata
+
+    itercomplex = zeros(length(inner_loop_grid), 1) # List of saved outputs
+    OUTPUTS = []
+    for idx_m in 1:length(inner_loop_grid)
+        m = inner_loop_grid[idx_m]
+        println("\nCurrent inner loop size: ", m)
+
+        if skipped_errors < -1 || skipped_errors == 0
+            error("skipped_errors has to be set to -1 (auto) or to a positive integer")
+        elseif skipped_errors == -1
+            options.skip_error_calculation = compute_skip_error_SVRG(n, 1, skip_multiplier)
+            println("The number of skipped calculations of the error has been automatically set to ", options.skip_error_calculation)
+        else
+            options.skip_error_calculation = skipped_errors
+        end
+
+        println("-------------------------------- INNER LOOP SIZE ---------------------------------------")
+        println(m)
+        println("----------------------------------------------------------------------------------------")
+
+        println("---------------------------------- SKIP_ERROR ------------------------------------------")
+        println(options.skip_error_calculation)
+        println("----------------------------------------------------------------------------------------")
+
+        n = prob.numdata
+        mu = prob.mu
+        L = prob.L
+        Lmax = prob.Lmax
+
+        for i=1:numsimu
+            println("----- Simulation #", i, " -----")
+            ################################################################################
+            ############################### 1-NICE FREE-SVRG ###############################
+            ################################################################################
+            ## Free-SVRG with 1-nice sampling ( m = n, b = 1, step size = gamma^*(b) )
+            options.batchsize = 1                          # 1-nice sampling
+            numinneriters = m                              # inner loop size set to the number of data points
+            options.stepsize_multiplier = -1.0             # theoretical step size set in boot_Free_SVRG
+            sampling = build_sampling("nice", n, options)
+            free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+            output = minimizeFunc(prob, free, options)
+            println("Output fail = ", output.fail, "\n")
+            itercomplex[idx_m] += output.iterations
+
+            output.name = string("m=", m)
+            OUTPUTS = [OUTPUTS; output]
+        end
+    end
+
+    ## Averaging the last iteration number
+    itercomplex = itercomplex ./ numsimu
+    itercomplex = itercomplex[:]
+
+    ## Saving the result of the simulations
+    savename = "-exp1b-empcomplex-$(numsimu)-avg"
+    save("$(path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
+
+    return OUTPUTS, itercomplex
+end
+
 
 """
-    plot_empirical_complexity_SVRG(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                              b_practical::Int64, b_empirical::Int64, save_path::AbstractString ;
+    plot_empirical_complexity_Free_SVRG(prob, exp_number, grid, empcomplex, b_practical, b_empirical, save_path ;
                               numsimu=1, skip_multiplier=0.0, legendpos=:best)
 
-Saves the plot of the empirical total complexity vs the minibatch size or the inner loop size.
+Saves the plot of the empirical total complexity vs the mini-batch or the inner loop size.
 
 #INPUTS:\\
     - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
-    - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
-    - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity)
-      for each of the mini-batch size (tau) over numsimu samples\\
-    - **Int64** b_practical: heuristic optimal mini-batch size\\
-    - **Int64** b_empirical: empirical optimal mini-batch size\\
+    - **Int64** exp_number: number of the experiment: 1 for mini-batch, 2 for inner loop size
+    - **Array{Int64,1}** grid: list of the different mini-batch or inner loop sizes\\
+    - **Array{Float64,1}** empcomplex: average total complexity for each of point of the grid over numsimu samples\\
+    - **Int64** theoretical_value: theoretical optimal value\\
+    - **Int64** empirical_value: empirical optimal value\\
     - **AbstractString** save_path: path to the experiment directory\\
     - **Int64** numsimu: number of simulations on which the total complexity is average\\
     - **Symbol** legendpos: position of the legend
 #OUTPUTS:\\
     - None
 """
-function plot_empirical_complexity_SVRG(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1}, b_practical::Int64, b_empirical::Int64, save_path::AbstractString ;                                                     numsimu::Int64=1, skip_multiplier::Float64=0.0, legendpos::Symbol=:best)
+function plot_empirical_complexity_Free_SVRG(prob::Prob, exp_number::Int64, grid::Array{Int64,1}, empcomplex::Array{Float64,1}, theoretical_value::Int64, empirical_value::Int64, save_path::AbstractString ;                                                   numsimu::Int64=1, skip_multiplier::Float64=0.0, legendpos::Symbol=:best)
+    if !(exp_number in 1:2)
+        error("Wrong choice of exp_number")
+    end
+
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
 
     fontmed = 12
     fontbig = 15
-    xlabeltxt = "mini-batch size"
     ylabeltxt = "empirical total complexity"
 
     n = prob.numdata
     d = prob.numfeatures
 
-    labellist = [latexstring("\$b_\\mathrm{empirical} = $b_empirical\$"),
-                 latexstring("\$b_\\mathrm{practical} \\; = $b_practical\$")]
+    if exp_number == 1
+        xlabeltxt = "mini-batch size"
+        labellist = [latexstring("\$b_\\mathrm{empirical} = $empirical_value\$"),
+                     latexstring("\$b_\\mathrm{practical} \\; = $theoretical_value\$")]
+        savename = "-exp1a-empcomplex-$(numsimu)-avg"
+    elseif exp_number == 2
+        xlabeltxt = "inner loop size"
+        labellist = [latexstring("\$m_\\mathrm{empirical} = $empirical_value\$"),
+                     latexstring("\$m_\\mathrm{practical} \\; = $theoretical_value\$")]
+        savename = "-exp1b-empcomplex-$(numsimu)-avg"
+    end
 
-    plot(minibatchgrid, empcomplex, linestyle=:solid, color=:black,
+    plot(grid, empcomplex, linestyle=:solid, color=:black,
          xaxis=:log, yaxis=:log,
          xlabel=xlabeltxt, ylabel=ylabeltxt, label="",
-         xticks=(minibatchgrid, minibatchgrid),
+         xticks=(grid, grid),
          xrotation = 45,
          tickfont=font(fontmed),
          guidefont=font(fontbig), linewidth=3, grid=false)
         #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
-    vline!([b_empirical], line=(:dash, 3), color=:blue, label=labellist[1],
+
+    vline!([empirical_value], line=(:dash, 3), color=:blue, label=labellist[1],
            legendfont=font(fontbig), legend=legendpos) #:legend
     #legendtitle="Optimal mini-batch size")
-    vline!([b_practical], line=(:dot, 3), color=:red, label=labellist[2])
+    vline!([theoretical_value], line=(:dot, 3), color=:red, label=labellist[2])
 
-    savename = "-exp1a-empcomplex-$(numsimu)-avg"
     if skip_multiplier > 0.0
-        savename = string(savename, "_skip_mult_", replace(string(skip_multiplier), "." => "_")); # Extra suffix to check which skip values to keep
+        savename = string(savename, "_skip_mult_", replace(string(skip_multiplier), "." => "_")) # Extra suffix to check which skip values to keep
     end
     savefig("$(save_path)figures/$(probname)$(savename).pdf")
 end
