@@ -27,15 +27,13 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 50
+max_epochs = 10^8
 max_time = 60.0*60.0*10.0
 precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
-a = parse(Int64, ARGS[1])
-b = parse(Int64, ARGS[2])
-problems = UnitRange{Int64}(a, b)
+problems = parse.(Int64, ARGS)
 println(problems)
 
 using Distributed
@@ -89,10 +87,10 @@ numsimu = 1 # number of runs of mini-batch SAGA for averaging the empirical comp
 #     problems = 1:1
 # end
 
-datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
-            "ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
             "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
 
@@ -111,18 +109,18 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0,        #
-                    1.0]        #
+skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
+                    1.0,        # ijcnn1_full + scaled + 1e-3
+                    0.01,       # YearPredictionMSD_full + scaled + 1e-1
+                    0.01,       # YearPredictionMSD_full + scaled + 1e-3
+                    0.01,       # covtype_binary + scaled + 1e-1
+                    0.01,       # covtype_binary + scaled + 1e-3
+                    0.1,        # slice + scaled + 1e-1
+                    1.0,        # slice + scaled + 1e-3
+                    1.0,        # real-sim + unscaled + 1e-1
+                    1.0,        # real-sim + unscaled + 1e-3
+                    1.0,        # rcv1_full + unscaled + 1e-1
+                    1.0]        # rcv1_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems

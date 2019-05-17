@@ -43,3 +43,6 @@ experiments/Free_SVRG/*
 experiments/L_SVRG_D/*
 experiments/Leap_SVRG/*
 experiments/SVRG/*
+
+# Temporary
+experiments/theory_practice_SVRG/*

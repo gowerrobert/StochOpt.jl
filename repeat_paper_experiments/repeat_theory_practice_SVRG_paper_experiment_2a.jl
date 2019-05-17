@@ -33,9 +33,7 @@ precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
-a = parse(Int64, ARGS[1])
-b = parse(Int64, ARGS[2])
-problems = UnitRange{Int64}(a, b)
+problems = parse.(Int64, ARGS)
 println(problems)
 
 using Distributed
@@ -93,10 +91,10 @@ end
 #     problems = 1:1
 # end
 
-datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
-            "ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
             "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
 
@@ -117,12 +115,12 @@ lambdas = [10^(-1), 10^(-3),
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
 skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
                [10^4 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-3
-               [10^4 10^4 -2. 10^4],  # slice + scaled + 1e-1
-               [10^4 10^4 -2. 10^4],  # slice + scaled + 1e-3
-               [10^3 10^3 -2. 10^3],  # YearPredictionMSD_full + scaled + 1e-1
-               [10^3 10^3 -2. 10^3],  # YearPredictionMSD_full + scaled + 1e-3
+               [10^4 10^4 -2. 10^4],  # YearPredictionMSD_full + scaled + 1e-1
+               [10^4 10^4 -2. 10^4],  # YearPredictionMSD_full + scaled + 1e-3
                [10^3 10^3 -2. 10^3],  # covtype_binary + scaled + 1e-1
                [10^3 10^3 -2. 10^3],  # covtype_binary + scaled + 1e-3
+               [10^3 10^3 -2. 10^3],  # slice + scaled + 1e-1
+               [10^3 10^3 -2. 10^3],  # slice + scaled + 1e-3
                [10^2 10^3 -2. 10^3],  # real-sim + unscaled + 1e-1
                [10^2 10^3 -2. 10^3],  # real-sim + unscaled + 1e-3
                [10^2 10^3 -2. 10^3],  # rcv1_full + unscaled + 1e-1
