@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0 #60.0*60.0*10.0
+max_time = 60.0*60.0*10.0
 precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
@@ -118,11 +118,11 @@ lambdas = [10^(-1), 10^(-3),
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
 skip_multipliers = [0.001,      # ijcnn1_full + scaled + 1e-1
-                    1.0,        # ijcnn1_full + scaled + 1e-3
+                    0.001,        # ijcnn1_full + scaled + 1e-3
                     0.01,       # YearPredictionMSD_full + scaled + 1e-1
                     0.01,       # YearPredictionMSD_full + scaled + 1e-3
                     0.01,       # covtype_binary + scaled + 1e-1
-                    0.01,       # covtype_binary + scaled + 1e-3
+                    1.0,       # covtype_binary + scaled + 1e-3
                     0.1,        # slice + scaled + 1e-1
                     1.0,        # slice + scaled + 1e-3
                     1.0,        # real-sim + unscaled + 1e-1
@@ -177,9 +177,14 @@ skip_multipliers = [0.001,      # ijcnn1_full + scaled + 1e-1
 
     ## Computing theoretical optimal inner loop for 1-nice sampling
     m_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
+    println("Theoretical optimal inner loop = ", m_theoretical)
 
     ## Computing the optimal empirical inner loop size over a grid
-    if m_theoretical == 1
+    if data == "ijcnn1_full"
+        inner_loop_grid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19]
+    elseif data == "slice"
+        inner_loop_grid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19]
+    elseif m_theoretical == 1
         inner_loop_grid = [m_theoretical, round(Int, m_theoretical*2^2), round(Int, m_theoretical*2^4), round(Int, m_theoretical*2^6)]
     else
         inner_loop_grid = [max(round(Int, m_theoretical*2^(-4)), 1), m_theoretical, round(Int, m_theoretical*2^4)]

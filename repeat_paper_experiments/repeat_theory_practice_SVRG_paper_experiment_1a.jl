@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*5.0 # 60.0*60.0*10.0
+max_time = 60.0*60.0*10.0
 precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
@@ -118,11 +118,11 @@ lambdas = [10^(-1), 10^(-3),
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
 skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1             # OK max_time = 60.0*5.0
-                    1.0,        # ijcnn1_full + scaled + 1e-3
+                    0.05,       # ijcnn1_full + scaled + 1e-3
                     0.01,       # YearPredictionMSD_full + scaled + 1e-1
                     0.01,       # YearPredictionMSD_full + scaled + 1e-3
                     0.01,       # covtype_binary + scaled + 1e-1
-                    0.01,       # covtype_binary + scaled + 1e-3
+                    0.1,       # covtype_binary + scaled + 1e-3
                     0.1,        # slice + scaled + 1e-1
                     1.0,        # slice + scaled + 1e-3
                     1.0,        # real-sim + unscaled + 1e-1
@@ -179,21 +179,17 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1             # OK m
     b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
 
     ## Computing the empirical mini-batch size over a grid
-    # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
-    # if data == "covtype_binary"
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
-    # elseif data == "ijcnn1_full" && lambda == 10^(-1)
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
-    # elseif data == "real-sim"
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
-    # else
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
-    # end
-
-    ## Try first a unique grid
-    # minibatchgrid = [2^0, 2^1, 2^2]
-    minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
-
+    if data == "covtype_binary"
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
+    elseif data == "ijcnn1_full" #&& lambda == 10^(-1)
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, n] # perfect
+    elseif data == "real-sim"
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
+    elseif data == "YearPredictionMSD_full"
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, n]
+    else
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
+    end
     println("---------------------------------- MINI-BATCH GRID ------------------------------------------")
     println(minibatchgrid)
     println("---------------------------------------------------------------------------------------------")
