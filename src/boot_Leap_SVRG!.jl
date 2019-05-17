@@ -91,7 +91,7 @@ function boot_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOption
         end
     elseif options.stepsize_multiplier == -1.0
         if occursin("nice", method.sampling.name)
-            method.stochastic_stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual)) # theoretical optimal value for b-nice sampling
+            method.stepsize = 1.0/(6.0*method.expected_smoothness) # theoretical optimal value for b-nice sampling
             method.gradient_stepsize = 1/method.L
             @printf "Automatically set Leap-SVRG theoretical stochastic step size: %1.3e and gradient step size: %1.3e\n" method.stochastic_stepsize method.gradient_stepsize
         else
