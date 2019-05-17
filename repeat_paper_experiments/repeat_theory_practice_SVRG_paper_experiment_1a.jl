@@ -45,7 +45,7 @@ using Distributed
     # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
     if machine == "lame10"
         path = "/cal/homes/ngazagnadou/StochOpt.jl/"   # lame10
-    elseif machine = "lame23"
+    elseif machine == "lame23"
         path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
     end
     println(path)
