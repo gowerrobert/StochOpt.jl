@@ -111,7 +111,7 @@ skip_errors = [[10^2 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-1
                [10^3 10^3 10^3 10^3],  # YearPredictionMSD_full + scaled + 1e-3
                [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-1
                [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-3
-               [10^2 10^1 10^1 10^1],  # real-sim + scaled + 1e-1
+               [10^4 10^4 10^4 10^4],  # real-sim + scaled + 1e-1
                [10^4 10^4 10^4 10^4]]  # real-sim + scaled + 1e-3
 
 # skip_error = [10000,         # XXmin with XXX
