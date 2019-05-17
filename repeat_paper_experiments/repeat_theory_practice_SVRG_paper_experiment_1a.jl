@@ -26,6 +26,10 @@ For each problem (data set + scaling process + regularization)
 - the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/sharp_SVRG/exp1a/outputs/" folder
 """
 
+## General settings
+max_epochs = 50
+max_time = 60.0*60.0*10.0
+precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
@@ -80,7 +84,7 @@ end
 ## Experiments settings
 numsimu = 1 # number of runs of mini-batch SAGA for averaging the empirical complexity
 # if all_problems
-#     problems = 1:10
+#     problems = 1:12
 # else
 #     problems = 1:1
 # end
@@ -89,15 +93,18 @@ datasets = ["slice", "slice",                                   # scaled,   n = 
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
             "ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
-            "real-sim", "real-sim"]                             # scaled,   n =  72,309, d = 20,958
+            "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
+            "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
+            "none", "none",
             "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
@@ -113,9 +120,9 @@ skip_multipliers = [1.0,        #
                     1.0,        #
                     1.0,        #
                     1.0,        #
+                    1.0,        #
+                    1.0,        #
                     1.0]        #
-
-precision = 10.0^(-4)
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -134,8 +141,9 @@ precision = 10.0^(-4)
 
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---")
-    options = set_options(tol=precision, max_iter=10^8, max_epocs=10^8,
-                          max_time=60.0*60.0*6.0,
+    options = set_options(tol=precision, max_iter=10^8,
+                          max_epocs=max_epochs,
+                          max_time=max_time,
                           skip_error_calculation=10^4,
                           batchsize=1,
                           regularizor_parameter = "normalized",

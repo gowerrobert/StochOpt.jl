@@ -26,9 +26,17 @@ For each problem (data set + scaling process + regularization)
 - the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/sharp_SVRG/exp2b/outputs/" folder
 """
 
+## General settings
+max_epochs = 50
+max_time = 60.0*60.0*10.0
+precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
+# all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
+a = parse(Int64, ARGS[1])
+b = parse(Int64, ARGS[2])
+problems = UnitRange{Int64}(a, b)
+println(problems)
 
 using Distributed
 
@@ -78,49 +86,52 @@ end
 #endregion
 
 ## Experiments settings
-if all_problems
-    problems = 1:10
-else
-    problems = 1:1
-end
+# if all_problems
+#     problems = 1:12
+# else
+#     problems = 1:1
+# end
 
 datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
             "ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
-            "real-sim", "real-sim"]                             # scaled, n =  72,309, d = 20,958
+            "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
+            "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
+            "none", "none",
             "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_error = [10000,         # XXmin with XXX
-              10000,         # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000,        # XXmin with XXX
-              50000,         # XXmin with XXX
-              50000,         # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000,        # XXmin with XXX
-              100000]        # XXmin with XXX
-
-max_epochs = 2
-precision = 10.0^(-4) # 10.0^(-6)
+skip_errors = [[10^2 10^4 X 10^4],  # ijcnn1_full + scaled + 1e-1
+               [10^4 10^4 X 10^4],  # ijcnn1_full + scaled + 1e-3
+               [10^4 10^4 X 10^4],  # slice + scaled + 1e-1
+               [10^4 10^4 X 10^4],  # slice + scaled + 1e-3
+               [10^3 10^3 X 10^3],  # YearPredictionMSD_full + scaled + 1e-1
+               [10^3 10^3 X 10^3],  # YearPredictionMSD_full + scaled + 1e-3
+               [10^3 10^3 X 10^3],  # covtype_binary + scaled + 1e-1
+               [10^3 10^3 X 10^3],  # covtype_binary + scaled + 1e-3
+               [10^2 10^3 X 10^3],  # real-sim + unscaled + 1e-1
+               [10^2 10^3 X 10^3],  # real-sim + unscaled + 1e-3
+               [10^2 10^3 X 10^3],  # rcv1_full + unscaled + 1e-1
+               [10^2 10^3 X 10^3]]  # rcv1_full + unscaled + 1e-3
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
     scaling = scalings[idx_prob]
     lambda = lambdas[idx_prob]
-    skip_parameter = skip_error[idx_prob]
+    skip_error = skip_errors[idx_prob]
     println("EXPERIMENT : ", idx_prob, " over ", length(problems))
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
@@ -136,7 +147,7 @@ precision = 10.0^(-4) # 10.0^(-6)
     options = set_options(tol=precision, max_iter=10^8,
                           max_epocs=max_epochs,
                           max_time=60.0*10.0, # 60.0*60.0*10.0
-                          skip_error_calculation=skip_parameter,
+                          skip_error_calculation=10^5,
                           batchsize=1,
                           regularizor_parameter="normalized",
                           initial_point="zeros", # is fixed not to add more randomness
@@ -169,9 +180,10 @@ precision = 10.0^(-4) # 10.0^(-6)
     ################################################################################
 
     ## SVRG-Bubeck with 1-nice sampling ( m = m^*, b = 1, step size = gamma^* )
-    numinneriters = -1                 # theoretical inner loop size (m^* = 20*Lmax/mu) set in initiate_SVRG_bubeck
-    options.batchsize = 1              # mini-batch size set to 1
-    options.stepsize_multiplier = -1.0 # theoretical step size (gamma^* = 1/10*Lmax) set in boot_SVRG_bubeck
+    options.skip_error_calculation = skip_error[1] # skip error different for each algo
+    numinneriters = -1                             # theoretical inner loop size (m^* = 20*Lmax/mu) set in initiate_SVRG_bubeck
+    options.batchsize = 1                          # mini-batch size set to 1
+    options.stepsize_multiplier = -1.0             # theoretical step size (gamma^* = 1/10*Lmax) set in boot_SVRG_bubeck
     sampling = build_sampling("nice", n, options)
     bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
 
@@ -197,9 +209,10 @@ precision = 10.0^(-4) # 10.0^(-6)
     optimal_minibatch_decreasing = optimal_minibatch_L_SVRG_D_nice(n, mu, L, Lmax) # work in progress for L-SVRG-D
 
     ## Free-SVRG with optimal b-nice sampling ( m = n, b = b^*(n), step size = gamma^*(b^*) )
-    numinneriters = n                           # inner loop size set to the number of data points
-    options.batchsize = optimal_minibatch_free  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    options.stepsize_multiplier = -1.0          # theoretical step size set in boot_Free_SVRG
+    options.skip_error_calculation = skip_error[2] # skip error different for each algo
+    numinneriters = n                              # inner loop size set to the number of data points
+    options.batchsize = optimal_minibatch_free     # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
+    options.stepsize_multiplier = -1.0             # theoretical step size set in boot_Free_SVRG
 
     sampling = build_sampling("nice", n, options)
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
@@ -217,6 +230,7 @@ precision = 10.0^(-4) # 10.0^(-6)
     ################################################################################
 
     # ## Leap-SVRG with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step sizes = {eta^*=1/L, alpha^*(b^*)} )
+    # options.skip_error_calculation = skip_error[3]    # skip error different for each algo
     # proba = 1/n                                       # update probability set to the inverse of the number of data points
     # options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
     # options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_Leap_SVRG
@@ -234,6 +248,7 @@ precision = 10.0^(-4) # 10.0^(-6)
 
 
     ## L_SVRG_D with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step size = gamma^*(b^*) )
+    options.skip_error_calculation = skip_error[4]    # skip error different for each algo
     proba = 1/n                                       # update probability set to the inverse of the number of data points
     options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
     options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_L_SVRG_D

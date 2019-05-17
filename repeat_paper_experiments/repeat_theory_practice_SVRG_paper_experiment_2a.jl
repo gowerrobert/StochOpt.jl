@@ -26,17 +26,17 @@ For each problem (data set + scaling process + regularization)
 - the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/sharp_SVRG/exp2a/outputs/" folder
 """
 
+## General settings
+max_epochs = 50
+max_time = 60.0*60.0*10.0
+precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
 a = parse(Int64, ARGS[1])
 b = parse(Int64, ARGS[2])
 problems = UnitRange{Int64}(a, b)
-# println(problems)
-
-max_epochs = 50
-max_time = 60.0*60.0*10.0
-precision = 10.0^(-6) # 10.0^(-6)
+println(problems)
 
 using Distributed
 
@@ -88,51 +88,45 @@ end
 
 ## Experiments settings
 # if all_problems
-#     problems = 1:10
+#     problems = 1:12
 # else
-#     problems = 9:9
+#     problems = 1:1
 # end
 
 datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
             "ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
-            "real-sim", "real-sim"]                             # scaled, n =  72,309, d = 20,958
+            "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
+            "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
+            "none", "none",
             "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[10^2 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-1
-               [10^4 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-3
-               [10^4 10^4 10^4 10^4],  # slice + scaled + 1e-1
-               [10^4 10^4 10^4 10^4],  # slice + scaled + 1e-3
-               [10^3 10^3 10^3 10^3],  # YearPredictionMSD_full + scaled + 1e-1
-               [10^3 10^3 10^3 10^3],  # YearPredictionMSD_full + scaled + 1e-3
-               [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-1
-               [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-3
-               [10^2 10^3 10^3 10^3],  # real-sim + scaled + 1e-1
-               [10^2 10^3 10^3 10^3]]  # real-sim + scaled + 1e-3
-
-# skip_error = [10000,         # XXmin with XXX
-#               10000,         # XXmin with XXX
-#               20000,        # XXmin with XXX
-#               20000,        # XXmin with XXX
-#               750,         # XXmin with XXX
-#               20000,         # XXmin with XXX
-#               20000,        # XXmin with XXX
-#               20000,        # XXmin with XXX
-#               50000,        # XXmin with XXX
-#               50000]        # XXmin with XXX
+skip_errors = [[10^2 10^4 X 10^4],  # ijcnn1_full + scaled + 1e-1
+               [10^4 10^4 X 10^4],  # ijcnn1_full + scaled + 1e-3
+               [10^4 10^4 X 10^4],  # slice + scaled + 1e-1
+               [10^4 10^4 X 10^4],  # slice + scaled + 1e-3
+               [10^3 10^3 X 10^3],  # YearPredictionMSD_full + scaled + 1e-1
+               [10^3 10^3 X 10^3],  # YearPredictionMSD_full + scaled + 1e-3
+               [10^3 10^3 X 10^3],  # covtype_binary + scaled + 1e-1
+               [10^3 10^3 X 10^3],  # covtype_binary + scaled + 1e-3
+               [10^2 10^3 X 10^3],  # real-sim + unscaled + 1e-1
+               [10^2 10^3 X 10^3],  # real-sim + unscaled + 1e-3
+               [10^2 10^3 X 10^3],  # rcv1_full + unscaled + 1e-1
+               [10^2 10^3 X 10^3]]  # rcv1_full + unscaled + 1e-3
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
