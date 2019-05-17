@@ -179,7 +179,7 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
     m_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
 
     ## Computing the optimal empirical inner loop size over a grid
-    inner_loop_grid = [round(Int, m_theoretical*2^(-4)), m_theoretical, round(Int, m_theoretical*2^4)]
+    inner_loop_grid = [max(round(Int, m_theoretical*2^(-4)), 1), m_theoretical, round(Int, m_theoretical*2^4)]
 
     println("---------------------------------- INNER LOOP GRID ------------------------------------------")
     println(inner_loop_grid)
