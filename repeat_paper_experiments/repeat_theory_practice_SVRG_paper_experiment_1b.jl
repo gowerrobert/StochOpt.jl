@@ -1,15 +1,15 @@
 """
 ### "Our Title", Othmane Sebbouh, Nidham Gazagnadou, Robert M. Gower (2019)
 
-## --- EXPERIMENT 1.A ---
-Goal: Testing the optimality of our optimal mini-batch size b* with m = n and corresponding step size gamma^*(b).
+## --- EXPERIMENT 1.B ---
+Goal: Testing the optimality of our optimal inner loop size m* with b = 1 and corresponding step size gamma^*(b).
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 - line XX: enter your full path to the "StochOpt.jl/" repository in the *path* variable
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a.jl <boolean>
+>julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_b.jl <boolean>
 where <number_of_processor_to_add> has to be replaced by the user.
 -If <boolean> == false, only the first problem (ijcnn1_full + column-scaling + lambda=1e-1) is launched
 -Elseif <boolean> == true, all XX problems are launched
@@ -22,8 +22,8 @@ XXXX, around XXmin
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
-- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp1a/figures/" folder
-- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp1a/outputs/" folder
+- the empirical total complexity v.s. inner loop size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp1b/figures/" folder
+- the results of the simulations (inner loop grid, empirical complexities, optimal empirical inner loop size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp1b/outputs/" folder
 """
 
 ## General settings
@@ -65,9 +65,9 @@ save_path = "$(path)experiments/theory_practice_SVRG/"
 #region
 if !isdir(save_path)
     mkdir(save_path)
-    mkdir("$(save_path)exp1a/")
+    mkdir("$(save_path)exp1b/")
 end
-save_path = "$(save_path)exp1a/"
+save_path = "$(save_path)exp1b/"
 if !isdir("$(save_path)data/")
     mkdir("$(save_path)data/")
 end
@@ -167,33 +167,20 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
     Lmax = prob.Lmax
     L = prob.L
 
-    ## Computing theoretical optimal mini-batch size for b-nice sampling with inner loop size m = n
-    b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
+    ## Computing theoretical optimal inner loop for 1-nice sampling
+    m_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
 
-    ## Computing the empirical mini-batch size over a grid
-    # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
-    # if data == "covtype_binary"
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
-    # elseif data == "ijcnn1_full" && lambda == 10^(-1)
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
-    # elseif data == "real-sim"
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
-    # else
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
-    # end
+    ## Computing the optimal empirical inner loop size over a grid
+    inner_loop_grid = [round(Int, m_theoretical*2^(-4)), m_theoretical, round(Int, m_theoretical*2^4)]
 
-    ## Try first a unique grid
-    # minibatchgrid = [2^0, 2^1, 2^2]
-    minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
-
-    println("---------------------------------- MINI-BATCH GRID ------------------------------------------")
-    println(minibatchgrid)
+    println("---------------------------------- INNER LOOP GRID ------------------------------------------")
+    println(inner_loop_grid)
     println("---------------------------------------------------------------------------------------------")
 
-    OUTPUTS, itercomplex = simulate_Free_SVRG_nice(prob, minibatchgrid, options, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path)
+    OUTPUTS, itercomplex = simulate_Free_SVRG_nice_inner_loop(prob, inner_loop_grid, options, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path)
 
     ## Checking that all simulations reached tolerance
-    fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu]
+    fails = [OUTPUTS[i].fail for i=1:length(inner_loop_grid)*numsimu]
     if all(s->(string(s)=="tol-reached"), fails)
         println("Tolerance always reached")
     else
@@ -201,30 +188,30 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
     end
 
     ## Computing the empirical complexity
-    empcomplex = reshape([OUTPUTS[i].epochs[end] for i=1:length(minibatchgrid)*numsimu], length(minibatchgrid)) # number of stochastic gradients computed
+    empcomplex = reshape([OUTPUTS[i].epochs[end] for i=1:length(inner_loop_grid)*numsimu], length(inner_loop_grid)) # number of stochastic gradients computed
     min_empcomplex, idx_min = findmin(empcomplex)
-    b_empirical = minibatchgrid[idx_min]
+    m_empirical = inner_loop_grid[idx_min]
 
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(probname, "-exp1a-", numsimu, "-avg")
+    savename = string(probname, "-exp1b-", numsimu, "-avg")
     savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")) # Extra suffix to check which skip values to keep
     if numsimu == 1
         save("$(save_path)data/$(savename).jld",
-        "options", options, "minibatchgrid", minibatchgrid,
+        "options", options, "inner_loop_grid", inner_loop_grid,
         "itercomplex", itercomplex, "empcomplex", empcomplex,
-        "b_theoretical", b_theoretical, "b_empirical", b_empirical)
+        "m_theoretical", m_theoretical, "m_empirical", m_empirical)
     end
 
-    ## Plotting total complexity vs mini-batch size
+    ## Plotting total complexity vs inner loop size
     legendpos = :topleft
     pyplot()
-    exp_number = 1 # grid of mini-batch sizes
-    plot_empirical_complexity_Free_SVRG(prob, exp_number, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos)
+    exp_number = 2 # grid of inner loop sizes
+    plot_empirical_complexity_Free_SVRG(prob, exp_number, inner_loop_grid, empcomplex, m_theoretical, m_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos)
 
-    println("Theoretical optimal mini-batch = ", b_theoretical)
-    println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
+    println("Theoretical optimal inner loop = ", m_theoretical)
+    println("Empirical optimal inner loop = ", m_empirical, "\n\n")
 end
 end
 
-println("\n\n--- EXPERIMENT 1A FINISHED ---")
+println("\n\n--- EXPERIMENT 1B FINISHED ---")

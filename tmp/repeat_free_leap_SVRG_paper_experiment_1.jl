@@ -22,8 +22,8 @@ XXXX, around XXmin
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
-- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/sharp_SVRG/exp1a/figures/" folder
-- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/sharp_SVRG/exp1a/outputs/" folder
+- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp1a/figures/" folder
+- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp1a/outputs/" folder
 """
 
 

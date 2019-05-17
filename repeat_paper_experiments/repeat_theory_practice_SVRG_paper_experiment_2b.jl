@@ -22,8 +22,8 @@ XXXX, around XXmin
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
-- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/sharp_SVRG/exp2b/figures/" folder
-- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/sharp_SVRG/exp2b/outputs/" folder
+- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp2b/figures/" folder
+- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp2b/outputs/" folder
 """
 
 ## General settings
@@ -174,9 +174,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     OUTPUTS = [] # list of saved outputs
 
     ################################################################################
-    ########################## DOUBLE-LOOP SVRG VARIANTS ###########################
+    ############################# OPTIMAL SVRG-BUBECK ##############################
     ################################################################################
-
     ## SVRG-Bubeck with 1-nice sampling ( m = m^*, b = 1, step size = gamma^* )
     options.skip_error_calculation = skip_error[1] # skip error different for each algo
     numinneriters = -1                             # theoretical inner loop size (m^* = 20*Lmax/mu) set in initiate_SVRG_bubeck
@@ -201,16 +200,13 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     OUTPUTS = [OUTPUTS; out_bubeck]
 
     ################################################################################
-    ########################### OPTIMAL MINI-BATCH SIZE ############################
+    ############################## OPTIMAL FREE-SVRG ###############################
     ################################################################################
-    optimal_minibatch_free = optimal_minibatch_Free_SVRG_nice(n, mu, L, Lmax) # optimal b for m = n or equivalently p = 1/n (Free- et Leap-SVRG)
-    optimal_minibatch_decreasing = optimal_minibatch_L_SVRG_D_nice(n, mu, L, Lmax) # work in progress for L-SVRG-D
-
     ## Free-SVRG with optimal b-nice sampling ( m = n, b = b^*(n), step size = gamma^*(b^*) )
-    options.skip_error_calculation = skip_error[2] # skip error different for each algo
-    numinneriters = n                              # inner loop size set to the number of data points
-    options.batchsize = optimal_minibatch_free     # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    options.stepsize_multiplier = -1.0             # theoretical step size set in boot_Free_SVRG
+    options.skip_error_calculation = skip_error[2]                                      # skip error different for each algo
+    numinneriters = n                                                                   # inner loop size set to the number of data points
+    options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, n, mu, L, Lmax) # mini-batch size set to the optimal value for m=n (same for Free- and Leap-SVRG)
+    options.stepsize_multiplier = -1.0                                                  # theoretical step size set in boot_Free_SVRG
 
     sampling = build_sampling("nice", n, options)
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
@@ -222,16 +218,14 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b^*(n) = $str_b_free, \\gamma^*(b^*) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
 
-
     ################################################################################
-    ############################ LOOPLESS SVRG VARIANTS ############################
+    ############################## OPTIMAL LEAP-SVRG ###############################
     ################################################################################
-
     # ## Leap-SVRG with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step sizes = {eta^*=1/L, alpha^*(b^*)} )
-    # options.skip_error_calculation = skip_error[3]    # skip error different for each algo
-    # proba = 1/n                                       # update probability set to the inverse of the number of data points
-    # options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    # options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_Leap_SVRG
+    # options.skip_error_calculation = skip_error[3]                          # skip error different for each algo
+    # proba = 1/n                                                             # update probability set to the inverse of the number of data points
+    # options.batchsize = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # mini-batch size set to the optimal value for p=1/n (same for Free- and Leap-SVRG)
+    # options.stepsize_multiplier = -1.0                                      # theoretical step sizes set in boot_Leap_SVRG
     # sampling = build_sampling("nice", n, options)
     # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
 
@@ -244,12 +238,14 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta^* = $str_step_grad_leap, \\alpha^*(b^*) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
 
-
+    ################################################################################
+    ############################### OPTIMAL L-SVRG-D ###############################
+    ################################################################################
     ## L_SVRG_D with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step size = gamma^*(b^*) )
-    options.skip_error_calculation = skip_error[4]    # skip error different for each algo
-    proba = 1/n                                       # update probability set to the inverse of the number of data points
-    options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_L_SVRG_D
+    options.skip_error_calculation = skip_error[4]                             # skip error different for each algo
+    proba = 1/n                                                                # update probability set to the inverse of the number of data points
+    options.batchsize = optimal_minibatch_L_SVRG_D_nice(proba, n, mu, L, Lmax) # mini-batch size set to the optimal value for p=1/n
+    options.stepsize_multiplier = -1.0                                         # theoretical step sizes set in boot_L_SVRG_D
     sampling = build_sampling("nice", n, options)
     decreasing = initiate_L_SVRG_D(prob, options, sampling, proba)
 

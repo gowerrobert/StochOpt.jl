@@ -22,8 +22,8 @@ XXXX, around XXmin
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
-- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/sharp_SVRG/exp2a/figures/" folder
-- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/sharp_SVRG/exp2a/outputs/" folder
+- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp2a/figures/" folder
+- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp2a/outputs/" folder
 """
 
 ## General settings
@@ -172,9 +172,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     OUTPUTS = [] # list of saved outputs
 
     ################################################################################
-    ########################## DOUBLE-LOOP SVRG VARIANTS ###########################
+    ################################# SVRG-BUBECK ##################################
     ################################################################################
-
     ## SVRG-Bubeck with 1-nice sampling ( m = m^*, b = 1, step size = gamma^* )
     options.skip_error_calculation = skip_error[1] # skip error different for each algo
     numinneriters = -1                 # theoretical inner loop size (m^* = 20*Lmax/mu) set in initiate_SVRG_bubeck
@@ -198,6 +197,9 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     out_bubeck.name = latexstring("$(out_bubeck.name) \$(m^* = $str_m_bubeck, b = 1, \\gamma^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
 
+    ################################################################################
+    ################################## FREE-SVRG ###################################
+    ################################################################################
     ## Free-SVRG with 1-nice sampling ( m = n, b = 1, step size = gamma^*(1) )
     options.skip_error_calculation = skip_error[2] # skip error different for each algo
     numinneriters = n                  # inner loop size set to the number of data points
@@ -215,9 +217,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
 
 
     ################################################################################
-    ############################ LOOPLESS SVRG VARIANTS ############################
+    ################################## LEAP-SVRG ###################################
     ################################################################################
-
     # ## Leap-SVRG with 1-nice sampling ( p = 1/n, b = 1, step sizes = {eta^*=1/L, alpha^*(b)} )
     # options.skip_error_calculation = skip_error[3] # skip error different for each algo
     # proba = 1/n                        # update probability set to the inverse of the number of data points
@@ -234,7 +235,9 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b = 1, \\eta^* = $str_step_grad_leap, \\alpha^*(1) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
 
-
+    ################################################################################
+    ################################### L-SVRG-D ###################################
+    ################################################################################
     ## L_SVRG_D with 1-nice sampling ( p = 1/n, b = 1, step size = gamma^*(b) )
     options.skip_error_calculation = skip_error[4] # skip error different for each algo
     proba = 1/n                        # update probability set to the inverse of the number of data points
