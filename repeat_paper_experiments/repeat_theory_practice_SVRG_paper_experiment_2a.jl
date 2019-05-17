@@ -33,7 +33,8 @@ all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true
 using Distributed
 
 @everywhere begin
-    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
+    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
