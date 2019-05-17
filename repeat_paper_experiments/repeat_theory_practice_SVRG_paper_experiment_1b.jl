@@ -33,15 +33,22 @@ precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
-problems = parse.(Int64, ARGS)
-println(problems)
+# problems = parse.(Int64, ARGS)
+problems = [parse(Int64, ARGS[1])]
+machine = ARGS[2]
+println("problems :", problems)
 
 using Distributed
 
 @everywhere begin
-    # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
-    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
-    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+    if machine == "lame10"
+        path = "/cal/homes/ngazagnadou/StochOpt.jl/"   # lame10
+    elseif machine == "lame23"
+        path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+    elseif machine == "home"
+        path = "/home/nidham/phd/StochOpt.jl/"         # local
+    end
+    println("path: ", path)
 
     using JLD
     using Plots
