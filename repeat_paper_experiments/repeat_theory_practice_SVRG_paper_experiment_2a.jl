@@ -32,7 +32,11 @@ For each problem (data set + scaling process + regularization)
 a = parse(Int64, ARGS[1])
 b = parse(Int64, ARGS[2])
 problems = UnitRange{Int64}(a, b)
-println(problems)
+# println(problems)
+
+max_epochs = 50
+max_time = 60.0*60.0*10.0
+precision = 10.0^(-6) # 10.0^(-6)
 
 using Distributed
 
@@ -130,9 +134,6 @@ skip_errors = [[10^2 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-1
 #               50000,        # XXmin with XXX
 #               50000]        # XXmin with XXX
 
-max_epochs = 10
-precision = 10.0^(-4) # 10.0^(-6)
-
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
     scaling = scalings[idx_prob]
@@ -152,7 +153,7 @@ precision = 10.0^(-4) # 10.0^(-6)
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8,
                           max_epocs=max_epochs,
-                          max_time=60.0*60.0*10.0,
+                          max_time=max_time,
                           skip_error_calculation=10^5,
                           batchsize=1,
                           regularizor_parameter="normalized",
