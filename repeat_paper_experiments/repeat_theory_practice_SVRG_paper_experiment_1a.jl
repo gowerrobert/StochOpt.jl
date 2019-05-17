@@ -28,20 +28,27 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 2.0 #60.0*60.0*10.0
+max_time = 60.0*5.0 # 60.0*60.0*10.0
 precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
-problems = parse.(Int64, ARGS)
+# problems = parse.(Int64, ARGS)
+problems = [parse(Int64, ARGS[1])]
+machine = ARGS[2]
+println(machine)
 println(problems)
 
 using Distributed
 
 @everywhere begin
     # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
-    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
-    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+    if machine == "lame10"
+        path = "/cal/homes/ngazagnadou/StochOpt.jl/"   # lame10
+    elseif machine = "lame23"
+        path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+    end
+    println(path)
 
     using JLD
     using Plots
@@ -208,7 +215,7 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
 
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(probname, "-exp1a-", numsimu, "-avg")
+    savename = string(probname, "-exp1a-$(machine)-", numsimu, "-avg")
     savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")) # Extra suffix to check which skip values to keep
     if numsimu == 1
         save("$(save_path)data/$(savename).jld",
@@ -221,7 +228,7 @@ skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1
     legendpos = :topleft
     pyplot()
     exp_number = 1 # grid of mini-batch sizes
-    plot_empirical_complexity_Free_SVRG(prob, exp_number, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos)
+    plot_empirical_complexity_Free_SVRG(prob, exp_number, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="-$(machine)")
 
     println("Theoretical optimal mini-batch = ", b_theoretical)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")

@@ -284,7 +284,7 @@ end
 
 """
     plot_empirical_complexity_Free_SVRG(prob, exp_number, grid, empcomplex, b_practical, b_empirical, save_path ;
-                              numsimu=1, skip_multiplier=0.0, legendpos=:best)
+                              numsimu=1, skip_multiplier=0.0, legendpos=:best, suffix="")
 
 Saves the plot of the empirical total complexity vs the mini-batch or the inner loop size.
 
@@ -297,11 +297,12 @@ Saves the plot of the empirical total complexity vs the mini-batch or the inner 
     - **Int64** empirical_value: empirical optimal value\\
     - **AbstractString** save_path: path to the experiment directory\\
     - **Int64** numsimu: number of simulations on which the total complexity is average\\
-    - **Symbol** legendpos: position of the legend
+    - **Symbol** legendpos: position of the legend\\
+    - **AbstractString** suffix: suffix to append to the output file name
 #OUTPUTS:\\
     - None
 """
-function plot_empirical_complexity_Free_SVRG(prob::Prob, exp_number::Int64, grid::Array{Int64,1}, empcomplex::Array{Float64,1}, theoretical_value::Int64, empirical_value::Int64, save_path::AbstractString ;                                                   numsimu::Int64=1, skip_multiplier::Float64=0.0, legendpos::Symbol=:best)
+function plot_empirical_complexity_Free_SVRG(prob::Prob, exp_number::Int64, grid::Array{Int64,1}, empcomplex::Array{Float64,1}, theoretical_value::Int64, empirical_value::Int64, save_path::AbstractString ; numsimu::Int64=1, skip_multiplier::Float64=0.0, legendpos::Symbol=:best, suffix::AbstractString="")
     if !(exp_number in 1:2)
         error("Wrong choice of exp_number")
     end
@@ -343,6 +344,7 @@ function plot_empirical_complexity_Free_SVRG(prob::Prob, exp_number::Int64, grid
 
     if skip_multiplier > 0.0
         savename = string(savename, "_skip_mult_", replace(string(skip_multiplier), "." => "_")) # Extra suffix to check which skip values to keep
+        savename = string(savename, suffix)
     end
     savefig("$(save_path)figures/$(probname)$(savename).pdf")
 end
