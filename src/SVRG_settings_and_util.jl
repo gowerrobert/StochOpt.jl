@@ -13,7 +13,7 @@ Compute the optimal mini-batch size when the inner loop size m = n for the Free-
 """
 function optimal_minibatch_Free_SVRG_nice(n, mu, L, Lmax)
     b_hat = sqrt( (n*(3*Lmax-L)) / (2*(n*L-3*Lmax)) )
-    b_tilda = sqrt( (n*(3*Lmax-L)) / ((n*(n-1)*mu)/(2*log(2)) - n*L + 3*Lmax) )
+    b_tilda = sqrt( (n*(3*Lmax-L)) / ((n*(n-1)*mu)/(2*log(2)) - n*L + 3*Lmax) ) # ERROR for one dataset : negative number
     flag = "none"
 
     if n < L/mu
