@@ -36,7 +36,7 @@ precision = 10.0^(-6) # 10.0^(-6)
 # problems = parse.(Int64, ARGS)
 problems = [parse(Int64, ARGS[1])]
 machine = ARGS[2]
-println("problems :", problems)
+println("problems : ", problems)
 
 using Distributed
 
