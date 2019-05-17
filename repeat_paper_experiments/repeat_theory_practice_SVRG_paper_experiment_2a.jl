@@ -28,7 +28,11 @@ For each problem (data set + scaling process + regularization)
 
 
 ## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
+# all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
+a = parse(Int64, ARGS[1])
+b = parse(Int64, ARGS[2])
+problems = UnitRange{Int64}(a, b)
+println(problems)
 
 using Distributed
 
@@ -79,11 +83,11 @@ end
 #endregion
 
 ## Experiments settings
-if all_problems
-    problems = 1:10
-else
-    problems = 9:9
-end
+# if all_problems
+#     problems = 1:10
+# else
+#     problems = 9:9
+# end
 
 datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
@@ -112,8 +116,8 @@ skip_errors = [[10^2 10^4 10^4 10^4],  # ijcnn1_full + scaled + 1e-1
                [10^3 10^3 10^3 10^3],  # YearPredictionMSD_full + scaled + 1e-3
                [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-1
                [10^3 10^3 10^3 10^3],  # covtype_binary + scaled + 1e-3
-               [10^4 10^4 10^4 10^4],  # real-sim + scaled + 1e-1
-               [10^4 10^4 10^4 10^4]]  # real-sim + scaled + 1e-3
+               [10^2 10^3 10^3 10^3],  # real-sim + scaled + 1e-1
+               [10^2 10^3 10^3 10^3]]  # real-sim + scaled + 1e-3
 
 # skip_error = [10000,         # XXmin with XXX
 #               10000,         # XXmin with XXX
@@ -259,6 +263,13 @@ precision = 10.0^(-4) # 10.0^(-6)
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(max_epochs)_epochs-new-new", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
+    if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
+        suffix = "lame10"
+    elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
+        suffix = "lame23"
+    else
+        suffix = ""
+    end
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(max_epochs)-$(suffix)_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
 
 end

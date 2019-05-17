@@ -28,7 +28,11 @@ For each problem (data set + scaling process + regularization)
 
 
 ## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
+# all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
+a = parse(Int64, ARGS[1])
+b = parse(Int64, ARGS[2])
+problems = UnitRange{Int64}(a, b)
+println(problems)
 
 using Distributed
 
@@ -75,11 +79,11 @@ end
 
 ## Experiments settings
 numsimu = 1 # number of runs of mini-batch SAGA for averaging the empirical complexity
-if all_problems
-    problems = 1:10
-else
-    problems = 1:1
-end
+# if all_problems
+#     problems = 1:10
+# else
+#     problems = 1:1
+# end
 
 datasets = ["slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
@@ -131,7 +135,7 @@ precision = 10.0^(-4)
     ## Setting up the problem
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8, max_epocs=10^8,
-                          max_time=60.0*60.0*3.0,
+                          max_time=60.0*60.0*6.0,
                           skip_error_calculation=10^4,
                           batchsize=1,
                           regularizor_parameter = "normalized",
