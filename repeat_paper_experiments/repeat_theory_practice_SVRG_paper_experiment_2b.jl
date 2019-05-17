@@ -39,7 +39,8 @@ println(problems)
 using Distributed
 
 @everywhere begin
-    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
+    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
