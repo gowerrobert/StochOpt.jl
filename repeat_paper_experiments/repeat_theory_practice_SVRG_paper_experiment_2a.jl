@@ -115,18 +115,18 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[10^2 10^4 X 10^4],  # ijcnn1_full + scaled + 1e-1
-               [10^4 10^4 X 10^4],  # ijcnn1_full + scaled + 1e-3
-               [10^4 10^4 X 10^4],  # slice + scaled + 1e-1
-               [10^4 10^4 X 10^4],  # slice + scaled + 1e-3
-               [10^3 10^3 X 10^3],  # YearPredictionMSD_full + scaled + 1e-1
-               [10^3 10^3 X 10^3],  # YearPredictionMSD_full + scaled + 1e-3
-               [10^3 10^3 X 10^3],  # covtype_binary + scaled + 1e-1
-               [10^3 10^3 X 10^3],  # covtype_binary + scaled + 1e-3
-               [10^2 10^3 X 10^3],  # real-sim + unscaled + 1e-1
-               [10^2 10^3 X 10^3],  # real-sim + unscaled + 1e-3
-               [10^2 10^3 X 10^3],  # rcv1_full + unscaled + 1e-1
-               [10^2 10^3 X 10^3]]  # rcv1_full + unscaled + 1e-3
+skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
+               [10^4 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-3
+               [10^4 10^4 -2. 10^4],  # slice + scaled + 1e-1
+               [10^4 10^4 -2. 10^4],  # slice + scaled + 1e-3
+               [10^3 10^3 -2. 10^3],  # YearPredictionMSD_full + scaled + 1e-1
+               [10^3 10^3 -2. 10^3],  # YearPredictionMSD_full + scaled + 1e-3
+               [10^3 10^3 -2. 10^3],  # covtype_binary + scaled + 1e-1
+               [10^3 10^3 -2. 10^3],  # covtype_binary + scaled + 1e-3
+               [10^2 10^3 -2. 10^3],  # real-sim + unscaled + 1e-1
+               [10^2 10^3 -2. 10^3],  # real-sim + unscaled + 1e-3
+               [10^2 10^3 -2. 10^3],  # rcv1_full + unscaled + 1e-1
+               [10^2 10^3 -2. 10^3]]  # rcv1_full + unscaled + 1e-3
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
