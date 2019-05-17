@@ -34,9 +34,9 @@ precision = 10.0^(-4) # 10.0^(-6)
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
 # problems = parse.(Int64, ARGS)
-problems = [parse(Int64, ARGS[1])]
-machine = ARGS[2]
-println("problems : ", problems)
+machine = ARGS[1]
+problems = [parse(Int64, ARGS[2])]
+println("problems: ", problems)
 
 using Distributed
 
