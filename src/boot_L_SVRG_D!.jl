@@ -102,7 +102,7 @@ function boot_L_SVRG_D!(prob::Prob, method::L_SVRG_D_method, options::MyOptions)
     elseif options.stepsize_multiplier == -1.0
         if occursin("nice", method.sampling.name)
             p = method.reference_update_proba
-            aux = ( p * (2-p) * (3-2*p) ) / ( (7-4*p) * (1-(1-p)^1.5) )
+            aux = ( p*(2-p)*(3-2*p) ) / ( (7-4*p)*(1-(1-p)^1.5) )
             method.initial_stepsize =  aux / (2 * method.expected_smoothness)   # theoretical value
             method.stepsize = method.initial_stepsize
             println("Automatically set L-SVRG-D initial step size: ", method.stepsize)
