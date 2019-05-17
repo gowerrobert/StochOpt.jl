@@ -34,17 +34,17 @@ end
 Random.seed!(1)
 
 ## Basic parameters and options for solvers
-# options = set_options(max_iter=10^8, max_time=10.0^4, max_epocs=50, force_continue=false, initial_point="zeros", skip_error_calculation=1000, repeat_stepsize_calculation=false, rep_number=3)
+options = set_options(max_iter=10^8, max_time=10.0^4, max_epocs=50, force_continue=false, initial_point="zeros", skip_error_calculation=1000, repeat_stepsize_calculation=false, rep_number=3)
 
 
 ## Settings to monitor leaping (error computed at each iteration, very few epochs)
-options = set_options(max_iter=20, max_time=10.0^8, max_epocs=10^8, initial_point="zeros", skip_error_calculation = 1)
+# options = set_options(max_iter=20, max_time=10.0^8, max_epocs=10^8, initial_point="zeros", skip_error_calculation = 1)
 # options = set_options(max_iter=10^8, max_time=10.0^8, max_epocs=10, initial_point="zeros", skip_error_calculation=1, repeat_stepsize_calculation=true, rep_number=3)
 
 ## Load problem
 datapath = "./data/"
-data = "australian"     # n =     690, d = 15
-# data = "ijcnn1_full"    # n = 141,691, d = 23
+# data = "australian"     # n =     690, d = 15
+data = "ijcnn1_full"    # n = 141,691, d = 23
 # data = "covtype_binary" # n = 581,012, d = 55
 X, y = loadDataset(datapath, data)
 prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="column-scaling")
@@ -74,7 +74,7 @@ OUTPUTS = []  # List of saved outputs
 
 numinneriters = prob.numdata
 if numinneriters == prob.numdata
-    options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+    options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, prob.numdata, prob.mu, prob.L, prob.Lmax)
 else
     options.batchsize = 1 # default value for other inner loop sizes
 end
@@ -104,7 +104,7 @@ println("Theoretical optimal mini-batch size: ", f1.batchsize)
 
 numinneriters = prob.numdata
 if numinneriters == prob.numdata
-    options.batchsize = optimal_minibatch_Free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+    options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, prob.numdata, prob.mu, prob.L, prob.Lmax)
 else
     options.batchsize = 1 # default value for other inner loop sizes
 end
@@ -124,7 +124,7 @@ output.name = latexstring("\$m = n = $str_m_2, b^*(n) = $str_b_2, \\gamma_\\math
 OUTPUTS = [OUTPUTS; output]
 
 ## m = n/b, b = 10, step size = gamma^*(b)
-options.skip_error_calculation = 500
+options.skip_error_calculation = 50
 
 options.batchsize = 10
 numinneriters = round(Int64, prob.numdata/options.batchsize)

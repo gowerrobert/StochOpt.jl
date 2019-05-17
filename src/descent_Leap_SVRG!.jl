@@ -14,17 +14,15 @@ Compute the descent direction (d).
 - **NONE**
 """
 function descent_Leap_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, method::Leap_SVRG_method, iter::Int64, d::Array{Float64})
+    ## - Implementation to double check
+
     gradient_counter = 0 # number of stochastic gradients computed during this iteration
 
     # println("ref point norm: ", norm(method.reference_point))
 
-    if iter > 1
-        flipped_coin = rand(method.reference_update_distrib)
-    end
-
     ## Initialization
     if iter == 1
-        println("Initialization of the reference point and gradient")
+        # println("Initialization of the reference point and gradient")
         method.reference_point[:] = x # initialize reference point
 
         # update reference gradient: mu = \nabla f(w^0)
@@ -38,39 +36,44 @@ function descent_Leap_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         end
 
         # method.stepsize = method.gradient_stepsize # \alpha_0 = \eta, should already be set in boot
-    ## Stochastic update of the reference and the step size
-    elseif flipped_coin
-        # println("Update the reference point, gradient and step size")
-        method.reference_point[:] = x # update reference point: w^{k+1} = x^{k+1}
-
-        # update reference gradient: mu = \nabla f(w^{k+1})
-        if prob.numdata > 10^8 || prob.numfeatures > 10^8
-            sampled_indices = sample(1:prob.numdata, 100, replace=false)
-            method.reference_grad[:] = prob.g_eval(method.reference_point, sampled_indices) # update stochastic reference gradient
-            gradient_counter += 100
-        else
-            method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # update full reference gradient
-            gradient_counter += prob.numdata
-        end
-
-        method.stepsize = method.gradient_stepsize # \alpha_{k+1} = \eta
-    else
-        # println("Update only the step size")
-        method.stepsize = method.stochastic_stepsize # \alpha_{k+1} = \alpha
-    end
-
-    ## Sampling method
-    sampled_indices = method.sampling.sampleindices(method.sampling)
-    # println("sampled_indices: ", sampled_indices)
-    if isempty(sampled_indices) # if no point is sampled
         d[:] = -method.reference_grad
     else
-        if norm(x - method.reference_point) < 1e-7
-            println("x = ref point")
+        ## Stochastic update of the reference and the step size
+        flipped_coin = rand(method.reference_update_distrib)
+        if flipped_coin
+            println("Leap-SVRG update at iteration: ", iter)
+            method.reference_point[:] = x # update reference point: w^{k+1} = x^{k+1}
+
+            # update reference gradient: mu = \nabla f(w^{k+1})
+            if prob.numdata > 10^8 || prob.numfeatures > 10^8
+                sampled_indices = sample(1:prob.numdata, 100, replace=false)
+                method.reference_grad[:] = prob.g_eval(method.reference_point, sampled_indices) # update stochastic reference gradient
+                gradient_counter += 100
+            else
+                method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # update full reference gradient
+                gradient_counter += prob.numdata
+            end
+
+            method.stepsize = method.gradient_stepsize # \alpha_{k+1} = \eta
+            d[:] = -method.reference_grad
+        else
+            # println("Update only the step size")
+            method.stepsize = method.stochastic_stepsize # \alpha_{k+1} = \alpha
+
+            ## Sampling method
+            sampled_indices = method.sampling.sampleindices(method.sampling)
+            # println("sampled_indices: ", sampled_indices)
+            if isempty(sampled_indices) # if no point is sampled
+                d[:] = -method.reference_grad
+            else
+                # if norm(x - method.reference_point) < 1e-7
+                #     println("x = ref point")
+                # end
+                d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
+            end
+            gradient_counter += 2*length(sampled_indices)
         end
-        d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
     end
-    gradient_counter += 2*length(sampled_indices)
 
     ## Monitoring the number of computed gradient during this iteration
     method.number_computed_gradients = [method.number_computed_gradients method.number_computed_gradients[end] + gradient_counter]

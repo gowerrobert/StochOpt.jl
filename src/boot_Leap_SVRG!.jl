@@ -107,7 +107,7 @@ function boot_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOption
         options.skip_error_calculation = ceil(options.max_epocs*prob.numdata/(options.batchsize*30)) # show 30 points between 0 and the max number of epochs
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
-    println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
+    # println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
 end
 
 
@@ -124,7 +124,7 @@ Reset the Loopless-SVRG, especially the step size, the point and gradient refere
 - **NONE**
 """
 function reset_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOptions)
-    println("\n---- RESET LEAP-SVRG ----\n")
+    println("---- RESET LEAP-SVRG ----")
 
     method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot

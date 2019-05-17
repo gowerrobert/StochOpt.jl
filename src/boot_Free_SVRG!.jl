@@ -102,7 +102,7 @@ function boot_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOption
         averaging_weights = [(1-method.stepsize*method.mu)^(method.numinneriters-1-t) for t in 0:(method.numinneriters-1)]
         method.averaging_weights = averaging_weights ./ sum(averaging_weights)
 
-        println("Sanity check: weights sum to 1 ? ---> ", sum(method.averaging_weights),"\n\n")
+        # println("Sanity check: weights sum to 1 ? ---> ", sum(method.averaging_weights),"\n\n")
     end
     # println("Averaging weights")
     # println(method.averaging_weights)
@@ -112,7 +112,7 @@ function boot_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOption
         options.skip_error_calculation = ceil(options.max_epocs*prob.numdata/(options.batchsize*30)) # show 30 points between 0 and the max number of epochs
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
-    println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
+    # println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
 end
 
 
@@ -129,7 +129,7 @@ Reset the Free-SVRG method with b-nice sampling, especially the step size, the p
 - **NONE**
 """
 function reset_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOptions)
-    println("\n---- RESET FREE-SVRG ----\n")
+    println("---- RESET FREE-SVRG ----")
 
     method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot

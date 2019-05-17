@@ -25,7 +25,7 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
 
     ## SVRG outerloop
     if iter%method.numinneriters == 1 || method.numinneriters == 1 # reset reference point and gradient
-        # println("\n\nSVRG outer loop at iteration: ", iter)
+        println("Free-SVRG outer loop at iteration: ", iter)
         if isempty(method.averaging_weights)
             method.reference_point[:] = x # Reference point set to last iterate iterates x^m
         else
@@ -53,9 +53,8 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         # if norm(x - method.reference_point) < 1e-7
         #     println("Outerloop, iter: ", iter, ", x = ref point")
         # end
-
-        # d[:] = -method.reference_grad; # WRONG: the first iteration of the inner loop is equivalent to a gradient step
     end
+
     ## SVRG inner step
     # println("---- SVRG inner loop at iteration: ", iter)
     if !isempty(method.averaging_weights)
@@ -68,22 +67,25 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
         method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x
     end
 
-    ## Sampling method
-    sampled_indices = method.sampling.sampleindices(method.sampling)
-    # println("sampled_indices: ", sampled_indices)
-
     # if norm(x - method.reference_point) < 1e-7
     #     println("Innerloop, iter: ", iter, ", x = ref point")
     # end
 
-    # TO CORRECT: no additional gradients computed for iter ==1
-    if iter == 1 || isempty(sampled_indices) # if no point is sampled
+    ## Computing descent direction
+    if iter == 1 # at first iteration the reference and the initial point are equal
         d[:] = -method.reference_grad
     else
-        d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
+        ## Sampling method
+        sampled_indices = method.sampling.sampleindices(method.sampling)
+        # println("sampled_indices: ", sampled_indices)
+        if isempty(sampled_indices) # if no point is sampled
+            d[:] = -method.reference_grad
+        else
+            d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
+        end
+        gradient_counter += 2*length(sampled_indices)
     end
     #  println("|d| ", norm(d))
-    gradient_counter += 2*length(sampled_indices)
 
     ## Monitoring the number of computed gradient during this iteration
     method.number_computed_gradients = [method.number_computed_gradients method.number_computed_gradients[end] + gradient_counter]

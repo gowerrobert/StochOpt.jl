@@ -18,7 +18,7 @@ function descent_L_SVRG_D!(x::Array{Float64}, prob::Prob, options::MyOptions, me
 
     ## Initialization at first iteration
     if iter == 1
-        println("Initialization of the reference point and gradient")
+        # println("Initialization of the reference point and gradient")
         method.reference_point[:] = x # initialize reference point
 
         if prob.numdata > 10^8 || prob.numfeatures > 10^8
@@ -43,14 +43,14 @@ function descent_L_SVRG_D!(x::Array{Float64}, prob::Prob, options::MyOptions, me
         gradient_counter += 2*length(sampled_indices)
     end
 
-    if norm(x - method.reference_point) < 1e-7
-        println("iter: ", iter, ", x = ref point")
-    end
+    # if norm(x - method.reference_point) < 1e-7
+    #     println("iter: ", iter, ", x = ref point")
+    # end
 
     ## Stochastic update of the reference
     flipped_coin = rand(method.reference_update_distrib)
     if flipped_coin
-        println("\n\nUpdate the step size, the reference point and gradient")
+        println("L-SVRG-D update at iteration: ", iter)
         method.reference_point[:] = x # update reference point
 
         if prob.numdata > 10^8 || prob.numfeatures > 10^8

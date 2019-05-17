@@ -109,7 +109,7 @@ function boot_L_SVRG_D!(prob::Prob, method::L_SVRG_D_method, options::MyOptions)
         else
             error("No theoretical step size available for L-SVRG-D with this sampling")
         end
-        println("Theoretical initial step size: ", method.stepsize)
+        # println("Theoretical initial step size: ", method.stepsize)
     else
         error("Invalid options.stepsize_multiplier")
     end
@@ -119,7 +119,7 @@ function boot_L_SVRG_D!(prob::Prob, method::L_SVRG_D_method, options::MyOptions)
         options.skip_error_calculation = ceil(options.max_epocs*prob.numdata/(options.batchsize*30)) # show 30 points between 0 and the max number of epochs
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
-    println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
+    # println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
 end
 
 
@@ -136,7 +136,7 @@ Reset the Loopless-SVRG-Decreasing, especially the step size, the point and grad
 - **NONE**
 """
 function reset_L_SVRG_D!(prob::Prob, method::L_SVRG_D_method, options::MyOptions)
-    println("\n---- RESET LOOPLESS-SVRG-DECREASING ----\n")
+    println("---- RESET LOOPLESS-SVRG-DECREASING ----")
 
     method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0          # Will be set during boot
