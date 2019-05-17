@@ -216,21 +216,21 @@ precision = 10.0^(-4) # 10.0^(-6)
     ############################ LOOPLESS SVRG VARIANTS ############################
     ################################################################################
 
-    ## Leap-SVRG with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step sizes = {eta^*=1/L, alpha^*(b^*)} )
-    proba = 1/n                                       # update probability set to the inverse of the number of data points
-    options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
-    options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_Leap_SVRG
-    sampling = build_sampling("nice", n, options)
-    leap = initiate_Leap_SVRG(prob, options, sampling, proba)
+    # ## Leap-SVRG with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step sizes = {eta^*=1/L, alpha^*(b^*)} )
+    # proba = 1/n                                       # update probability set to the inverse of the number of data points
+    # options.batchsize = optimal_minibatch_decreasing  # mini-batch size set to the optimal value for m=n (same for Free-, Leap- and L-SVRG-D)
+    # options.stepsize_multiplier = -1.0                # theoretical step sizes set in boot_Leap_SVRG
+    # sampling = build_sampling("nice", n, options)
+    # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
 
-    out_leap = minimizeFunc(prob, leap, options)
+    # out_leap = minimizeFunc(prob, leap, options)
 
-    str_proba_leap = @sprintf "%.2e" proba
-    str_b_leap = @sprintf "%d" leap.batchsize
-    str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
-    str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
-    out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta^* = $str_step_grad_leap, \\alpha^*(b^*) = $str_step_sto_leap)\$")
-    OUTPUTS = [OUTPUTS; out_leap]
+    # str_proba_leap = @sprintf "%.2e" proba
+    # str_b_leap = @sprintf "%d" leap.batchsize
+    # str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
+    # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
+    # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta^* = $str_step_grad_leap, \\alpha^*(b^*) = $str_step_sto_leap)\$")
+    # OUTPUTS = [OUTPUTS; out_leap]
 
 
     ## L_SVRG_D with optimal b-nice sampling ( p = 1/n, b = b^*(1/n), step size = gamma^*(b^*) )
