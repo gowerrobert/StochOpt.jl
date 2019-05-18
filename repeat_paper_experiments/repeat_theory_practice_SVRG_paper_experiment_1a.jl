@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*10.0
+max_time = 60.0*60.0*1.0 #60.0*60.0*1.0
 precision = 10.0^(-4) # 10.0^(-6)
 
 ## Bash input
@@ -119,8 +119,8 @@ lambdas = [10^(-1), 10^(-3),
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
 skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # OK max_time = 60.0*5.0
                     0.05,       # 2)  ijcnn1_full + scaled + 1e-3
-                    0.01,       # 3)  YearPredictionMSD_full + scaled + 1e-1
-                    0.01,       # 4)  YearPredictionMSD_full + scaled + 1e-3
+                    0.1,       # 3)  YearPredictionMSD_full + scaled + 1e-1  #0.01
+                    0.1,       # 4)  YearPredictionMSD_full + scaled + 1e-3  #0.01
                     0.01,       # 5)  covtype_binary + scaled + 1e-1
                     0.1,        # 6)  covtype_binary + scaled + 1e-3
                     0.1,        # 7)  slice + scaled + 1e-1
@@ -130,12 +130,12 @@ skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # 
                     1.0,        # 11) rcv1_full + unscaled + 1e-1
                     1.0]        # 12) rcv1_full + unscaled + 1e-3
 
-grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, n], # 1)  ijcnn1_full + scaled + 1e-1 OK
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, n], # 2)  ijcnn1_full + scaled + 1e-3
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 3)  YearPredictionMSD_full + scaled + 1e-1
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 4)  YearPredictionMSD_full + scaled + 1e-3
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 5)  covtype_binary + scaled + 1e-1
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 6)  covtype_binary + scaled + 1e-3
+grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 1)  ijcnn1_full + scaled + 1e-1 OK
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 2)  ijcnn1_full + scaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, 515345], # 3)  YearPredictionMSD_full + scaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, 515345], # 4)  YearPredictionMSD_full + scaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 581012], # 5)  covtype_binary + scaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 581012], # 6)  covtype_binary + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 7)  slice + scaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 8)  slice + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 9)  real-sim + unscaled + 1e-1
