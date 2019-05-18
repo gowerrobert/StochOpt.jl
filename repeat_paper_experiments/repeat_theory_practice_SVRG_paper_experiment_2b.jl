@@ -121,18 +121,18 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
-               [10^4 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-3
-               [10^4 10^4 -2. 10^4],  # YearPredictionMSD_full + scaled + 1e-1
-               [10^4 10^4 -2. 10^4],  # YearPredictionMSD_full + scaled + 1e-3
-               [10^3 10^3 -2. 10^3],  # covtype_binary + scaled + 1e-1
-               [10^3 10^3 -2. 10^3],  # covtype_binary + scaled + 1e-3
-               [10^3 10^3 -2. 10^3],  # slice + scaled + 1e-1
-               [10^3 10^3 -2. 10^3],  # slice + scaled + 1e-3
-               [10^2 10^3 -2. 10^3],  # real-sim + unscaled + 1e-1
-               [10^2 10^3 -2. 10^3],  # real-sim + unscaled + 1e-3
-               [10^2 10^3 -2. 10^3],  # rcv1_full + unscaled + 1e-1
-               [10^2 10^3 -2. 10^3]]  # rcv1_full + unscaled + 1e-3
+skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
+               [10^4 10^4 -2. 10^4],  # 2)  ijcnn1_full + scaled + 1e-3
+               [10^4 10^4 -2. 10^4],  # 3)  YearPredictionMSD_full + scaled + 1e-1
+               [10^4 10^4 -2. 10^4],  # 4)  YearPredictionMSD_full + scaled + 1e-3
+               [10^3 10^3 -2. 10^3],  # 5)  covtype_binary + scaled + 1e-1
+               [10^3 10^3 -2. 10^3],  # 6)  covtype_binary + scaled + 1e-3
+               [10^3 10^3 -2. 10^3],  # 7)  slice + scaled + 1e-1
+               [10^3 10^3 -2. 10^3],  # 8)  slice + scaled + 1e-3
+               [10^2 10^3 -2. 10^3],  # 9)  real-sim + unscaled + 1e-1
+               [10^2 10^3 -2. 10^3],  # 10) real-sim + unscaled + 1e-3
+               [10^2 10^3 -2. 10^3],  # 11) rcv1_full + unscaled + 1e-1
+               [10^2 10^3 -2. 10^3]]  # 12) rcv1_full + unscaled + 1e-3
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -227,6 +227,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b^*(n) = $str_b_free, \\gamma^*(b^*) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
 
+    #region
     ################################################################################
     ############################## OPTIMAL LEAP-SVRG ###############################
     ################################################################################
@@ -246,6 +247,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # ijcnn1_full + scaled + 1e-1
     # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
     # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta^* = $str_step_grad_leap, \\alpha^*(b^*) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
+    #endregion
 
     ################################################################################
     ############################### OPTIMAL L-SVRG-D ###############################

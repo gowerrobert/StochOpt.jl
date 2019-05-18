@@ -117,18 +117,18 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [0.1,        # ijcnn1_full + scaled + 1e-1             # OK max_time = 60.0*5.0
-                    0.05,       # ijcnn1_full + scaled + 1e-3
-                    0.01,       # YearPredictionMSD_full + scaled + 1e-1
-                    0.01,       # YearPredictionMSD_full + scaled + 1e-3
-                    0.01,       # covtype_binary + scaled + 1e-1
-                    0.1,       # covtype_binary + scaled + 1e-3
-                    0.1,        # slice + scaled + 1e-1
-                    1.0,        # slice + scaled + 1e-3
-                    1.0,        # real-sim + unscaled + 1e-1
-                    1.0,        # real-sim + unscaled + 1e-3
-                    1.0,        # rcv1_full + unscaled + 1e-1
-                    1.0]        # rcv1_full + unscaled + 1e-3
+skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # OK max_time = 60.0*5.0
+                    0.05,       # 2)  ijcnn1_full + scaled + 1e-3
+                    0.01,       # 3)  YearPredictionMSD_full + scaled + 1e-1
+                    0.01,       # 4)  YearPredictionMSD_full + scaled + 1e-3
+                    0.01,       # 5)  covtype_binary + scaled + 1e-1
+                    0.1,        # 6)  covtype_binary + scaled + 1e-3
+                    0.1,        # 7)  slice + scaled + 1e-1
+                    1.0,        # 8)  slice + scaled + 1e-3
+                    1.0,        # 9)  real-sim + unscaled + 1e-1
+                    1.0,        # 10) real-sim + unscaled + 1e-3
+                    1.0,        # 11) rcv1_full + unscaled + 1e-1
+                    1.0]        # 12) rcv1_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems
