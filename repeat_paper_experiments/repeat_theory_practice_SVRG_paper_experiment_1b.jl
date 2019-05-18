@@ -117,18 +117,18 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [0.001,      # ijcnn1_full + scaled + 1e-1
-                    0.001,        # ijcnn1_full + scaled + 1e-3
-                    0.01,       # YearPredictionMSD_full + scaled + 1e-1
-                    0.01,       # YearPredictionMSD_full + scaled + 1e-3
-                    0.01,       # covtype_binary + scaled + 1e-1
-                    1.0,       # covtype_binary + scaled + 1e-3
-                    0.1,        # slice + scaled + 1e-1
-                    1.0,        # slice + scaled + 1e-3
-                    1.0,        # real-sim + unscaled + 1e-1
-                    1.0,        # real-sim + unscaled + 1e-3
-                    1.0,        # rcv1_full + unscaled + 1e-1
-                    1.0]        # rcv1_full + unscaled + 1e-3
+skip_multipliers = [0.001,      # 1)  ijcnn1_full + scaled + 1e-1
+                    0.001,      # 2)  ijcnn1_full + scaled + 1e-3
+                    0.01,       # 3)  YearPredictionMSD_full + scaled + 1e-1
+                    0.01,       # 4)  YearPredictionMSD_full + scaled + 1e-3
+                    0.01,       # 5)  covtype_binary + scaled + 1e-1
+                    1.0,        # 6)  covtype_binary + scaled + 1e-3
+                    0.1,        # 7)  slice + scaled + 1e-1
+                    1.0,        # 8)  slice + scaled + 1e-3
+                    1.0,        # 9)  real-sim + unscaled + 1e-1
+                    1.0,        # 10) real-sim + unscaled + 1e-3
+                    1.0,        # 11) rcv1_full + unscaled + 1e-1
+                    1.0]        # 12) rcv1_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -176,7 +176,7 @@ skip_multipliers = [0.001,      # ijcnn1_full + scaled + 1e-1
     L = prob.L
 
     ## Computing theoretical optimal inner loop for 1-nice sampling
-    m_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
+    m_theoretical = round(Int, 3*Lmax / mu) # optimal m for Free-SVRG whith 1-nice sampling (\cL = Lmax)
     println("Theoretical optimal inner loop = ", m_theoretical)
 
     ## Computing the optimal empirical inner loop size over a grid
