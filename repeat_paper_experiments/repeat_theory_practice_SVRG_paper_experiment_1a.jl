@@ -73,9 +73,11 @@ save_path = "$(path)experiments/theory_practice_SVRG/"
 #region
 if !isdir(save_path)
     mkdir(save_path)
-    mkdir("$(save_path)exp1a/")
 end
 save_path = "$(save_path)exp1a/"
+if !isdir(save_path)
+    mkdir(save_path)
+end
 if !isdir("$(save_path)data/")
     mkdir("$(save_path)data/")
 end
@@ -86,6 +88,7 @@ if !isdir("$(save_path)outputs/")
     mkdir("$(save_path)outputs/")
 end
 #endregion
+
 
 ## Experiments settings
 numsimu = 1 # number of runs of Free-SVRG for averaging the empirical complexity

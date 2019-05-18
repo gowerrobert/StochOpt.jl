@@ -73,9 +73,11 @@ save_path = "$(path)experiments/theory_practice_SVRG/"
 #region
 if !isdir(save_path)
     mkdir(save_path)
-    mkdir("$(save_path)exp1b/")
 end
 save_path = "$(save_path)exp1b/"
+if !isdir(save_path)
+    mkdir(save_path)
+end
 if !isdir("$(save_path)data/")
     mkdir("$(save_path)data/")
 end
