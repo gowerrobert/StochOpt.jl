@@ -130,11 +130,24 @@ skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # 
                     1.0,        # 11) rcv1_full + unscaled + 1e-1
                     1.0]        # 12) rcv1_full + unscaled + 1e-3
 
+grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, n], # 1)  ijcnn1_full + scaled + 1e-1 OK
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, n], # 2)  ijcnn1_full + scaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 3)  YearPredictionMSD_full + scaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 4)  YearPredictionMSD_full + scaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 5)  covtype_binary + scaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n], # 6)  covtype_binary + scaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 7)  slice + scaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 8)  slice + scaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 9)  real-sim + unscaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 10) real-sim + unscaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 11) rcv1_full + unscaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]] # 12) rcv1_full + unscaled + 1e-3
+
 @time begin
 @sync @distributed for idx_prob in problems
-    data = datasets[idx_prob];
-    scaling = scalings[idx_prob];
-    lambda = lambdas[idx_prob];
+    data = datasets[idx_prob]
+    scaling = scalings[idx_prob]
+    lambda = lambdas[idx_prob]
     println("EXPERIMENT : ", idx_prob, " over ", length(problems))
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda;
 
@@ -179,17 +192,7 @@ skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # 
     b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
 
     ## Computing the empirical mini-batch size over a grid
-    if data == "covtype_binary"
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
-    elseif data == "ijcnn1_full" #&& lambda == 10^(-1)
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, n] # perfect
-    elseif data == "real-sim"
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
-    elseif data == "YearPredictionMSD_full"
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, n]
-    else
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
-    end
+    minibatchgrid = grids[idx_prob]
     println("---------------------------------- MINI-BATCH GRID ------------------------------------------")
     println(minibatchgrid)
     println("---------------------------------------------------------------------------------------------")
