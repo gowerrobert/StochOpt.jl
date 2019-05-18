@@ -130,6 +130,20 @@ skip_multipliers = [0.001,      # 1)  ijcnn1_full + scaled + 1e-1
                     1.0,        # 11) rcv1_full + unscaled + 1e-1
                     1.0]        # 12) rcv1_full + unscaled + 1e-3
 
+## Grid of inner loop values
+grids = [[2^0, 2^2, 2^4, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^16, 2^18, 2^19],
+         [2^0, 2^4, 2^8, 2^12, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19, 2^20],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16],
+         [2^0, 2^8, 2^12, 2^16]]
+
 @time begin
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob];
@@ -180,15 +194,16 @@ skip_multipliers = [0.001,      # 1)  ijcnn1_full + scaled + 1e-1
     println("Theoretical optimal inner loop = ", m_theoretical)
 
     ## Computing the optimal empirical inner loop size over a grid
-    if data == "ijcnn1_full"
-        inner_loop_grid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19]
-    elseif data == "slice"
-        inner_loop_grid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19]
-    elseif m_theoretical == 1
-        inner_loop_grid = [m_theoretical, round(Int, m_theoretical*2^2), round(Int, m_theoretical*2^4), round(Int, m_theoretical*2^6)]
-    else
-        inner_loop_grid = [max(round(Int, m_theoretical*2^(-4)), 1), m_theoretical, round(Int, m_theoretical*2^4)]
-    end
+    inner_loop_grid = grids[idx_prob]
+    # if data == "ijcnn1_full" && lambda == 1e-1
+    #     inner_loop_grid = [2^0, 2^2, 2^4, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^16, 2^18, 2^20]
+    # elseif data == "slice"
+    #     inner_loop_grid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19]
+    # elseif m_theoretical == 1
+    #     inner_loop_grid = [m_theoretical, round(Int, m_theoretical*2^2), round(Int, m_theoretical*2^4), round(Int, m_theoretical*2^6)]
+    # else
+    #     inner_loop_grid = [max(round(Int, m_theoretical*2^(-4)), 1), m_theoretical, round(Int, m_theoretical*2^4)]
+    # end
 
     println("---------------------------------- INNER LOOP GRID ------------------------------------------")
     println(inner_loop_grid)
