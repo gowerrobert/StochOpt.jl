@@ -176,6 +176,11 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
             sampling = build_sampling("nice", n, options)
             free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
             output = minimizeFunc(prob, free, options)
+
+            println("----------------------------- # EPOCHS[END] -------------------------------------")
+            println(output.epochs[end])
+            println("----------------------------------------------------------------------------------------")
+
             println("Output fail = ", output.fail, "\n")
             itercomplex[idx_b] += output.iterations
 

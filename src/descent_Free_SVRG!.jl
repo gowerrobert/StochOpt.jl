@@ -32,7 +32,7 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
             if iter == 1
                 method.reference_point[:] = x # Reference point set to initial point x_0^m
             else
-                method.reference_point[:] = method.new_reference_point; # Reference point set to the weighted average of iterates from x^0 to x^{m-1}
+                method.reference_point[:] = method.new_reference_point # Reference point set to the weighted average of iterates from x^0 to x^{m-1}
             end
             # println("Resetting new_reference_point to zero")
             method.new_reference_point[:] = zeros(prob.numfeatures)
@@ -59,9 +59,9 @@ function descent_Free_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, m
     # println("---- SVRG inner loop at iteration: ", iter)
     if !isempty(method.averaging_weights)
         if iter % method.numinneriters == 0 # small index shift: weight a_m times point x_{s+1}^{m-1}
-            idx_weights = method.numinneriters; # i = m
+            idx_weights = method.numinneriters # i = m
         else
-            idx_weights = iter % method.numinneriters; # for i = 1, ..., m-1
+            idx_weights = iter % method.numinneriters # for i = 1, ..., m-1
         end
         # println("        idx weights: ", idx_weights)
         method.new_reference_point[:] += method.averaging_weights[idx_weights] .* x

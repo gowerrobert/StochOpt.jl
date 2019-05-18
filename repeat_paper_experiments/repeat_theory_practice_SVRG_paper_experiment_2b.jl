@@ -94,7 +94,7 @@ end
 
 ## Experiments settings
 # if all_problems
-#     problems = 1:12
+#     problems = 1:10
 # else
 #     problems = 1:1
 # end

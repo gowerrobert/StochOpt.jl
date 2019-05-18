@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 50
+max_epochs = 20
 max_time = 60.0*60.0*10.0
 precision = 10.0^(-6) # 10.0^(-6)
 
@@ -94,7 +94,7 @@ end
 
 ## Experiments settings
 # if all_problems
-#     problems = 1:12
+#     problems = 1:10
 # else
 #     problems = 1:1
 # end
@@ -158,7 +158,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
                           batchsize=1,
                           regularizor_parameter="normalized",
                           initial_point="zeros", # is fixed not to add more randomness
-                          force_continue=false) # force continue if diverging or if tolerance reached
+                          force_continue=true) # force continue if diverging or if tolerance reached
 
     u = unique(y)
     if length(u) < 2

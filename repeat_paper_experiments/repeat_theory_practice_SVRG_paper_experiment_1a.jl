@@ -28,8 +28,8 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*1.0 #60.0*60.0*1.0
-precision = 10.0^(-4) # 10.0^(-6)
+max_time = 60.0*60.0*2.0 #60.0*60.0*10.0
+precision = 10.0^(-4)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
@@ -90,7 +90,7 @@ end
 ## Experiments settings
 numsimu = 1 # number of runs of Free-SVRG for averaging the empirical complexity
 # if all_problems
-#     problems = 1:12
+#     problems = 1:10
 # else
 #     problems = 1:1
 # end
@@ -117,31 +117,32 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # OK max_time = 60.0*5.0
-                    0.05,       # 2)  ijcnn1_full + scaled + 1e-3
-                    0.1,       # 3)  YearPredictionMSD_full + scaled + 1e-1  #0.01
-                    0.1,       # 4)  YearPredictionMSD_full + scaled + 1e-3  #0.01
-                    0.01,       # 5)  covtype_binary + scaled + 1e-1
-                    0.1,        # 6)  covtype_binary + scaled + 1e-3
-                    0.1,        # 7)  slice + scaled + 1e-1
-                    1.0,        # 8)  slice + scaled + 1e-3
-                    1.0,        # 9)  real-sim + unscaled + 1e-1
-                    1.0,        # 10) real-sim + unscaled + 1e-3
-                    1.0,        # 11) rcv1_full + unscaled + 1e-1
+skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # OK
+                    0.05,       # 2)  ijcnn1_full + scaled + 1e-3             # OK
+                    0.1,        # 3)  YearPredictionMSD_full + scaled + 1e-1  # OK
+                    0.1,        # 4)  YearPredictionMSD_full + scaled + 1e-3  # OK
+                    0.01,       # 5)  covtype_binary + scaled + 1e-1          # maybe larger max_time?
+                    0.1,        # 6)  covtype_binary + scaled + 1e-3          # maybe larger max_time?
+                    0.05,       # 7)  slice + scaled + 1e-1                   # OK with 0.1
+                    2.0,        # 8)  slice + scaled + 1e-3
+                    0.005,      # 9)  real-sim + unscaled + 1e-1        # Better? (used to be 0.1 -> to large skip error for b=256)
+                    0.1,        # 10) real-sim + unscaled + 1e-3
+                    5.0,        # 11) rcv1_full + unscaled + 1e-1 # UNUSED
                     1.0]        # 12) rcv1_full + unscaled + 1e-3
 
-grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 1)  ijcnn1_full + scaled + 1e-1 OK
+grids = [#[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 1)  ijcnn1_full + scaled + 1e-1 OK
+         [2^0, 2^5, 2^9, 2^11, 2^12, 141691], # 1)  ijcnn1_full + scaled + 1e-1 OK
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 2)  ijcnn1_full + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, 515345], # 3)  YearPredictionMSD_full + scaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, 515345], # 4)  YearPredictionMSD_full + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 581012], # 5)  covtype_binary + scaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 581012], # 6)  covtype_binary + scaled + 1e-3
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 7)  slice + scaled + 1e-1
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 8)  slice + scaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^15, 53500], # 7)  slice + scaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^15, 53500], # 8)  slice + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 9)  real-sim + unscaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 10) real-sim + unscaled + 1e-3
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14], # 11) rcv1_full + unscaled + 1e-1
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]] # 12) rcv1_full + unscaled + 1e-3
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 697641], # 11) rcv1_full + unscaled + 1e-1
+         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 697641]] # 12) rcv1_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -155,7 +156,7 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
 
     ## Loading the data
     println("--- Loading data ---")
-    data_path = "$(path)data/";
+    data_path = "$(path)data/"
     X, y = loadDataset(data_path, data)
 
     ## Setting up the problem
@@ -205,6 +206,7 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
         println("Tolerance always reached")
     else
         println("Some total complexities might be threshold because of reached maximal time")
+        println("fails: ", fails)
     end
 
     ## Computing the empirical complexity
