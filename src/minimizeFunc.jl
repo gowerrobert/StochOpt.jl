@@ -23,12 +23,12 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         end
     else
         # println("\n---Method is not a String---\n") # To try if this else is for SAGA_nice or SVRG_nice
-        method = method_input;
-        # method = method.bootmethod(prob, method, options); # SAGA_nice
-        method.bootmethod(prob, method, options); # SVRG_nice
+        method = method_input
+        # method = method.bootmethod(prob, method, options) # SAGA_nice
+        method.bootmethod(prob, method, options) # SVRG_nice
         # method = method.bootmethod(prob, method, options, x); # ??
     end
-    println(method.name);
+    println(method.name)
     # println("---> Method set")
 
     times = [0];

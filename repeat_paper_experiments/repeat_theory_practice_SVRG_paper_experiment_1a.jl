@@ -229,7 +229,7 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
     legendpos = :topleft
     pyplot()
     exp_number = 1 # grid of mini-batch sizes
-    plot_empirical_complexity_Free_SVRG(prob, exp_number, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="-$(machine)")
+    plot_empirical_complexity_SVRG(prob, exp_number, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="-$(machine)")
 
     println("Theoretical optimal mini-batch = ", b_theoretical)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
