@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*10.0
+max_time = 60.0*10.0 #60.0*60.0*10.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
@@ -127,16 +127,16 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
-               [10^4 10^4 -2. 10^4],  # 2)  ijcnn1_full + scaled + 1e-3
+skip_errors = [[10^2 10^3 -2. 10^3],  # 1)  ijcnn1_full + scaled + 1e-1
+               [10^4 10^3 -2. 10^3],  # 2)  ijcnn1_full + scaled + 1e-3
                [10^4 10^4 -2. 10^4],  # 3)  YearPredictionMSD_full + scaled + 1e-1
                [10^4 10^4 -2. 10^4],  # 4)  YearPredictionMSD_full + scaled + 1e-3
                [10^3 10^3 -2. 10^3],  # 5)  covtype_binary + scaled + 1e-1
                [10^3 10^3 -2. 10^3],  # 6)  covtype_binary + scaled + 1e-3
-               [10^3 10^3 -2. 10^3],  # 7)  slice + scaled + 1e-1
-               [10^3 10^3 -2. 10^3],  # 8)  slice + scaled + 1e-3
-               [10^1 10^1 -2. 10^1],  # 9)  real-sim + unscaled + 1e-1
-               [10^1 10^1 -2. 10^1],  # 10) real-sim + unscaled + 1e-3
+               [10^5 10^4 -2. 10^4],  # 7)  slice + scaled + 1e-1
+               [10^5 10^4 -2. 10^4],  # 8)  slice + scaled + 1e-3
+               [   5    5 -2.    5],  # 9)  real-sim + unscaled + 1e-1
+               [10^2 10^2 -2. 10^2],  # 10) real-sim + unscaled + 1e-3
                [10^2 10^3 -2. 10^3],  # 11) a1a_full + unscaled + 1e-1
                [10^2 10^3 -2. 10^3],  # 12) a1a_full + unscaled + 1e-3
                [10^2 10^3 -2. 10^3],  # 13) colon-cancer + unscaled + 1e-1
@@ -200,8 +200,19 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
 
     ## Setting the number of skipped iteration to m/4
-    # options.skip_error_calculation = skip_error[1] # skip error different for each algo
-    options.skip_error_calculation = round(Int64, bubeck.numinneriters/4)
+    options.skip_error_calculation = skip_error[1] # skip error different for each algo
+    # options.skip_error_calculation = round(Int64, bubeck.numinneriters/4)
+
+    ## Extra parameters for speeding up simulations
+    if idx_prob == 2
+        println("Adding a max_epochs = 10 to stop Bubeck SVRG running endlessly")
+        options.max_epocs = 10
+        options.skip_error_calculation = round(Int64, bubeck.numinneriters/100)
+    elseif idx_prob == 7
+        options.skip_error_calculation = round(Int64, bubeck.numinneriters/1000)
+    elseif idx_prob == 8
+        options.skip_error_calculation = round(Int64, bubeck.numinneriters/100000)
+    end
 
     println("-------------------- WARM UP --------------------")
     tmp = options.max_epocs
@@ -209,7 +220,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     minimizeFunc(prob, bubeck, options)
     options.max_epocs = tmp
     bubeck.reset(prob, bubeck, options)
-    println("-------------------------------------------------")
+    println("-------------------------------------------------\n")
 
     out_bubeck = minimizeFunc(prob, bubeck, options)
 
@@ -217,7 +228,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
     out_bubeck.name = latexstring("$(out_bubeck.name) \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
-    println("")
+    options.max_epocs = max_epochs
+    println("\n")
 
     ################################################################################
     ################################## FREE-SVRG ###################################
@@ -230,8 +242,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
 
     ## Setting the number of skipped iteration to m/4
-    # options.skip_error_calculation = skip_error[2] # skip error different for each algo
-    options.skip_error_calculation = round(Int64, free.numinneriters/4)
+    options.skip_error_calculation = skip_error[2] # skip error different for each algo
+    # options.skip_error_calculation = round(Int64, free.numinneriters/4)
 
     out_free = minimizeFunc(prob, free, options)
 
@@ -239,6 +251,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_step_free = @sprintf "%.2e" free.stepsize
     out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b = 1, \\alpha^*(1) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
+    println("\n")
 
     #region
     ################################################################################
@@ -252,8 +265,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
 
     # ## Setting the number of skipped iteration to 1/4*p
-    # # options.skip_error_calculation = skip_error[3] # skip error different for each algo
-    # options.skip_error_calculation = round(Int64, 1/(4*proba))
+    # options.skip_error_calculation = skip_error[3] # skip error different for each algo
+    # # options.skip_error_calculation = round(Int64, 1/(4*proba))
 
     # out_leap = minimizeFunc(prob, leap, options)
 
@@ -262,6 +275,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
     # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b = 1, \\eta^* = $str_step_grad_leap, \\alpha^*(1) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
+    # println("\n")
     #endregion
 
     ################################################################################
@@ -275,8 +289,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     decreasing = initiate_L_SVRG_D(prob, options, sampling, proba)
 
     ## Setting the number of skipped iteration to 1/4*p
-    # options.skip_error_calculation = skip_error[4] # skip error different for each algo
-    options.skip_error_calculation = round(Int64, 1/(4*proba))
+    options.skip_error_calculation = skip_error[4] # skip error different for each algo
+    # options.skip_error_calculation = round(Int64, 1/(4*proba))
 
     out_decreasing = minimizeFunc(prob, decreasing, options)
 
@@ -284,6 +298,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_step_decreasing = @sprintf "%.2e" decreasing.stepsize
     out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha^*(1) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
+    println("\n")
 
     ## Saving outputs and plots
     if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
@@ -294,11 +309,13 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
         suffix = ""
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp2a-$(suffix)-$(max_epochs)_max_epochs-autoskip")
+    # savename = string(savename, "-exp2a-$(suffix)-$(max_epochs)_max_epochs")
+    savename = string(savename, "-exp2a-$(suffix)-10min")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(max_epochs)_max_epochs-autoskip", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-10min", path=save_path, legendpos=:topright, legendfont=6) #
 
 end
 println("\n\n--- EXPERIMENT 2.A FINISHED ---")

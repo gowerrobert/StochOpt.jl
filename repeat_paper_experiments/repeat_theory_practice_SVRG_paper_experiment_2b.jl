@@ -94,7 +94,7 @@ end
 
 ## Experiments settings
 # if all_problems
-#     problems = 1:16
+#     problems = [1, 2, 3, 4, 7, 8, 9, 10]
 # else
 #     problems = 1:1
 # end
@@ -203,8 +203,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
 
     ## Setting the number of skipped iteration to m/4
-    # options.skip_error_calculation = skip_error[1] # skip error different for each algo
-    options.skip_error_calculation = round(Int64, bubeck.numinneriters/4)
+    options.skip_error_calculation = skip_error[1] # skip error different for each algo
+    # options.skip_error_calculation = round(Int64, bubeck.numinneriters/4)
 
     println("-------------------- WARM UP --------------------")
     tmp = options.max_epocs
@@ -212,7 +212,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     minimizeFunc(prob, bubeck, options)
     options.max_epocs = tmp
     bubeck.reset(prob, bubeck, options)
-    println("-------------------------------------------------")
+    println("-------------------------------------------------\n")
 
     out_bubeck = minimizeFunc(prob, bubeck, options)
 
@@ -220,6 +220,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
     out_bubeck.name = latexstring("$(out_bubeck.name) \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
+    println("\n")
 
     ################################################################################
     ############################## OPTIMAL FREE-SVRG ###############################
@@ -232,8 +233,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
 
     ## Setting the number of skipped iteration to m/4
-    # options.skip_error_calculation = skip_error[2] # skip error different for each algo
-    options.skip_error_calculation = round(Int64, free.numinneriters/4)
+    options.skip_error_calculation = skip_error[2] # skip error different for each algo
+    # options.skip_error_calculation = round(Int64, free.numinneriters/4)
 
     out_free = minimizeFunc(prob, free, options)
 
@@ -242,6 +243,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_step_free = @sprintf "%.2e" free.stepsize
     out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b^*(n) = $str_b_free, \\alpha^*(b^*) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
+    println("\n")
 
     #region
     ################################################################################
@@ -255,8 +257,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
 
     # ## Setting the number of skipped iteration to 1/4*p
-    # # options.skip_error_calculation = skip_error[3] # skip error different for each algo
-    # options.skip_error_calculation = round(Int64, 1/(4*proba))
+    # options.skip_error_calculation = skip_error[3] # skip error different for each algo
+    # # options.skip_error_calculation = round(Int64, 1/(4*proba))
 
     # out_leap = minimizeFunc(prob, leap, options)
 
@@ -266,6 +268,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
     # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta^* = $str_step_grad_leap, \\alpha^*(b^*) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
+    # println("\n")
     #endregion
 
     ################################################################################
@@ -279,8 +282,8 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     decreasing = initiate_L_SVRG_D(prob, options, sampling, proba)
 
     ## Setting the number of skipped iteration to 1/4*p
-    # options.skip_error_calculation = skip_error[4] # skip error different for each algo
-    options.skip_error_calculation = round(Int64, 1/(4*proba))
+    options.skip_error_calculation = skip_error[4] # skip error different for each algo
+    # options.skip_error_calculation = round(Int64, 1/(4*proba))
 
     out_decreasing = minimizeFunc(prob, decreasing, options)
 
@@ -289,6 +292,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_step_decreasing = @sprintf "%.2e" decreasing.stepsize
     out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b^*(n) = $str_b_decreasing, \\alpha^*(b^*) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
+    println("\n")
 
     ## Saving outputs and plots
     if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
