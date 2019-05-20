@@ -1,12 +1,12 @@
 # include("./dataLoad.jl")
 using SparseArrays
-include("../src/dataLoad.jl")
+include("./src/dataLoad.jl")
 default_path = "./data/";
 initDetails(default_path)
 
 
-datasets = ["ijcnn1_full"];
-# already loaded: "covtype_binary", "YearPredictionMSD_full", "rcv1_full", "news20_binary", "slice", "real-sim"
+datasets = ["name-of-libsvm-dataset-to-load"]
+# already loaded: "covtype_binary", "YearPredictionMSD_full", "rcv1_full", "news20_binary", "slice", "real-sim", "ijcnn1_full", "a1a_full", "colon-cancer"
 
 ## WARNING: be careful and select properly the following setting!
 # classification = false; # Regression

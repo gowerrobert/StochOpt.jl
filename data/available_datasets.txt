@@ -19,3 +19,5 @@ housing
 abalone
 australian
 diagalone-10-0.0-100-rotated-binary_seed-1
+a1a_full
+colon-cancer
