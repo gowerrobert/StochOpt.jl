@@ -127,16 +127,16 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[10^2 10^3 -2. 10^3],  # 1)  ijcnn1_full + scaled + 1e-1             should be OK
-               [10^4 10^4 -2. 10^4],  # 2)  ijcnn1_full + scaled + 1e-3             OK
-               [10^5 10^5 -2. 10^5],  # 3)  YearPredictionMSD_full + scaled + 1e-1  should be OK
-               [10^5 10^5 -2. 10^5],  # 4)  YearPredictionMSD_full + scaled + 1e-3  should be OK
+skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1                midnight retry
+               [25000 6500 -2. 5500], # 2)  ijcnn1_full + scaled + 1e-3                midnight retry
+               [60000 40000 -2. 25000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  midnight retry
+               [10^4 10^4 -2. 10^4],  # 4)  YearPredictionMSD_full + scaled + 1e-3  not checked
                [10^3 10^3 -2. 10^3],  # 5)  covtype_binary + scaled + 1e-1
                [10^3 10^3 -2. 10^3],  # 6)  covtype_binary + scaled + 1e-3
-               [10^5 10^4 -2. 10^4],  # 7)  slice + scaled + 1e-1                   OK
-               [10^5 10^4 -2. 10^4],  # 8)  slice + scaled + 1e-3                   OK
-               [   5    5 -2.    5],  # 9)  real-sim + unscaled + 1e-1              should be OK
-               [10^1 10^5 -2. 10^5],  # 10) real-sim + unscaled + 1e-3              should be OK
+               [50000 40000 -2. 40000],  # 7)  slice + scaled + 1e-1                   midnight retry
+               [50000 40000 -2. 40000],  # 8)  slice + scaled + 1e-3                   midnight retry (not tested)
+               [   5   3 -2.    3],  # 9)  real-sim + unscaled + 1e-1                  midnight retry
+               [600    5 -2.    5],  # 10) real-sim + unscaled + 1e-3                  midnight retry
                [10^2 10^3 -2. 10^3],  # 11) a1a_full + unscaled + 1e-1
                [10^2 10^3 -2. 10^3],  # 12) a1a_full + unscaled + 1e-3
                [10^2 10^3 -2. 10^3],  # 13) colon-cancer + unscaled + 1e-1
