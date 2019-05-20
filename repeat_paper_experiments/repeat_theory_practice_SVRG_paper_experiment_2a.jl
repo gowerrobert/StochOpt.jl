@@ -203,16 +203,16 @@ skip_errors = [[10^3 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1         
     options.skip_error_calculation = skip_error[1] # skip error different for each algo
     # options.skip_error_calculation = round(Int64, bubeck.numinneriters/4)
 
-    ## Extra parameters for speeding up simulations
-    if idx_prob == 2
-        println("Adding a max_epochs = 10 to stop Bubeck SVRG running endlessly")
-        options.max_epocs = 10
-        options.skip_error_calculation = round(Int64, bubeck.numinneriters/100)
-    elseif idx_prob == 7
-        options.skip_error_calculation = round(Int64, bubeck.numinneriters/1000)
-    elseif idx_prob == 8
-        options.skip_error_calculation = round(Int64, bubeck.numinneriters/100000)
-    end
+    # ## Extra parameters for speeding up simulations
+    # if idx_prob == 2
+    #     println("Adding a max_epochs = 10 to stop Bubeck SVRG running endlessly")
+    #     options.max_epocs = 10
+    #     options.skip_error_calculation = round(Int64, bubeck.numinneriters/100)
+    # elseif idx_prob == 7
+    #     options.skip_error_calculation = round(Int64, bubeck.numinneriters/1000)
+    # elseif idx_prob == 8
+    #     options.skip_error_calculation = round(Int64, bubeck.numinneriters/100000)
+    # end
 
     println("-------------------- WARM UP --------------------")
     tmp = options.max_epocs
