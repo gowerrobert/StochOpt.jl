@@ -66,13 +66,13 @@ for idx_expe=1:length(proba_grid)
         minimizeFunc(prob, decreasing, options) # Warm up
         options.max_epocs = tmp
         decreasing.reset(prob, decreasing, options)
-        println("-------------------------------------------------")
+        println("-------------------------------------------------\n")
     end
 
     output = minimizeFunc(prob, decreasing, options)
     str_b = @sprintf "%d" sampling.batchsize
     str_proba = @sprintf "%.3f" proba
-    str_step = @sprintf "%.2e" decreasing.stepsize
+    str_step = @sprintf "%.2e" decreasing.initial_stepsize
     output.name = latexstring("L_SVRG_D \$b = $str_b, p = $str_proba, \\gamma^* = $str_step\$")
 
     global OUTPUTS = [OUTPUTS; output]
@@ -94,7 +94,7 @@ plot_outputs_Plots(OUTPUTS, prob, options, methodname="debug_L_SVRG_D", path=sav
 # minimizeFunc(prob, L_SVRG_D_1, options) # Warm up
 # options.max_iter = 10^8
 # L_SVRG_D_1.reset(prob, L_SVRG_D_1, options)
-# println("-------------------------------------------------")
+# println("-------------------------------------------------\n")
 
 # output = minimizeFunc(prob, L_SVRG_D_1, options)
 # str_b_1 = @sprintf "%d" sampling.batchsize

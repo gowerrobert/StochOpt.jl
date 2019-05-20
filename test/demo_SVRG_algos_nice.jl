@@ -154,7 +154,7 @@ problems = 4:8
     minimizeFunc(prob, bubeck, options) # Warm up
     options.max_epocs = tmp
     bubeck.reset(prob, bubeck, options)
-    println("-------------------------------------------------")
+    println("-------------------------------------------------\n")
 
     output2 = minimizeFunc(prob, bubeck, options)
     str_m_2 = @sprintf "%d" bubeck.numinneriters
@@ -242,7 +242,7 @@ problems = 4:8
     output5 = minimizeFunc(prob, decreasing, options)
     str_b_5 = @sprintf "%d" sampling.batchsize
     str_proba_5 = @sprintf "%.2e" proba
-    str_step_5 = @sprintf "%.2e" decreasing.stepsize
+    str_step_5 = @sprintf "%.2e" decreasing.initial_stepsize
     output5.name = latexstring("$(output5.name) \$(p = 1/n = $str_proba_5, b^*(n) = $str_b_5, \\gamma^*(b^*(n)) = $str_step_5)\$") # optimal b^*
     # output5.name = latexstring("$(output5.name) \$(p = $str_proba_5, b = $str_b_5, \\gamma^*(b) = $str_step_5)\$")
     OUTPUTS = [OUTPUTS; output5]
@@ -295,7 +295,7 @@ end
 # # minimizeFunc(prob, bubeck, options) # Warm up
 # # options.max_epocs = tmp
 # # bubeck.reset(prob, bubeck, options)
-# # println("-------------------------------------------------")
+# # println("-------------------------------------------------\n")
 
 # output2 = minimizeFunc(prob, bubeck, options)
 # str_m_2 = @sprintf "%d" bubeck.numinneriters
@@ -363,7 +363,7 @@ end
 # output5 = minimizeFunc(prob, decreasing, options)
 # str_b_5 = @sprintf "%d" sampling.batchsize
 # str_proba_5 = @sprintf "%.3f" proba
-# str_step_5 = @sprintf "%.2e" decreasing.stepsize
+# str_step_5 = @sprintf "%.2e" decreasing.initial_stepsize
 # # output5.name = latexstring("$(output5.name) \$(p = 1/n = $str_proba_5, b^*(n) = $str_b_5, \\gamma^*(b^*(n)) = $str_step_5)\$") # optimal b^*
 # output5.name = latexstring("$(output5.name) \$(p = $str_proba_5, b = $str_b_5, \\gamma^*(b) = $str_step_5)\$")
 # OUTPUTS = [OUTPUTS; output5]
@@ -393,7 +393,7 @@ end
 # minimizeFunc(prob, SVRG_vanilla, options) # Warm up
 # # options.max_epocs = 100
 # SVRG_vanilla.reset(prob, SVRG_vanilla, options)
-# println("-------------------------------------------------")
+# println("-------------------------------------------------\n")
 
 # output1 = minimizeFunc(prob, SVRG_vanilla, options)
 # str_m_1 = @sprintf "%d" SVRG_vanilla.numinneriters

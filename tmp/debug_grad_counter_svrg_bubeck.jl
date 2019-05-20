@@ -60,7 +60,7 @@ println("-------------------- WARM UP --------------------")
 minimizeFunc(prob, bubeck, options) # Warm up
 # bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinneriters)
 bubeck.reset(prob, bubeck, options)
-println("-------------------------------------------------")
+println("-------------------------------------------------\n")
 
 output2 = minimizeFunc(prob, bubeck, options)
 str_m_2 = @sprintf "%d" bubeck.numinneriters

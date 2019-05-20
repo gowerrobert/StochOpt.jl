@@ -27,8 +27,8 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 50
-max_time = 60.0*60.0*10.0
+max_epochs = 10^8
+max_time = 60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
@@ -127,16 +127,16 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
-               [10^4 10^4 -2. 10^4],  # 2)  ijcnn1_full + scaled + 1e-3
-               [10^4 10^4 -2. 10^4],  # 3)  YearPredictionMSD_full + scaled + 1e-1
-               [10^4 10^4 -2. 10^4],  # 4)  YearPredictionMSD_full + scaled + 1e-3
+skip_errors = [[10^2 10^3 -2. 10^3],  # 1)  ijcnn1_full + scaled + 1e-1             should be OK
+               [10^4 10^4 -2. 10^4],  # 2)  ijcnn1_full + scaled + 1e-3             OK
+               [10^5 10^5 -2. 10^5],  # 3)  YearPredictionMSD_full + scaled + 1e-1  should be OK
+               [10^5 10^5 -2. 10^5],  # 4)  YearPredictionMSD_full + scaled + 1e-3  should be OK
                [10^3 10^3 -2. 10^3],  # 5)  covtype_binary + scaled + 1e-1
                [10^3 10^3 -2. 10^3],  # 6)  covtype_binary + scaled + 1e-3
-               [10^3 10^3 -2. 10^3],  # 7)  slice + scaled + 1e-1
-               [10^3 10^3 -2. 10^3],  # 8)  slice + scaled + 1e-3
-               [10^2 10^3 -2. 10^3],  # 9)  real-sim + unscaled + 1e-1
-               [10^2 10^3 -2. 10^3],  # 10) real-sim + unscaled + 1e-3
+               [10^5 10^4 -2. 10^4],  # 7)  slice + scaled + 1e-1                   OK
+               [10^5 10^4 -2. 10^4],  # 8)  slice + scaled + 1e-3                   OK
+               [   5    5 -2.    5],  # 9)  real-sim + unscaled + 1e-1              should be OK
+               [10^1 10^5 -2. 10^5],  # 10) real-sim + unscaled + 1e-3              should be OK
                [10^2 10^3 -2. 10^3],  # 11) a1a_full + unscaled + 1e-1
                [10^2 10^3 -2. 10^3],  # 12) a1a_full + unscaled + 1e-3
                [10^2 10^3 -2. 10^3],  # 13) colon-cancer + unscaled + 1e-1
@@ -163,7 +163,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8,
                           max_epocs=max_epochs,
-                          max_time=60.0*10.0, # 60.0*60.0*10.0
+                          max_time=max_time, # 60.0*60.0*10.0
                           skip_error_calculation=10^5,
                           batchsize=1,
                           regularizor_parameter="normalized",
@@ -289,7 +289,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
 
     str_proba_decreasing = @sprintf "%.2e" proba
     str_b_decreasing = @sprintf "%d" decreasing.batchsize
-    str_step_decreasing = @sprintf "%.2e" decreasing.stepsize
+    str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
     out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b^*(n) = $str_b_decreasing, \\alpha^*(b^*) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
@@ -303,11 +303,15 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
         suffix = ""
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp2b-$(suffix)-$(max_epochs)_max_epochs")
+    # savename = string(savename, "-exp2b-$(suffix)-$(max_epochs)_max_epochs")
+    savename = string(savename, "-exp2b-$(suffix)-10min")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-10min", path=save_path, legendpos=:topright, legendfont=8)
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-test", path=save_path, legendpos=:topright, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=8) #
 
 end
 println("\n\n--- EXPERIMENT 2.B FINISHED ---")

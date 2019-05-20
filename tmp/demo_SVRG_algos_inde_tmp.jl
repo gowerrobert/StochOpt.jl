@@ -60,7 +60,7 @@ println("-------------------- WARM UP --------------------")
 options.max_iter = 3
 minimizeFunc(prob, SVRG_vanilla, options) # Warm up
 options.max_iter = 10^8
-println("-------------------------------------------------")
+println("-------------------------------------------------\n")
 
 output = minimizeFunc(prob, SVRG_vanilla, options)
 # str_m_1 = @sprintf "%d" SVRG_vanilla.numinneriters

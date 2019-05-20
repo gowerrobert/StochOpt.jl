@@ -243,6 +243,7 @@ mutable struct L_SVRG_D_method
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
+    batchsize::Int64
     stepsize::Float64 # step size
     initial_stepsize::Float64 # step size at first iteration
     L::Float64 # smoothness constant of the whole objective function f

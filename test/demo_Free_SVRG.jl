@@ -88,7 +88,7 @@ options.max_iter = 30
 minimizeFunc(prob, f1, options) # Warm up
 f1.reset(prob, f1, options)
 options.max_iter = old_max_iter
-println("-------------------------------------------------")
+println("-------------------------------------------------\n")
 
 output = minimizeFunc(prob, f1, options)
 str_m_1 = @sprintf "%d" f1.numinneriters

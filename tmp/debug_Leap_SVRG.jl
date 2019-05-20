@@ -72,7 +72,7 @@ for idx_expe=1:length(proba_grid)
         minimizeFunc(prob, leap, options) # Warm up
         # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
         leap.reset(prob, leap, options)
-        println("-------------------------------------------------")
+        println("-------------------------------------------------\n")
     end
 
     output = minimizeFunc(prob, leap, options)

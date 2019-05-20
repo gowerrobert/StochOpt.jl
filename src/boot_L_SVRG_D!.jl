@@ -58,7 +58,7 @@ function initiate_L_SVRG_D(prob::Prob, options::MyOptions, sampling::Sampling, r
     reference_point = zeros(prob.numfeatures)
     reference_grad = zeros(prob.numfeatures)
 
-    method = L_SVRG_D_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, stepsize, initial_stepsize, L, Lmax, expected_smoothness, reference_update_proba, reference_update_distrib, reference_point, reference_grad, reset, sampling)
+    method = L_SVRG_D_method(epocsperiter, gradsperiter, number_computed_gradients, name, stepmethod, bootmethod, b, stepsize, initial_stepsize, L, Lmax, expected_smoothness, reference_update_proba, reference_update_distrib, reference_point, reference_grad, reset, sampling)
 
     # epocsperiter::Float64
     # gradsperiter::Float64
