@@ -94,26 +94,32 @@ end
 
 ## Experiments settings
 # if all_problems
-#     problems = 1:10
+#     problems = 1:16
 # else
 #     problems = 1:1
 # end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
-            "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
-            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
-            "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
-            "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
+            "covtype_binary", "covtype_binary",                 # scaled,         n = 581,012, d =     54
+            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
+            "real-sim", "real-sim",                             # unscaled,       n =  72,309, d = 20,958
+            "a1a_full", "a1a_full",                             # unscaled,       n =  32,561, d =    123
+            "colon-cancer", "colon-cancer",                     # already scaled, n =   2,000, d =     62
+            "leukemia_full", "leukemia_full"]                   # already scaled, n =      62, d =  7,129
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "none", "none",
+            "none", "none",
+            "none", "none",
             "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
@@ -131,8 +137,12 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
                [10^3 10^3 -2. 10^3],  # 8)  slice + scaled + 1e-3
                [10^2 10^3 -2. 10^3],  # 9)  real-sim + unscaled + 1e-1
                [10^2 10^3 -2. 10^3],  # 10) real-sim + unscaled + 1e-3
-               [10^2 10^3 -2. 10^3],  # 11) rcv1_full + unscaled + 1e-1
-               [10^2 10^3 -2. 10^3]]  # 12) rcv1_full + unscaled + 1e-3
+               [10^2 10^3 -2. 10^3],  # 11) a1a_full + unscaled + 1e-1
+               [10^2 10^3 -2. 10^3],  # 12) a1a_full + unscaled + 1e-3
+               [10^2 10^3 -2. 10^3],  # 13) colon-cancer + unscaled + 1e-1
+               [10^2 10^3 -2. 10^3],  # 14) colon-cancer + unscaled + 1e-3
+               [10^2 10^3 -2. 10^3],  # 15) leukemia_full + unscaled + 1e-1
+               [10^2 10^3 -2. 10^3]]  # 16) leukemia_full + unscaled + 1e-3
 
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -205,7 +215,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
 
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
-    out_bubeck.name = latexstring("$(out_bubeck.name) \$(m^* = $str_m_bubeck, b = 1, \\gamma^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("$(out_bubeck.name) \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
 
     ################################################################################
@@ -224,7 +234,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_m_free = @sprintf "%d" free.numinneriters
     str_b_free = @sprintf "%d" free.batchsize
     str_step_free = @sprintf "%.2e" free.stepsize
-    out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b^*(n) = $str_b_free, \\gamma^*(b^*) = $str_step_free)\$")
+    out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b^*(n) = $str_b_free, \\alpha^*(b^*) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
 
     #region
@@ -265,7 +275,7 @@ skip_errors = [[10^2 10^4 -2. 10^4],  # 1)  ijcnn1_full + scaled + 1e-1
     str_proba_decreasing = @sprintf "%.2e" proba
     str_b_decreasing = @sprintf "%d" decreasing.batchsize
     str_step_decreasing = @sprintf "%.2e" decreasing.stepsize
-    out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b^*(n) = $str_b_decreasing, \\gamma^*(b^*) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b^*(n) = $str_b_decreasing, \\alpha^*(b^*) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
 
     ## Saving outputs and plots

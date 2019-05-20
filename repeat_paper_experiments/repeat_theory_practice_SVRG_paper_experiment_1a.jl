@@ -93,26 +93,32 @@ end
 ## Experiments settings
 numsimu = 1 # number of runs of Free-SVRG for averaging the empirical complexity
 # if all_problems
-#     problems = 1:10
+#     problems = 1:16
 # else
 #     problems = 1:1
 # end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
-            "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
-            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
-            "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
-            "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
+            "covtype_binary", "covtype_binary",                 # scaled,         n = 581,012, d =     54
+            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
+            "real-sim", "real-sim",                             # unscaled,       n =  72,309, d = 20,958
+            "a1a_full", "a1a_full",                             # unscaled,       n =  32,561, d =    123
+            "colon-cancer", "colon-cancer",                     # already scaled, n =   2,000, d =     62
+            "leukemia_full", "leukemia_full"]                   # already scaled, n =      62, d =  7,129
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "none", "none",
+            "none", "none",
+            "none", "none",
             "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
@@ -130,8 +136,12 @@ skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # 
                     2.0,        # 8)  slice + scaled + 1e-3
                     0.005,      # 9)  real-sim + unscaled + 1e-1        # Better? (used to be 0.1 -> to large skip error for b=256)
                     0.1,        # 10) real-sim + unscaled + 1e-3
-                    5.0,        # 11) rcv1_full + unscaled + 1e-1 # UNUSED
-                    1.0]        # 12) rcv1_full + unscaled + 1e-3
+                    1.0,        # 11) a1a_full + unscaled + 1e-1
+                    1.0,        # 12) a1a_full + unscaled + 1e-3
+                    1.0,        # 13) colon-cancer + unscaled + 1e-1
+                    1.0,        # 14) colon-cancer + unscaled + 1e-3
+                    1.0,        # 15) leukemia_full + unscaled + 1e-1
+                    1.0]        # 16) leukemia_full + unscaled + 1e-3
 
 grids = [#[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 1)  ijcnn1_full + scaled + 1e-1 OK
          [2^0, 2^9, 2^11], # 1)  ijcnn1_full + scaled + 1e-1 OK
@@ -144,8 +154,12 @@ grids = [#[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^15, 53500], # 8)  slice + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 9)  real-sim + unscaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 10) real-sim + unscaled + 1e-3
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 697641], # 11) rcv1_full + unscaled + 1e-1
-         [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, 697641]] # 12) rcv1_full + unscaled + 1e-3
+         [2^0, 2^4, 2^8, 2^12, 32561], # 11) a1a_full + unscaled + 1e-1
+         [2^0, 2^4, 2^8, 2^12, 32561], # 12) a1a_full + unscaled + 1e-3
+         [2^0, 2^2, 2^4, 62], # 13) colon-cancer + unscaled + 1e-1
+         [2^0, 2^2, 2^4, 62], # 14) colon-cancer + unscaled + 1e-3
+         [2^0, 2^2, 2^4, 72], # 15) leukemia_full + unscaled + 1e-1
+         [2^0, 2^2, 2^4, 72]] # 16) leukemia_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems

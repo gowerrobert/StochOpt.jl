@@ -102,16 +102,22 @@ datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 
             "covtype_binary", "covtype_binary",                 # scaled,   n = 581,012, d =     54
             "slice", "slice",                                   # scaled,   n =  53,500, d =    384
             "real-sim", "real-sim",                             # unscaled, n =  72,309, d = 20,958
-            "rcv1_full", "rcv1_full"]                           # unscaled, n = 697,641, d = 47,236
+            "a1a_full", "a1a_full",                             # unscaled,       n =  32,561, d =    123
+            "colon-cancer", "colon-cancer",                     # already scaled, n =   2,000, d =     62
+            "leukemia_full", "leukemia_full"]                   # already scaled, n =      62, d =  7,129
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "none", "none",
+            "none", "none",
+            "none", "none",
             "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
+           10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
@@ -129,8 +135,12 @@ skip_multipliers = [0.001,      # 1)  ijcnn1_full + scaled + 1e-1
                     1.0,        # 8)  slice + scaled + 1e-3
                     1.0,        # 9)  real-sim + unscaled + 1e-1
                     1.0,        # 10) real-sim + unscaled + 1e-3
-                    1.0,        # 11) rcv1_full + unscaled + 1e-1
-                    1.0]        # 12) rcv1_full + unscaled + 1e-3
+                    1.0,        # 11) a1a_full + unscaled + 1e-1
+                    1.0,        # 12) a1a_full + unscaled + 1e-3
+                    1.0,        # 13) colon-cancer + unscaled + 1e-1
+                    1.0,        # 14) colon-cancer + unscaled + 1e-3
+                    1.0,        # 15) leukemia_full + unscaled + 1e-1
+                    1.0]        # 16) leukemia_full + unscaled + 1e-3
 
 ## Grid of inner loop values
 grids = [[2^0, 2^4, 2^8, 2^12, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19, 2^20],
@@ -143,8 +153,12 @@ grids = [[2^0, 2^4, 2^8, 2^12, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19, 2^20],
          [2^0, 2^8, 2^12, 2^16],
          [2^0, 2^8, 2^12, 2^16],
          [2^0, 2^8, 2^12, 2^16],
-         [2^0, 2^8, 2^12, 2^16],
-         [2^0, 2^8, 2^12, 2^16]]
+         [2^0, 2^4, 2^8, 2^12, 32561], # 11) a1a_full + unscaled + 1e-1
+         [2^0, 2^4, 2^8, 2^12, 32561], # 12) a1a_full + unscaled + 1e-3
+         [2^0, 2^2, 2^4, 62], # 13) colon-cancer + unscaled + 1e-1
+         [2^0, 2^2, 2^4, 62], # 14) colon-cancer + unscaled + 1e-3
+         [2^0, 2^2, 2^4, 72], # 15) leukemia_full + unscaled + 1e-1
+         [2^0, 2^2, 2^4, 72]] # 16) leukemia_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems
