@@ -297,14 +297,14 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
         suffix = "home"
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp2c-$(suffix)-$(max_epochs)_max_epochs")
-    # savename = string(savename, "-exp2c-$(suffix)-midnight")
+    # savename = string(savename, "-exp2c-$(suffix)-$(max_epochs)_max_epochs")
+    savename = string(savename, "-exp2c-$(suffix)-FINAL")
     # save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=6) #
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-newlegend", path=save_path, legendpos=:topright, legendfont=6) #
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-FINAL", path=save_path, legendpos=:topright, legendfont=6) #
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-test", path=save_path, legendpos=:topright, legendfont=6) #
 
 end
 println("\n\n--- EXPERIMENT 2.C FINISHED ---")
