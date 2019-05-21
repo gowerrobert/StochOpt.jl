@@ -218,7 +218,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
-    out_bubeck.name = latexstring("$(out_bubeck.name) \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
     println("\n")
 
@@ -241,7 +241,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_m_free = @sprintf "%d" free.numinneriters
     str_b_free = @sprintf "%d" free.batchsize
     str_step_free = @sprintf "%.2e" free.stepsize
-    out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b^*(n) = $str_b_free, \\alpha^*(b^*) = $str_step_free)\$")
+    out_free.name = latexstring("Free-SVRG \$(m = n = $str_m_free, b_{Free}^*(n) = $str_b_free, \\alpha_{Free}^*(b^*) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
     println("\n")
 
@@ -266,7 +266,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
     # str_b_leap = @sprintf "%d" leap.batchsize
     # str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
     # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
-    # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta_{Leap}^* = $str_step_grad_leap, \\alpha_{Leap}^*(b^*) = $str_step_sto_leap)\$")
+    # out_leap.name = latexstring("Leap-SVRG \$(p = 1/n = $str_proba_leap, b_{Leap}^*(n) = $str_b_leap, \\eta_{Leap}^* = $str_step_grad_leap, \\alpha_{Leap}^*(b^*) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
     # println("\n")
     #endregion
@@ -290,7 +290,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_proba_decreasing = @sprintf "%.2e" proba
     str_b_decreasing = @sprintf "%d" decreasing.batchsize
     str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
-    out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b_{Decreasing}^*(n) = $str_b_decreasing, \\alpha_{Decreasing}^*(b^*) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b_{Decreasing}^*(n) = $str_b_decreasing, \\alpha_{Decreasing}^*(b^*) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
 
