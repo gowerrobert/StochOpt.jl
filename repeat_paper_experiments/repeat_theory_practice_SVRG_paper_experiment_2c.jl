@@ -27,8 +27,8 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 10^8
-max_time = 60.0*60.0*4.0
+max_epochs = 100
+max_time = 60.0*60.0*24.0 #60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
@@ -298,11 +298,12 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp2c-$(suffix)-$(max_epochs)_max_epochs")
+    # savename = string(savename, "-exp2c-$(suffix)-midnight")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=8) #
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=8) #
 
 end
 println("\n\n--- EXPERIMENT 2.C FINISHED ---")
