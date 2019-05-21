@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 100
+max_epochs = 10^8
 max_time = 60.0*60.0*24.0 #60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
@@ -226,7 +226,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
-    out_bubeck.name = latexstring("$(out_bubeck.name) \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("$(out_bubeck.name) \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
     options.max_epocs = max_epochs
     println("\n")
@@ -249,7 +249,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     str_m_free = @sprintf "%d" free.numinneriters
     str_step_free = @sprintf "%.2e" free.stepsize
-    out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b = 1, \\alpha^*(1) = $str_step_free)\$")
+    out_free.name = latexstring("$(out_free.name) \$(m = n = $str_m_free, b = 1, \\alpha_{Free}^*(1) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
     println("\n")
 
@@ -273,7 +273,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     # str_proba_leap = @sprintf "%.2e" proba
     # str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
     # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
-    # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b = 1, \\eta^* = $str_step_grad_leap, \\alpha^*(1) = $str_step_sto_leap)\$")
+    # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b = 1, \\eta_{Leap}^* = $str_step_grad_leap, \\alpha_{Leap}^*(1) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
     # println("\n")
     #endregion
@@ -296,7 +296,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     str_proba_decreasing = @sprintf "%.2e" proba
     str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
-    out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha^*(1) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha_{Decreasing}^*(1) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
 

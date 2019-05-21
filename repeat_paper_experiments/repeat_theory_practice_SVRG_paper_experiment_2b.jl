@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 100
+max_epochs = 10^8
 max_time = 60.0*60.0*24.0 #60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
@@ -218,7 +218,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
-    out_bubeck.name = latexstring("$(out_bubeck.name) \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("$(out_bubeck.name) \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
     println("\n")
 
@@ -266,7 +266,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
     # str_b_leap = @sprintf "%d" leap.batchsize
     # str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
     # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
-    # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta^* = $str_step_grad_leap, \\alpha^*(b^*) = $str_step_sto_leap)\$")
+    # out_leap.name = latexstring("$(out_leap.name) \$(p = 1/n = $str_proba_leap, b^*(n) = $str_b_leap, \\eta_{Leap}^* = $str_step_grad_leap, \\alpha_{Leap}^*(b^*) = $str_step_sto_leap)\$")
     # OUTPUTS = [OUTPUTS; out_leap]
     # println("\n")
     #endregion
@@ -290,7 +290,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_proba_decreasing = @sprintf "%.2e" proba
     str_b_decreasing = @sprintf "%d" decreasing.batchsize
     str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
-    out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b^*(n) = $str_b_decreasing, \\alpha^*(b^*) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("$(out_decreasing.name) \$(p = 1/n = $str_proba_decreasing, b_{Decreasing}^*(n) = $str_b_decreasing, \\alpha_{Decreasing}^*(b^*) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
 
