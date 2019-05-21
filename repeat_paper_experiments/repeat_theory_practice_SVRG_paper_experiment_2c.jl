@@ -284,17 +284,17 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
 
     str_proba_decreasing = @sprintf "%.2e" proba
     str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
-    out_decreasing.name = latexstring("L-SVRG-D \$(p_{heuristic} = 1/m_{Free}^*(1) = $str_proba_decreasing, b = 1, \\alpha_{L-SVRG-D}^*(1) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("L-SVRG-D \$(p_{heuristic} = 1/m_{Free}^*(1) = $str_proba_decreasing, b = 1, \\alpha_{Decrease}^*(1) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
 
     ## Saving outputs and plots
     if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
-        suffix = "lame10"
+        suffix = "-lame10"
     elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
-        suffix = "lame23"
+        suffix = "-lame23"
     else
-        suffix = ""
+        suffix = "-"
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp2c-$(suffix)-$(max_epochs)_max_epochs")
@@ -302,9 +302,9 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
     # save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=8) #
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-newlegend", path=save_path, legendpos=:topright, legendfont=7) #
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=6) #
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c$(suffix)-newlegend", path=save_path, legendpos=:topright, legendfont=6) #
 
 end
 println("\n\n--- EXPERIMENT 2.C FINISHED ---")
