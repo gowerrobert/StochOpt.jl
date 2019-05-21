@@ -155,7 +155,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     Random.seed!(1)
 
     if idx_prob == 7 || idx_prob == 8
-        max_epochs = 100
+        global max_epochs = 100
     end
 
     ## Loading the data
