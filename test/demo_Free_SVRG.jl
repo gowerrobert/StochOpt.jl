@@ -44,11 +44,18 @@ options = set_options(max_iter=10^8, max_time=10.0^4, max_epocs=50, force_contin
 ## Load problem
 datapath = "./data/"
 # data = "australian"     # n =     690, d = 15
-data = "slice"
+# data = "slice"
+data = "YearPredictionMSD_full"
 # data = "ijcnn1_full"    # n = 141,691, d = 23
+# data = "real-sim"
 # data = "covtype_binary" # n = 581,012, d = 55
 X, y = loadDataset(datapath, data)
-prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="column-scaling")
+prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="none")
+prob.mu
+
+prob = load_ridge_regression(X, y, data, options, lambda=1e-3, scaling="column-scaling")
+prob.mu
+
 
 ## Running methods
 OUTPUTS = []  # List of saved outputs
