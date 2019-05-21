@@ -290,11 +290,11 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
 
     ## Saving outputs and plots
     if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
-        suffix = "-lame10"
+        suffix = "lame10"
     elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
-        suffix = "-lame23"
+        suffix = "lame23"
     else
-        suffix = "-"
+        suffix = "home"
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp2c-$(suffix)-$(max_epochs)_max_epochs")
@@ -304,7 +304,7 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=6) #
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c$(suffix)-newlegend", path=save_path, legendpos=:topright, legendfont=6) #
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2c-$(suffix)-newlegend", path=save_path, legendpos=:topright, legendfont=6) #
 
 end
 println("\n\n--- EXPERIMENT 2.C FINISHED ---")
