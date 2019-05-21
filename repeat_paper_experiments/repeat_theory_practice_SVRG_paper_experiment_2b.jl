@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*24.0 #60.0*60.0*4.0
+max_time = 1.0 #60.0*60.0*24.0 #60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
@@ -290,7 +290,7 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_proba_decreasing = @sprintf "%.2e" proba
     str_b_decreasing = @sprintf "%d" decreasing.batchsize
     str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
-    out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b_{Decreasing}^*(n) = $str_b_decreasing, \\alpha_{Decreasing}^*(b^*) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b_{L-SVRG-D}^*(n) = $str_b_decreasing, \\alpha_{L-SVRG-D}^*(b^*) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
 
@@ -305,12 +305,12 @@ skip_errors = [[700 10^3 -2. 8000],  # 1)  ijcnn1_full + scaled + 1e-1          
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp2b-$(suffix)-$(max_epochs)_max_epochs")
     # savename = string(savename, "-exp2b-$(suffix)-midnight")
-    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+    # save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-10min", path=save_path, legendpos=:topright, legendfont=8)
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=8) #
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-newlegend", path=save_path, legendpos=:topright, legendfont=7)
 
 end
 println("\n\n--- EXPERIMENT 2.B FINISHED ---")

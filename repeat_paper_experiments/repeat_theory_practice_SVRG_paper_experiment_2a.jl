@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*24.0 #60.0*60.0*4.0
+max_time = 1.0 #60.0*60.0*24.0 #60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
@@ -296,7 +296,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     str_proba_decreasing = @sprintf "%.2e" proba
     str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
-    out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha_{Decreasing}^*(1) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha_{L-SVRG-D}^*(1) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
 
@@ -311,11 +311,12 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp2a-$(suffix)-$(max_epochs)_max_epochs")
     # savename = string(savename, "-exp2a-$(suffix)-midnight")
-    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+    # save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8) # Plot and save output
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-midnight", path=save_path, legendpos=:topright, legendfont=8) #
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-newlegend", path=save_path, legendpos=:topright, legendfont=8) #
 
 end
 println("\n\n--- EXPERIMENT 2.A FINISHED ---")
