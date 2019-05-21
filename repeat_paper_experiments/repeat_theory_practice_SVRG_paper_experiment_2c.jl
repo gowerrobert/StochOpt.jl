@@ -134,9 +134,9 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
                [10^3 10^3 -2. 10^3],  # 5)  covtype_binary + scaled + 1e-1
                [10^3 10^3 -2. 10^3],  # 6)  covtype_binary + scaled + 1e-3
                [50000 50000 -2. 50000],  # 7)  slice + scaled + 1e-1                   midnight retry / FINAL
-               [50000 50000 -2. 50000],  # 8)  slice + scaled + 1e-3                   midnight retry (not tested)
+               [50000 50000 -2. 50000],  # 8)  slice + scaled + 1e-3                   midnight retry / FINAL
                [   5   3 -2.    3],  # 9)  real-sim + unscaled + 1e-1                  midnight retry / FINAL
-               [600    5 -2.    5],  # 10) real-sim + unscaled + 1e-3                  midnight retry
+               [600  150 -2.  100],  # 10) real-sim + unscaled + 1e-3                  midnight retry / FINAL
                [10^2 10^3 -2. 10^3],  # 11) a1a_full + unscaled + 1e-1
                [10^2 10^3 -2. 10^3],  # 12) a1a_full + unscaled + 1e-3
                [10^2 10^3 -2. 10^3],  # 13) colon-cancer + unscaled + 1e-1
