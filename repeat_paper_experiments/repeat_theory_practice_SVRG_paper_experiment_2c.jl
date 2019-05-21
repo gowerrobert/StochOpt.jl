@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 1.0 #60.0*60.0*24.0 #60.0*60.0*4.0
+max_time = 60.0*60.0*4.0 #60.0*60.0*24.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## Bash input
@@ -133,8 +133,8 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
                [10^4 10^4 -2. 10^4],  # 4)  YearPredictionMSD_full + scaled + 1e-3     too long
                [10^3 10^3 -2. 10^3],  # 5)  covtype_binary + scaled + 1e-1
                [10^3 10^3 -2. 10^3],  # 6)  covtype_binary + scaled + 1e-3
-               [50000 40000 -2. 40000],  # 7)  slice + scaled + 1e-1                   midnight retry
-               [50000 40000 -2. 40000],  # 8)  slice + scaled + 1e-3                   midnight retry (not tested)
+               [50000 50000 -2. 50000],  # 7)  slice + scaled + 1e-1                   midnight retry / FINAL
+               [50000 50000 -2. 50000],  # 8)  slice + scaled + 1e-3                   midnight retry (not tested)
                [   5   3 -2.    3],  # 9)  real-sim + unscaled + 1e-1                  midnight retry / FINAL
                [600    5 -2.    5],  # 10) real-sim + unscaled + 1e-3                  midnight retry
                [10^2 10^3 -2. 10^3],  # 11) a1a_full + unscaled + 1e-1
@@ -144,7 +144,7 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
                [10^2 10^3 -2. 10^3],  # 15) leukemia_full + unscaled + 1e-1
                [10^2 10^3 -2. 10^3]]  # 16) leukemia_full + unscaled + 1e-3
 
-@sync @distributed for idx_prob in problems
+@time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
     scaling = scalings[idx_prob]
     lambda = lambdas[idx_prob]
@@ -153,6 +153,10 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
     Random.seed!(1)
+
+    if idx_prob == 7 || idx_prob == 8
+        max_epochs = 100
+    end
 
     ## Loading the data
     println("--- Loading data ---")
