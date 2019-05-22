@@ -19,12 +19,12 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*4.0
+max_time = 5000.0 # 60.0*60.0*4.0
 precision = 10.0^(-6)
 
 ## File names
 # details = "final"
-details = "try1"
+details = "try2"
 # details = "test"
 
 ## Bash input
@@ -265,7 +265,12 @@ skip_errors = [[7000 5000 3000 3 7000],             # 1)  ijcnn1_full + scaled +
     savename = string(savename, "-exp3-$(suffix)-$(details)")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
-    legendpos = :topright
+    if idx_prob == 7 || idx_prob == 8
+        legendpos = :best
+    else
+        legendpos = :topright
+    end
+
     legendtitle = "Mini-batch size b"
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
