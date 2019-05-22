@@ -28,7 +28,7 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time =  9000.0 # should be enough # old limit = 60.0*60.0*4.0
+max_time = 9000.0 # should be enough # old limit = 60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## File names
