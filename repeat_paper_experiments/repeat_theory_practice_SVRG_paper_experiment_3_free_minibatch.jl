@@ -19,12 +19,13 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 1.0 #60.0*60.0*4.0
+max_time = 60.0*60.0*4.0
 precision = 10.0^(-6)
 
 ## File names
 # details = "final"
-details = "test"
+details = "try1"
+# details = "test"
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
@@ -119,12 +120,12 @@ lambdas = [10^(-1), 10^(-3),
 ## Set smaller number of skipped iteration for more data points
 skip_errors = [[7000 5000 3000 3 7000],             # 1)  ijcnn1_full + scaled + 1e-1              b^* = 1
                [7000 5000 3000 70 7000],             # 2)  ijcnn1_full + scaled + 1e-3              b^* = 1
-               [30000 10000 5000 1 30000],    # 3)  YearPredictionMSD_full + scaled + 1e-1   b^* = 1
+               [30000 10000 5000 10 30000],    # 3)  YearPredictionMSD_full + scaled + 1e-1   b^* = 1                   moins de 3h a tourner
                [30000 10000 5000 1 30000],    # 4)  YearPredictionMSD_full + scaled + 1e-3   b^* = 2
                [-2 -2 -2 -2 -2],                  # 5)  covtype_binary + scaled + 1e-1
                [-2 -2 -2 -2 -2],                  # 6)  covtype_binary + scaled + 1e-3
-               [2500 2000 1000 1 2500],              # 7)  slice + scaled + 1e-1                    b^* = 22
-               [2500 2000 1000 1 2500],              # 8)  slice + scaled + 1e-3                    b^* = n = 53500
+               [25000 2000 1000 1 2500],              # 7)  slice + scaled + 1e-1                    b^* = 22            moins de 3h a tourner
+               [25000 2000 1000 1 2500],              # 8)  slice + scaled + 1e-3                    b^* = n = 53500     moins de 3h a tourner
                [2000 1000 500 1 2000],              # 9)  real-sim + unscaled + 1e-1               b^* = 1
                [5000 2500 1000 1 5000],              # 10) real-sim + unscaled + 1e-3               b^* = 1 (for approx mu)
                [-2 -2 -2 -2 -2],                  # 11) a1a_full + unscaled + 1e-1
@@ -133,6 +134,23 @@ skip_errors = [[7000 5000 3000 3 7000],             # 1)  ijcnn1_full + scaled +
                [-2 -2 -2 -2 -2],                  # 14) colon-cancer + unscaled + 1e-3
                [-2 -2 -2 -2 -2],                  # 15) leukemia_full + unscaled + 1e-1
                [-2 -2 -2 -2 -2]]                  # 16) leukemia_full + unscaled + 1e-3
+
+# max_epochs_list = [ 300, # 1)  ijcnn1_full + scaled + 1e-1
+#                    1000, # 2)  ijcnn1_full + scaled + 1e-3
+#                    9999 , # 3)  YearPredictionMSD_full + scaled + 1e-1
+#                    9999, # 4)  YearPredictionMSD_full + scaled + 1e-3
+#                      -2,
+#                      -2,
+#                    9999, # 7)  slice + scaled + 1e-1
+#                    9999, # 8)  slice + scaled + 1e-3
+#                     250, # 9)  real-sim + unscaled + 1e-1
+#                     500, # 10) real-sim + unscaled + 1e-3
+#                      -2,
+#                      -2,
+#                      -2,
+#                      -2,
+#                      -2,
+#                      -2]
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -158,6 +176,7 @@ skip_errors = [[7000 5000 3000 3 7000],             # 1)  ijcnn1_full + scaled +
     println("\n--- Setting up the selected problem ---")
     options = set_options(tol=precision, max_iter=10^8,
                           max_epocs=max_epochs,
+                        #   max_epocs=max_epochs_list[idx_prob], #limiting computation time
                           max_time=max_time,
                           skip_error_calculation=10^4,
                           batchsize=1,
