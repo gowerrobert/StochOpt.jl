@@ -309,8 +309,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     # savename = string(savename, "-exp2b-$(suffix)-$(max_epochs)_max_epochs")
     # savename = string(savename, "-exp2b-$(suffix)-FINAL")
-    savename = string(savename, "-exp2b-$(suffix)-approx_mu")
-    # savename = string(savename, "-exp2b-$(suffix)-exact_mu")
+    # savename = string(savename, "-exp2b-$(suffix)-approx_mu")
+    savename = string(savename, "-exp2b-$(suffix)-exact_mu")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     if idx_prob == 8
@@ -322,8 +322,10 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=legendpos, legendfont=6) # Plot and save output
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-FINAL", path=save_path, legendpos=legendpos, legendfont=6)
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-approx_mu", path=save_path, legendpos=legendpos, legendfont=6)
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-exact_mu", path=save_path, legendpos=legendpos, legendfont=6)
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-approx_mu", path=save_path, legendpos=legendpos, legendfont=6)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-exact_mu", path=save_path, legendpos=legendpos, legendfont=6)
+
+    println("\nSTRONG CONVEXITY : ", prob.mu, "\n")
 
 end
 println("\n\n--- EXPERIMENT 2.B FINISHED ---")
