@@ -1,5 +1,5 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
-function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, methodname::AbstractString="", suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best, legendfont::Int64=12) #, datapassbnd::Int64
+function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, methodname::AbstractString="", suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best, legendtitle::AbstractString="", legendfont::Int64=12) #, datapassbnd::Int64
     ## Now in epocs X function values
 
     # New version with method name
@@ -50,8 +50,9 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
 
     plt = plot(epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol),
                xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name,
-               linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont),
-               legend=legendpos, markersize=6, linewidth=4, marker=:auto, grid=false)
+               linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig),
+               legendfont=font(legendfont), legend=legendpos, legendtitle=legendtitle,
+               markersize=6, linewidth=4, marker=:auto, grid=false)
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
 
@@ -97,7 +98,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf));
     plot(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name,
          linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont),
-         legend=legendpos, markersize=6, linewidth=4, marker=:auto, grid=false)
+         legend=legendpos, legendtitle=legendtitle, markersize=6, linewidth=4, marker=:auto, grid=false)
     println(output.name, ": 2^", log(2, output.stepsize_multiplier))
     for jiter=2:length(OUTPUTS)
         output = OUTPUTS[jiter]
@@ -132,7 +133,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         lf = length(output.testerrors);
         bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf));
         plot(output.times[1:bnd], output.testerrors[1:bnd], xlabel="time", ylabel="residual", label=string(output.name, "-t"), linestyle=:auto,
-             tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont), legend=legendpos, markersize=6, linewidth=4, marker=:auto, grid=false)
+             tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont), legend=legendpos, legendtitle=legendtitle, markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2, output.stepsize_multiplier))
         println(output.testerrors[1:bnd])
         for jiter=2:length(OUTPUTS)

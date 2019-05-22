@@ -188,8 +188,8 @@ skip_errors = [[7000   7000     200    200],             # 1)  ijcnn1_full + sca
     m_star = round(Int64, (3*Lmax)/mu) # theoretical optimal inner loop size for Free-SVRG with 1-nice sampling
 
     ## List of mini-batch sizes
-    numinneriters_list   = [n, round(Int64, Lmax/mu), m_star, 2*n]
-    numinneriters_labels = ["n", "L_{\\max}/\\mu", "m^* = 3L_{\\max}/\\mu", "2n"] # round? floor?
+    numinneriters_list   = [n, 2*n, round(Int64, Lmax/mu), m_star]
+    numinneriters_labels = ["n", "2n", "L_{\\max}/\\mu", "3L_{\\max}/\\mu = m^*"] # round? floor?
 
     ## Running methods
     OUTPUTS = [] # list of saved outputs
@@ -200,7 +200,7 @@ skip_errors = [[7000   7000     200    200],             # 1)  ijcnn1_full + sca
         numinneriters_label = numinneriters_labels[idx_numinneriter]
         str_numinneriters = @sprintf "%d" numinneriters_list[idx_numinneriter]
         println("\n------------------------------------------------------------")
-        println("Current inner loop size: \$m =$numinneriters_label $str_numinneriters\$")
+        println("Current inner loop size: \$m = $numinneriters_label = $str_numinneriters\$")
         println("------------------------------------------------------------")
 
         numinneriters = numinneriters_list[idx_numinneriter]  # inner loop size set to the number of data points
@@ -235,8 +235,10 @@ skip_errors = [[7000   7000     200    200],             # 1)  ijcnn1_full + sca
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     legendpos = :topright
+    legendtitle = "Inner loop size m"
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp4-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp4-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp4-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendtitle=legendtitle, legendfont=8)
 
 end
 end
