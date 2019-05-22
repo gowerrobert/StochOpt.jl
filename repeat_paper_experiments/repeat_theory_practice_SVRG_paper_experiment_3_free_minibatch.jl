@@ -19,7 +19,7 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 1.0 #60.0*60.0*10.0
+max_time = 60.0*60.0*4.0
 precision = 10.0^(-6)
 
 ## Bash input
@@ -113,23 +113,22 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for more data points
-# skip_errors = [[7000 7000 7000 7000 7000],       # 1)  ijcnn1_full + scaled + 1e-1
-skip_errors = [[700 700 700 700 700],       # 1)  ijcnn1_full + scaled + 1e-1
-               [7000 7000 7000 7000 7000],       # 2)  ijcnn1_full + scaled + 1e-3
-               [30000 30000 30000 30000 30000],  # 3)  YearPredictionMSD_full + scaled + 1e-1
-               [30000 30000 30000 30000 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3
-               [-2 -2 -2 -2 -2],                 # 5)  covtype_binary + scaled + 1e-1
-               [-2 -2 -2 -2 -2],                 # 6)  covtype_binary + scaled + 1e-3
-               [2500 2500 2500 2500 2500],       # 7)  slice + scaled + 1e-1
-               [2500 2500 2500 2500 2500],       # 8)  slice + scaled + 1e-3
-               [2000 2000 2000 2000 2000],       # 9)  real-sim + unscaled + 1e-1
-               [5000 5000 5000 5000 5000],       # 10) real-sim + unscaled + 1e-3
-               [-2 -2 -2 -2 -2],                 # 11) a1a_full + unscaled + 1e-1
-               [-2 -2 -2 -2 -2],                 # 12) a1a_full + unscaled + 1e-3
-               [-2 -2 -2 -2 -2],                 # 13) colon-cancer + unscaled + 1e-1
-               [-2 -2 -2 -2 -2],                 # 14) colon-cancer + unscaled + 1e-3
-               [-2 -2 -2 -2 -2],                 # 15) leukemia_full + unscaled + 1e-1
-               [-2 -2 -2 -2 -2]]                 # 16) leukemia_full + unscaled + 1e-3
+skip_errors = [[7000 5000 3000 1 7000],             # 1)  ijcnn1_full + scaled + 1e-1              b^* = 1
+               [7000 5000 3000 1 7000],             # 2)  ijcnn1_full + scaled + 1e-3              b^* = 1
+               [30000 10000 5000 1 30000],    # 3)  YearPredictionMSD_full + scaled + 1e-1   b^* = 1
+               [30000 10000 5000 1 30000],    # 4)  YearPredictionMSD_full + scaled + 1e-3   b^* = 2
+               [-2 -2 -2 -2 -2],                  # 5)  covtype_binary + scaled + 1e-1
+               [-2 -2 -2 -2 -2],                  # 6)  covtype_binary + scaled + 1e-3
+               [2500 2000 1000 1 2500],              # 7)  slice + scaled + 1e-1                    b^* = 22
+               [2500 2000 1000 1 2500],              # 8)  slice + scaled + 1e-3                    b^* = n = 53500
+               [2000 1000 500 1 2000],              # 9)  real-sim + unscaled + 1e-1               b^* = 1
+               [5000 2500 1000 1 5000],              # 10) real-sim + unscaled + 1e-3               b^* = 1 (for approx mu)
+               [-2 -2 -2 -2 -2],                  # 11) a1a_full + unscaled + 1e-1
+               [-2 -2 -2 -2 -2],                  # 12) a1a_full + unscaled + 1e-3
+               [-2 -2 -2 -2 -2],                  # 13) colon-cancer + unscaled + 1e-1
+               [-2 -2 -2 -2 -2],                  # 14) colon-cancer + unscaled + 1e-3
+               [-2 -2 -2 -2 -2],                  # 15) leukemia_full + unscaled + 1e-1
+               [-2 -2 -2 -2 -2]]                  # 16) leukemia_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -141,6 +140,10 @@ skip_errors = [[700 700 700 700 700],       # 1)  ijcnn1_full + scaled + 1e-1
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
     Random.seed!(1)
+
+    if idx_prob == 7 || idx_prob == 8
+        global max_epochs = 100
+    end
 
     ## Loading the data
     println("--- Loading data ---")
@@ -186,7 +189,11 @@ skip_errors = [[700 700 700 700 700],       # 1)  ijcnn1_full + scaled + 1e-1
     ## List of mini-batch sizes
     minibatch_list   = [1, 100, round(Int64, sqrt(n)), n]
     minibatch_labels = ["", "", " \\sqrt{n} =", " n ="]
-    if !(b_theoretical in minibatch_list)
+    if b_theoretical == 1
+        minibatch_labels[1] = " b^*(n) ="
+    elseif b_theoretical == n
+        minibatch_labels[4] = " b^*(n) = n ="
+    elseif !(b_theoretical in minibatch_list) # low proba that b^* is 100 or sqrt(n)
         minibatch_list   = [minibatch_list   ; b_theoretical]
         minibatch_labels = [minibatch_labels ; " b^*(n) ="]
     end
@@ -199,7 +206,7 @@ skip_errors = [[700 700 700 700 700],       # 1)  ijcnn1_full + scaled + 1e-1
         ## Monitoring
         minibatch_label = minibatch_labels[idx_minibatch]
         str_minibatch = @sprintf "%d" minibatch_list[idx_minibatch]
-        println("\n\n------------------------------------------------------------")
+        println("\n------------------------------------------------------------")
         println("Current mini-batch: \$b =$minibatch_label $str_minibatch\$")
         println("------------------------------------------------------------")
 
@@ -220,6 +227,7 @@ skip_errors = [[700 700 700 700 700],       # 1)  ijcnn1_full + scaled + 1e-1
         OUTPUTS = [OUTPUTS; output]
         println("\n")
     end
+    println("\n")
 
     ## Saving outputs and plots
     if path == "/cal/homes/ngazagnadou/StochOpt.jl/"

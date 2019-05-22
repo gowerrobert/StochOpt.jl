@@ -114,7 +114,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         bnd = convert(Int64, min(ceil(datapassbnd*lf/number_epochs), lf));
         plot!(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
             guidefont=font(fontbig), legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
-        println(output.name,": 2^", log(2,output.stepsize_multiplier))
+        println(output.name,": 2^", log(2, output.stepsize_multiplier))
     end
     println("$(path)figures/$(probname)-time.pdf")
     savefig("$(path)figures/$(probname)-time.pdf")
