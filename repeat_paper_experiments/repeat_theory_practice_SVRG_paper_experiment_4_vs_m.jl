@@ -19,12 +19,13 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 1.0 #60.0*60.0*4.0
+max_time = 60.0*60.0 #60.0*60.0*4.0
 precision = 10.0^(-6)
 
 ## File names
 # details = "final"
-details = "test"
+details = "1h"
+# details = "test"
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
