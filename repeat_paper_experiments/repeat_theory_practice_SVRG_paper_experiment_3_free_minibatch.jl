@@ -14,13 +14,17 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 ## --- EXAMPLE OF RUNNING TIME ---
 
 ## --- SAVED FILES ---
-3333
+
 """
 
 ## General settings
 max_epochs = 10^8
 max_time = 60.0*60.0*4.0
 precision = 10.0^(-6)
+
+## File names
+details = "final"
+# details = "test"
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
@@ -237,8 +241,6 @@ skip_errors = [[7000 5000 3000 1 7000],             # 1)  ijcnn1_full + scaled +
     else
         suffix = "home"
     end
-    # details = "final"
-    details = "test"
 
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp3-$(suffix)-$(details)")
