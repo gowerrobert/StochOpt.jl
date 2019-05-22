@@ -2,7 +2,7 @@
 ### "Towards closing the gap between the theory and practice of SVRG", O. Sebbouh, S. Jelassi, N. Gazagnadou, F. Bach, R. M. Gower (2019)
 
 ## --- EXPERIMENT 4 ---
-Goal: Comparing Free-SVRG for different inner loop sizes {n, L_{\max}/mu, m^* = L_{\max}/mu, 2n} for 1-nice sampling.
+Goal: Comparing Free-SVRG for different inner loop sizes {n, L_max/mu, m^* = L_max/mu, 2n} for 1-nice sampling.
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 
@@ -117,16 +117,17 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for more data points
-skip_errors = [[7000 5000 3000 1 7000],             # 1)  ijcnn1_full + scaled + 1e-1              b^* = 1
-               [7000 5000 3000 1 7000],             # 2)  ijcnn1_full + scaled + 1e-3              b^* = 1
-               [30000 10000 5000 1 30000],    # 3)  YearPredictionMSD_full + scaled + 1e-1   b^* = 1
-               [30000 10000 5000 1 30000],    # 4)  YearPredictionMSD_full + scaled + 1e-3   b^* = 2
-               [-2 -2 -2 -2 -2],                  # 5)  covtype_binary + scaled + 1e-1
-               [-2 -2 -2 -2 -2],                  # 6)  covtype_binary + scaled + 1e-3
-               [2500 2000 1000 1 2500],              # 7)  slice + scaled + 1e-1                    b^* = 22
-               [2500 2000 1000 1 2500],              # 8)  slice + scaled + 1e-3                    b^* = n = 53500
-               [2000 1000 500 1 2000],              # 9)  real-sim + unscaled + 1e-1               b^* = 1
-               [5000 2500 1000 1 5000],              # 10) real-sim + unscaled + 1e-3               b^* = 1 (for approx mu)
+#          m =   n      2n    Lmax/mu   m*
+skip_errors = [[7000   7000     200    200],             # 1)  ijcnn1_full + scaled + 1e-1              m^* =
+               [7000   7000    6500   6500],             # 2)  ijcnn1_full + scaled + 1e-3              m^* =
+               [30000  30000   40000  40000],    # 3)  YearPredictionMSD_full + scaled + 1e-1           m^* =
+               [30000  30000   10000  10000],    # 4)  YearPredictionMSD_full + scaled + 1e-3           m^* =
+               [-2      -2     -2      -2],                  # 5)  covtype_binary + scaled + 1e-1
+               [-2      -2     -2      -2],                  # 6)  covtype_binary + scaled + 1e-3
+               [40000  40000   50000  50000],              # 7)  slice + scaled + 1e-1                  m^* =
+               [40000  40000   50000  50000],              # 8)  slice + scaled + 1e-3                  m^* =
+               [10      100      3      3],              # 9)  real-sim + unscaled + 1e-1               m^* =
+               [500     500     150    150],              # 10) real-sim + unscaled + 1e-3              m^* =
                [-2 -2 -2 -2 -2],                  # 11) a1a_full + unscaled + 1e-1
                [-2 -2 -2 -2 -2],                  # 12) a1a_full + unscaled + 1e-3
                [-2 -2 -2 -2 -2],                  # 13) colon-cancer + unscaled + 1e-1
@@ -240,4 +241,4 @@ skip_errors = [[7000 5000 3000 1 7000],             # 1)  ijcnn1_full + scaled +
 end
 end
 
-println("\n\n--- EXPERIMENT 3 FINISHED ---")
+println("\n\n--- EXPERIMENT 4 FINISHED ---")

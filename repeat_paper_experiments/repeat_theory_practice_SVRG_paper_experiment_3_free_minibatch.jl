@@ -117,8 +117,8 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for more data points
-skip_errors = [[7000 5000 3000 1 7000],             # 1)  ijcnn1_full + scaled + 1e-1              b^* = 1
-               [7000 5000 3000 1 7000],             # 2)  ijcnn1_full + scaled + 1e-3              b^* = 1
+skip_errors = [[7000 5000 3000 3 7000],             # 1)  ijcnn1_full + scaled + 1e-1              b^* = 1
+               [7000 5000 3000 70 7000],             # 2)  ijcnn1_full + scaled + 1e-3              b^* = 1
                [30000 10000 5000 1 30000],    # 3)  YearPredictionMSD_full + scaled + 1e-1   b^* = 1
                [30000 10000 5000 1 30000],    # 4)  YearPredictionMSD_full + scaled + 1e-3   b^* = 2
                [-2 -2 -2 -2 -2],                  # 5)  covtype_binary + scaled + 1e-1
