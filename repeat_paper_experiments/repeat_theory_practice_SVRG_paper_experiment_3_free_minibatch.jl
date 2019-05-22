@@ -112,15 +112,32 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
-
+## Set smaller number of skipped iteration for more data points
+skip_errors = [[7000 7000 7000 7000 7000],       # 1)  ijcnn1_full + scaled + 1e-1
+               [7000 7000 7000 7000 7000],       # 2)  ijcnn1_full + scaled + 1e-3
+               [30000 30000 30000 30000 30000],  # 3)  YearPredictionMSD_full + scaled + 1e-1
+               [30000 30000 30000 30000 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3
+               [-2 -2 -2 -2 -2],                 # 5)  covtype_binary + scaled + 1e-1
+               [-2 -2 -2 -2 -2],                 # 6)  covtype_binary + scaled + 1e-3
+               [2500 2500 2500 2500 2500],       # 7)  slice + scaled + 1e-1
+               [2500 2500 2500 2500 2500],       # 8)  slice + scaled + 1e-3
+               [2000 2000 2000 2000 2000],       # 9)  real-sim + unscaled + 1e-1
+               [5000 5000 5000 5000 5000],       # 10) real-sim + unscaled + 1e-3
+               [-2 -2 -2 -2 -2],                 # 11) a1a_full + unscaled + 1e-1
+               [-2 -2 -2 -2 -2],                 # 12) a1a_full + unscaled + 1e-3
+               [-2 -2 -2 -2 -2],                 # 13) colon-cancer + unscaled + 1e-1
+               [-2 -2 -2 -2 -2],                 # 14) colon-cancer + unscaled + 1e-3
+               [-2 -2 -2 -2 -2],                 # 15) leukemia_full + unscaled + 1e-1
+               [-2 -2 -2 -2 -2]]                 # 16) leukemia_full + unscaled + 1e-3
 
 @time begin
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
     scaling = scalings[idx_prob]
     lambda = lambdas[idx_prob]
+    skip_error = skip_errors[idx_prob]
     println("EXPERIMENT : ", idx_prob, " over ", length(problems))
-    @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda;
+    @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
     Random.seed!(1)
 
@@ -162,44 +179,40 @@ lambdas = [10^(-1), 10^(-3),
     ## Computing theoretical optimal mini-batch size for b-nice sampling with inner loop size m = n
     b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
 
-    ## Computing the empirical mini-batch size over a grid
-    minibatchgrid = grids[idx_prob]
-    println("---------------------------------- MINI-BATCH GRID ------------------------------------------")
-    println(minibatchgrid)
-    println("---------------------------------------------------------------------------------------------")
+    ## List of mini-batch sizes
+    minibatch_list   = [1, 100, sqrt(n), n]
+    minibatch_labels = ["1", "100", "\$\\sqrt{n}\$", "\$n\$"]
+    if !(b_theoretical in minibatch_list)
+        minibatch_list   = [minibatch_list  ; b_theoretical]
+        minibatch_labels = [minibatch_labels; "\$b^*(n)\$"]
+    end
+    ## Running methods
+    OUTPUTS = [] # list of saved outputs
 
-    OUTPUTS, itercomplex = simulate_Free_SVRG_nice(prob, minibatchgrid, options, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path)
+    ################################################################################
+    ################################## FREE-SVRG ###################################
+    ################################################################################
+    for idx_minibatch in 1:length(minibatch_list)
+        numinneriters = n                                  # inner loop size set to the number of data points
+        options.batchsize = minibatch_list[idx_minibatch]  # mini-batch size
+        options.stepsize_multiplier = -1.0                 # theoretical step size set in boot_Free_SVRG
+        sampling = build_sampling("nice", n, options)
+        free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
 
-    ## Checking that all simulations reached tolerance
-    fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu]
-    if all(s->(string(s)=="tol-reached"), fails)
-        println("Tolerance always reached")
-    else
-        println("Some total complexities might be threshold because of reached maximal time")
-        println("fails: ", fails)
+        ## Setting the number of skipped iteration
+        options.skip_error_calculation = skip_error[idx_minibatch] # skip error different for each algo
+
+        out_free = minimizeFunc(prob, free, options)
+
+        str_minibatch_free = @sprintf "%d" minibatch_list[idx_minibatch]
+        str_step_free = @sprintf "%.2e" free.stepsize
+        # out_free.name = latexstring("\$(b = $str_minibatch_free, \\alpha^*(b) = $str_step_free)\$") # write sqrt(n) etc
+        OUTPUTS = [OUTPUTS; out_free]
+        println("\n")
     end
 
-    ## Computing the empirical complexity
-    empcomplex = reshape([OUTPUTS[i].epochs[end] for i=1:length(minibatchgrid)*numsimu], length(minibatchgrid)) # number of stochastic gradients computed
-    min_empcomplex, idx_min = findmin(empcomplex)
-    b_empirical = minibatchgrid[idx_min]
-
-    ## Saving the result of the simulations
-    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(probname, "-exp3-$(machine)-", numsimu, "-avg")
-    savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")) # Extra suffix to check which skip values to keep
-    # save("$(save_path)data/$(savename).jld",
-    #      "options", options, "minibatchgrid", minibatchgrid,
-    #      "itercomplex", itercomplex, "empcomplex", empcomplex,
-    #      "b_theoretical", b_theoretical, "b_empirical", b_empirical)
-
-    ## Plotting total complexity vs mini-batch size
-    # legendpos = :topleft
-    legendpos = :best
-    pyplot()
-
 
 end
 end
 
-println("\n\n--- EXPERIMENT 1.A FINISHED ---")
+println("\n\n--- EXPERIMENT 3 FINISHED ---")
