@@ -2,24 +2,24 @@
 ### "Towards closing the gap between the theory and practice of SVRG", O. Sebbouh, S. Jelassi, N. Gazagnadou, F. Bach, R. M. Gower (2019)
 
 ## --- EXPERIMENT 3 ---
-Goal: Comparing Free-SVRG with m=n for different mini-batch sizes {1, 100, \sqrt{n}, n, b^*}.
+Goal: Comparing Free-SVRG with m=n for different mini-batch sizes {1, 100, \\sqrt{n}, n, b^*}.
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_3-free_minibatch.jl
+>julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_3_free_minibatch.jl
 
 ## --- EXAMPLE OF RUNNING TIME ---
 
 ## --- SAVED FILES ---
-
+3333
 """
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*10.0
+max_time = 1.0 #60.0*60.0*10.0
 precision = 10.0^(-6)
 
 ## Bash input
@@ -113,7 +113,8 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for more data points
-skip_errors = [[7000 7000 7000 7000 7000],       # 1)  ijcnn1_full + scaled + 1e-1
+# skip_errors = [[7000 7000 7000 7000 7000],       # 1)  ijcnn1_full + scaled + 1e-1
+skip_errors = [[700 700 700 700 700],       # 1)  ijcnn1_full + scaled + 1e-1
                [7000 7000 7000 7000 7000],       # 2)  ijcnn1_full + scaled + 1e-3
                [30000 30000 30000 30000 30000],  # 3)  YearPredictionMSD_full + scaled + 1e-1
                [30000 30000 30000 30000 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3
@@ -178,21 +179,30 @@ skip_errors = [[7000 7000 7000 7000 7000],       # 1)  ijcnn1_full + scaled + 1e
 
     ## Computing theoretical optimal mini-batch size for b-nice sampling with inner loop size m = n
     b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
+    println("------------------------------------------------------------")
+    println("Theoretical mini-batch: ", b_theoretical)
+    println("------------------------------------------------------------\n")
 
     ## List of mini-batch sizes
-    minibatch_list   = [1, 100, sqrt(n), n]
-    minibatch_labels = ["1", "100", "\$\\sqrt{n}\$", "\$n\$"]
+    minibatch_list   = [1, 100, round(Int64, sqrt(n)), n]
+    minibatch_labels = ["", "", " \\sqrt{n} =", " n ="]
     if !(b_theoretical in minibatch_list)
-        minibatch_list   = [minibatch_list  ; b_theoretical]
-        minibatch_labels = [minibatch_labels; "\$b^*(n)\$"]
+        minibatch_list   = [minibatch_list   ; b_theoretical]
+        minibatch_labels = [minibatch_labels ; " b^*(n) ="]
     end
+
     ## Running methods
     OUTPUTS = [] # list of saved outputs
 
-    ################################################################################
-    ################################## FREE-SVRG ###################################
-    ################################################################################
+    ## Launching Free-SVRG for different mini-batch sizes and m = n
     for idx_minibatch in 1:length(minibatch_list)
+        ## Monitoring
+        minibatch_label = minibatch_labels[idx_minibatch]
+        str_minibatch = @sprintf "%d" minibatch_list[idx_minibatch]
+        println("\n\n------------------------------------------------------------")
+        println("Current mini-batch: \$b =$minibatch_label $str_minibatch\$")
+        println("------------------------------------------------------------")
+
         numinneriters = n                                  # inner loop size set to the number of data points
         options.batchsize = minibatch_list[idx_minibatch]  # mini-batch size
         options.stepsize_multiplier = -1.0                 # theoretical step size set in boot_Free_SVRG
@@ -200,17 +210,35 @@ skip_errors = [[7000 7000 7000 7000 7000],       # 1)  ijcnn1_full + scaled + 1e
         free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
 
         ## Setting the number of skipped iteration
-        options.skip_error_calculation = skip_error[idx_minibatch] # skip error different for each algo
+        options.skip_error_calculation = skip_error[idx_minibatch] # skip error different for each mini-batch size
 
-        out_free = minimizeFunc(prob, free, options)
+        ## Running the minimization
+        output = minimizeFunc(prob, free, options)
 
-        str_minibatch_free = @sprintf "%d" minibatch_list[idx_minibatch]
-        str_step_free = @sprintf "%.2e" free.stepsize
-        # out_free.name = latexstring("\$(b = $str_minibatch_free, \\alpha^*(b) = $str_step_free)\$") # write sqrt(n) etc
-        OUTPUTS = [OUTPUTS; out_free]
+        str_step = @sprintf "%.2e" free.stepsize
+        output.name = latexstring("\$b =$minibatch_label $str_minibatch, \\alpha^*(b) = $str_step\$")
+        OUTPUTS = [OUTPUTS; output]
         println("\n")
     end
 
+    ## Saving outputs and plots
+    if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
+        suffix = "lame10"
+    elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
+        suffix = "lame23"
+    else
+        suffix = "home"
+    end
+    # details = "final"
+    details = "test"
+
+    savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+    savename = string(savename, "-exp3-$(suffix)-$(details)")
+    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+
+    legendpos = :topright
+    pyplot()
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
 
 end
 end
