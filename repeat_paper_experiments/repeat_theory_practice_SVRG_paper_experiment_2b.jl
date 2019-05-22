@@ -228,7 +228,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
     # out_bubeck.name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
-    out_bubeck.name = latexstring("SVRG \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("SVRG \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
     println("\n")
 
@@ -251,7 +251,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_m_free = @sprintf "%d" free.numinneriters
     str_b_free = @sprintf "%d" free.batchsize
     str_step_free = @sprintf "%.2e" free.stepsize
-    out_free.name = latexstring("Free-SVRG \$(m = n = $str_m_free, b_{Free}^*(n) = $str_b_free, \\alpha_{Free}^*(b^*) = $str_step_free)\$")
+    # out_free.name = latexstring("Free-SVRG \$(m = n = $str_m_free, b_{Free}^*(n) = $str_b_free, \\alpha_{Free}^*(b^*) = $str_step_free)\$")
+    out_free.name = latexstring("Free-SVRG \$(m = n = $str_m_free, b^*(n) = $str_b_free, \\alpha^*(b^*) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
     println("\n")
 
@@ -300,7 +301,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_proba_decreasing = @sprintf "%.2e" proba
     str_b_decreasing = @sprintf "%d" decreasing.batchsize
     str_step_decreasing = @sprintf "%.2e" decreasing.initial_stepsize
-    out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b_{Decrease}^*(n) = $str_b_decreasing, \\alpha_{Decrease}^*(b^*) = $str_step_decreasing)\$")
+    # out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b_{Decrease}^*(n) = $str_b_decreasing, \\alpha_{Decrease}^*(b^*) = $str_step_decreasing)\$")
+    out_decreasing.name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b^*(n) = $str_b_decreasing, \\alpha^*(b^*) = $str_step_decreasing)\$")
     OUTPUTS = [OUTPUTS; out_decreasing]
     println("\n")
 
