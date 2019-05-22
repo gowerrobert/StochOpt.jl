@@ -28,8 +28,8 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*2.0 #60.0*60.0*10.0
-precision = 10.0^(-4)
+max_time = 60.0*60.0*10.0
+precision = 10.0^(-3)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
@@ -154,12 +154,12 @@ grids = [#[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^15, 53500], # 8)  slice + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 9)  real-sim + unscaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 10) real-sim + unscaled + 1e-3
-         [2^0, 2^4, 2^8, 2^12, 32561], # 11) a1a_full + unscaled + 1e-1
-         [2^0, 2^4, 2^8, 2^12, 32561], # 12) a1a_full + unscaled + 1e-3
-         [2^0, 2^2, 2^4, 62], # 13) colon-cancer + unscaled + 1e-1
-         [2^0, 2^2, 2^4, 62], # 14) colon-cancer + unscaled + 1e-3
-         [2^0, 2^2, 2^4, 72], # 15) leukemia_full + unscaled + 1e-1
-         [2^0, 2^2, 2^4, 72]] # 16) leukemia_full + unscaled + 1e-3
+         [2^0, 2^4, 2^8, 2^12, 32561], # 11) a1a_full + unscaled + 1e-1  # unscaled,       n =  32,561, d =    123
+         [2^0, 2^4, 2^8, 2^12, 32561], # 12) a1a_full + unscaled + 1e-3  # unscaled,       n =  32,561, d =    123
+         [2^0, 2^2, 2^4, 62], # 13) colon-cancer + unscaled + 1e-1       # already scaled, n =   2,000, d =     62
+         [2^0, 2^2, 2^4, 62], # 14) colon-cancer + unscaled + 1e-3       # already scaled, n =   2,000, d =     62
+         [2^0, 2^2, 2^4, 72], # 15) leukemia_full + unscaled + 1e-1      # already scaled, n =      62, d =  7,129
+         [2^0, 2^2, 2^4, 72]] # 16) leukemia_full + unscaled + 1e-3      # already scaled, n =      62, d =  7,129
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -243,7 +243,8 @@ grids = [#[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2
     end
 
     ## Plotting total complexity vs mini-batch size
-    legendpos = :topleft
+    # legendpos = :topleft
+    legendpos = :best
     pyplot()
     exp_number = 1 # grid of mini-batch sizes
     plot_empirical_complexity_SVRG(prob, exp_number, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="-$(machine)")
