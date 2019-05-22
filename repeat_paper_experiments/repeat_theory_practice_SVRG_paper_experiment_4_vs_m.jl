@@ -121,13 +121,13 @@ lambdas = [10^(-1), 10^(-3),
 skip_errors = [[7000   7000     200    200],             # 1)  ijcnn1_full + scaled + 1e-1              m^* =
                [7000   7000    6500   6500],             # 2)  ijcnn1_full + scaled + 1e-3              m^* =
                [30000  30000   40000  40000],    # 3)  YearPredictionMSD_full + scaled + 1e-1           m^* =
-               [30000  30000   10000  10000],    # 4)  YearPredictionMSD_full + scaled + 1e-3           m^* =
+               [40000  40000   10000  10000],    # 4)  YearPredictionMSD_full + scaled + 1e-3           m^* =
                [-2      -2     -2      -2],                  # 5)  covtype_binary + scaled + 1e-1
                [-2      -2     -2      -2],                  # 6)  covtype_binary + scaled + 1e-3
                [40000  40000   50000  50000],              # 7)  slice + scaled + 1e-1                  m^* =
                [40000  40000   50000  50000],              # 8)  slice + scaled + 1e-3                  m^* =
-               [10      100      3      3],              # 9)  real-sim + unscaled + 1e-1               m^* =
-               [500     500     150    150],              # 10) real-sim + unscaled + 1e-3              m^* =
+               [2000   2000      3      3],              # 9)  real-sim + unscaled + 1e-1               m^* =
+               [5000   5000     150    150],              # 10) real-sim + unscaled + 1e-3              m^* =
                [-2 -2 -2 -2 -2],                  # 11) a1a_full + unscaled + 1e-1
                [-2 -2 -2 -2 -2],                  # 12) a1a_full + unscaled + 1e-3
                [-2 -2 -2 -2 -2],                  # 13) colon-cancer + unscaled + 1e-1
