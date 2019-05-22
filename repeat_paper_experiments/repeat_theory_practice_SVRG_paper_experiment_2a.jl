@@ -28,8 +28,13 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*4.0 #60.0*60.0*24.0
+max_time =  9000.0 # should be enough # old limit = 60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
+
+## File names
+# details = "final"
+details = "legend"
+# details = "test"
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
@@ -230,7 +235,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
-    out_bubeck.name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
+    # out_bubeck.name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("SVRG \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
     options.max_epocs = max_epochs
     println("\n")
@@ -313,17 +319,12 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
         suffix = "home"
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    # savename = string(savename, "-exp2a-$(suffix)-$(max_epochs)_max_epochs")
-    # savename = string(savename, "-exp2a-$(suffix)-FINAL")
-    # savename = string(savename, "-exp2a-$(suffix)-approx_mu")
-    savename = string(savename, "-exp2a-$(suffix)-exact_mu")
+    savename = string(savename, "-exp2a-$(suffix)-$(details)")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-FINAL", path=save_path, legendpos=:topright, legendfont=6)
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-approx_mu", path=save_path, legendpos=:topright, legendfont=6)
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-exact_mu", path=save_path, legendpos=:topright, legendfont=6)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(details)", path=save_path, legendpos=:topright, legendfont=8)
 
     println("\nSTRONG CONVEXITY : ", prob.mu, "\n")
 
