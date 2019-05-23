@@ -41,8 +41,8 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
     ## To avoid very long computations when dimensions are large mu is approximated by lambda
-    # if numdata > 10000 || numfeatures > 10000
-    if numdata > 10^8 || numfeatures > 10^8
+    if numdata > 10000 || numfeatures > 10000
+    # if numdata > 10^8 || numfeatures > 10^8
         mu = lambda
     else
         mu = get_mu_str_conv(X, lambda) # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
