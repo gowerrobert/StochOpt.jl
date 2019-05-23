@@ -1,5 +1,5 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
-function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, methodname::AbstractString="", suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best, legendtitle::AbstractString="", legendfont::Int64=12, legendabove::Bool=false) #, datapassbnd::Int64
+function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, methodname::AbstractString="", suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best, legendtitle::AbstractString="", legendfont::Int64=12, legendabove::Bool=false, nolegend::Bool=false) #, datapassbnd::Int64
     ## Now in epocs X function values
 
     # New version with method name
@@ -87,6 +87,9 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     if legendabove
         ylims!(min_value - 0.5*min_value , 300)
     end
+    if nolegend
+        plot!(legend = nothing)
+    end
     println("$(path)figures/$(probname)-epoc.pdf")
     savefig(plt, "$(path)figures/$(probname)-epoc.pdf")
 
@@ -131,6 +134,9 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
     if legendabove
         ylims!(min_value - 0.5*min_value , 300)
     end
+    if nolegend
+        plot!(legend = nothing)
+    end
     println("$(path)figures/$(probname)-time.pdf")
     savefig("$(path)figures/$(probname)-time.pdf")
 
@@ -172,6 +178,9 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         end
         if legendabove
             ylims!(min_value - 0.5*min_value , 300)
+        end
+        if nolegend
+            plot!(legend = nothing)
         end
         println(probname)
         savefig("$(path)figures/$(probname)-t-time.pdf")
