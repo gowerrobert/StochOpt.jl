@@ -11,7 +11,7 @@ using Base64
 include("../src/StochOpt.jl")
 
 ## Path settings
-#region
+#region # This code is repeated in many demo. Should include it as a little script and call it?
 save_path = "./experiments/SVRG/"
 if !isdir(save_path) # create directory if not existing
     if !isdir("./experiments/")

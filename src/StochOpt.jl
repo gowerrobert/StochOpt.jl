@@ -82,6 +82,7 @@ mutable struct Prob
     Hess_D!::Function   # Calculates Diagonal
     Hess_C::Function   # Gets subset of the columns of Hessian
     Hess_C!::Function   # Gets subset of the columns of Hessian
+    Hess_CC_g_C!::Function   # Gets subset of the columns and rows of Hessian, and subset of rows of gradient. 
     Hess_C2::Function
     #    Hess_vv::Function  # Calculates the Hessian-vector-vector product v'Hv
     ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method)
@@ -268,8 +269,12 @@ mutable struct SPIN
     HS::Array{Float64}  # Sketched Hessian
     SHS::Array{Float64}  # Sketched Hessian
     grad::Array{Float64} # gradient
+    avrg_dir::Array{Float64} #Weighted average of search direction
+    cov_dir::Array{Float64} # Weighted covariance matrix of search direction
+    weight::Float64 # the weight used in taking weighted averages of the past
     stepsize::Float64
     sketchtype::AbstractString
+    reset::Function # reset some parameters of the method
 end
 
 mutable struct Method
