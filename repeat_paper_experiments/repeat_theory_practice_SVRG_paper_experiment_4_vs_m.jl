@@ -24,7 +24,7 @@ precision = 10.0^(-6)
 
 ## File names
 # details = "final"
-details = "1h"
+details = "1hbis"
 # details = "test"
 
 ## Bash input
@@ -119,7 +119,7 @@ lambdas = [10^(-1), 10^(-3),
 
 ## Set smaller number of skipped iteration for more data points
 #          m =   n      2n    Lmax/mu   m*
-skip_errors = [[7000   7000     200    200],             # 1)  ijcnn1_full + scaled + 1e-1              m^* =
+skip_errors = [[7000   7000     200    300],             # 1)  ijcnn1_full + scaled + 1e-1              m^* =
                [7000   7000    6500   6500],             # 2)  ijcnn1_full + scaled + 1e-3              m^* =
                [30000  30000   40000  40000],    # 3)  YearPredictionMSD_full + scaled + 1e-1           m^* =
                [40000  40000   10000  10000],    # 4)  YearPredictionMSD_full + scaled + 1e-3           m^* =

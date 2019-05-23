@@ -1,5 +1,5 @@
 # Front end for plotting the execution in time and in flops of the outputs recorded in OUTPUTS.
-function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, methodname::AbstractString="", suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best, legendtitle::AbstractString="", legendfont::Int64=12) #, datapassbnd::Int64
+function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0, methodname::AbstractString="", suffix::AbstractString="", path::AbstractString="./", legendpos::Symbol=:best, legendtitle::AbstractString="", legendfont::Int64=12, legendabove::Bool=false) #, datapassbnd::Int64
     ## Now in epocs X function values
 
     # New version with method name
@@ -53,6 +53,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
                linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig),
                legendfont=font(legendfont), legend=legendpos, legendtitle=legendtitle,
                markersize=6, linewidth=4, marker=:auto, grid=false)
+    min_value = minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
     for j=2:length(OUTPUTS)
         output = OUTPUTS[j];
 
@@ -79,6 +80,12 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         plot!(plt, epochs[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol),
               xlabel=xlabeltxt, ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
               guidefont=font(fontbig), legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
+        if min_value > minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
+            min_value = minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
+        end
+    end
+    if legendabove
+        ylims!(min_value - 0.5*min_value , 300)
     end
     println("$(path)figures/$(probname)-epoc.pdf")
     savefig(plt, "$(path)figures/$(probname)-epoc.pdf")
@@ -100,6 +107,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
          linestyle=:auto, tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont),
          legend=legendpos, legendtitle=legendtitle, markersize=6, linewidth=4, marker=:auto, grid=false)
     println(output.name, ": 2^", log(2, output.stepsize_multiplier))
+    min_value = minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
     for jiter=2:length(OUTPUTS)
         output = OUTPUTS[jiter]
 
@@ -116,6 +124,12 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
         plot!(output.times[1:bnd], (fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol), xlabel="time", ylabel="residual", yscale=:log10, label=output.name, linestyle=:auto, tickfont=font(fontsmll),
             guidefont=font(fontbig), legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2, output.stepsize_multiplier))
+        if min_value > minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
+            min_value = minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
+        end
+    end
+    if legendabove
+        ylims!(min_value - 0.5*min_value , 300)
     end
     println("$(path)figures/$(probname)-time.pdf")
     savefig("$(path)figures/$(probname)-time.pdf")
@@ -136,6 +150,7 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
              tickfont=font(fontsmll), guidefont=font(fontbig), legendfont=font(legendfont), legend=legendpos, legendtitle=legendtitle, markersize=6, linewidth=4, marker=:auto, grid=false)
         println(output.name,": 2^", log(2, output.stepsize_multiplier))
         println(output.testerrors[1:bnd])
+        min_value = minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
         for jiter=2:length(OUTPUTS)
             output = OUTPUTS[jiter]
 
@@ -151,6 +166,12 @@ function plot_outputs_Plots(OUTPUTS, prob::Prob, options ; datapassbnd::Int64=0,
                 legendfont=font(legendfont), markersize=6, linewidth=4, marker=:auto, grid=false)
             println(output.testerrors[1:bnd])
             println(output.name, ": 2^", log(2, output.stepsize_multiplier))
+            if min_value > minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
+                min_value = minimum((fs[1:bnd].-prob.fsol)./(fs[1].-prob.fsol))
+            end
+        end
+        if legendabove
+            ylims!(min_value - 0.5*min_value , 300)
         end
         println(probname)
         savefig("$(path)figures/$(probname)-t-time.pdf")

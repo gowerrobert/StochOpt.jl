@@ -19,12 +19,12 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 5000.0 # 60.0*60.0*4.0
+max_time = 60.0*60.0*6.0 # 5000.0
 precision = 10.0^(-6)
 
 ## File names
 # details = "final"
-details = "try2"
+details = "100_epochs"
 # details = "test"
 
 ## Bash input
