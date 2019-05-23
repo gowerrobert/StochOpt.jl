@@ -59,7 +59,7 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
-for idx_prob in [1]#[1 2 3 4 7 8 9 10]
+for idx_prob in [1 2 3 4 7 8 9 10]
     # idx_prob = 1
     data = datasets[idx_prob]
     scaling = scalings[idx_prob]

@@ -19,12 +19,12 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0 #60.0*60.0*4.0
+max_time = 60.0*60.0*6.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "final"
-details = "1hbis"
+details = "FINAL"
+# details = "1hbis"
 # details = "test"
 
 ## Bash input
@@ -122,7 +122,7 @@ lambdas = [10^(-1), 10^(-3),
 skip_errors = [[7000   7000     200    300],             # 1)  ijcnn1_full + scaled + 1e-1              m^* =
                [7000   7000    6500   6500],             # 2)  ijcnn1_full + scaled + 1e-3              m^* =
                [30000  30000   40000  40000],    # 3)  YearPredictionMSD_full + scaled + 1e-1           m^* =
-               [40000  40000   10000  10000],    # 4)  YearPredictionMSD_full + scaled + 1e-3           m^* =
+               [40000  40000   20000  20000],    # 4)  YearPredictionMSD_full + scaled + 1e-3           m^* =
                [-2      -2     -2      -2],                  # 5)  covtype_binary + scaled + 1e-1
                [-2      -2     -2      -2],                  # 6)  covtype_binary + scaled + 1e-3
                [40000  40000   50000  50000],              # 7)  slice + scaled + 1e-1                  m^* =
