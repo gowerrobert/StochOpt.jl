@@ -1,5 +1,6 @@
 ## Detail in file names
 details = "exact_mu"
+problems = [1 2 3 4 7 8 9 10]
 
 using JLD
 using Plots
@@ -59,8 +60,8 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
-for idx_prob in [1 2 3 4 7 8 9 10]
-    # idx_prob = 1
+# idx_prob = 1
+for idx_prob in problems
     data = datasets[idx_prob]
     scaling = scalings[idx_prob]
     lambda = lambdas[idx_prob]
@@ -95,27 +96,31 @@ for idx_prob in [1 2 3 4 7 8 9 10]
     ## Change legend
     # Legend Bubeck 2a
     legend1 = string(OUTPUTS[1].name)
-    str_m_bubeck = split(legend1)[4][1:end-1]
-    str_step_bubeck = split(legend1)[end][1:end-2]
-    OUTPUTS[1].name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
+    # str_m_bubeck = split(legend1)[4][1:end-1]
+    # str_step_bubeck = split(legend1)[end][1:end-2]
+    # OUTPUTS[1].name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
     # OUTPUTS[1].name = latexstring("SVRG \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
+    OUTPUTS[1].name = latexstring("SVRG \$(b = 1, m = 20L_{\\max}/\\mu)\$")
 
     # Legend Free-SVRG 2a
     legend2 = string(OUTPUTS[2].name)
-    str_m_free = split(legend2)[6][1:end-1]
-    str_step_free = split(legend2)[end][1:end-2]
-    OUTPUTS[2].name = latexstring("Free-SVRG \$(m = n = $str_m_free, b = 1, \\alpha_{Free}^*(1) = $str_step_free)\$")
-    # OUTPUTS[2].name = latexstring("Free-SVRG \$(m = n = $str_m_free, b = 1, \\alpha^*(1) = $str_step_free)\   $")
+    # str_m_free = split(legend2)[6][1:end-1]
+    # str_step_free = split(legend2)[end][1:end-2]
+    # OUTPUTS[2].name = latexstring("Free-SVRG \$(m = n = $str_m_free, b = 1, \\alpha_{Free}^*(1) = $str_step_free)\$")
+    # OUTPUTS[2].name = latexstring("Free-SVRG \$(m = n = $str_m_free, b = 1, \\alpha^*(1) = $str_step_free)\$")
+    OUTPUTS[2].name = latexstring("Free-SVRG \$(b = 1, m = n)\$")
 
     # Legend L-SVRG-D 2a
     legend3 = string(OUTPUTS[3].name)
-    str_proba_decreasing = split(legend3)[6][1:end-1]
-    str_step_decreasing = split(legend3)[end][1:end-2]
-    OUTPUTS[3].name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha_{Decrease}^*(1) = $str_step_decreasing)\$")
+    # str_proba_decreasing = split(legend3)[6][1:end-1]
+    # str_step_decreasing = split(legend3)[end][1:end-2]
+    # OUTPUTS[3].name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha_{Decrease}^*(1) = $str_step_decreasing)\$")
     # OUTPUTS[3].name = latexstring("L-SVRG-D \$(p = 1/n = $str_proba_decreasing, b = 1, \\alpha^*(1) = $str_step_decreasing)\$")
+    OUTPUTS[3].name = latexstring("L-SVRG-D \$(b = 1, p = 1/n)\$")
 
     ## Replot
     pyplot()
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-replot", path=folder_path, legendpos=:top, legendfont=10, legendabove=true)
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-extract-legend", path=folder_path, legendpos=:topright, legendfont=16)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-submission", path=folder_path, legendpos=:topright, legendfont=10, nolegend=true)
 end
 
