@@ -14,16 +14,14 @@ Initiate the Loopless-SVRG method.
 # REFERENCES
 __Don't Jump Through Hoops and Remove Those Loops: SVRG and Katyusha are Better Without the Outer Loop__\\
 Dmitry Kovalev, Samuel Horvath and Peter Richtarik\\
-arXiv:1901.08689, 2019.
+arXiv:1901.08689, 2019
 """
 function initiate_L_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, reference_update_proba::Float64)
-    n = prob.numdata
-
     ## No deterministic number of computed gradients per iteration because of the inner and outer loop scheme
     b = sampling.batchsize # deterministic or average mini-batch size
     epocsperiter = 0
     gradsperiter = 0
-    number_computed_gradients = 0 # dynamic counter of computed gradients
+    number_computed_gradients = Int64[0] # dynamic table of the number of computed gradients at each iteration
 
     name = string("L-SVRG-", sampling.name)
 
@@ -108,7 +106,7 @@ Reset the Loopless-SVRG, especially the step size, the point and gradient refere
 function reset_L_SVRG!(prob::Prob, method::L_SVRG_method, options::MyOptions)
     println("\n---- RESET LOOPLESS-SVRG ----\n")
 
-    method.number_computed_gradients = 0
+    method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)

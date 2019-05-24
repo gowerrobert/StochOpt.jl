@@ -14,19 +14,21 @@ Compute the descent direction (d).
 - **NONE**
 """
 function descent_L_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, method::L_SVRG_method, iter::Int64, d::Array{Float64})
+    gradient_counter = 0 # number of stochastic gradients computed during this iteration
+
     ## Initialization at first iteration
     if iter == 1
         println("Initialization of the reference point and gradient")
         method.reference_point[:] = x # initialize reference point
 
-        if prob.numdata > 10000 || prob.numfeatures > 10000
+        if prob.numdata > 10^8 || prob.numfeatures > 10^8
             println("Dimensions are too large too compute the full gradient")
             sampled_indices = sample(1:prob.numdata, 100, replace=false)
             method.reference_grad[:] = prob.g_eval(method.reference_point, sampled_indices) # initialize stochastic reference gradient
-            method.number_computed_gradients += 100
+            gradient_counter += 100
         else
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # initialize reference gradient
-            method.number_computed_gradients += prob.numdata
+            gradient_counter += prob.numdata
         end
     end
 
@@ -38,7 +40,7 @@ function descent_L_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, meth
     else
         d[:] = -prob.g_eval(x, sampled_indices) + prob.g_eval(method.reference_point, sampled_indices) - method.reference_grad
     end
-    method.number_computed_gradients += 2*length(sampled_indices)
+    gradient_counter += 2*length(sampled_indices)
 
     ## Stochastic update of the reference
     flipped_coin = rand(method.reference_update_distrib)
@@ -46,14 +48,16 @@ function descent_L_SVRG!(x::Array{Float64}, prob::Prob, options::MyOptions, meth
         println("Update the reference point and gradient")
         method.reference_point[:] = x # update reference point
 
-        if prob.numdata > 10000 || prob.numfeatures > 10000
+        if prob.numdata > 10^8 || prob.numfeatures > 10^8
             sampled_indices = sample(1:prob.numdata, 100, replace=false)
             method.reference_grad[:] = prob.g_eval(method.reference_point, sampled_indices) # update stochastic reference gradient
-            method.number_computed_gradients += 100
+            gradient_counter += 100
         else
             method.reference_grad[:] = prob.g_eval(method.reference_point, 1:prob.numdata) # update reference gradient
-            method.number_computed_gradients += prob.numdata
+            gradient_counter += prob.numdata
         end
     end
 
+    ## Monitoring the number of computed gradient during this iteration
+    method.number_computed_gradients = [method.number_computed_gradients method.number_computed_gradients[end] + gradient_counter]
 end

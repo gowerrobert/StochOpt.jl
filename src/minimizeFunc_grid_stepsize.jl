@@ -29,7 +29,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             beststep = 0.0; #iteratesp = 1;
             for stepind = start_step:length(stepsizes)
                 println("--------------------------------> minfval = ", minfval);
-                recentmethods = [SVRG_vanilla_method, free_SVRG_method, SAGA_nice_method] # reset if one of these
+                recentmethods = [SVRG_vanilla_method, Free_SVRG_method, SAGA_nice_method] # reset if one of these
                 if typeof(method_input) in recentmethods
                     # println("\n\nMONITORING STEPSIZE BEFORE RESET => ", method_input.stepsize, "\n\n")
                     # method_input = method_input.reset(prob, method_input, options); # old implementation
@@ -72,7 +72,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     options.stepsize_multiplier = beststep;
 
     options.max_epocs *= 2;
-    options.max_time *= 2.0; # To adjust
+    options.max_time *= 6.0; # To adjust
 
     outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
     # for expnum =2: options.rep_number

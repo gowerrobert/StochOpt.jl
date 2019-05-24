@@ -13,8 +13,8 @@ Initiate the Loopless-SVRG method.
 
 # REFERENCES
 __Our Title__\\
-Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
-arXiv:??????, 2019.
+Francis Bach, Othmane Sebbouh, Robert M. Gower and Nidham Gazagnadou\\
+arXiv:??????, 2019
 """
 function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, reference_update_proba::Float64 ; stochastic_stepsize::Float64=0.0, gradient_stepsize::Float64=0.0)
     n = prob.numdata
@@ -31,11 +31,16 @@ function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, 
     bootmethod = boot_Leap_SVRG!
     reset = reset_Leap_SVRG!
 
+    mu = prob.mu
     L = prob.L
     Lmax = prob.Lmax
 
-    expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L
-    expected_residual = ((n-b)/(b*(n-1)))*Lmax
+    if occursin("nice", sampling.name)
+        expected_smoothness = ((n-b)/(b*(n-1)))*Lmax + ((n*(b-1))/(b*(n-1)))*L
+        expected_residual = ((n-b)/(b*(n-1)))*Lmax
+    else
+        error("Unavailable expected smoothness and residual for other samplings than b-nice")
+    end
 
     stepsize = 0.0
 
@@ -46,7 +51,9 @@ function initiate_Leap_SVRG(prob::Prob, options::MyOptions, sampling::Sampling, 
         error("Negative stochastic or gradient step size")
     end
 
-    if 0 <= reference_update_proba <= 1
+    if reference_update_proba == -1
+        reference_update_distrib = Bernoulli( mu/(3*expected_smoothness) )
+    elseif 0 <= reference_update_proba <= 1
         reference_update_distrib = Bernoulli(reference_update_proba)
     else
         error("Invalid reference update probability")
@@ -87,7 +94,7 @@ function boot_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOption
         end
     elseif options.stepsize_multiplier == -1.0
         if occursin("nice", method.sampling.name)
-            method.stochastic_stepsize = 1/(2*(method.expected_smoothness + 2*method.expected_residual)) # theoretical optimal value for b-nice sampling
+            method.stepsize = 1.0/(6.0*method.expected_smoothness) # theoretical optimal value for b-nice sampling
             method.gradient_stepsize = 1/method.L
             @printf "Automatically set Leap-SVRG theoretical stochastic step size: %1.3e and gradient step size: %1.3e\n" method.stochastic_stepsize method.gradient_stepsize
         else
@@ -103,7 +110,7 @@ function boot_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOption
         options.skip_error_calculation = ceil(options.max_epocs*prob.numdata/(options.batchsize*30)) # show 30 points between 0 and the max number of epochs
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
-    println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
+    # println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
 end
 
 
@@ -120,7 +127,7 @@ Reset the Loopless-SVRG, especially the step size, the point and gradient refere
 - **NONE**
 """
 function reset_Leap_SVRG!(prob::Prob, method::Leap_SVRG_method, options::MyOptions)
-    println("\n---- RESET LEAP-SVRG ----\n")
+    println("---- RESET LEAP-SVRG ----")
 
     method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot

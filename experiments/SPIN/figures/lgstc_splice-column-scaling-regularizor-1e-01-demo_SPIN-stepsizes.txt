@@ -1,0 +1,4 @@
+lgstc_splice-column-scaling-regularizor-1e-01-demo_SPIN stepsize_multiplier 
+SPIN-5-gauss : 2^ -6.795859283219775
+SPIN-5-prev : 2^ -6.795859283219775
+Newton : 2^ -4.643856189774724

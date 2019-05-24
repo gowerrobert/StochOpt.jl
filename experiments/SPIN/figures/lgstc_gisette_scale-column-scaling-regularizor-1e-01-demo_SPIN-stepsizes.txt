@@ -1,0 +1,5 @@
+lgstc_gisette_scale-column-scaling-regularizor-1e-01-demo_SPIN stepsize_multiplier 
+SPIN-5-prev-0.8 : 2^ -6.795859283219775
+SPIN-10-prev-0.5 : 2^ -6.795859283219775
+SPIN-20-prev-0.1 : 2^ -6.795859283219775
+SPIN-50-gauss-0.1 : 2^ -6.795859283219775

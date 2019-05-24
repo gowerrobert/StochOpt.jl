@@ -1,0 +1,5 @@
+ridge_slice-none-regularizor-1e-03-exp3 stepsize_multiplier 
+$b_\mathrm{Defazio} \; \; = 1 \ \ , \gamma_\mathrm{Defazio} \ \ \: \: = 1.98e-03$ : 2^ -8.982257932714514
+$b_\mathrm{practical} \, = 2 \ , \gamma_\mathrm{practical} \ \ = 3.72e-03$ : 2^ -8.070306856005717
+$b_\mathrm{practical} \, = 2 \ , \gamma_\mathrm{grid search} = 7.81e-03$ : 2^ -7.0
+$b_\mathrm{Hofmann} = 20 \ \ , \gamma_\mathrm{Hofmann}  \ \, = 2.17e-03$ : 2^ -8.85069980970335

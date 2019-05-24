@@ -58,7 +58,7 @@ options.max_iter = 3
 minimizeFunc(prob, L_SVRG_1, options) # Warm up
 options.max_iter = 10^8
 L_SVRG_1.reset(prob, L_SVRG_1, options)
-println("-------------------------------------------------")
+println("-------------------------------------------------\n")
 
 output = minimizeFunc(prob, L_SVRG_1, options)
 str_b_1 = @sprintf "%d" sampling.batchsize

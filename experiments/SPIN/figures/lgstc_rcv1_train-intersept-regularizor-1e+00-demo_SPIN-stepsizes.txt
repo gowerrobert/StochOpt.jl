@@ -1,0 +1,3 @@
+lgstc_rcv1_train-intersept-regularizor-1e+00-demo_SPIN stepsize_multiplier 
+SPIN-218-gauss-0.1 : 2^ 0.9863206662052671
+SPIN-218-prev-0.1 : 2^ 0.9863206662052671

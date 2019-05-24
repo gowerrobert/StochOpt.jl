@@ -153,7 +153,7 @@ mutable struct SVRG_vanilla_method
     ## Ref: Accelerating stochastic gradient descent using predictive variance reduction, R. Johnson and T. Zhang, NIPS (2013)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -173,7 +173,7 @@ mutable struct SVRG_bubeck_method
     ## Ref: Convex optimization: Algorithms and complexity, S. Bubeck, Foundations and Trends in Machine Learning (2015)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -189,10 +189,12 @@ mutable struct SVRG_bubeck_method
     sampling::Sampling # b-nice or independent sampling
 end
 
-mutable struct free_SVRG_method
+mutable struct Free_SVRG_method
+    ## Version of SVRG for which the user can set freely the size of the inner loop m
+    ## Ref: Our Title, O. Sebbouh, R. M. Gower and N. Gazagnadou, arXiv:????? (2019)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -213,11 +215,11 @@ mutable struct free_SVRG_method
 end
 
 mutable struct L_SVRG_method
-    ## Loopless-SVRG without outer loop but a coin tossing at each iteration to decide whether te reference is updated or not
+    ## Loopless-SVRG without outer loop but a coin tossing at each iteration to decide whether te reference is updated (with probability p) or not
     ## Ref: Don't Jump Through Hoops and Remove Those Loops: SVRG and Katyusha are Better Without the Outer Loop, D. Kovalev, S. Horvath and P. Richtarik, arXiv:1901.08689 (2019)
     epocsperiter::Float64
     gradsperiter::Float64
-    number_computed_gradients::Int64 # counter of computed stochastic gradients
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
     name::AbstractString
     stepmethod::Function # /!\ mutating function
     bootmethod::Function # /!\ mutating function
@@ -225,6 +227,30 @@ mutable struct L_SVRG_method
     Lmax::Float64 # max of the smoothness constant of the f_i functions
     # numinneriters::Int64 # number of inner iterations, usually denoted m
     # reference_update_proba::Float64 # probability of updating the reference point and gradient (denoted p in the paper)
+    reference_update_distrib::Bernoulli{Float64} # Bernoulli distribution controlling the frequence of update of the reference point and gradient
+    reference_point::Array{Float64}
+    reference_grad::Array{Float64}
+    reset::Function # reset some parameters of the method
+    sampling::Sampling # b-nice or independent sampling
+end
+
+mutable struct L_SVRG_D_method
+    ## Loopless-SVRG-Decreasing without outer loop but a coin tossing at each iteration to decide whether te reference is updated (with probability p) or not
+    ## The stepsize is big at the begin and than decreases geometrically (factor = \sqrt(1-p))
+    ## Ref: Our Title, O. Sebbouh, R. M. Gower and N. Gazagnadou, arXiv:????? (2019)
+    epocsperiter::Float64
+    gradsperiter::Float64
+    number_computed_gradients::Array{Int64} # cumulative sum of the number of computed stochastic gradients at each iteration
+    name::AbstractString
+    stepmethod::Function # /!\ mutating function
+    bootmethod::Function # /!\ mutating function
+    batchsize::Int64
+    stepsize::Float64 # step size
+    initial_stepsize::Float64 # step size at first iteration
+    L::Float64 # smoothness constant of the whole objective function f
+    Lmax::Float64 # max of the smoothness constant of the f_i functions
+    expected_smoothness::Float64 # Expected smoothness constant
+    reference_update_proba::Float64 # probability of updating the reference point and gradient (denoted p in the paper)
     reference_update_distrib::Bernoulli{Float64} # Bernoulli distribution controlling the frequence of update of the reference point and gradient
     reference_point::Array{Float64}
     reference_grad::Array{Float64}
@@ -327,8 +353,8 @@ include("samplings.jl")
 #Including test and problem generating functions
 include("testing.jl")
 #Including iterative methods for calculating search direction
-allmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"]
-recentmethods = ["Leap_SVRG", "L_SVRG", "SVRG_bubeck", "free_SVRG", "SVRG_vanilla", "SAGA_nice"]
+allmethods = ["Leap_SVRG", "L_SVRG_D", "L_SVRG", "SVRG_bubeck", "Free_SVRG", "SVRG_vanilla", "SAGA_nice", "SPIN", "SAGA", "SVRG", "SVRG2",  "2D", "2Dsec", "CMcoord", "CMgauss", "CMprev", "AMgauss","AMprev", "AMcoord", "BFGS", "BFGS_accel", "grad"]
+recentmethods = ["Leap_SVRG", "L_SVRG_D", "L_SVRG", "SVRG_bubeck", "Free_SVRG", "SVRG_vanilla", "SAGA_nice"]
 for method in allmethods
     if method in recentmethods
         include(string("boot_", method , "!.jl")) # boot is a mutating function
@@ -353,6 +379,6 @@ include("../util/power_iteration.jl")
 #Additional
 include("BFGS_update!.jl")
 include("calculate_SAGA_rates_and_complexities.jl")
-include("free_SVRG_settings.jl")
+include("SVRG_settings_and_util.jl")
 include("get_saved_stepsize.jl")
 # include("../tmp/parallel_minimizeFunc_grid_stepsize.jl")

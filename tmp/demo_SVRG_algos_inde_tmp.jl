@@ -34,11 +34,11 @@ end
 Random.seed!(1)
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation=1000, repeat_stepsize_calculation=false)
+# options = set_options(max_iter=10^8, max_time=100.0, max_epocs=50, force_continue=true, initial_point="zeros", skip_error_calculation=1000, repeat_stepsize_calculation=false)
 
 ## Debugging settings
-# options = set_options(max_iter=10^8, max_time=0.005, max_epocs=1, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
-# numinneriters = 5
+options = set_options(max_iter=10^8, max_time=0.005, max_epocs=1, force_continue=true, initial_point="zeros", skip_error_calculation = 1, repeat_stepsize_calculation=false)
+numinneriters = 5
 
 ## Load problem
 datapath = "./data/"
@@ -60,7 +60,7 @@ println("-------------------- WARM UP --------------------")
 options.max_iter = 3
 minimizeFunc(prob, SVRG_vanilla, options) # Warm up
 options.max_iter = 10^8
-println("-------------------------------------------------")
+println("-------------------------------------------------\n")
 
 output = minimizeFunc(prob, SVRG_vanilla, options)
 # str_m_1 = @sprintf "%d" SVRG_vanilla.numinneriters
@@ -85,13 +85,13 @@ OUTPUTS = [OUTPUTS; output]
 ## Free-SVRG with 1-uniform independent sampling (m = m^*, b = 1, step size = gamma^*)
 options.batchsize = 1
 sampling = build_sampling("independent", prob.numdata, options)
-options.stepsize_multiplier = -1.0 # Theoretical step size in boot_free_SVRG
+options.stepsize_multiplier = -1.0 # Theoretical step size in boot_Free_SVRG
 numinneriters = 2*prob.numdata # 2*n
-free_SVRG = initiate_free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
-output = minimizeFunc(prob, free_SVRG, options)
-# str_m_3 = @sprintf "%d" free_SVRG.numinneriters
-# str_b_3 = @sprintf "%d" free_SVRG.batchsize
-# str_step_3 = @sprintf "%.2e" free_SVRG.stepsize
+Free_SVRG = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+output = minimizeFunc(prob, Free_SVRG, options)
+# str_m_3 = @sprintf "%d" Free_SVRG.numinneriters
+# str_b_3 = @sprintf "%d" Free_SVRG.batchsize
+# str_step_3 = @sprintf "%.2e" Free_SVRG.stepsize
 # output.name = latexstring("Free-SVRG \$(m^* = $str_m_3, b^* = $str_b_3 , \\gamma^* = $str_step_3)\$")
 OUTPUTS = [OUTPUTS; output]
 

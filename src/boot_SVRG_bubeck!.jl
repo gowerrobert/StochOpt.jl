@@ -24,7 +24,7 @@ function initiate_SVRG_bubeck(prob::Prob, options::MyOptions, sampling::Sampling
     b = sampling.batchsize # deterministic or average mini-batch size
     epocsperiter = 0
     gradsperiter = 0
-    number_computed_gradients = 0 # dynamic counter of computed gradients
+    number_computed_gradients = Int64[0] # dynamic table of the number of computed gradients at each iteration
 
     name = string("SVRG-Bubeck-", sampling.name)
 
@@ -83,7 +83,7 @@ function boot_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyOp
 
         method.stepsize = 1/(10*method.Lmax)
         options.stepsize_multiplier = method.stepsize # /!\ Modifies the options
-        println("Theoretical step size: ", method.stepsize)
+        # println("Theoretical step size: ", method.stepsize)
     else
         error("Invalid options.stepsize_multiplier")
     end
@@ -93,7 +93,7 @@ function boot_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyOp
         options.skip_error_calculation = ceil(options.max_epocs*prob.numdata/(options.batchsize*30)) # show 30 points between 0 and the max number of epochs
         # 20 points over options.max_epocs when there are options.max_epocs *prob.numdata/(options.batchsize)) iterates in total
     end
-    println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
+    # println("Skipping ", options.skip_error_calculation, " iterations per epoch\n")
 end
 
 
@@ -110,9 +110,9 @@ Reset the original SVRG method (option I), especially the step size, the point a
 - **NONE**
 """
 function reset_SVRG_bubeck!(prob::Prob, method::SVRG_bubeck_method, options::MyOptions)
-    println("\n---- RESET SVRG BUBECK ----\n")
+    println("---- RESET SVRG BUBECK ----")
 
-    method.number_computed_gradients = 0
+    method.number_computed_gradients = Int64[0]
     method.stepsize = 0.0 # Will be set during boot
 
     method.reference_point = zeros(prob.numfeatures)

@@ -46,7 +46,7 @@ Construtor of a sampling, "independent" or "nice".
 """
 function build_sampling(type::AbstractString, numdata::Int64, options::MyOptions ; probas::Array{Float64}=Float64[])
     if type == "nice"
-        println("nice sampling initiated")
+        # println("nice sampling initiated")
         name = "nice"
         batchsize = options.batchsize # exact batchsize
         if batchsize != 1
