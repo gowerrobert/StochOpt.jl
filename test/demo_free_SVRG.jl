@@ -8,11 +8,11 @@ using Printf
 using LinearAlgebra
 using Statistics
 using Base64
-include("../src/StochOpt.jl")
+include("./src/StochOpt.jl")
 
 ## Path settings
-#region # This code is repeated in many demo. Should include it as a little script and call it?
-save_path = "./experiments/SVRG/"
+#region
+save_path = "./experiments/Free_SVRG/"
 if !isdir(save_path) # create directory if not existing
     if !isdir("./experiments/")
         mkdir("./experiments/")
@@ -34,13 +34,28 @@ end
 Random.seed!(1)
 
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=10000.0, max_epocs=50, force_continue=false, initial_point="zeros", skip_error_calculation=100, repeat_stepsize_calculation=false)
+options = set_options(max_iter=10^8, max_time=10.0^4, max_epocs=50, force_continue=false, initial_point="zeros", skip_error_calculation=1000, repeat_stepsize_calculation=false, rep_number=3)
+
+
+## Settings to monitor leaping (error computed at each iteration, very few epochs)
+# options = set_options(max_iter=20, max_time=10.0^8, max_epocs=10^8, initial_point="zeros", skip_error_calculation = 1)
+# options = set_options(max_iter=10^8, max_time=10.0^8, max_epocs=10, initial_point="zeros", skip_error_calculation=1, repeat_stepsize_calculation=true, rep_number=3)
 
 ## Load problem
 datapath = "./data/"
-data = "australian"
+# data = "australian"     # n =     690, d = 15
+# data = "slice"
+data = "YearPredictionMSD_full"
+# data = "ijcnn1_full"    # n = 141,691, d = 23
+# data = "real-sim"
+# data = "covtype_binary" # n = 581,012, d = 55
 X, y = loadDataset(datapath, data)
-prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-1, scaling="column-scaling")
+prob = load_logistic_from_matrices(X, y, data, options, lambda=1e-3, scaling="none")
+prob.mu
+
+prob = load_ridge_regression(X, y, data, options, lambda=1e-3, scaling="column-scaling")
+prob.mu
+
 
 ## Running methods
 OUTPUTS = []  # List of saved outputs
@@ -62,59 +77,81 @@ OUTPUTS = []  # List of saved outputs
 # sampling.name
 #endregion
 
-## m = m^*, b = b^*, step size = gamma^*
-options.batchsize = optimal_minibatch_free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
+## m = n, b = b^*(n), step size = gamma^*(b^*(n))
+# options.skip_error_calculation = 10
+
+numinneriters = prob.numdata
+if numinneriters == prob.numdata
+    options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, prob.numdata, prob.mu, prob.L, prob.Lmax)
+else
+    options.batchsize = 1 # default value for other inner loop sizes
+end
 sampling = build_sampling("nice", prob.numdata, options)
-free_SVRG1 = initiate_free_SVRG(prob, options, sampling, numinneriters=-1, averaged_reference_point=true)
-options.stepsize_multiplier = -1.0 # Theoretical step size in boot_free_SVRG
+f1 = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+options.stepsize_multiplier = -1.0 # Theoretical step size in boot_Free_SVRG
 
 println("-------------------- WARM UP --------------------")
-options.max_iter = 3
-minimizeFunc(prob, free_SVRG1, options) # Warm up
-options.max_iter = 10^8
-println("-------------------------------------------------")
+old_max_iter = options.max_iter
+options.max_iter = 30
+minimizeFunc(prob, f1, options) # Warm up
+f1.reset(prob, f1, options)
+options.max_iter = old_max_iter
+println("-------------------------------------------------\n")
 
-output = minimizeFunc(prob, free_SVRG1, options)
-str_m_1 = @sprintf "%d" free_SVRG1.numinneriters
-str_b_1 = @sprintf "%d" free_SVRG1.batchsize
-str_step_1 = @sprintf "%.2e" free_SVRG1.stepsize
-output.name = latexstring("\$m^* = $str_m_1, b^* = $str_b_1, \\gamma^* = $str_step_1\$")
+output = minimizeFunc(prob, f1, options)
+str_m_1 = @sprintf "%d" f1.numinneriters
+str_b_1 = @sprintf "%d" f1.batchsize
+str_step_1 = @sprintf "%.2e" f1.stepsize
+output.name = latexstring("\$m = n = $str_m_1, b^*(n) = $str_b_1, \\gamma^* (b^*(n)) = $str_step_1\$")
 OUTPUTS = [OUTPUTS; output]
-println("Theoretical mini-batch size: ", free_SVRG1.batchsize)
-println("Theoretical inner loop size: ", free_SVRG1.numinneriters)
+println("Theoretical optimal mini-batch size: ", f1.batchsize)
 
-## m = m^*, b = b^*, step size = grid searched
-options.batchsize = optimal_minibatch_free_SVRG_nice(prob.numdata, prob.mu, prob.L, prob.Lmax)
-sampling = build_sampling("nice", prob.numdata, options)
-free_SVRG2 = initiate_free_SVRG(prob, options, sampling, numinneriters=-1, averaged_reference_point=true)
-options.stepsize_multiplier, = get_saved_stepsize(prob.name, free_SVRG2.name, options)
-if options.stepsize_multiplier == 0.0 || options.repeat_stepsize_calculation
-    output = minimizeFunc_grid_stepsize(prob, free_SVRG2, options)
-    step_practical_gridsearch, = get_saved_stepsize(prob.name, free_SVRG2.name, options)
+
+## m = n, b = b^*(n), step size = grid searched
+# options.skip_error_calculation = 5000
+
+numinneriters = prob.numdata
+if numinneriters == prob.numdata
+    options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, prob.numdata, prob.mu, prob.L, prob.Lmax)
+else
+    options.batchsize = 1 # default value for other inner loop sizes
 end
-output = minimizeFunc(prob, free_SVRG2, options)
-str_m_2 = @sprintf "%d" free_SVRG2.numinneriters
-str_b_2 = @sprintf "%d" free_SVRG2.batchsize
-str_step_2 = @sprintf "%.2e" free_SVRG2.stepsize
-output.name = latexstring("\$m^* = $str_m_2, b^* = $str_b_2, \\gamma_\\mathrm{grid search} = $str_step_2\$")
+
+sampling = build_sampling("nice", prob.numdata, options)
+f_grid = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+options.stepsize_multiplier, = get_saved_stepsize(prob.name, f_grid.name, options)
+if options.stepsize_multiplier == 0.0 || options.repeat_stepsize_calculation
+    output = minimizeFunc_grid_stepsize(prob, f_grid, options)
+    step_practical_gridsearch, = get_saved_stepsize(prob.name, f_grid.name, options)
+end
+output = minimizeFunc(prob, f_grid, options)
+str_m_2 = @sprintf "%d" f_grid.numinneriters
+str_b_2 = @sprintf "%d" f_grid.batchsize
+str_step_2 = @sprintf "%.2e" f_grid.stepsize
+output.name = latexstring("\$m = n = $str_m_2, b^*(n) = $str_b_2, \\gamma_\\mathrm{grid search} = $str_step_2\$")
 OUTPUTS = [OUTPUTS; output]
 
-## m = 2*n, b = 1, step size = gamma^* (corresponding to m^*)
-options.batchsize = 1
+## m = n/b, b = 10, step size = gamma^*(b)
+options.skip_error_calculation = 50
+
+options.batchsize = 10
+numinneriters = round(Int64, prob.numdata/options.batchsize)
+
 sampling = build_sampling("nice", prob.numdata, options)
-free_SVRG3 = initiate_free_SVRG(prob, options, sampling, numinneriters=2*prob.numdata, averaged_reference_point=true)
-options.stepsize_multiplier = -1.0 # Theoretical step size in boot_free_SVRG
-output = minimizeFunc(prob, free_SVRG3, options)
-str_m_3 = @sprintf "%d" free_SVRG3.numinneriters
-str_b_3 = @sprintf "%d" free_SVRG3.batchsize
-str_step_3 = @sprintf "%.2e" free_SVRG3.stepsize
-output.name = latexstring("\$m^* = $str_m_3, b = $str_b_3, \\gamma^* = $str_step_3\$")
+f3 = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
+options.stepsize_multiplier = -1.0 # Theoretical step size in boot_Free_SVRG
+output = minimizeFunc(prob, f3, options)
+str_m_3 = @sprintf "%d" f3.numinneriters
+str_b_3 = @sprintf "%d" f3.batchsize
+str_step_3 = @sprintf "%.2e" f3.stepsize
+output.name = latexstring("\$m = n/b = $str_m_3, b = $str_b_3, \\gamma^* (b) = $str_step_3\$")
 OUTPUTS = [OUTPUTS; output]
 
 ## Saving outputs and plots
-savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-savename = string(savename, "-", "demo_free_SVRG")
-save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+# savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+# savename = string(savename, "-", "demo_Free_SVRG")
+# save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
 pyplot() # gr() pyplot() # pgfplots() #plotly()
-plot_outputs_Plots(OUTPUTS, prob, options, methodname="demo_free_SVRG", path=save_path) # Plot and save output
+# plot_outputs_Plots(OUTPUTS, prob, options, methodname="demo_Free_SVRG", path=save_path, legendfont=10) # Plot and save output
+plot_outputs_Plots(OUTPUTS, prob, options, methodname="debug_Free_SVRG", path=save_path, legendfont=10) # Plot and save output
