@@ -16,7 +16,7 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 ## --- SAVED FILES ---
 """
 max_epochs = 10^8
-max_time = 60.0 * 60.0 * 6.0 # 5000.0
+max_time =  60.0 * 60.0 * 6.0  # 5000.0,  60.0 * 60.0 * 6.0
 tol = 10.0^(-6.0)
  
 path = "/home/rgower/Dropbox/Software/StochOpt.jl/"         # local
@@ -35,7 +35,7 @@ using Base64
 using Formatting
 using SharedArrays
 
-include("./src/StochOpt.jl")
+include("../src/StochOpt.jl")
     # gr()
 pyplot() # No problem with pyplot when called in @everywhere statement
 
@@ -107,8 +107,8 @@ skip_errors = [[7000 5000 3000 3 7000],           # 1)  ijcnn1_full + scaled + 1
 
 data = "slice"  #datasets[idx_prob]
 scaling = "column-scaling" # or "none"
-lambda =   10^(-3) # 10^(-1), lambdas[idx_prob]
-skip_error =  [25000 2000 1000 1 2500]   # skip_errors[idx_prob]
+lambda =   10^(-1) # 10^(-1), 10^(-3) lambdas[idx_prob]
+skip_error =  [25000 2000 1000 1000 2500]   # skip_errors[idx_prob]
 @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
 Random.seed!(1)
@@ -149,18 +149,7 @@ mu = prob.mu
 Lmax = prob.Lmax
 L = prob.L
 
-function b_tilde(n::Int,  L,Lmax,mu)
-    # \tilde{b} &\eqdef & \tfrac{3n(L_{\max} - L)}{n(n-1)\mu- 3(nL - L_{\max})}
-    return 3*n*(Lmax-L)/( n*(n-1)*mu- 3*(n*L - Lmax)  )
-end
-function b_hat(n::Int,  L,Lmax,mu)
-    # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{L_{\max} - L}{nL - L_{\max}}}\\
-    return sqrt((n/2)*((Lmax - L)/(n*L - Lmax)))
-end
 
-btilde = b_tilde(n,  L,Lmax,mu)
-bhat = b_hat(n,  L,Lmax,mu)
-bstar = min(btilde, bhat)
 
     ## Computing theoretical optimal mini-batch size for b-nice sampling with inner loop size m = n
 b_theoretical_old = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
@@ -184,7 +173,8 @@ elseif !(b_theoretical in minibatch_list) # low proba that b^* is 100 or sqrt(n)
 end
 
     ## Running methods
-OUTPUTS = [] # list of saved outputs
+let
+global OUTPUTS = [] # list of saved outputs
 
     ## Launching Free-SVRG for different mini-batch sizes and m = n
 for idx_minibatch in 1:length(minibatch_list)
@@ -212,25 +202,25 @@ for idx_minibatch in 1:length(minibatch_list)
     OUTPUTS = [OUTPUTS; output]
     println("\n")
 end
+end
 println("\n")
 
     ## Saving outputs and plots
 suffix = ""
-
+details =""
 savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
 savename = string(savename, "-exp3-$(suffix)-$(details)")
 save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
-if idx_prob == 7 || idx_prob == 8
-    legendpos = :best
-else
-    legendpos = :topright
-end
+
+legendpos = :best
+
 
 legendtitle = "Mini-batch size b"
 pyplot()
+
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
-plot_outputs_Plots(OUTPUTS, prob, options, suffix = "-exp3-$(suffix)-$(details)", path = save_path, legendpos = legendpos, legendtitle = legendtitle, legendfont = 8)
+plot_outputs_Plots(OUTPUTS, prob, options, suffix = "-exp3-$(suffix)-$(details)", path = save_path, legendtitle = legendtitle, legendfont = 8)
 
 
 println("\n\n--- EXPERIMENT 3 FINISHED ---")
