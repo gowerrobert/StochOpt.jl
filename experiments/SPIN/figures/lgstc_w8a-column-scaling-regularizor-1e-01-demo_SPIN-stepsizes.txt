@@ -1,0 +1,7 @@
+lgstc_w8a-column-scaling-regularizor-1e-01-demo_SPIN stepsize_multiplier 
+SPIN-6-prev-0.05 : 2^ -6.643856189774724
+SPIN-6-prev-0.01 : 2^ -6.643856189774724
+SPIN-18-prev-0.05 : 2^ -6.643856189774724
+SPIN-18-prev-0.01 : 2^ -6.643856189774724
+SPIN-6-prev-0.0 : 2^ -6.643856189774724
+SPIN-6-gauss-0.1 : 2^ -6.643856189774724

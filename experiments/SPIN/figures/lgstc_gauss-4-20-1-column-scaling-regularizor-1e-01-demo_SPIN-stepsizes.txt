@@ -1,0 +1,5 @@
+lgstc_gauss-4-20-1-column-scaling-regularizor-1e-01-demo_SPIN stepsize_multiplier 
+Newton : 2^ -6.795859283219775
+Newton : 2^ -6.795859283219775
+Newton : 2^ -6.795859283219775
+Newton : 2^ -6.795859283219775

@@ -13,7 +13,6 @@ function nice_sampling(sampling::Sampling)
     return indices
 end
 
-
 """
     independent_sampling2(probas)
 

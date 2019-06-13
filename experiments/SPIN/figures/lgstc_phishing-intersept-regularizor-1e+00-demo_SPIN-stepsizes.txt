@@ -1,0 +1,4 @@
+lgstc_phishing-intersept-regularizor-1e+00-demo_SPIN stepsize_multiplier 
+SPIN-9-coord-0.1 : 2^ 0.5971441697485639
+SPIN-9-gauss-0.1 : 2^ 0.5971441697485639
+SPIN-9-prev-0.1 : 2^ 0.5971441697485639

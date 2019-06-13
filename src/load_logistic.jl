@@ -131,6 +131,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     Hess_eval!(x, S, g, H)      = logistic_hess!(X[:,S], y[S], x, lambda, length(S), g, H) ;
     Hess_C(x, S, C)             = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S)); # .+ (lambda).*eye(numfeatures)[:,C]not great solution on the identity
     Hess_C!(x, S, C, g, HC)     = logistic_hessC!(X[:,S], y[S], x, C, lambda, length(S), g, HC);
+    Hess_CC_g_C!(x, S, C, gC, CHC) = logistic_hessC_gradC!(X[:,S], y[S], x, C, lambda,length(S), gC, CHC);
     Hess_C2(x, S, C)            = logistic_hessC(X[:,S], y[S], x, C, lambda, length(S));
     Hess_opt(x, S, v)           = ((1 ./ length(S))*logistic_hessv(X[:,S], y[S], x, v) .+ (lambda).*v);
     Hess_opt!(x, S, v, g, Hv)   = logistic_hessv!(X[:,S], y[S], x, v, lambda, length(S), g, Hv);
@@ -143,7 +144,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     #end
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
-                Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
+                Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!,  Hess_CC_g_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
 
     ## Try to load the solution of the problem, if already computed
     load_fsol!(opts, prob);

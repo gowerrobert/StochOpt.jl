@@ -82,6 +82,7 @@ mutable struct Prob
     Hess_D!::Function   # Calculates Diagonal
     Hess_C::Function   # Gets subset of the columns of Hessian
     Hess_C!::Function   # Gets subset of the columns of Hessian
+    Hess_CC_g_C!::Function   # Gets subset of the columns and rows of Hessian, and subset of rows of gradient. 
     Hess_C2::Function
     #    Hess_vv::Function  # Calculates the Hessian-vector-vector product v'Hv
     ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method)
@@ -89,8 +90,42 @@ mutable struct Prob
     mu::Float64 # Strong-convexity constant
     L::Float64 # Smoothness constant of the whole objective function f
     Lmax::Float64 # Max of the smoothness constant of the f_i functions
-    Lbar::Float64 # Average of the smoothness constant of the f_i functions
+    Lbar::Float64
 end
+
+function initiate_Prob(; 
+    X  =[],
+    y::Array{Float64} =[],
+    numfeatures::Int64 =0,
+    numdata::Int64 =0,
+    fsol::Float64 =0.0,
+    name::AbstractString = "empty",
+    datascaling::DataScaling ="none",
+    f_eval::Function = x->x,
+    g_eval::Function = x->x, 
+    g_eval!::Function = x->x, 
+    Jac_eval!::Function = x->x,
+    scalar_grad_eval::Function = x->x,
+    scalar_grad_hess_eval::Function = x->x,
+    Hess_eval::Function = x->x,
+    Hess_eval!::Function = x->x,
+    Hess_opt::Function = x->x,
+    Hess_opt!::Function = x->x,
+    Hess_D::Function   = x->x,
+    Hess_D!::Function   = x->x,
+    Hess_C::Function   = x->x,
+    Hess_C!::Function   = x->x,
+    Hess_CC_g_C!::Function  = x->x,
+    Hess_C2::Function = x->x,
+    ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method)
+    lambda::Float64 =0.0 ,
+    mu::Float64  =0.0, 
+    L::Float64  =0.0, 
+    Lmax::Float64 =0.0,
+    Lbar::Float64 =0.0)
+    prob = Prob( X,  y, numfeatures,  numdata,  fsol,  name,  datascaling,  f_eval, g_eval,   g_eval!,   Jac_eval!,   scalar_grad_eval,  scalar_grad_hess_eval,   Hess_eval,   Hess_eval!, Hess_opt,  Hess_opt!,   Hess_D, Hess_D!,   Hess_C, Hess_C!,  Hess_CC_g_C!, Hess_C2, lambda,  mu,  L, Lmax, Lbar)
+end
+
 
 mutable struct Sampling
     name::AbstractString # "independent" or "nice"
@@ -294,8 +329,12 @@ mutable struct SPIN
     HS::Array{Float64}  # Sketched Hessian
     SHS::Array{Float64}  # Sketched Hessian
     grad::Array{Float64} # gradient
+    avrg_dir::Array{Float64} #Weighted average of search direction
+    cov_dir::Array{Float64} # Weighted covariance matrix of search direction
+    weight::Float64 # the weight used in taking weighted averages of the past
     stepsize::Float64
     sketchtype::AbstractString
+    reset::Function # reset some parameters of the method
 end
 
 mutable struct Method

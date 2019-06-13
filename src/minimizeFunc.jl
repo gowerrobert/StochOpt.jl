@@ -107,7 +107,7 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
         #     println("Current stepsize: ", method.stepsize)
         # end
 
-        # println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
+        #  println("method.stepsize ", method.stepsize); # Monitoring the stepsize value (for later implementation of line search)
         # println("method.stepsize ", method.stepsize, ", norm(d): ", norm(d));
 
         timeaccum += time_elapsed # Keeps track of time accumulated at every iteration

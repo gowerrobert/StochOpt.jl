@@ -1,0 +1,3 @@
+lgstc_mushrooms-none-regularizor-1e+00-demo_SPIN stepsize_multiplier 
+SPIN-11-gauss-0.1 : 2^ -1.8424616747538007
+SPIN-20-prev-0.1 : 2^ -1.8424616747538007
