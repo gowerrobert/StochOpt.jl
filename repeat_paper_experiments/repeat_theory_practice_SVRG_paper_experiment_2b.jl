@@ -190,6 +190,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
         prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling)
     end
 
+    println("\nSTRONG CONVEXITY : ", prob.mu, "\n")
+
     X = nothing
     y = nothing
 
@@ -327,8 +329,6 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=legendpos, legendfont=6) # Plot and save output
     plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
-
-    println("\nSTRONG CONVEXITY : ", prob.mu, "\n")
 
 end
 println("\n\n--- EXPERIMENT 2.B FINISHED ---")
