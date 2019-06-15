@@ -41,8 +41,8 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
     ## To avoid very long computations when dimensions are large mu is approximated by lambda
-    if numdata > 10000 || numfeatures > 10000
-    # if numdata > 10^8 || numfeatures > 10^8
+    # if numdata > 10000 || numfeatures > 10000
+    if numdata > 10^8 || numfeatures > 10^8
         mu = lambda
     else
         mu = get_mu_str_conv(X, lambda) # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
@@ -59,7 +59,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:, S], y[S], x);
     scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:, S], y[S], x);
 
-    prob = initiate_Prob(X=X, y=y, numfeatures =numfeatures,  numdata = numdata,  name= name,   datascaling=  datascaling, 
+    prob = initiate_Prob(X=X, y=y, numfeatures =numfeatures,  numdata = numdata,  name= name,   datascaling=  datascaling,
      f_eval =f_eval, g_eval = g_eval,   g_eval! =  g_eval!,   Jac_eval! =  Jac_eval!,   scalar_grad_eval =scalar_grad_eval,
        scalar_grad_hess_eval =scalar_grad_hess_eval, lambda =lambda,  mu =mu,  L =L, Lmax =Lmax, Lbar =Lbar )
     # prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
