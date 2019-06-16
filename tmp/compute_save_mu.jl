@@ -19,7 +19,7 @@ all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (tru
 ## Experiments settings
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
 if all_problems
-    problems = 1:12;
+    problems = 1:10;
 else
     problems = 1:1;
     # problems = 11:11;
@@ -122,8 +122,8 @@ for idx_prob in problems
         # println("mu = ", mu)
         # println("condition number = ", L/mu, "\n")
 
-        @printf "L = %e and mu = %e" L mu
-        @printf "Condition number = %e" L/mu
+        @printf "L = %e and mu = %e\n" L mu
+        @printf "Condition number = %e\n" L/mu
 
         println("Practical optimal mini-batch = ", b_practical)
     end
