@@ -59,9 +59,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     scalar_grad_eval(x, S)      = ridge_scalar_grad(X[:, S], y[S], x);
     scalar_grad_hess_eval(x, S) = ridge_scalar_grad_hess(X[:, S], y[S], x);
 
-    prob = initiate_Prob(X=X, y=y, numfeatures =numfeatures,  numdata = numdata,  name= name,   datascaling=  datascaling,
-     f_eval =f_eval, g_eval = g_eval,   g_eval! =  g_eval!,   Jac_eval! =  Jac_eval!,   scalar_grad_eval =scalar_grad_eval,
-       scalar_grad_hess_eval =scalar_grad_hess_eval, lambda =lambda,  mu =mu,  L =L, Lmax =Lmax, Lbar =Lbar )
+    prob = initiate_Prob(X=X, y=y, numfeatures=numfeatures, numdata=numdata, name=name, datascaling=datascaling, f_eval=f_eval, g_eval=g_eval, g_eval!=g_eval!, Jac_eval!=Jac_eval!, scalar_grad_eval=scalar_grad_eval, scalar_grad_hess_eval=scalar_grad_hess_eval, lambda=lambda, mu=mu, L=L, Lmax=Lmax, Lbar=Lbar)
     # prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
                 # x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, x->x, lambda, mu, L, Lmax, Lbar)
 

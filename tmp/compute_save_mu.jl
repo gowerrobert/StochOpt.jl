@@ -21,7 +21,8 @@ numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical com
 if all_problems
     problems = 1:10;
 else
-    problems = 1:1;
+    # problems = 1:1;
+    problems = 3:3;
     # problems = 11:11;
 end
 

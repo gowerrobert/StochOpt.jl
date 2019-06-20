@@ -115,6 +115,9 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     L /= 4;
     Lmax /= 4;
     Lbar /= 4;
+    # L = (L-lambda)/4 + lambda; # correcting the error?
+    # Lmax = (Lmax-lambda)/4 + lambda;
+    # Lbar = (Lbar-lambda)/4 + lambda;
 
     # if opts.regularizor =="huber"
     #         f_eval(x,S) =  (1./length(S))*logistic_eval(Xt,y,x,S)+(reg)* huber_eval(x,opts.hubermu);
@@ -142,6 +145,31 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     #        println("Choose regularizor huber or L2");
     #        error("Unknown regularizor"+ opts.regularizor);
     #end
+
+    prob = initiate_Prob(X=X,
+                         y=y,
+                         numfeatures=numfeatures,
+                         numdata=numdata,
+                         name=name,
+                         datascaling=datascaling,
+                         f_eval=f_eval,
+                         g_eval=g_eval,
+                         g_eval!=g_eval!,
+                         Jac_eval!=Jac_eval!,
+                         scalar_grad_eval=scalar_grad_eval,
+                         scalar_grad_hess_eval=scalar_grad_hess_eval,
+                         Hess_eval=Hess_eval,
+                         Hess_eval!=Hess_eval!,
+                         Hess_opt=Hess_opt,
+                         Hess_opt!=Hess_opt!,
+                         Hess_D=Hess_D,
+                         Hess_D!=Hess_D!,
+                         Hess_C=Hess_C,
+                         Hess_C!=Hess_C!,
+                         Hess_CC_g_C!=Hess_CC_g_C!,
+                         Hess_C2=Hess_C2,
+                         lambda=lambda,
+                         mu=mu, L=L, Lmax=Lmax, Lbar=Lbar)
 
     prob = Prob(X, y, numfeatures, numdata, 0.0, name, datascaling, f_eval, g_eval, g_eval!, Jac_eval!, scalar_grad_eval, scalar_grad_hess_eval,
                 Hess_eval, Hess_eval!, Hess_opt, Hess_opt!, Hess_D, Hess_D!, Hess_C, Hess_C!,  Hess_CC_g_C!, Hess_C2, lambda, mu, L, Lmax, Lbar)
