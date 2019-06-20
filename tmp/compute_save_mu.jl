@@ -66,12 +66,6 @@ skip_multipliers = [0.01,        # 2min 20s avec 0.01
 
 precision = 10.0^(-4)
 
-function get_mu_filename(prob)
-    savename = string(replace(prob.name, r"[\/]" => "-"), "-strong_convexity");
-    default_path = "./data/";
-    return string(default_path, savename);
-end
-
 for idx_prob in problems
     @time begin
         data = datasets[idx_prob];
