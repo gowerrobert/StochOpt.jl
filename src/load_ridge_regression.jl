@@ -73,13 +73,14 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
     load_mu_str_conv!(prob)
     if prob.mu == 0.0
         println("Computing and saving the strong convexity parameter of the problem")
-        ## getting and saving approximation of the strong convexity parameter mu
+        ## Getting and saving approximation of the strong convexity parameter mu
         if numdata > 10^8 || numfeatures > 10^8
             prob.mu = lambda
         else
             prob.mu = get_mu_str_conv(X, lambda) # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
         end
     end
+    print("\n")
 
     return prob
 end

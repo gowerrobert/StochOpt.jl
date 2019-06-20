@@ -11,24 +11,12 @@ using Base64
 using Formatting
 using SharedArrays
 
-path = "./"
-include("./src/StochOpt.jl")
-# path = "/cal/homes/ngazagnadou/StochOpt.jl/"
-# include("$(path)src/StochOpt.jl")
+# path = "./"
+# include("./src/StochOpt.jl")
+path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+include("$(path)src/StochOpt.jl")
 
-# all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (true)
-all_problems = false
-
-## Experiments settings
-numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-if all_problems
-    problems = 1:12;
-    # problems = 11:12;
-else
-    # problems = 1:1;
-    problems = 3:3;
-    # problems = 11:11;
-end
+problems = [3, 4, 7, 8, 9, 10] # Only ridge problems
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
@@ -67,8 +55,8 @@ skip_multipliers = [0.01,        # 2min 20s avec 0.01
 
 precision = 10.0^(-4)
 
-# for idx_prob in problems
-idx_prob = 1
+for idx_prob in problems
+# idx_prob = 1
     @time begin
         data = datasets[idx_prob];
         scaling = scalings[idx_prob];
@@ -118,13 +106,8 @@ idx_prob = 1
         ## Computing mini-batch and step sizes
         b_practical = round(Int, 1 + (mu*(n-1))/(4*L)) # ERROR for pb 11? b_practical cannot be lager than ~ n/4 ?
 
-        # println("L = ", L)
-        # println("mu = ", mu)
-        # println("condition number = ", L/mu, "\n")
-
         @printf "\nL = %e and mu = %e\n" L mu
         @printf "Condition number = %e\n" L/mu
-
         println("Practical optimal mini-batch = ", b_practical, "\n")
     end
 end

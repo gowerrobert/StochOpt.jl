@@ -89,12 +89,8 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     end
     println("loaded ", name, " with ", numfeatures, " features and ", numdata, " data");
 
-    ## To avoid very long computations when dimensions are large mu is approximated by lambda
-    if numdata > 10^8 || numfeatures > 10^8
-        mu = lambda;
-    else
-        mu = get_mu_str_conv(X, lambda); # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
-    end
+    ## The logistic loss is NOT strongly convex, so the strong convexity parameter is the regularization
+    mu = lambda
 
     ## Computing smoothness constants
     if verbose
@@ -147,7 +143,6 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
 
     ## Try to load the solution of the problem, if already computed
     load_fsol!(opts, prob);
-
     if prob.fsol == 0.0
         println("Need to compute the solution of the problem")
         # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
