@@ -142,6 +142,22 @@ function get_mu_str_conv(X, lambda::Float64)
     return mu
 end
 
+function get_mu_filename(prob)
+    savename = string(replace(prob.name, r"[\/]" => "-"), "-strong_convexity");
+    default_path = "./data/";
+    return string(default_path, savename);
+end
+
+function load_mu_str_conv!(prob)
+    try # getting saved strong convexity parameter
+        println("Loading mu for ", prob.name)
+        mu_filename = get_mu_filename(prob)
+        prob.mu = load("$(mu_filename).jld", "mu")
+    catch
+        println("No mu for ", prob.name)
+        prob.mu = 0.0
+    end
+end
 
 # """
 #     get_approx_mu_str_conv(X, lambda::Float64)
