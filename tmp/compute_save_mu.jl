@@ -12,11 +12,12 @@ using Formatting
 using SharedArrays
 
 path = "./"
-include("../src/StochOpt.jl")
+include("./src/StochOpt.jl")
 # path = "/cal/homes/ngazagnadou/StochOpt.jl/"
 # include("$(path)src/StochOpt.jl")
 
-all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (true)
+# all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (true)
+all_problems = false
 
 ## Experiments settings
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
@@ -66,7 +67,8 @@ skip_multipliers = [0.01,        # 2min 20s avec 0.01
 
 precision = 10.0^(-4)
 
-for idx_prob in problems
+# for idx_prob in problems
+idx_prob = 1
     @time begin
         data = datasets[idx_prob];
         scaling = scalings[idx_prob];
