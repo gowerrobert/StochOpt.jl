@@ -82,7 +82,7 @@ mutable struct Prob
     Hess_D!::Function   # Calculates Diagonal
     Hess_C::Function   # Gets subset of the columns of Hessian
     Hess_C!::Function   # Gets subset of the columns of Hessian
-    Hess_CC_g_C!::Function   # Gets subset of the columns and rows of Hessian, and subset of rows of gradient. 
+    Hess_CC_g_C!::Function   # Gets subset of the columns and rows of Hessian, and subset of rows of gradient.
     Hess_C2::Function
     #    Hess_vv::Function  # Calculates the Hessian-vector-vector product v'Hv
     ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method)
@@ -93,7 +93,8 @@ mutable struct Prob
     Lbar::Float64
 end
 
-function initiate_Prob(; 
+
+function initiate_Prob(;
     X  =[],
     y::Array{Float64} =[],
     numfeatures::Int64 =0,
@@ -102,8 +103,8 @@ function initiate_Prob(;
     name::AbstractString = "empty",
     datascaling::DataScaling ="none",
     f_eval::Function = x->x,
-    g_eval::Function = x->x, 
-    g_eval!::Function = x->x, 
+    g_eval::Function = x->x,
+    g_eval!::Function = x->x,
     Jac_eval!::Function = x->x,
     scalar_grad_eval::Function = x->x,
     scalar_grad_hess_eval::Function = x->x,
@@ -119,8 +120,8 @@ function initiate_Prob(;
     Hess_C2::Function = x->x,
     ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method)
     lambda::Float64 =0.0 ,
-    mu::Float64  =0.0, 
-    L::Float64  =0.0, 
+    mu::Float64  =0.0,
+    L::Float64  =0.0,
     Lmax::Float64 =0.0,
     Lbar::Float64 =0.0)
     prob = Prob( X,  y, numfeatures,  numdata,  fsol,  name,  datascaling,  f_eval, g_eval,   g_eval!,   Jac_eval!,   scalar_grad_eval,  scalar_grad_hess_eval,   Hess_eval,   Hess_eval!, Hess_opt,  Hess_opt!,   Hess_D, Hess_D!,   Hess_C, Hess_C!,  Hess_CC_g_C!, Hess_C2, lambda,  mu,  L, Lmax, Lbar)
