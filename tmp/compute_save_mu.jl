@@ -11,15 +11,18 @@ using Base64
 using Formatting
 using SharedArrays
 
-path = "/cal/homes/ngazagnadou/StochOpt.jl/"
-include("$(path)src/StochOpt.jl")
+path = "./"
+include("../src/StochOpt.jl")
+# path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+# include("$(path)src/StochOpt.jl")
 
 all_problems = parse(Bool, ARGS[1]); # run 1 (false) or all the 12 problems (true)
 
 ## Experiments settings
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
 if all_problems
-    problems = 1:10;
+    problems = 1:12;
+    # problems = 11:12;
 else
     # problems = 1:1;
     problems = 3:3;
@@ -114,7 +117,7 @@ for idx_prob in problems
 
         ## Save strong-convexity parameter
         mufilename = get_mu_filename(prob);
-        save("$(mufilename).jld", "mu", mu)
+        save("$(mufilename)_new.jld", "mu", mu)
 
         ## Computing mini-batch and step sizes
         b_practical = round(Int, 1 + (mu*(n-1))/(4*L)) # ERROR for pb 11? b_practical cannot be lager than ~ n/4 ?
@@ -123,10 +126,10 @@ for idx_prob in problems
         # println("mu = ", mu)
         # println("condition number = ", L/mu, "\n")
 
-        @printf "L = %e and mu = %e\n" L mu
+        @printf "\nL = %e and mu = %e\n" L mu
         @printf "Condition number = %e\n" L/mu
 
-        println("Practical optimal mini-batch = ", b_practical)
+        println("Practical optimal mini-batch = ", b_practical, "\n")
     end
 end
 

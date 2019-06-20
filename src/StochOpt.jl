@@ -93,38 +93,37 @@ mutable struct Prob
     Lbar::Float64
 end
 
-
 function initiate_Prob(;
-    X  =[],
-    y::Array{Float64} =[],
-    numfeatures::Int64 =0,
-    numdata::Int64 =0,
-    fsol::Float64 =0.0,
+    X = [],
+    y::Array{Float64} = [],
+    numfeatures::Int64 = 0,
+    numdata::Int64 = 0,
+    fsol::Float64 = 0.0,
     name::AbstractString = "empty",
-    datascaling::DataScaling ="none",
+    datascaling::DataScaling = "none",
     f_eval::Function = x->x,
     g_eval::Function = x->x,
-    g_eval!::Function = x->x,
-    Jac_eval!::Function = x->x,
+    g_eval_mutating::Function = x->x,
+    Jac_eval_mutating::Function = x->x,
     scalar_grad_eval::Function = x->x,
     scalar_grad_hess_eval::Function = x->x,
     Hess_eval::Function = x->x,
-    Hess_eval!::Function = x->x,
+    Hess_eval_mutating::Function = x->x,
     Hess_opt::Function = x->x,
-    Hess_opt!::Function = x->x,
-    Hess_D::Function   = x->x,
-    Hess_D!::Function   = x->x,
-    Hess_C::Function   = x->x,
-    Hess_C!::Function   = x->x,
-    Hess_CC_g_C!::Function  = x->x,
+    Hess_opt_mutating::Function = x->x,
+    Hess_D::Function = x->x,
+    Hess_D_mutating::Function = x->x,
+    Hess_C::Function = x->x,
+    Hess_C_mutating::Function = x->x,
+    Hess_CC_g_C_mutating::Function = x->x,
     Hess_C2::Function = x->x,
     ## SUGGESTION: add L, Lbar, Lis and L_max as attributes of the problem (instead of attribute of the SAGA method)
-    lambda::Float64 =0.0 ,
-    mu::Float64  =0.0,
-    L::Float64  =0.0,
-    Lmax::Float64 =0.0,
-    Lbar::Float64 =0.0)
-    prob = Prob( X,  y, numfeatures,  numdata,  fsol,  name,  datascaling,  f_eval, g_eval,   g_eval!,   Jac_eval!,   scalar_grad_eval,  scalar_grad_hess_eval,   Hess_eval,   Hess_eval!, Hess_opt,  Hess_opt!,   Hess_D, Hess_D!,   Hess_C, Hess_C!,  Hess_CC_g_C!, Hess_C2, lambda,  mu,  L, Lmax, Lbar)
+    lambda::Float64 = 0.0 ,
+    mu::Float64 = 0.0,
+    L::Float64 = 0.0,
+    Lmax::Float64 = 0.0,
+    Lbar::Float64 = 0.0)
+    prob = Prob(X, y, numfeatures, numdata, fsol, name, datascaling, f_eval, g_eval, g_eval_mutating, Jac_eval_mutating, scalar_grad_eval, scalar_grad_hess_eval, Hess_eval, Hess_eval_mutating, Hess_opt, Hess_opt_mutating, Hess_D, Hess_D_mutating, Hess_C, Hess_C_mutating, Hess_CC_g_C_mutating, Hess_C2, lambda, mu, L, Lmax, Lbar)
 end
 
 
