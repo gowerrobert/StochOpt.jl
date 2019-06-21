@@ -129,8 +129,6 @@ function calculate_complex_Hofmann(prob::Prob, options::MyOptions)
 end
 
 function get_mu_str_conv(X, lambda::Float64)
-    println("//\\ Computing the strong convexity parameter //\\")
-
     sX = size(X);
     numfeatures = sX[1];
     numdata = sX[2];

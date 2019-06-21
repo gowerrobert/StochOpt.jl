@@ -79,6 +79,9 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         else
             prob.mu = get_mu_str_conv(X, lambda) # mu = minimum(sum(prob.X.^2, 1)) + prob.lambda;
         end
+        ## Saving the computed strong convexity
+        mu_filename = get_mu_filename(prob)
+        save("$(mu_filename).jld", "mu", prob.mu)
     end
     print("\n")
 
