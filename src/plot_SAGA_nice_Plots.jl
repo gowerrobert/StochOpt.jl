@@ -17,8 +17,7 @@ function plot_expected_smoothness_bounds(prob::Prob, simplebound::Array{Float64}
     # PROBLEM: there is still a problem of ticking non integer on the xaxis
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-    # default_path = "./figures/"; # old path
-    default_path = "./experiments/SAGA_nice/figures/"; # new path
+    default_path = "./experiments/SAGA_nice/exp1/figures/"; # new path
 
     fontsmll = 8;
     fontmed = 12;
@@ -131,7 +130,7 @@ function plot_stepsize_bounds(prob::Prob, simplestepsize::Array{Float64}, bernst
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     # default_path = "./figures/"; # old path
-    default_path = "./experiments/SAGA_nice/figures/"; # new path
+    default_path = "./experiments/SAGA_nice/exp2/figures/"; # new path
 
     fontsmll = 8;
     fontmed = 12;

@@ -55,16 +55,19 @@ using Distributed
     pyplot() # No problem with pyplot when called in @everywhere statement
 end
 
-save_path = "$(path)experiments/SAGA_nice/";
+save_path = "$(path)experiments/SAGA_nice/exp3/";
 # Create saving directories if not existing
+if !isdir("$(save_path)")
+    mkdir("$(save_path)")
+end
 if !isdir("$(save_path)data/")
-    mkdir("$(save_path)data/");
+    mkdir("$(save_path)data/")
 end
 if !isdir("$(save_path)figures/")
-    mkdir("$(save_path)figures/");
+    mkdir("$(save_path)figures/")
 end
 if !isdir("$(save_path)outputs/")
-    mkdir("$(save_path)outputs/");
+    mkdir("$(save_path)outputs/")
 end
 
 #region

@@ -81,7 +81,7 @@ scalings = collect(Iterators.flatten([Iterators.flatten(fill(["none", "none", "c
 lambdas = collect(Iterators.flatten(fill([10^(-1), 10^(-3)], 21)))
 
 data_path = "$(path)data/";
-save_path = "$(path)experiments/SAGA_nice/";
+save_path = "$(path)experiments/SAGA_nice/exp1/";
 
 @time begin
 @sync @distributed for idx_prob in problems
