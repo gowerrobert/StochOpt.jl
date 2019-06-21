@@ -92,6 +92,6 @@ for idx_prob in problems
 
     @printf "L = %e and mu = %e\n" L mu
     @printf "Condition number = %e\n" L/mu
-    println("Practical optimal mini-batch = ", b_practical, "\n\n")
+    println("Practical optimal mini-batch = ", b_practical, "\n\n\n")
 end
 
