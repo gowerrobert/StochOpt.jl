@@ -35,7 +35,8 @@ using Distributed
 
 @everywhere begin
     # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
-    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
+    path = "/home/infres/ngazagnadou/new_StochOpt.jl/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
@@ -260,8 +261,8 @@ precision = 10.0^(-4)
                 2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
                 2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
         nbskip = closest_power_of_ten(round.(Int, n ./ b_practical ));
-        output = calculate_best_stepsize_SAGA_nice(prob, options, skip=nbskip, max_time=60.0,
-                                                   rep_number=1, batchsize=b_practical, grid=grid);
+        output = calculate_best_stepsize_SAGA_nice(prob, options, skip=nbskip, max_time=180.0,
+                                                   rep_number=3, batchsize=b_practical, grid=grid);
         step_practical_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
     end
 

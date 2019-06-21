@@ -36,7 +36,8 @@ using Distributed
 
 @everywhere begin
     # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
-    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
+    path = "/home/infres/ngazagnadou/new_StochOpt.jl/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
