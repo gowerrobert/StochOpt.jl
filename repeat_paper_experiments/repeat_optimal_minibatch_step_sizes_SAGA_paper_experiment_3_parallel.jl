@@ -232,7 +232,7 @@ precision = 10.0^(-4)
     K = (4.0*b_hofmann*Lmax) / (n*mu);
     step_hofmann = K / (2*Lmax*(1+K+sqrt(1+K^2)));
 
-    b_practical = round(Int, 1 + ( mu*(n-1) ) / ( 4*L ) );
+    b_practical = round(Int, 1 + (mu*(n-1))/(4*(L+lambda)))
     rho = ( n*(n - b_practical) ) / ( b_practical*(n-1) ); # Sketch residual
     rightterm = (rho / n)*Lmax + ( (mu*n) / (4*b_practical) ); # Right-hand side term in the max
     practical_bound = ( n*(b_practical-1)*L + (n-b_practical)*Lmax ) / ( b_practical*(n-1) );

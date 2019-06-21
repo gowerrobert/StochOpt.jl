@@ -16,8 +16,8 @@ include("../src/StochOpt.jl")
 # path = "/cal/homes/ngazagnadou/StochOpt.jl/"
 # include("$(path)src/StochOpt.jl")
 
-problems = [3, 4, 7, 8, 9, 10] # Only ridge problems
-# problems = 1:12
+# problems = [3, 4, 7, 8, 9, 10] # Only ridge problems
+problems = 1:12
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
@@ -51,12 +51,12 @@ for idx_prob in problems
     Random.seed!(1);
 
     ## Loading the data
-    println("--- Loading data ---");
+    # println("--- Loading data ---");
     data_path = "$(path)data/";
     X, y = loadDataset(data_path, data);
 
     ## Setting up the problem
-    println("\n--- Setting up the selected problem ---");
+    # println("\n--- Setting up the selected problem ---");
     options = set_options(tol=10.0^(-4), max_iter=10^8, max_epocs=10^8,
                           max_time=60.0*60.0*10.0,
                           skip_error_calculation=10^4,
@@ -68,10 +68,10 @@ for idx_prob in problems
     if length(u) < 2
         error("Wrong number of possible outputs");
     elseif length(u) == 2
-        println("Binary output detected: the problem is set to logistic regression")
+        # println("Binary output detected: the problem is set to logistic regression")
         prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);
     else
-        println("More than three modalities in the outputs: the problem is set to ridge regression")
+        # println("More than three modalities in the outputs: the problem is set to ridge regression")
         prob = load_ridge_regression(X, y, data, options, lambda=lambda, scaling=scaling);
     end
 
@@ -84,14 +84,16 @@ for idx_prob in problems
     L = prob.L;
 
     ## Save strong-convexity parameter
-    mu_filename = get_mu_filename(prob);
-    save("$(mu_filename).jld", "mu", mu)
+    # mu_filename = get_mu_filename(prob);
+    # save("$(mu_filename).jld", "mu", mu)
 
     ## Computing mini-batch and step sizes
-    b_practical = round(Int, 1 + (mu*(n-1))/(4*L))
+    b_practical = round(Int, 1 + (mu*(n-1))/(4*(L+lambda)))
 
     @printf "L = %e and mu = %e\n" L mu
     @printf "Condition number = %e\n" L/mu
-    println("Practical optimal mini-batch = ", b_practical, "\n\n\n")
+    println("---------------------------------------------------")
+    println("Old practical optimal mini-batch = ", b_practical)
+    println("---------------------------------------------------\n\n")
 end
 

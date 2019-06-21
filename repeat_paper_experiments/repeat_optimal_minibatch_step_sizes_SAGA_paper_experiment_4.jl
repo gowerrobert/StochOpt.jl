@@ -139,7 +139,7 @@ for idx_prob in problems
     ## Computing mini-batch and step sizes
     # tau_simple = round(Int, 1 + (mu*(n-1))/(4*Lbar))
     # tau_bernstein = max(1, round(Int, 1 + (mu*(n-1))/(8*L) - (4/3)*log(d)*((n-1)/n)*(Lmax/(2*L))))
-    b_practical = round(Int, 1 + (mu*(n-1))/(4*L))
+    b_practical = round(Int, 1 + (mu*(n-1))/(4*(L+lambda)))
 
     ## Computing the empirical mini-batch size over a grid
     # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))

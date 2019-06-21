@@ -213,7 +213,7 @@ for idx_prob in problems
     K = (4.0*tau_hofmann*Lmax) / (n*mu);
     step_hofmann = K / (2*Lmax*(1+K+sqrt(1+K^2)));
 
-    tau_practical = round(Int, 1 + ( mu*(n-1) ) / ( 4*L ) );
+    tau_practical = round(Int, 1 + ( mu*(n-1) ) / ( 4*(L+lambda) ) );
     rho = ( n*(n - tau_practical) ) / ( tau_practical*(n-1) ); # Sketch residual
     rightterm = (rho / n)*Lmax + ( (mu*n) / (4*tau_practical) ); # Right-hand side term in the max
     practical_bound = ( n*(tau_practical-1)*L + (n-tau_practical)*Lmax ) / ( tau_practical*(n-1) );
