@@ -238,8 +238,7 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
     numsimu = 1
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    # default_path = "./figures/"; # old path
-    default_path = "./experiments/SAGA_nice/figures/"; # new path
+    default_path = "$(path)figures/"; # new path
 
     fontmed = 12
     fontbig = 15
