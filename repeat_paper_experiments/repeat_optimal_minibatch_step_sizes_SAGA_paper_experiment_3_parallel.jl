@@ -135,7 +135,7 @@ end
 
 ## Experiments settings
 numsimu = 1;                 # Increase the number of simulations to compute an average of the empirical total complexity of each method
-relaunch_gridsearch = false; # Change to true for recomputing the grid search on the step sizes
+relaunch_gridsearch = true;  # Change to true for recomputing the grid search on the step sizes
 if all_problems
     problems = 1:12;
 else
@@ -260,7 +260,7 @@ precision = 10.0^(-4)
                 2.0^(-7), 2.0^(-9), 2.0^(-11), 2.0^(-13), 2.0^(-15), 2.0^(-17), 2.0^(-19),
                 2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
         nbskip = closest_power_of_ten(round.(Int, n ./ b_practical ));
-        output = calculate_best_stepsize_SAGA_nice(prob, options, skip=nbskip, max_time=180.0,
+        output = calculate_best_stepsize_SAGA_nice(prob, options, skip=nbskip, max_time=60.0,
                                                    rep_number=1, batchsize=b_practical, grid=grid);
         step_practical_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
     end
