@@ -75,9 +75,9 @@ end
 ## Experiments settings
 numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
 if all_problems
-    problems = 1:12;
+    problems = 1:12
 else
-    problems = 1:1;
+    problems = 1:1
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
@@ -211,12 +211,7 @@ precision = 10.0^(-4)
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    if idx_prob == 11
-        legendpos = :bottomleft
-    else
-        legendpos = :topleft
-    end
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos)
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_practical, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=:topleft)
 
     println("Practical optimal mini-batch = ", b_practical)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
