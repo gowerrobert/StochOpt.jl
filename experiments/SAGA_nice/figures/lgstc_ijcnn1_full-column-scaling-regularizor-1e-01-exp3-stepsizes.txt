@@ -1,5 +1,0 @@
-lgstc_ijcnn1_full-column-scaling-regularizor-1e-01-exp3 stepsize_multiplier 
-$b_\mathrm{Defazio} \; \; = 1 \ \ , \gamma_\mathrm{Defazio} \ \ \: \: = 2.34e-05$ : 2^ -15.38065952261166
-$b_\mathrm{practical} \, = 5370 \ , \gamma_\mathrm{practical} \ \ = 3.74e-01$ : 2^ -1.4198031651071448
-$b_\mathrm{practical} \, = 5370 \ , \gamma_\mathrm{grid search} = 2.00e+00$ : 2^ 1.0
-$b_\mathrm{Hofmann} = 20 \ \ , \gamma_\mathrm{Hofmann}  \ \, = 1.21e-03$ : 2^ -9.690319602957317

@@ -1,0 +1,5 @@
+lgstc_real-sim-none-regularizor-1e-01-exp3 stepsize_multiplier 
+$b_\mathrm{Defazio} \; \; = 1 \ \ , \gamma_\mathrm{Defazio} \ \ \: \: = 4.61e-05$ : 2^ -14.404991839603372
+$b_\mathrm{practical} \, = 8898 \ , \gamma_\mathrm{practical} \ \ = 1.23e+00$ : 2^ 0.2990609384929377
+$b_\mathrm{practical} \, = 8898 \ , \gamma_\mathrm{grid search} = 2.00e+00$ : 2^ 1.0
+$b_\mathrm{Hofmann} = 20 \ \ , \gamma_\mathrm{Hofmann}  \ \, = 2.76e-03$ : 2^ -8.500827364078303
