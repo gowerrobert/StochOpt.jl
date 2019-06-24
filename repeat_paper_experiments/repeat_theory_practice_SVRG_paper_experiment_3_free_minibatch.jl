@@ -43,6 +43,8 @@ using Distributed
         path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
     elseif machine == "home"
         path = "/home/nidham/phd/StochOpt.jl/"         # local
+    else
+        error("Unkown machine name (first argument)")
     end
     println("path: ", path)
 
