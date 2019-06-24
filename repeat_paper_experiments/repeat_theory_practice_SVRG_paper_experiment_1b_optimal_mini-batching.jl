@@ -1,7 +1,7 @@
 """
 ### "Towards closing the gap between the theory and practice of SVRG", Francis Bach, Othmane Sebbouh, Nidham Gazagnadou, Robert M. Gower (2019)
 
-## --- EXPERIMENT 2.B ---
+## --- EXPERIMENT 1.B ---
 Goal: Compare SVRG variants: Bubeck version, Free-SVRG, Leap-SVRG and Loopless-SVRG-Decreasing for b-nice sampling. The mini-batch size is set to one for SVRG-Bubeck and to the optimal value b^*(n) corresponding to m=n.
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
@@ -9,7 +9,7 @@ Goal: Compare SVRG variants: Bubeck version, Free-SVRG, Leap-SVRG and Loopless-S
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a.jl <boolean>
+>julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl <boolean>
 where <number_of_processor_to_add> has to be replaced by the user.
 - If <boolean> == false, only the first problem (ijcnn1_full + column-scaling + lambda=1e-1) is launched
 - Else, <boolean> == true, all XX problems are launched
@@ -22,8 +22,8 @@ XXXX, around XXmin
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
-- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp2b/figures/" folder
-- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp2b/outputs/" folder
+- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp1b/figures/" folder
+- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp1b/outputs/" folder
 """
 
 ## General settings
@@ -76,7 +76,7 @@ using Distributed
 end
 
 ## Path settings
-save_path = "$(path)experiments/theory_practice_SVRG/exp2b/"
+save_path = "$(path)experiments/theory_practice_SVRG/exp1b/"
 #region
 # Create saving directories if not existing
 if !isdir("$(path)experiments/")
@@ -319,7 +319,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
         suffix = "home"
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp2b-$(suffix)-$(details)")
+    savename = string(savename, "-exp1b-$(suffix)-$(details)")
     save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     if idx_prob == 8
@@ -329,8 +329,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     end
 
     pyplot()
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=legendpos, legendfont=6) # Plot and save output
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=legendpos, legendfont=6) # Plot and save output
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
 
 end
-println("\n\n--- EXPERIMENT 2.B FINISHED ---")
+println("\n\n--- EXPERIMENT 1.B FINISHED ---")

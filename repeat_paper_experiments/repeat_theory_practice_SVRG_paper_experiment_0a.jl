@@ -1,15 +1,15 @@
 """
 ### "Towards closing the gap between the theory and practice of SVRG", O. Sebbouh, S. Jelassi, N. Gazagnadou, F. Bach, R. M. Gower (2019)
 
-## --- EXPERIMENT 1.A ---
-Goal: Testing the optimality of our optimal mini-batch size b* with p = 1/n and corresponding step size gamma^*(b) for Loopless-SVRG-Decreasing.
+## --- EXPERIMENT 0.A ---
+Goal: Testing the optimality of our optimal mini-batch size b* with m = n and corresponding step size gamma^*(b).
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 - line XX: enter your full path to the "StochOpt.jl/" repository in the *path* variable
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a.jl <boolean>
+>julia -p <number_of_processor_to_add> repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_0a.jl <boolean>
 where <number_of_processor_to_add> has to be replaced by the user.
 -If <boolean> == false, only the first problem (ijcnn1_full + column-scaling + lambda=1e-1) is launched
 -Elseif <boolean> == true, all XX problems are launched
@@ -22,14 +22,14 @@ XXXX, around XXmin
 
 ## --- SAVED FILES ---
 For each problem (data set + scaling process + regularization)
-- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp1a-decreasing/figures/" folder
-- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp1a-decreasing/outputs/" folder
+- the empirical total complexity v.s. mini-batch size plots are saved in ".pdf" format in the "./experiments/theory_practice_SVRG/exp0a/figures/" folder
+- the results of the simulations (mini-batch grid, empirical complexities, optimal empirical mini-batch size, etc.) are saved in ".jld" format in the "./experiments/theory_practice_SVRG/exp0a/outputs/" folder
 """
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*2.0 #60.0*60.0*10.0
-precision = 10.0^(-4)
+max_time = 60.0*60.0*10.0
+precision = 10.0^(-3)
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
@@ -76,7 +76,7 @@ save_path = "$(path)experiments/theory_practice_SVRG/"
 if !isdir(save_path)
     mkdir(save_path)
 end
-save_path = "$(save_path)exp1a-decreasing/"
+save_path = "$(save_path)exp0a/"
 if !isdir(save_path)
     mkdir(save_path)
 end
@@ -91,8 +91,9 @@ if !isdir("$(save_path)outputs/")
 end
 #endregion
 
+
 ## Experiments settings
-numsimu = 1 # number of runs of L-SVRG-D for averaging the empirical complexity
+numsimu = 1 # number of runs of Free-SVRG for averaging the empirical complexity
 # if all_problems
 #     problems = 1:16
 # else
@@ -144,8 +145,8 @@ skip_multipliers = [0.1,        # 1)  ijcnn1_full + scaled + 1e-1             # 
                     1.0,        # 15) leukemia_full + unscaled + 1e-1
                     1.0]        # 16) leukemia_full + unscaled + 1e-3
 
-grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 1)  ijcnn1_full + scaled + 1e-1 OK
-        #  [2^0, 2^5, 2^9, 2^11, 2^12, 141691], # small grid for testing
+grids = [#[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 1)  ijcnn1_full + scaled + 1e-1 OK
+         [2^0, 2^9, 2^11], # 1)  ijcnn1_full + scaled + 1e-1 OK
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^13, 2^14, 2^15, 2^16, 141691], # 2)  ijcnn1_full + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, 515345], # 3)  YearPredictionMSD_full + scaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^12, 2^14, 2^16, 2^18, 515345], # 4)  YearPredictionMSD_full + scaled + 1e-3
@@ -155,12 +156,12 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^15, 53500], # 8)  slice + scaled + 1e-3
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 9)  real-sim + unscaled + 1e-1
          [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16], # 10) real-sim + unscaled + 1e-3
-         [2^0, 2^4, 2^8, 2^12, 32561], # 11) a1a_full + unscaled + 1e-1
-         [2^0, 2^4, 2^8, 2^12, 32561], # 12) a1a_full + unscaled + 1e-3
-         [2^0, 2^2, 2^4, 62], # 13) colon-cancer + unscaled + 1e-1
-         [2^0, 2^2, 2^4, 62], # 14) colon-cancer + unscaled + 1e-3
-         [2^0, 2^2, 2^4, 72], # 15) leukemia_full + unscaled + 1e-1
-         [2^0, 2^2, 2^4, 72]] # 16) leukemia_full + unscaled + 1e-3
+         [2^0, 2^4, 2^8, 2^12, 32561], # 11) a1a_full + unscaled + 1e-1  # unscaled,       n =  32,561, d =    123
+         [2^0, 2^4, 2^8, 2^12, 32561], # 12) a1a_full + unscaled + 1e-3  # unscaled,       n =  32,561, d =    123
+         [2^0, 2^2, 2^4, 62], # 13) colon-cancer + unscaled + 1e-1       # already scaled, n =   2,000, d =     62
+         [2^0, 2^2, 2^4, 62], # 14) colon-cancer + unscaled + 1e-3       # already scaled, n =   2,000, d =     62
+         [2^0, 2^2, 2^4, 72], # 15) leukemia_full + unscaled + 1e-1      # already scaled, n =      62, d =  7,129
+         [2^0, 2^2, 2^4, 72]] # 16) leukemia_full + unscaled + 1e-3      # already scaled, n =      62, d =  7,129
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -207,8 +208,8 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
     Lmax = prob.Lmax
     L = prob.L
 
-    ## Computing theoretical optimal mini-batch size for b-nice sampling with update probability p = 1/ n
-    b_theoretical = optimal_minibatch_L_SVRG_D_nice(1.0/n, n, mu, L, Lmax) # optimal b for L-SVRG-D when p = 1/n
+    ## Computing theoretical optimal mini-batch size for b-nice sampling with inner loop size m = n
+    b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
 
     ## Computing the empirical mini-batch size over a grid
     minibatchgrid = grids[idx_prob]
@@ -216,7 +217,7 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
     println(minibatchgrid)
     println("---------------------------------------------------------------------------------------------")
 
-    OUTPUTS = simulate_L_SVRG_D_nice(prob, minibatchgrid, options, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path)
+    OUTPUTS, itercomplex = simulate_Free_SVRG_nice(prob, minibatchgrid, options, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path)
 
     ## Checking that all simulations reached tolerance
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu]
@@ -234,17 +235,20 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
 
     ## Saving the result of the simulations
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(probname, "-exp1a-decreasing-$(machine)-", numsimu, "-avg")
+    savename = string(probname, "-exp0a-$(machine)-", numsimu, "-avg")
     savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")) # Extra suffix to check which skip values to keep
     if numsimu == 1
         save("$(save_path)data/$(savename).jld",
-        "options", options, "minibatchgrid", minibatchgrid, "empcomplex", empcomplex,"b_theoretical", b_theoretical, "b_empirical", b_empirical)
+        "options", options, "minibatchgrid", minibatchgrid,
+        "itercomplex", itercomplex, "empcomplex", empcomplex,
+        "b_theoretical", b_theoretical, "b_empirical", b_empirical)
     end
 
     ## Plotting total complexity vs mini-batch size
-    legendpos = :topleft
+    # legendpos = :topleft
+    legendpos = :best
     pyplot()
-    exp_number = 3 # grid of mini-batch sizes
+    exp_number = 1 # grid of mini-batch sizes
     plot_empirical_complexity_SVRG(prob, exp_number, minibatchgrid, empcomplex, b_theoretical, b_empirical, save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="-$(machine)")
 
     println("Theoretical optimal mini-batch = ", b_theoretical)
@@ -252,4 +256,4 @@ grids = [[2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^9, 2^10, 2^11, 2^12, 2^
 end
 end
 
-println("\n\n--- EXPERIMENT 1.A-DECREASING FINISHED ---")
+println("\n\n--- EXPERIMENT 0.A FINISHED ---")
