@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 10^8
+max_epochs = 10^3
 max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
@@ -111,12 +111,12 @@ lambdas = [10^(-1), 10^(-3),
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
 skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 25/06 11:14
                [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               25/06 11:14
-               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14
-               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14
+               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 11 epochs
+               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 11 epochs
                [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
                [50000 40000 -2. 30000],  # 6)  slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
-               [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 25/06 11:14 / 11 epochs
-               [500 5000 -2. 2000]]  # 8) real-sim + unscaled + 1e-3                   25/06 11:14 / 11 epochs
+               [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 25/06 11:14
+               [500 5000 -2. 2000]]  # 8) real-sim + unscaled + 1e-3                   25/06 11:14
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -128,10 +128,10 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     Random.seed!(1)
 
-    if idx_prob == 7
-        global max_epochs = 100
-    elseif idx_prob == 8
+    if idx_prob == 3 || idx_prob == 4
         global max_epochs = 11
+    elseif idx_prob == 5 || idx_prob == 6
+        global max_epochs = 100
     end
 
     ## Loading the data
@@ -284,16 +284,12 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     println("\n")
 
     ## Saving outputs and plots
-    if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
-        suffix = "lame10"
-    elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
+    if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
-    else
-        suffix = "home"
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1a-$(suffix)-$(details)")
-    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+    save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output

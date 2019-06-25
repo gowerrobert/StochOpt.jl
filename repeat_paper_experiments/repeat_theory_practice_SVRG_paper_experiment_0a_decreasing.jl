@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 10^8
+max_epochs = 10^3
 max_time = 60.0*60.0*2.0 #60.0*60.0*10.0
 precision = 10.0^(-4)
 

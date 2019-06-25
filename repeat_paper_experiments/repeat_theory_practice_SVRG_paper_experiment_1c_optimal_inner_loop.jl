@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 10^8
+max_epochs = 10^3
 max_time = 9000.0 # should be enough # old limit = 60.0*60.0*4.0
 precision = 10.0^(-6) # 10.0^(-6)
 
@@ -270,12 +270,8 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
     println("\n")
 
     ## Saving outputs and plots
-    if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
-        suffix = "lame10"
-    elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
+    if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
-    else
-        suffix = "home"
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1c-$(suffix)-$(details)")

@@ -18,7 +18,7 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 """
 
 ## General settings
-max_epochs = 10^8
+max_epochs = 10^3
 max_time = 60.0*60.0*6.0
 precision = 10.0^(-6)
 
@@ -191,12 +191,8 @@ skip_errors = [[7000   7000     200    300],   # 1)  ijcnn1_full + scaled + 1e-1
     println("\n")
 
     ## Saving outputs and plots
-    if path == "/cal/homes/ngazagnadou/StochOpt.jl/"
-        suffix = "lame10"
-    elseif path == "/home/infres/ngazagnadou/StochOpt.jl/"
+    if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
-    else
-        suffix = "home"
     end
 
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
