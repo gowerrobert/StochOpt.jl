@@ -28,8 +28,8 @@ For each problem (data set + scaling process + regularization)
 
 ## General settings
 max_epochs = 10^8
-max_time = 9000.0 # should be enough # old limit = 60.0*60.0*4.0
-precision = 10.0^(-6) # 10.0^(-6)
+max_time = 60.0*60.0*24.0
+precision = 10.0^(-6)
 
 ## File names
 # details = "final"
@@ -109,14 +109,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 midnight retry / FINAL
-               [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               midnight OK / FINAL
-               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
-               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  midnight retry / FINAL
-               [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   100 epochs / FINAL
-               [50000 40000 -2. 30000],  # 6)  slice + scaled + 1e-3                   100 epochs / FINAL
-               [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 midnight retry / FINAL
-               [500 5000 -2. 2000]]  # 8) real-sim + unscaled + 1e-3                  midnight retry / FINAL
+skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 25/06 11:14
+               [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               25/06 11:14
+               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14
+               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14
+               [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
+               [50000 40000 -2. 30000],  # 6)  slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
+               [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 25/06 11:14 / 11 epochs
+               [500 5000 -2. 2000]]  # 8) real-sim + unscaled + 1e-3                   25/06 11:14 / 11 epochs
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -128,8 +128,10 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     Random.seed!(1)
 
-    if idx_prob == 7 || idx_prob == 8
+    if idx_prob == 7
         global max_epochs = 100
+    elseif idx_prob == 8
+        global max_epochs = 11
     end
 
     ## Loading the data
