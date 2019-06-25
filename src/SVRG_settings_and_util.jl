@@ -1,8 +1,19 @@
+function b_tilde_tight(n::Int, L, Lmax, mu)
+    # Tight formula?
+    # \tilde{b} &\eqdef & \tfrac{n(3L_{\max} - L)}{n(n-1)\mu - nL + 3L_{\max})}
+    return max(floor(n*(3*Lmax-L)/(n*(n-1)*mu - n*L - 3*Lmax)), 1)
+end
+function b_hat_tight(n::Int, L, Lmax, mu)
+    # Tight formula?
+    # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{3L_{\max} - L}{nL - 3L_{\max}}}\\
+    return max(floor(sqrt( n*(3*Lmax - L)/(2*(n*L - 3*Lmax)) )), 1)
+end
+
 """
     optimal_minibatch_Free_SVRG_nice_tight(m, n, mu, L, Lmax)
 
 Compute the optimal mini-batch size when the inner loop size m = n for the Free-SVRG algorithm with b-nice sampling,
-     base don the theory that takes sketch residual into acount
+    based on the theory that takes sketch residual into acount.
 
 # INPUTS
 - **Int64** m: inner loop size
@@ -14,23 +25,6 @@ Compute the optimal mini-batch size when the inner loop size m = n for the Free-
 - **Int64** minibatch_size: theoretical mini-batch size for Free-SVRG with b-nice sampling
 """
 
-function b_tilde(n::Int, L, Lmax, mu)
-    # Wrong formula?
-    # # \tilde{b} &\eqdef & \tfrac{3n(L_{\max} - L)}{n(n-1)\mu- 3(nL - L_{\max})}
-    # return max(floor(3*n*(Lmax-L)/( n*(n-1)*mu- 3*(n*L - Lmax)  )), 1)
-
-    # \tilde{b} &\eqdef & \tfrac{n(3L_{\max} - L)}{n(n-1)\mu - nL + 3L_{\max})}
-    return max(floor(n*(3*Lmax-L)/(n*(n-1)*mu - n*L - 3*Lmax)), 1)
-end
-function b_hat(n::Int, L, Lmax, mu)
-    # Wrong formula?
-    # # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{L_{\max} - L}{nL - L_{\max}}}\\
-    # return max(floor(sqrt((n/2)*((Lmax - L)/(n*L - Lmax)))),1)
-
-    # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{3L_{\max} - L}{nL - 3L_{\max}}}\\
-    return max(floor(sqrt( n*(3*Lmax - L)/(2*(n*L - 3*Lmax)) )), 1)
-end
-
 function optimal_minibatch_Free_SVRG_nice_tight(m, n, mu, L, Lmax)
     if m == n
         flag = "none"
@@ -39,16 +33,16 @@ function optimal_minibatch_Free_SVRG_nice_tight(m, n, mu, L, Lmax)
                 minibatch_size = n
                 flag = "n"
             else
-                minibatch_size = b_hat(n, L, Lmax, mu)
+                minibatch_size = b_hat_tight(n, L, Lmax, mu)
                 flag = "b_hat"
             end
         elseif L/mu <= n <= 3*Lmax/mu
-            b_tilde_value = b_tilde(n, L, Lmax, mu) #( 3*n*(Lmax-L) ) / ( mu*n*(n-1) - 3*(n*L-Lmax) )
+            b_tilde_value = b_tilde_tight(n, L, Lmax, mu) #( 3*n*(Lmax-L) ) / ( mu*n*(n-1) - 3*(n*L-Lmax) )
             if 3*Lmax > n*L
                 minibatch_size = b_tilde_value
                 flag = "b_tilde"
             else
-                b_hat_value = b_hat(n, L, Lmax, mu) #sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
+                b_hat_value = b_hat_tight(n, L, Lmax, mu) #sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
                 minibatch_size = floor(Int, min(b_hat_value, b_tilde_value))
                 flag = "min"
             end
@@ -62,6 +56,17 @@ function optimal_minibatch_Free_SVRG_nice_tight(m, n, mu, L, Lmax)
     end
 
     return minibatch_size
+end
+
+function b_tilde(n::Int, L, Lmax, mu)
+    # Previous formula?
+    # \tilde{b} &\eqdef & \tfrac{3n(L_{\max} - L)}{n(n-1)\mu- 3(nL - L_{\max})}
+    return max(floor(3*n*(Lmax-L)/( n*(n-1)*mu- 3*(n*L - Lmax) )), 1)
+end
+function b_hat(n::Int, L, Lmax, mu)
+    # Previous formula?
+    # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{L_{\max} - L}{nL - L_{\max}}}\\
+    return max(floor(sqrt((n/2)*((Lmax - L)/(n*L - Lmax)))), 1)
 end
 
 """
@@ -119,15 +124,17 @@ Compute the optimal mini-batch size when the update probability is p = 1/n for t
 function optimal_minibatch_L_SVRG_D_nice(p, n, mu, L, Lmax)
     if norm(p - 1/n) < 1e-7
         flag = "none"
-        ksi_p = ( (7-4*p)*(1-(1-p)^1.5) ) / ( p*(2-p)*(3-2*p) )
-        if n < 0.5*ksi_p*3*L/mu
+        ksi_p = ( (7-4*p)*(1-(1-p)^1.5) ) / ( p*(2-p)*(3-2*p) ) # Defined in Theorem 5.1
+        if n < 1.5*ksi_p*L/mu
             minibatch_size = n
             flag = "n"
-        elseif 0.5*ksi_p*3*L/mu <= n <= 0.5*ksi_p*3*Lmax/mu
+        elseif 1.5*ksi_p*L/mu <= n <= 1.5*ksi_p*Lmax/mu
             b_hat = sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
             b_tilda = ( 0.5*ksi_p*3*n*(Lmax-L) ) / ( mu*n*(n-1) - 0.5*ksi_p*3*(n*L-Lmax) )
             if b_tilda < 1
                 error("b_tilda is non positive")
+            elseif b_hat < 1
+                error("b_hat is non positive")
             end
             minibatch_size = floor(Int, min(b_hat, b_tilda))
             flag = "min"
