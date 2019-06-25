@@ -14,13 +14,21 @@ Compute the optimal mini-batch size when the inner loop size m = n for the Free-
 - **Int64** minibatch_size: theoretical mini-batch size for Free-SVRG with b-nice sampling
 """
 
-function b_tilde(n::Int,  L,Lmax,mu)
-    # \tilde{b} &\eqdef & \tfrac{3n(L_{\max} - L)}{n(n-1)\mu- 3(nL - L_{\max})}
-    return max(floor(3*n*(Lmax-L)/( n*(n-1)*mu- 3*(n*L - Lmax)  )),1)
+function b_tilde(n::Int, L, Lmax, mu)
+    # Wrong formula?
+    # # \tilde{b} &\eqdef & \tfrac{3n(L_{\max} - L)}{n(n-1)\mu- 3(nL - L_{\max})}
+    # return max(floor(3*n*(Lmax-L)/( n*(n-1)*mu- 3*(n*L - Lmax)  )), 1)
+
+    # \tilde{b} &\eqdef & \tfrac{n(3L_{\max} - L)}{n(n-1)\mu - nL + 3L_{\max})}
+    return max(floor(n*(3*Lmax-L)/(n*(n-1)*mu - n*L - 3*Lmax)), 1)
 end
-function b_hat(n::Int,  L,Lmax,mu)
-    # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{L_{\max} - L}{nL - L_{\max}}}\\
-    return max(floor(sqrt((n/2)*((Lmax - L)/(n*L - Lmax)))),1)
+function b_hat(n::Int, L, Lmax, mu)
+    # Wrong formula?
+    # # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{L_{\max} - L}{nL - L_{\max}}}\\
+    # return max(floor(sqrt((n/2)*((Lmax - L)/(n*L - Lmax)))),1)
+
+    # \hat{b} &\eqdef & \sqrt{\tfrac{n}{2}\tfrac{3L_{\max} - L}{nL - 3L_{\max}}}\\
+    return max(floor(sqrt( n*(3*Lmax - L)/(2*(n*L - 3*Lmax)) )), 1)
 end
 
 function optimal_minibatch_Free_SVRG_nice_tight(m, n, mu, L, Lmax)
@@ -31,17 +39,17 @@ function optimal_minibatch_Free_SVRG_nice_tight(m, n, mu, L, Lmax)
                 minibatch_size = n
                 flag = "n"
             else
-                minibatch_size = b_hat(n,L,Lmax,mu)
+                minibatch_size = b_hat(n, L, Lmax, mu)
                 flag = "b_hat"
             end
         elseif L/mu <= n <= 3*Lmax/mu
-            b_tilde2 = b_tilde(n,L,Lmax,mu) #( 3*n*(Lmax-L) ) / ( mu*n*(n-1) - 3*(n*L-Lmax) )
+            b_tilde_value = b_tilde(n, L, Lmax, mu) #( 3*n*(Lmax-L) ) / ( mu*n*(n-1) - 3*(n*L-Lmax) )
             if 3*Lmax > n*L
-                minibatch_size = b_tilde(n,L,Lmax,mu)
+                minibatch_size = b_tilde_value
                 flag = "b_tilde"
             else
-                b_hat2 = b_hat(n,L,Lmax,mu) #sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
-                minibatch_size = floor(Int, min(b_hat2, b_tilde2))
+                b_hat_value = b_hat(n, L, Lmax, mu) #sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
+                minibatch_size = floor(Int, min(b_hat_value, b_tilde_value))
                 flag = "min"
             end
         else
@@ -78,9 +86,9 @@ function optimal_minibatch_Free_SVRG_nice(m, n, mu, L, Lmax)
             minibatch_size = n
             flag = "n"
         elseif 3*L/mu <= n <= 3*Lmax/mu
-            b_hat2 = b_hat(n,L,Lmax,mu) #sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
-            b_tilde2 = b_tilde(n,L,Lmax,mu) # ( 3*n*(Lmax-L) ) / ( mu*n*(n-1) - 3*(n*L-Lmax) )
-            minibatch_size = floor(Int, min(b_hat2, b_tilde2))
+            b_hat_value = b_hat(n, L, Lmax, mu) #sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
+            b_tilde_value = b_tilde(n, L, Lmax, mu) # ( 3*n*(Lmax-L) ) / ( mu*n*(n-1) - 3*(n*L-Lmax) )
+            minibatch_size = floor(Int, min(b_hat_value, b_tilde_value))
             flag = "min"
         else
             minibatch_size = 1
