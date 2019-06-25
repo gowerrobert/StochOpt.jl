@@ -208,9 +208,10 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     ############################## OPTIMAL FREE-SVRG ###############################
     ################################################################################
     ## Free-SVRG with optimal b-nice sampling ( m = n, b = b^*(n), step size = gamma^*(b^*) )
-    numinneriters = n                                                                   # inner loop size set to the number of data points
-    options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, n, mu, L, Lmax) # mini-batch size set to the optimal value for m=n (same for Free- and Leap-SVRG)
-    options.stepsize_multiplier = -1.0                                                  # theoretical step size set in boot_Free_SVRG
+    numinneriters = n                                                                         # inner loop size set to the number of data points
+    # options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, n, mu, L, Lmax)     # mini-batch size set to the optimal value for m=n (same for Free- and Leap-SVRG)
+    options.batchsize = optimal_minibatch_Free_SVRG_nice_tight(numinneriters, n, mu, L, Lmax) # mini-batch size set to the optimal value for m=n taking sketch residual into acount
+    options.stepsize_multiplier = -1.0                                                        # theoretical step size set in boot_Free_SVRG
     sampling = build_sampling("nice", n, options)
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
 
