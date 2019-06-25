@@ -33,29 +33,16 @@ precision = 10.0^(-6) # 10.0^(-6)
 
 ## File names
 # details = "final"
-details = "legend"
-# details = "test"
+# details = "legend"
+details = "test-rho"
 
 ## Bash input
-# all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 12 problems (true)
-# problems = parse.(Int64, ARGS)
-machine = ARGS[1]
-problems = [parse(Int64, ARGS[2])]
-println("problems: ", problems)
+all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
 
 using Distributed
 
 @everywhere begin
-    if machine == "lame10"
-        path = "/cal/homes/ngazagnadou/StochOpt.jl/"   # lame10
-    elseif machine == "lame23"
-        path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
-    elseif machine == "home"
-        path = "/home/nidham/phd/StochOpt.jl/"         # local
-    else
-        error("Unkown machine name (first argument)")
-    end
-    println("path: ", path)
+    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
@@ -100,35 +87,23 @@ end
 #endregion
 
 ## Experiments settings
-# if all_problems
-#     problems = 1:16
-# else
-#     problems = 1:1
-# end
+if all_problems
+    problems = 1:8
+else
+    problems = 1:1
+end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "covtype_binary", "covtype_binary",                 # scaled,         n = 581,012, d =     54
             "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim",                             # unscaled,       n =  72,309, d = 20,958
-            "a1a_full", "a1a_full",                             # unscaled,       n =  32,561, d =    123
-            "colon-cancer", "colon-cancer",                     # already scaled, n =   2,000, d =     62
-            "leukemia_full", "leukemia_full"]                   # already scaled, n =      62, d =  7,129
+            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
-            "column-scaling", "column-scaling",
-            "none", "none",
-            "none", "none",
-            "none", "none",
             "none", "none"]
 
 lambdas = [10^(-1), 10^(-3),
-           10^(-1), 10^(-3),
-           10^(-1), 10^(-3),
-           10^(-1), 10^(-3),
-           10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
@@ -138,18 +113,10 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
                [25000 6500 -2. 5500], # 2)  ijcnn1_full + scaled + 1e-3                midnight retry / FINAL
                [60000 40000 -2. 25000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
                [10^4 10^4 -2. 10^4],  # 4)  YearPredictionMSD_full + scaled + 1e-3     too long
-               [10^3 10^3 -2. 10^3],  # 5)  covtype_binary + scaled + 1e-1
-               [10^3 10^3 -2. 10^3],  # 6)  covtype_binary + scaled + 1e-3
-               [50000 50000 -2. 50000],  # 7)  slice + scaled + 1e-1                   midnight retry / FINAL
-               [50000 50000 -2. 50000],  # 8)  slice + scaled + 1e-3                   midnight retry / FINAL
-               [   5   3 -2.    3],  # 9)  real-sim + unscaled + 1e-1                  midnight retry / FINAL
-               [600  150 -2.  100],  # 10) real-sim + unscaled + 1e-3                  midnight retry / FINAL
-               [10^2 10^3 -2. 10^3],  # 11) a1a_full + unscaled + 1e-1
-               [10^2 10^3 -2. 10^3],  # 12) a1a_full + unscaled + 1e-3
-               [10^2 10^3 -2. 10^3],  # 13) colon-cancer + unscaled + 1e-1
-               [10^2 10^3 -2. 10^3],  # 14) colon-cancer + unscaled + 1e-3
-               [10^2 10^3 -2. 10^3],  # 15) leukemia_full + unscaled + 1e-1
-               [10^2 10^3 -2. 10^3]]  # 16) leukemia_full + unscaled + 1e-3
+               [50000 50000 -2. 50000],  # 5)  slice + scaled + 1e-1                   midnight retry / FINAL
+               [50000 50000 -2. 50000],  # 6)  slice + scaled + 1e-3                   midnight retry / FINAL
+               [   5   3 -2.    3],  # 7)  real-sim + unscaled + 1e-1                  midnight retry / FINAL
+               [600  150 -2.  100]]  # 8) real-sim + unscaled + 1e-3                  midnight retry / FINAL
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
