@@ -15,8 +15,8 @@ where <number_of_processor_to_add> has to be replaced by the user.
 - Else, <boolean> == true, all XX problems are launched
 
 ## --- EXAMPLE OF RUNNING TIME ---
-Running time of the first problem only when adding XX processors on XXXX
-XXXX, around XXmin
+Running time of the first problem only
+XXXX, around 5min
 Running time of all problems when adding XX processors on XXXX
 XXXX, around XXmin
 

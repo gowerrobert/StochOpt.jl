@@ -12,6 +12,7 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 >julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_vs_m.jl
 
 ## --- EXAMPLE OF RUNNING TIME ---
+5min for false
 
 ## --- SAVED FILES ---
 
