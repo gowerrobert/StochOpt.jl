@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 10^3
+max_epochs = 10^8
 max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
@@ -129,7 +129,11 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     Random.seed!(1)
 
-    if idx_prob == 7 || idx_prob == 8
+    if idx_prob == 3
+        global max_epochs = 10
+    elseif idx_prob == 4
+        global max_epochs = 13
+    elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
     end
 
@@ -210,7 +214,9 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     ## Free-SVRG with optimal b-nice sampling ( m = n, b = b^*(n), step size = gamma^*(b^*) )
     numinneriters = n                                                                         # inner loop size set to the number of data points
     # options.batchsize = optimal_minibatch_Free_SVRG_nice(numinneriters, n, mu, L, Lmax)     # mini-batch size set to the optimal value for m=n (same for Free- and Leap-SVRG)
-    options.batchsize = optimal_minibatch_Free_SVRG_nice_tight(numinneriters, n, mu, L, Lmax) # mini-batch size set to the optimal value for m=n taking sketch residual into acount
+    # Mini-batch size set to the optimal value for m=n taking sketch residual into acount
+    # /!\ Not the same for Leap-SVRG anymore, but can be used for the latter as an approximation
+    options.batchsize = optimal_minibatch_Free_SVRG_nice_tight(numinneriters, n, mu, L, Lmax)
     options.stepsize_multiplier = -1.0                                                        # theoretical step size set in boot_Free_SVRG
     sampling = build_sampling("nice", n, options)
     free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
@@ -285,7 +291,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1b-$(suffix)-$(details)")
-    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+    save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     if idx_prob == 8
         legendpos = :best

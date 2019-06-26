@@ -27,7 +27,7 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 10^3
+max_epochs = 10^8
 max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
@@ -128,8 +128,10 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     Random.seed!(1)
 
-    if idx_prob == 3 || idx_prob == 4
-        global max_epochs = 11
+    if idx_prob == 3
+        global max_epochs = 10
+    elseif idx_prob == 4
+        global max_epochs = 13
     elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
     end
@@ -293,7 +295,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-$(suffix)-$(details)", path=save_path, legendpos=:topright, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-$(suffix)-$(details)", path=save_path, nolegend=true)
 
     println("\nSTRONG CONVEXITY : ", prob.mu, "\n")
 

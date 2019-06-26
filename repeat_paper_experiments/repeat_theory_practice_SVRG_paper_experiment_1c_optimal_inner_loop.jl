@@ -27,8 +27,8 @@ For each problem (data set + scaling process + regularization)
 """
 
 ## General settings
-max_epochs = 10^3
-max_time = 9000.0 # should be enough # old limit = 60.0*60.0*4.0
+max_epochs = 10^8
+max_time = 60.0*60.0*24.0
 precision = 10.0^(-6) # 10.0^(-6)
 
 ## File names
@@ -109,14 +109,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1                midnight retry / FINAL
-               [25000 6500 -2. 5500], # 2)  ijcnn1_full + scaled + 1e-3                midnight retry / FINAL
+skip_errors = [[700 200 -2. 150],        # 1)  ijcnn1_full + scaled + 1e-1                midnight retry / FINAL
+               [25000 6500 -2. 5500],    # 2)  ijcnn1_full + scaled + 1e-3                midnight retry / FINAL
                [60000 40000 -2. 25000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
-               [10^4 10^4 -2. 10^4],  # 4)  YearPredictionMSD_full + scaled + 1e-3     too long
+               [30000 20000 -2. 20000],  # 4)  YearPredictionMSD_full + scaled + 1e-3     new try
                [50000 50000 -2. 50000],  # 5)  slice + scaled + 1e-1                   midnight retry / FINAL
                [50000 50000 -2. 50000],  # 6)  slice + scaled + 1e-3                   midnight retry / FINAL
-               [   5   3 -2.    3],  # 7)  real-sim + unscaled + 1e-1                  midnight retry / FINAL
-               [600  150 -2.  100]]  # 8) real-sim + unscaled + 1e-3                  midnight retry / FINAL
+               [   5   3 -2.    3],      # 7)  real-sim + unscaled + 1e-1                  midnight retry / FINAL
+               [600  150 -2.  100]]      # 8)  real-sim + unscaled + 1e-3                  midnight retry / FINAL
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -128,7 +128,11 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
 
     Random.seed!(1)
 
-    if idx_prob == 7 || idx_prob == 8
+    if idx_prob == 3
+        global max_epochs = 10
+    elseif idx_prob == 4
+        global max_epochs = 16
+    elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
     end
 
@@ -275,11 +279,11 @@ skip_errors = [[700 200 -2. 150],     # 1)  ijcnn1_full + scaled + 1e-1         
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1c-$(suffix)-$(details)")
-    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+    save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
 
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1c-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1c-$(suffix)-$(details)", path=save_path, legendpos=:topright, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1c-$(suffix)-$(details)", path=save_path, nolegend=true)
 
     println("\nSTRONG CONVEXITY : ", prob.mu, "\n")
 

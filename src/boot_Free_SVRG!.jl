@@ -89,8 +89,12 @@ function boot_Free_SVRG!(prob::Prob, method::Free_SVRG_method, options::MyOption
         method.stepsize = options.stepsize_multiplier
     elseif options.stepsize_multiplier == -1.0
         if occursin("nice", method.sampling.name)
-            method.stepsize = 1.0/(6.0*method.expected_smoothness) # theoretical optimal value for b-nice sampling
+            # method.stepsize = 1.0/(6.0*method.expected_smoothness) # theoretical "loose" optimal value for b-nice sampling
+            method.stepsize = 1.0/(2.0*(method.expected_smoothness + 2.0*method.expected_residual)) # theoretical tight optimal value for b-nice sampling
+            println("\n-----------------------------------------------------------------")
+            println("OLD FREE-SVRG STEP SIZE: ", 1.0/(6.0*method.expected_smoothness))
             println("Automatically set Free-SVRG step size: ", method.stepsize)
+            println("-----------------------------------------------------------------\n")
         else
             error("No theoretical step size available for Free-SVRG with this sampling")
         end

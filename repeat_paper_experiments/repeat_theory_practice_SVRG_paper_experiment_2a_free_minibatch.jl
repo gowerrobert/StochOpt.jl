@@ -1,7 +1,7 @@
 """
 ### "Towards closing the gap between the theory and practice of SVRG", O. Sebbouh, S. Jelassi, N. Gazagnadou, F. Bach, R. M. Gower (2019)
 
-## --- EXPERIMENT 3 ---
+## --- EXPERIMENT 2.A ---
 Goal: Comparing Free-SVRG with m=n for different mini-batch sizes {1, 100, \\sqrt{n}, n, b^*}.
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
@@ -9,7 +9,7 @@ Goal: Comparing Free-SVRG with m=n for different mini-batch sizes {1, 100, \\sqr
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_3_free_minibatch.jl
+>julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl
 
 ## --- EXAMPLE OF RUNNING TIME ---
 
@@ -18,8 +18,8 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 """
 
 ## General settings
-max_epochs = 10^3
-max_time = 60.0*60.0*6.0 # 5000.0
+max_epochs = 10^8
+max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
@@ -59,7 +59,7 @@ save_path = "$(path)experiments/theory_practice_SVRG/"
 if !isdir(save_path)
     mkdir(save_path)
 end
-save_path = "$(save_path)exp3/"
+save_path = "$(save_path)exp2a/"
 if !isdir(save_path)
     mkdir(save_path)
 end
@@ -131,7 +131,7 @@ skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1  
 
     Random.seed!(1)
 
-    if idx_prob == 7 || idx_prob == 8
+    if idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
     end
 
@@ -172,7 +172,10 @@ skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1  
     L = prob.L
 
     ## Computing theoretical optimal mini-batch size for b-nice sampling with inner loop size m = n
-    b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
+    # b_theoretical = optimal_minibatch_Free_SVRG_nice(n, n, mu, L, Lmax) # optimal b for Free-SVRG when m=n
+    # Mini-batch size set to the optimal value for m=n taking sketch residual into acount
+    # /!\ Not the same for Leap-SVRG anymore, but can be used for the latter as an approximation
+    b_theoretical = optimal_minibatch_Free_SVRG_nice_tight(n, n, mu, L, Lmax)
     println("------------------------------------------------------------")
     println("Theoretical mini-batch: ", b_theoretical)
     println("------------------------------------------------------------\n")
@@ -226,10 +229,10 @@ skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1  
     end
 
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp3-$(suffix)-$(details)")
-    save("$(save_path)data/$(savename).jld", "OUTPUTS", OUTPUTS)
+    savename = string(savename, "-exp2a-$(suffix)-$(details)")
+    save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
 
-    if idx_prob == 7 || idx_prob == 8
+    if idx_prob == 5 || idx_prob == 6
         legendpos = :best
     else
         legendpos = :topright
@@ -237,10 +240,10 @@ skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1  
 
     legendtitle = "Mini-batch size b"
     pyplot()
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendtitle=legendtitle, legendfont=8)
+    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2a-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendtitle=legendtitle, legendfont=8)
 
 end
 end
 
-println("\n\n--- EXPERIMENT 3 FINISHED ---")
+println("\n\n--- EXPERIMENT 2.A FINISHED ---")
