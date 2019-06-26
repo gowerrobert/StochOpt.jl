@@ -36,17 +36,17 @@ function optimal_minibatch_Free_SVRG_nice_tight(m, n, mu, L, Lmax)
                 flag = "n"
             else
                 minibatch_size = max(floor(b_hat_tight(n, L, Lmax)), 1)
-                flag = "b_hat"
+                flag = "b_hat_tight"
             end
         elseif L/mu <= n <= 3*Lmax/mu
             b_tilde_value = max(floor(b_tilde_tight(n, L, Lmax, mu)), 1) #( 3*n*(Lmax-L) ) / ( mu*n*(n-1) - 3*(n*L-Lmax) )
             if 3*Lmax > n*L
                 minibatch_size = b_tilde_value
-                flag = "b_tilde"
+                flag = "b_tilde_tight"
             else
                 b_hat_value = max(floor(b_hat_tight(n, L, Lmax)), 1) #sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
                 minibatch_size = floor(Int, min(b_hat_value, b_tilde_value))
-                flag = "min"
+                flag = "min_tight"
             end
         else
             minibatch_size = 1
