@@ -81,7 +81,7 @@ function load_ridge_regression(X, y::Array{Float64}, name::AbstractString, opts:
         end
         ## Saving the computed strong convexity
         mu_filename = get_mu_filename(prob)
-        save("$(mu_filename).jld", "mu", prob.mu)
+        save("$(mu_filename).jld", "mu", prob.mu) # path = "./data/...-strong_convexity.jld"
     end
     print("\n")
 

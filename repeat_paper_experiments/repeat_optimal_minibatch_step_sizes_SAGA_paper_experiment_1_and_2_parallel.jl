@@ -34,7 +34,8 @@ using Distributed
 
 @everywhere begin
     # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
-    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
+    path = "/home/infres/ngazagnadou/new_StochOpt.jl/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
@@ -81,7 +82,7 @@ scalings = collect(Iterators.flatten([Iterators.flatten(fill(["none", "none", "c
 lambdas = collect(Iterators.flatten(fill([10^(-1), 10^(-3)], 21)))
 
 data_path = "$(path)data/";
-save_path = "$(path)experiments/SAGA_nice/";
+save_path = "$(path)experiments/SAGA_nice/exp1/";
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -153,8 +154,7 @@ save_path = "$(path)experiments/SAGA_nice/";
     ########################################### SAVNG RESULTS ########################################################
     println("\n--- Saving the bounds ---");
     save_SAGA_nice_constants(prob, data, simple_bound, bernstein_bound, practical_approx, expsmoothcst,
-                             simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size,
-                             path=save_path);
+                             simple_step_size, bernstein_step_size, practical_step_size, expsmooth_step_size);
     ##################################################################################################################
 
 end

@@ -48,3 +48,4 @@ experiments/SVRG/*
 experiments/theory_practice_SVRG/*
 retrieve_from_lame23.sh
 sync_to_lame23.sh
+list_exp_commands_lame23.txt

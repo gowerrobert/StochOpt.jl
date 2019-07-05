@@ -35,7 +35,8 @@ using Distributed
 
 @everywhere begin
     # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
-    path = "/cal/homes/ngazagnadou/StochOpt.jl/"
+    # path = "/cal/homes/ngazagnadou/StochOpt.jl/" # lame10
+    path = "/home/infres/ngazagnadou/new_StochOpt.jl/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
@@ -55,16 +56,19 @@ using Distributed
     pyplot() # No problem with pyplot when called in @everywhere statement
 end
 
-save_path = "$(path)experiments/SAGA_nice/";
+save_path = "$(path)experiments/SAGA_nice/exp3/";
 # Create saving directories if not existing
+if !isdir("$(save_path)")
+    mkdir("$(save_path)")
+end
 if !isdir("$(save_path)data/")
-    mkdir("$(save_path)data/");
+    mkdir("$(save_path)data/")
 end
 if !isdir("$(save_path)figures/")
-    mkdir("$(save_path)figures/");
+    mkdir("$(save_path)figures/")
 end
 if !isdir("$(save_path)outputs/")
-    mkdir("$(save_path)outputs/");
+    mkdir("$(save_path)outputs/")
 end
 
 #region
@@ -132,7 +136,7 @@ end
 
 ## Experiments settings
 numsimu = 1;                 # Increase the number of simulations to compute an average of the empirical total complexity of each method
-relaunch_gridsearch = false; # Change to true for recomputing the grid search on the step sizes
+relaunch_gridsearch = false;  # Change to true for recomputing the grid search on the step sizes
 if all_problems
     problems = 1:12;
 else
@@ -160,16 +164,16 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3),
            10^(-1), 10^(-3)];
 
-skip_errors = [[10^4 1 1 500],        # ijcnn1_full + scaled + 1e-1
-               [10^4 500 500 10^3],  # ijcnn1_full + scaled + 1e-3
+skip_errors = [[10^4 1 1 500],         # ijcnn1_full + scaled + 1e-1
+               [10^4 500 500 10^3],    # ijcnn1_full + scaled + 1e-3
                [10^4 10 10 10^4],      # YearPredictionMSD_full + scaled + 1e-1
-               [10^4 10^3 10 10^4],    # YearPredictionMSD_full + scaled + 1e-3
-               [10^5 10 10 10^5],    # covtype_binary + scaled + 1e-1
+               [10^4 10 1 10^4],        # YearPredictionMSD_full + scaled + 1e-3 # a relancer
+               [10^5 10 10 10^5],      # covtype_binary + scaled + 1e-1
                [10^6 10^4 10^3 10^6],  # covtype_binary + scaled + 1e-3
                [10^4 10^3 10^3 10^4],  # slice + scaled + 1e-1
                [10^5 10^5 10^5 10^5],  # slice + scaled + 1e-3
                [10^4 10^2 10^2 10^2],  # slice + unscaled + 1e-1
-               [10^3 5000 5000 10^4],  # slice + unscaled + 1e-3
+               [2000 5000 5000 10^4],  # slice + unscaled + 1e-3 # a relancer
                [10^4 1 1 10^3],        # real-sim + unscaled + 1e-1
                [10^4 10 10 10^3]];     # real-sim + unscaled + 1e-3
 
@@ -258,7 +262,7 @@ precision = 10.0^(-4)
                 2.0^(-21), 2.0^(-23), 2.0^(-25), 2.0^(-27), 2.0^(-29), 2.0^(-31), 2.0^(-33)];
         nbskip = closest_power_of_ten(round.(Int, n ./ b_practical ));
         output = calculate_best_stepsize_SAGA_nice(prob, options, skip=nbskip, max_time=180.0,
-                                                   rep_number=1, batchsize=b_practical, grid=grid);
+                                                   rep_number=3, batchsize=b_practical, grid=grid);
         step_practical_gridsearch, = get_saved_stepsize(prob.name, method_name, options);
     end
 

@@ -84,32 +84,17 @@ julia ./repeat_paper_experiments/test_optimal_minibatch_SAGA_nice.jl
 
 To re-generate the experiments from Section 5.1 & 5.2 of [5] (~1h 30min)
 ```julia
-julia ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2.jl all_problems
-```
-setting `all_problems` to `false` to run the code only on the first two problem, unscaled *uniform* synthetic dataset with $\lambda =10^{-1}$), (~7min) or to `true` to run it on all of them (~1h 22min).
-Or using the parallel implementation
-```julia
 julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, unscaled *uniform* synthetic dataset with $\lambda =10^{-1}$, (~XXXXXmin) or to `true` to run it on all of them (~XXXXXXXXh XXXXXmin).
 
 To re-generate experiments from Section 5.3 of [5]
 ```julia
-julia ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3.jl all_problems
-```
-setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~1min) or to `true` to run it on all of them (~2h 09min).
-Or using the parallel implementation
-```julia
 julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~1min) or to `true` to run it on all of them (~1h 30min).
 
 To re-generate the experiments from Section 5.4 of [5]
-```julia
-julia ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4.jl all_problems
-```
-setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~2min) or to `true` to run it on all of them (~XXh XXmin).
-Or using the parallel implementation
 ```julia
 julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl all_problems
 ```

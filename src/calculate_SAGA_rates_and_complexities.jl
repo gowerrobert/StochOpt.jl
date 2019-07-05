@@ -302,8 +302,7 @@ end
                              simple_step_size, bernstein_step_size,
                              practical_step_size, expsmooth_step_size,
                              b_simple, b_bernstein,
-                             b_practical, b_exact,
-                             path="./")
+                             b_practical, b_exact)
 
 Saves the problem, caracteristic constants of the problem, the upper bounds of the expected
 smoothness constant, and corresponding estimation of the optimal mini-batch size.
@@ -330,7 +329,6 @@ optimal mini-batch size (both are of type Nothing if not available).
     - **Int64** b_bernstein: bernstein bound optimal mini-batch size estimate\\
     - **Int64** b_practical: practical optimal mini-batch size approximation\\
     - **Int64** b_exact: theoretical exact optimal mini-batch size\\
-    - **AbstractString** path: path to the folder where the plots are saved\\
 #OUTPUTS:\\
     - None
 """
@@ -340,10 +338,10 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
                                   simple_step_size::Array{Float64}, bernstein_step_size::Array{Float64},
                                   practical_step_size::Array{Float64}, expsmooth_step_size,
                                   b_simple::Int64=0, b_bernstein::Int64=0,
-                                  b_practical::Int64=0, b_exact::Int64=0 ; path::AbstractString="./")
+                                  b_practical::Int64=0, b_exact::Int64=0)
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
     savename = "-exp1-cst";
-    path = string(path, "data/");
+    default_path = "./experiments/SAGA_nice/exp1/data/"; # new path
 
     n = prob.numdata;
     d = prob.numfeatures;
@@ -363,7 +361,7 @@ function save_SAGA_nice_constants(prob::Prob, data::String,
     end
 
     ## Saving the problem and the related constants
-    save("$(path)$(probname)$(savename).jld",
+    save("$(default_path)$(probname)$(savename).jld",
          "mu", prob.mu, "L", prob.L, "Lmax", prob.Lmax, "Lbar", prob.Lbar, "Li_s", Li_s,
          "simple_bound", simple_bound, "bernstein_bound", bernstein_bound,
          "practical_approx", practical_approx, "expsmoothcst", expsmoothcst,

@@ -1,0 +1,4 @@
+ridge_YearPredictionMSD_full-column-scaling-regularizor-1e-01_without_hofmann-exp3 stepsize_multiplier 
+$b_\mathrm{Defazio} \; \; = 1 \ \ , \gamma_\mathrm{Defazio} \ \ \: \: = 3.01e-06$ : 2^ -18.34277684832333
+$b_\mathrm{practical} \, = 1940 \ , \gamma_\mathrm{practical} \ \ = 9.84e-03$ : 2^ -6.667623067924603
+$b_\mathrm{practical} \, = 1940 \ , \gamma_\mathrm{grid search} = 3.13e-02$ : 2^ -5.0
