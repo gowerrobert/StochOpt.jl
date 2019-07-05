@@ -76,7 +76,7 @@ end
 if all_problems
     problems = 1:8
 else
-    problems = 1:1
+    problems = [3, 4, 7, 8] #1:1
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
@@ -97,12 +97,12 @@ lambdas = [10^(-1), 10^(-3),
 ## Set smaller number of skipped iteration for more data points
 skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1              b^* = 1
                [7000 5000 3000 70 7000],      # 2) ijcnn1_full + scaled + 1e-3              b^* = 1
-               [30000 10000 5000 10 30000],   # 3) YearPredictionMSD_full + scaled + 1e-1   b^* = 1          moins de 3h a tourner
-               [30000 10000 5000 10 30000],   # 4) YearPredictionMSD_full + scaled + 1e-3   b^* = 2
+               [30000 20000 10000 10 30000],  # 3) YearPredictionMSD_full + scaled + 1e-1   b^* = 1          moins de 3h a tourner
+               [30000 20000 10000 10 30000],  # 4) YearPredictionMSD_full + scaled + 1e-3  b^* = 2
                [25000 2000 1000 1 2500],      # 5) slice + scaled + 1e-1                    b^* = 22         moins de 3h a tourner
                [25000 2000 1000 1 2500],      # 6) slice + scaled + 1e-3                    b^* = n = 53500  moins de 3h a tourner
-               [2000 1000 500 1 2000],        # 7) real-sim + unscaled + 1e-1               b^* = 1
-               [5000 2500 1000 1 5000]]       # 8) real-sim + unscaled + 1e-3               b^* = 1 (for approx mu)
+               [2000 2000 1000 1 2000],       # 7) real-sim + unscaled + 1e-1               b^* = 1
+               [5000 5000 2000 1 8000]]       # 8) real-sim + unscaled + 1e-3               b^* = 1
 
 # max_epochs_list = [ 300, # 1)  ijcnn1_full + scaled + 1e-1
 #                    1000, # 2)  ijcnn1_full + scaled + 1e-3

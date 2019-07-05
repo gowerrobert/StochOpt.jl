@@ -96,14 +96,14 @@ lambdas = [10^(-1), 10^(-3),
 
 ## Set smaller number of skipped iteration for more data points
 #          m =   n      2n    Lmax/mu   m*
-skip_errors = [[7000   7000     200    300],   # 1)  ijcnn1_full + scaled + 1e-1             m^* =
-               [7000   7000    6500   6500],   # 2)  ijcnn1_full + scaled + 1e-3             m^* =
-               [30000  30000   40000  40000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  m^* =
-               [40000  40000   20000  20000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  m^* =
-               [40000  40000   50000  50000],  # 5)  slice + scaled + 1e-1                   m^* =
-               [40000  40000   50000  50000],  # 6)  slice + scaled + 1e-3                   m^* =
-               [2000   2000      3      3],    # 7)  real-sim + unscaled + 1e-1              m^* =
-               [5000   5000     150    150]]   # 8) real-sim + unscaled + 1e-3               m^* =
+skip_errors = [[8000   8000     200    300],   # 1)  ijcnn1_full + scaled + 1e-1             m^* =
+               [7000   8000    6500   7500],   # 2)  ijcnn1_full + scaled + 1e-3             m^* =
+               [30000  40000   40000  45000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  m^* =
+               [60000  40000   30000  20000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  m^* =
+               [45000  45000   45000  55000],  # 5)  slice + scaled + 1e-1                   m^* =
+               [45000  45000   45000  55000],  # 6)  slice + scaled + 1e-3                   m^* =
+               [4000   4000      4      4],    # 7)  real-sim + unscaled + 1e-1              m^* =
+               [7000   7000     200    200]]   # 8)  real-sim + unscaled + 1e-3              m^* =
 
 @time begin
 @sync @distributed for idx_prob in problems
