@@ -20,12 +20,12 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 10.0 # 60.0*60.0*24.0
+max_time = 60.0*10.0 # 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-details = "final"
-# details = "test-rho"
+# details = "final"
+details = "test"
 
 ## Bash input
 all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
@@ -33,6 +33,7 @@ all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
 using Distributed
 
 @everywhere begin
+    # path = "/home/nidham/phd/StochOpt.jl/" # Change the full path here
     path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
 
     using JLD
@@ -52,6 +53,13 @@ using Distributed
     # gr()
     pyplot() # No problem with pyplot when called in @everywhere statement
 end
+
+if path == "/home/infres/ngazagnadou/StochOpt.jl/"
+    suffix = "lame23"
+else
+    suffix = "home"
+end
+
 
 ## Create saving directories if not existing
 save_path = "$(path)experiments/theory_practice_SVRG/"
@@ -97,26 +105,25 @@ lambdas = [10^(-1), 10^(-3),
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
 skip_multipliers = [0.01,  #
                     0.01,  #
-                    0.01,  #
-                    0.01,  #
-                    0.01,  #
-                    0.01,  #
+                    0.1,  #
+                    0.1,  #
+                    0.1,  #
+                    0.1,  #
                     0.01,  #
                     0.01]  #
-
 
 @time begin
 @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
     scaling = scalings[idx_prob]
     lambda = lambdas[idx_prob]
-    skip_error = skip_errors[idx_prob]
     println("EXPERIMENT : ", idx_prob, " over ", length(problems))
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
     Random.seed!(1)
 
     if idx_prob == 5 || idx_prob == 6
+        global precision = 10.0^(-3)
         global max_epochs = 100
     end
 
@@ -156,26 +163,29 @@ skip_multipliers = [0.01,  #
     L = prob.L
 
     #############################
+    numinneriters = n
+    b_optimal = optimal_minibatch_Free_SVRG_nice_tight(numinneriters, n, mu, L, Lmax)
 
-    b_optimal = round(Int, 1 + (mu*(n-1))/(4*(L+lambda)))
 
     ## Computing the empirical mini-batch size over a grid
-    # minibatchgrid = vcat(2 .^ collect(0:7), 2 .^ collect(8:2:floor(Int, log2(n))))
-    if data == "covtype_binary"
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
-    elseif data == "ijcnn1_full" && lambda == 10^(-1)
+    if data == "ijcnn1_full"
+        # minibatchgrid = [2^0, 2^5, n] # debugging
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
+    elseif data == "YearPredictionMSD_full"
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
+    elseif data == "slice"
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, n]
     elseif data == "real-sim"
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16]
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
     else
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14]
+        error("No mini-batch grid available for this dataset")
     end
 
-    println("---------------------------------- MINI-BATCH GRID ------------------------------------------");
-    println(minibatchgrid);
-    println("---------------------------------------------------------------------------------------------");
+    println("---------------------------------- MINI-BATCH GRID ------------------------------------------")
+    println(minibatchgrid)
+    println("---------------------------------------------------------------------------------------------")
 
-    OUTPUTS, itercomplex = simulate_Free_SVRG_nice(prob, minibatchgrid, options, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], path=save_path)
+    OUTPUTS, itercomplex = simulate_Free_SVRG_nice(prob, minibatchgrid, options, save_path, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], suffix="$(suffix)-$(details)")
 
     ## Checking that all simulations reached tolerance
     fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];
@@ -186,45 +196,28 @@ skip_multipliers = [0.01,  #
     end
 
     ## Computing the empirical complexity
-    empcomplex = reshape(minibatchgrid .* itercomplex, length(minibatchgrid)); # mini-batch size times number of iterations
+    empcomplex = reshape(minibatchgrid .* itercomplex, length(minibatchgrid)) # mini-batch size times number of iterations
     min_empcomplex, idx_min = findmin(empcomplex)
     b_empirical = minibatchgrid[idx_min]
 
     ## Saving the result of the simulations
-    if path == "/home/infres/ngazagnadou/StochOpt.jl/"
-        suffix = "lame23"
-    end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    savename = string(savename, "-exp3-$(numsimu)-avg-$(suffix)-$(details)")
+    savename = string(savename, "-exp3-$(numsimu)-avg")
     savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")) # Extra suffix to check which skip values to keep
+    savename = string(savename, "-$(suffix)-$(details)")
     if numsimu == 1
         save("$(save_path)data/$(savename).jld",
         "options", options, "minibatchgrid", minibatchgrid,
         "itercomplex", itercomplex, "empcomplex", empcomplex,
-        "b_empirical", b_empirical);
+        "b_empirical", b_empirical)
     end
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=:topleft)
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=:topleft, suffix=suffix)
 
     println("Practical optimal mini-batch = ", b_optimal)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
-
-    #############################
-
-    # ## Saving outputs and plots
-    # if path == "/home/infres/ngazagnadou/StochOpt.jl/"
-    #     suffix = "lame23"
-    # end
-    # savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    # savename = string(savename, "-exp3-$(suffix)-$(details)")
-    # save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
-
-    # legendpos = :topright
-    # legendtitle = "Inner loop size m"
-    # pyplot()
-    # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp3-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendtitle=legendtitle, legendfont=8)
 
 end
 end

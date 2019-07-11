@@ -228,16 +228,21 @@ Saves the plot of the empirical total complexity.
     - **Int64** b_practical: heuristic optimal mini-batch size\\
     - **Int64** b_empirical: empirical optimal mini-batch size\\
     - **AbstractString** path: path to the folder where the plots are saved\\
-    - **Symbol** legendpos: position of the legend
+    - **Symbol** legendpos: position of the legend\\
+    - **AbstractString** suffix: suffix added to saved file names\\
 #OUTPUTS:\\
     - None
 """
 function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", skip_multiplier::Float64=0.0, legendpos::Symbol=:best)
+                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", skip_multiplier::Float64=0.0, legendpos::Symbol=:best, suffix::AbstractString="")
     numsimu = 1
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     default_path = "$(path)figures/"; # new path
+
+    if suffix != ""
+        suffix = "-$(suffix)"
+    end
 
     fontmed = 12
     fontbig = 15
@@ -266,5 +271,6 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
     if skip_multiplier > 0.0
         savename = string(savename, "_skip_mult_", replace(string(skip_multiplier), "." => "_")); # Extra suffix to check which skip values to keep
     end
+    savename = "$(savename)$(suffix)"
     savefig("$(default_path)$(probname)$(savename).pdf")
 end

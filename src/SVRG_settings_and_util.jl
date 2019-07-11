@@ -182,8 +182,8 @@ end
 
 
 """
-    simulate_Free_SVRG_nice(prob, minibatchgrid, options,
-                       numsimu=1, skipped_errors=1, skip_multiplier=0.02, path="./")
+    simulate_Free_SVRG_nice(prob, minibatchgrid, options, save_path,
+                       numsimu=1, skipped_errors=1, skip_multiplier=0.02)
 
 Runs several times (numsimu) mini-batch Free-SVRG with nice sampling for each
 mini-batch size in the given list (minibatchgrid) in order to evaluate the
@@ -193,24 +193,27 @@ corresponding average iteration complexity.
     - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
     - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
     - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
+    - **AbstractString** save_path: path to the folder where the plots are saved\\
     - **Int64** numsimu: number of runs of mini-batch Free-SVRG\\
     - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
     - **Float64** skip\\_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
-    - **AbstractString** path: path to the folder where the plots are saved\\
+    - **AbstractString** suffix: suffix added to saved file names\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(minibatchgrid)*numsimu\\
     - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
 """
-function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions ;
-                                 numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
+function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions, save_path::AbstractString ;
+                                 numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, suffix::AbstractString="")
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/b
 
-    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-    path = string(path, "data/")
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+
+    if suffix != ""
+        suffix = "-$(suffix)"
+    end
 
     n = prob.numdata
-
     itercomplex = zeros(length(minibatchgrid), 1) # List of saved outputs
     OUTPUTS = []
     for idx_b in 1:length(minibatchgrid)
@@ -220,7 +223,7 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
         if skipped_errors < -1 || skipped_errors == 0
             error("skipped_errors has to be set to -1 (auto) or to a positive integer")
         elseif skipped_errors == -1
-            options.skip_error_calculation = compute_skip_error_SVRG(n, b, skip_multiplier)
+            options.skip_error_calculation = compute_skip_error_SVRG(n, b, skip_multiplier) ## Maybe a better parametrization exists ...
             println("The number of skipped calculations of the error has been automatically set to ", options.skip_error_calculation)
         else
             options.skip_error_calculation = skipped_errors
@@ -269,8 +272,8 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
     itercomplex = itercomplex[:]
 
     ## Saving the result of the simulations
-    savename = "-exp1a-empcomplex-$(numsimu)-avg"
-    save("$(path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
+    savename = "-exp3-empcomplex-$(numsimu)-avg$(suffix)"
+    save("$(save_path)data/$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
 
     return OUTPUTS, itercomplex
 end
