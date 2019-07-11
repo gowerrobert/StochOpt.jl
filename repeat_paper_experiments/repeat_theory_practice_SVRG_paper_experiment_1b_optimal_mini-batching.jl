@@ -32,9 +32,9 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "final"
+details = "final"
 # details = "legend"
-details = "test-rho"
+# details = "test-rho"
 
 ## Bash input
 all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
@@ -293,7 +293,7 @@ skip_errors = [[700 7000 -2. 7000],     # 1)  ijcnn1_full + scaled + 1e-1       
     savename = string(savename, "-exp1b-$(suffix)-$(details)")
     save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
 
-    if idx_prob == 8
+    if idx_prob == 8 || idx_prob == 6
         legendpos = :best
     else
         legendpos = :topright
