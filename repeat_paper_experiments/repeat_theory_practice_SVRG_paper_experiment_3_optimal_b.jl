@@ -20,15 +20,17 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*10.0 # 60.0*60.0*24.0
+max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
 # details = "final"
-details = "test"
+# details = "test"
+details = "legend_change"
 
 ## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
+# all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
+problems = [parse(Int, ARGS[1])]
 
 using Distributed
 
@@ -80,12 +82,12 @@ end
 #endregion
 
 ## Experiments settings
-numsimu = 1; # number of runs of mini-batch SAGA for averaging the empirical complexity
-if all_problems
-    problems = 1:8
-else
-    problems = 1:1
-end
+numsimu = 1 # number of runs of mini-batch SAGA for averaging the empirical complexity
+# if all_problems
+#     problems = 1:8
+# else
+#     problems = 1:1
+# end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
             "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
@@ -103,14 +105,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [0.01,  #
+skip_multipliers = [0.005,  #
+                    0.005,  #
                     0.01,  #
-                    0.1,  #
-                    0.1,  #
-                    0.1,  #
-                    0.1,  #
                     0.01,  #
-                    0.01]  #
+                    0.01,  #
+                    0.01,  #
+                    0.005,  #
+                    0.005]  #
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -123,8 +125,8 @@ skip_multipliers = [0.01,  #
     Random.seed!(1)
 
     if idx_prob == 5 || idx_prob == 6
-        global precision = 10.0^(-3)
-        global max_epochs = 100
+        global precision = 10.0^(-4)
+        global max_epochs = 200
     end
 
     ## Loading the data
