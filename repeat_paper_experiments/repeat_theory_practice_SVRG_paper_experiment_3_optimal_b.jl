@@ -20,13 +20,15 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*24.0
+max_time = 60.0*60.0*72.0
 precision = 10.0^(-6)
 
 ## File names
 # details = "final"
 # details = "test"
-details = "legend_change"
+# details = "legend_change"
+details = "small_precision"
+
 
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
@@ -125,8 +127,8 @@ skip_multipliers = [0.005,  #
     Random.seed!(1)
 
     if idx_prob == 5 || idx_prob == 6
-        global precision = 10.0^(-4)
-        global max_epochs = 200
+        # global precision = 10.0^(-4)
+        global max_epochs = 300
     end
 
     ## Loading the data
