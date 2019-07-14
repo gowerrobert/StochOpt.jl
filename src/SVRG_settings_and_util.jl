@@ -200,7 +200,7 @@ corresponding average iteration complexity.
     - **AbstractString** suffix: suffix added to saved file names\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(minibatchgrid)*numsimu\\
-    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
+    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch sizes over numsimu samples
 """
 function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions, save_path::AbstractString ;
                                  numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, suffix::AbstractString="")
@@ -214,6 +214,10 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
     end
 
     n = prob.numdata
+    mu = prob.mu
+    L = prob.L
+    Lmax = prob.Lmax
+
     itercomplex = zeros(length(minibatchgrid), 1) # List of saved outputs
     OUTPUTS = []
     for idx_b in 1:length(minibatchgrid)
@@ -237,11 +241,6 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
         println(options.skip_error_calculation)
         println("----------------------------------------------------------------------------------------")
 
-        n = prob.numdata
-        mu = prob.mu
-        L = prob.L
-        Lmax = prob.Lmax
-
         options.batchsize = b
         for i=1:numsimu
             println("----- Simulation #", i, " -----")
@@ -257,7 +256,7 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
 
             println("----------------------------- # EPOCHS[END] -------------------------------------")
             println(output.epochs[end])
-            println("----------------------------------------------------------------------------------------")
+            println("---------------------------------------------------------------------------------")
 
             println("Output fail = ", output.fail, "\n")
             itercomplex[idx_b] += output.iterations
@@ -267,7 +266,7 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
         end
     end
 
-    ## Averaging the last iteration number
+    ## Averaging the iteration complexity
     itercomplex = itercomplex ./ numsimu
     itercomplex = itercomplex[:]
 
@@ -382,7 +381,7 @@ correpsonding average iteration complexity.
     - **AbstractString** path: path to the folder where the plots are saved\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(inner_loop_grid)*numsimu\\
-    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the inner loop size over numsimu samples
+    - **Array{Float64,1}** itercomplex: average iter complexity for each of the inner loop sizes over numsimu samples
 """
 function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{Int64,1}, options::MyOptions ;
                                            numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
@@ -400,6 +399,11 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
         options.skip_error_calculation = skipped_errors
     end
 
+    n = prob.numdata
+    mu = prob.mu
+    L = prob.L
+    Lmax = prob.Lmax
+
     itercomplex = zeros(length(inner_loop_grid), 1) # List of saved outputs
     OUTPUTS = []
     for idx_m in 1:length(inner_loop_grid)
@@ -414,11 +418,6 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
         println(options.skip_error_calculation)
         println("----------------------------------------------------------------------------------------")
 
-        n = prob.numdata
-        mu = prob.mu
-        L = prob.L
-        Lmax = prob.Lmax
-
         for i=1:numsimu
             println("----- Simulation #", i, " -----")
             ################################################################################
@@ -431,6 +430,11 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
             sampling = build_sampling("nice", n, options)
             free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
             output = minimizeFunc(prob, free, options)
+
+            println("----------------------------- # EPOCHS[END] -------------------------------------")
+            println(output.epochs[end])
+            println("---------------------------------------------------------------------------------")
+
             println("Output fail = ", output.fail, "\n")
             itercomplex[idx_m] += output.iterations
 
@@ -439,13 +443,13 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
         end
     end
 
-    ## Averaging the last iteration number
+    ## Averaging the iteration complexity
     itercomplex = itercomplex ./ numsimu
     itercomplex = itercomplex[:]
 
     ## Saving the result of the simulations
-    savename = "-exp1b-empcomplex-$(numsimu)-avg"
-    save("$(path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
+    savename = "-exp4-empcomplex-$(numsimu)-avg$(suffix)"
+    save("$(save_path)data/$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
 
     return OUTPUTS, itercomplex
 end

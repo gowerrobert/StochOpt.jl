@@ -20,14 +20,14 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*72.0
+max_time = 60.0*60.0*96.0
 precision = 10.0^(-6)
 
 ## File names
 # details = "final"
-# details = "test"
-# details = "legend_change"
-details = "small_precision"
+# details = "debug"
+details = "gnl_run"
+# details = "smaller_slice_precision"
 
 
 ## Bash input
@@ -127,7 +127,7 @@ skip_multipliers = [0.005,  #
     Random.seed!(1)
 
     if idx_prob == 5 || idx_prob == 6
-        # global precision = 10.0^(-4)
+        global precision = 10.0^(-4)
         global max_epochs = 300
     end
 
@@ -170,7 +170,6 @@ skip_multipliers = [0.005,  #
     numinneriters = n
     b_optimal = optimal_minibatch_Free_SVRG_nice_tight(numinneriters, n, mu, L, Lmax)
 
-
     ## Computing the empirical mini-batch size over a grid
     if data == "ijcnn1_full"
         # minibatchgrid = [2^0, 2^5, n] # debugging
@@ -192,7 +191,7 @@ skip_multipliers = [0.005,  #
     OUTPUTS, itercomplex = simulate_Free_SVRG_nice(prob, minibatchgrid, options, save_path, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], suffix="$(suffix)-$(details)")
 
     ## Checking that all simulations reached tolerance
-    fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu];
+    fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu]
     if all(s->(string(s)=="tol-reached"), fails)
         println("Tolerance always reached")
     else
@@ -200,7 +199,7 @@ skip_multipliers = [0.005,  #
     end
 
     ## Computing the empirical complexity
-    empcomplex = reshape(minibatchgrid .* itercomplex, length(minibatchgrid)) # mini-batch size times number of iterations
+    empcomplex = reshape([n*OUTPUTS[i].epochs[end] for i=1:length(minibatchgrid)*numsimu], length(minibatchgrid)) # number of stochastic gradients computed
     min_empcomplex, idx_min = findmin(empcomplex)
     b_empirical = minibatchgrid[idx_min]
 
@@ -212,7 +211,8 @@ skip_multipliers = [0.005,  #
     if numsimu == 1
         save("$(save_path)data/$(savename).jld",
         "options", options, "minibatchgrid", minibatchgrid,
-        "itercomplex", itercomplex, "empcomplex", empcomplex,
+        "itercomplex", itercomplex,
+        "empcomplex", empcomplex,
         "b_empirical", b_empirical)
     end
 

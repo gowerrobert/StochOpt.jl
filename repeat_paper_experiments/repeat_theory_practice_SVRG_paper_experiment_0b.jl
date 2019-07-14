@@ -238,7 +238,7 @@ grids = [[2^0, 2^4, 2^8, 2^12, 2^14, 2^15, 2^16, 2^17, 2^18, 2^19, 2^20],
     end
 
     ## Computing the empirical complexity
-    empcomplex = reshape([OUTPUTS[i].epochs[end] for i=1:length(inner_loop_grid)*numsimu], length(inner_loop_grid)) # number of stochastic gradients computed
+    empcomplex = reshape([n*OUTPUTS[i].epochs[end] for i=1:length(inner_loop_grid)*numsimu], length(inner_loop_grid)) # number of stochastic gradients computed
     min_empcomplex, idx_min = findmin(empcomplex)
     m_empirical = inner_loop_grid[idx_min]
 
