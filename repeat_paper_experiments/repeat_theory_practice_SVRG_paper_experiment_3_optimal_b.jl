@@ -20,13 +20,15 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*96.0
+max_time = 60.0*60.0*96.0 # 4 days max
+# precision = 10.0^(-4)
+# details = "prec_1e-4"
 precision = 10.0^(-6)
+details = "prec_1e-6"
 
 ## File names
 # details = "final"
 # details = "debug"
-details = "gnl_run"
 # details = "smaller_slice_precision"
 
 
@@ -107,14 +109,27 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## In the following table, set smaller values for finer estimations (yet, longer simulations)
-skip_multipliers = [0.005,  #
-                    0.005,  #
-                    0.01,  #
-                    0.01,  #
-                    0.01,  #
-                    0.01,  #
-                    0.005,  #
-                    0.005]  #
+if isapprox(precision, 1e-4)
+    skip_multipliers = [0.001,  #
+                        0.001,  #
+                        0.01,   #
+                        0.1,    #
+                        0.01,   #
+                        0.1,    #
+                        0.001,  #
+                        0.005]  #
+elseif isapprox(precision, 1e-6)
+    skip_multipliers = [0.005,  #
+                        0.005,  #
+                        0.01,   #
+                        0.1,    #
+                        0.01,   #
+                        0.1,    #
+                        0.005,  #
+                        0.01]   #
+else
+    error("No skip multipliers designed for this precision")
+end
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -126,9 +141,12 @@ skip_multipliers = [0.005,  #
 
     Random.seed!(1)
 
-    if idx_prob == 5 || idx_prob == 6
-        global precision = 10.0^(-4)
-        global max_epochs = 300
+    # Thresholding max_epochs too skip poorly performing cases
+    if idx_prob == 3 || idx_prob == 4
+        global max_epochs = 1500
+    elseif idx_prob == 5 || idx_prob == 6
+        # global precision = 10.0^(-4)
+        global max_epochs = 400
     end
 
     ## Loading the data
@@ -173,13 +191,13 @@ skip_multipliers = [0.005,  #
     ## Computing the empirical mini-batch size over a grid
     if data == "ijcnn1_full"
         # minibatchgrid = [2^0, 2^5, n] # debugging
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^17, n] # adding 2^17=131,072 to check behavior for b=n=141,691
     elseif data == "YearPredictionMSD_full"
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
     elseif data == "slice"
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, n]
     elseif data == "real-sim"
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, n] # 2^16=65,536 and n=72,309 are too close on the figure
     else
         error("No mini-batch grid available for this dataset")
     end
@@ -216,9 +234,17 @@ skip_multipliers = [0.005,  #
         "b_empirical", b_empirical)
     end
 
+    if idx_prob == 5 # slice, 1e-1
+        legendpos = :bottomright
+    elseif idx_prob == 6 # slice, 1e-3
+        legendpos = :top
+    else
+        legendpos = :topleft
+    end
+
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=:topleft, suffix=suffix)
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix=suffix)
 
     println("Practical optimal mini-batch = ", b_optimal)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
