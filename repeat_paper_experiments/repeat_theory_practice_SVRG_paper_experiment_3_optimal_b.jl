@@ -20,7 +20,7 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*96.0 # 4 days max
+max_time = 60.0*60.0*24.0*7.0 # 7 days max
 # precision = 10.0^(-4)
 # details = "prec_1e-4"
 precision = 10.0^(-6)
@@ -146,7 +146,7 @@ end
         global max_epochs = 1500
     elseif idx_prob == 5 || idx_prob == 6
         # global precision = 10.0^(-4)
-        global max_epochs = 400
+        global max_epochs = 600
     end
 
     ## Loading the data
@@ -191,7 +191,7 @@ end
     ## Computing the empirical mini-batch size over a grid
     if data == "ijcnn1_full"
         # minibatchgrid = [2^0, 2^5, n] # debugging
-        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^17, n] # adding 2^17=131,072 to check behavior for b=n=141,691
+        minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
     elseif data == "YearPredictionMSD_full"
         minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
     elseif data == "slice"
@@ -237,14 +237,14 @@ end
     if idx_prob == 5 # slice, 1e-1
         legendpos = :bottomright
     elseif idx_prob == 6 # slice, 1e-3
-        legendpos = :top
+        legendpos = :bottomright
     else
         legendpos = :topleft
     end
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix=suffix)
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="$(suffix)-$(details)")
 
     println("Practical optimal mini-batch = ", b_optimal)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
