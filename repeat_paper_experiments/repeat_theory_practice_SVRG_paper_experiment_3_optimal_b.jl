@@ -20,15 +20,11 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 
 ## General settings
 max_epochs = 10^8
-max_time = 60.0*60.0*24.0*7.0 # 7 days max
+max_time = 60.0*60.0*24.0*7.0 # 7 days max = 168h
 # precision = 10.0^(-4)
 # details = "prec_1e-4"
 precision = 10.0^(-6)
 details = "prec_1e-6"
-
-seed = 1
-# seed = 2
-details = "$(details)-seed_$(seed)"
 
 ## File names
 # details = "final"
@@ -39,6 +35,9 @@ details = "$(details)-seed_$(seed)"
 ## Bash input
 # all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
 problems = [parse(Int, ARGS[1])]
+
+seed = parse(Int, ARGS[2])
+details = "$(details)-seed_$(seed)"
 
 using Distributed
 
