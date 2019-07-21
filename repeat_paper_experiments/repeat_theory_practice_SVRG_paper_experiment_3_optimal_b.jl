@@ -26,6 +26,10 @@ max_time = 60.0*60.0*24.0*7.0 # 7 days max
 precision = 10.0^(-6)
 details = "prec_1e-6"
 
+seed = 1
+# seed = 2
+details = "$(details)-seed_$(seed)"
+
 ## File names
 # details = "final"
 # details = "debug"
@@ -139,7 +143,7 @@ end
     println("EXPERIMENT : ", idx_prob, " over ", length(problems))
     @printf "Inputs: %s + %s + %1.1e \n" data scaling lambda
 
-    Random.seed!(1)
+    Random.seed!(seed)
 
     # Thresholding max_epochs too skip poorly performing cases
     if idx_prob == 3 || idx_prob == 4
@@ -238,6 +242,8 @@ end
         legendpos = :bottomright
     elseif idx_prob == 6 # slice, 1e-3
         legendpos = :bottomright
+    elseif idx_prob == 7 # real-sim, 1e-1
+        legendpos = :topright
     else
         legendpos = :topleft
     end
