@@ -145,11 +145,10 @@ end
     Random.seed!(seed)
 
     # Thresholding max_epochs too skip poorly performing cases
-    if idx_prob == 3 || idx_prob == 4
-        global max_epochs = 1500
-    elseif idx_prob == 5 || idx_prob == 6
-        # global precision = 10.0^(-4)
-        global max_epochs = 600
+    if idx_prob == 3 || idx_prob == 4 # YearPredictionMSD_full
+        global max_epochs = 2500
+    elseif idx_prob == 5 || idx_prob == 6 # slice
+        global max_epochs = 1000
     end
 
     ## Loading the data
