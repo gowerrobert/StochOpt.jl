@@ -2,7 +2,7 @@
 ### "Towards closing the gap between the theory and practice of SVRG", O. Sebbouh, S. Jelassi, N. Gazagnadou, F. Bach, R. M. Gower (2019)
 
 ## --- EXPERIMENT 3 ---
-Goal: Testing the optimality of our optimal mini-batch size versus grid-search ones.
+Goal: Exploring the optimality of our optimal mini-batch size versus grid-search ones.
 
 ## --- THINGS TO CHANGE BEFORE RUNNING ---
 
@@ -25,6 +25,8 @@ max_time = 60.0*60.0*24.0*7.0 # 7 days max = 168h
 # details = "prec_1e-4"
 precision = 10.0^(-6)
 details = "prec_1e-6"
+
+# show_theory = false # Show the theoretical total complexity plot
 
 ## File names
 # details = "final"

@@ -529,3 +529,33 @@ function plot_empirical_complexity_SVRG(prob::Prob, exp_number::Int64, grid::Arr
     end
     savefig("$(save_path)figures/$(probname)$(savename).pdf")
 end
+
+
+
+"""
+    compute_total_complexity_Free_SVRG(prob, numinneriters, precision)
+
+Compute the theoretical total complexity vs the mini-batch or the inner loop size.
+
+#INPUTS:\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
+    - **Int64** numinneriters: size of the inner loop\\
+    - **Float64** precision: precision desired for the optimization quantifying the expected quadratic distance between the last iterate and the solution (epsilon in the paper)\\
+#OUTPUTS:\\
+    - **Array{Float64,1}** total_complexity: theoretical total complexity for all possible mini-batch size from 1 to n\\
+"""
+function compute_total_complexity_Free_SVRG(prob::Prob, numinneriters::Int64, precision::Float64)
+    n = prob.numdata
+    mu = prob.mu
+    Lmax = prob.Lmax
+    L = prob.L
+
+    minibatch_grid = 1:n
+    expected_residual =  (Lmax.*(n.-minibatch_grid)) ./ ((n-1).*minibatch_grid)
+    expected_smoothness = expected_residual .+ ((n*L).*(minibatch_grid .- 1)) ./ ((n-1).*minibatch_grid)
+    left_term = (expected_smoothness + 2 .* expected_residual) ./ mu
+
+    total_complexity = 2 .* (n/numinneriters .+ 2 .* minibatch_grid) .* max.(left_term, numinneriters) .* log(1/precision)
+
+    return total_complexity
+end
