@@ -21,10 +21,10 @@ To run this experiment, open a terminal, go into the "StochOpt.jl/" repository a
 ## General settings
 max_epochs = 10^8
 max_time = 60.0*60.0*24.0*7.0 # 7 days max = 168h
-# precision = 10.0^(-4)
-# details = "prec_1e-4"
-precision = 10.0^(-6)
-details = "prec_1e-6"
+precision = 10.0^(-4)
+details = "prec_1e-4_threshold"
+# precision = 10.0^(-6)
+# details = "prec_1e-6"
 
 # show_theory = false # Show the theoretical total complexity plot
 
@@ -148,9 +148,11 @@ end
 
     # Thresholding max_epochs too skip poorly performing cases
     if idx_prob == 3 || idx_prob == 4 # YearPredictionMSD_full
-        global max_epochs = 2500
-    elseif idx_prob == 5 || idx_prob == 6 # slice
+        # global max_epochs = 2500
         global max_epochs = 1000
+    elseif idx_prob == 5 || idx_prob == 6 # slice
+        # global max_epochs = 1000
+        global max_epochs = 300
     end
 
     ## Loading the data
@@ -238,11 +240,13 @@ end
         "b_empirical", b_empirical)
     end
 
-    if idx_prob == 5 # slice, 1e-1
+    if idx_prob == 2 # ijcnn1, 1e-3
+        legendpos = :bottomright
+    elseif idx_prob == 5 # slice, 1e-1
         legendpos = :bottomright
     elseif idx_prob == 6 # slice, 1e-3
         legendpos = :bottomright
-    elseif idx_prob == 7 # real-sim, 1e-1
+    elseif idx_prob == 7 && precision ≈ 10.0^(-4) # real-sim, 1e-1
         legendpos = :topright
     else
         legendpos = :topleft
@@ -250,7 +254,7 @@ end
 
     ## Plotting total complexity vs mini-batch size
     pyplot()
-    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="$(suffix)-$(details)")
+    plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, max_epochs=max_epochs, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="$(suffix)-$(details)")
 
     println("Practical optimal mini-batch = ", b_optimal)
     println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
