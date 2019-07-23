@@ -145,78 +145,10 @@ end
     Lmax = prob.Lmax
     L = prob.L
 
-
-    numinneriters = n
-    b_optimal = optimal_minibatch_Free_SVRG_nice_tight(numinneriters, n, mu, L, Lmax)
-
-
     ## Computing the theoretical total complexity for all mini-batch size
+    numinneriters = n
     total_complexity = compute_total_complexity_Free_SVRG(prob, numinneriters, precision)
 
     plot(total_complexity, linestyle=:dash, color=:blue, xaxis=:log, yaxis=:log, linewidth=3, grid=false)
 
-    #############################
-
-    # ## Computing the empirical mini-batch size over a grid
-    # if data == "ijcnn1_full"
-    #     # minibatchgrid = [2^0, 2^5, n] # debugging
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, n]
-    # elseif data == "YearPredictionMSD_full"
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, 2^16, 2^18, n]
-    # elseif data == "slice"
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, n]
-    # elseif data == "real-sim"
-    #     minibatchgrid = [2^0, 2^1, 2^2, 2^3, 2^4, 2^5, 2^6, 2^7, 2^8, 2^10, 2^12, 2^14, n] # 2^16=65,536 and n=72,309 are too close on the figure
-    # else
-    #     error("No mini-batch grid available for this dataset")
-    # end
-
-    # println("---------------------------------- MINI-BATCH GRID ------------------------------------------")
-    # println(minibatchgrid)
-    # println("---------------------------------------------------------------------------------------------")
-
-    # OUTPUTS, itercomplex = simulate_Free_SVRG_nice(prob, minibatchgrid, options, save_path, numsimu=numsimu, skip_multiplier=skip_multipliers[idx_prob], suffix="$(suffix)-$(details)")
-
-    # ## Checking that all simulations reached tolerance
-    # fails = [OUTPUTS[i].fail for i=1:length(minibatchgrid)*numsimu]
-    # if all(s->(string(s)=="tol-reached"), fails)
-    #     println("Tolerance always reached")
-    # else
-    #     println("Some total complexities might be threshold because of reached maximal time")
-    # end
-
-    # ## Computing the empirical complexity
-    # empcomplex = reshape([n*OUTPUTS[i].epochs[end] for i=1:length(minibatchgrid)*numsimu], length(minibatchgrid)) # number of stochastic gradients computed
-    # min_empcomplex, idx_min = findmin(empcomplex)
-    # b_empirical = minibatchgrid[idx_min]
-
-    # ## Saving the result of the simulations
-    # savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-    # savename = string(savename, "-exp3-$(numsimu)-avg")
-    # savename = string(savename, "_skip_mult_", replace(string(skip_multipliers[idx_prob]), "." => "_")) # Extra suffix to check which skip values to keep
-    # savename = string(savename, "-$(suffix)-$(details)")
-    # if numsimu == 1
-    #     save("$(save_path)data/$(savename).jld",
-    #     "options", options, "minibatchgrid", minibatchgrid,
-    #     "itercomplex", itercomplex,
-    #     "empcomplex", empcomplex,
-    #     "b_empirical", b_empirical)
-    # end
-
-    # if idx_prob == 5 # slice, 1e-1
-    #     legendpos = :bottomright
-    # elseif idx_prob == 6 # slice, 1e-3
-    #     legendpos = :bottomright
-    # elseif idx_prob == 7 # real-sim, 1e-1
-    #     legendpos = :topright
-    # else
-    #     legendpos = :topleft
-    # end
-
-    # ## Plotting total complexity vs mini-batch size
-    # pyplot()
-    # plot_empirical_complexity(prob, minibatchgrid, empcomplex, b_optimal, b_empirical, path=save_path, skip_multiplier=skip_multipliers[idx_prob], legendpos=legendpos, suffix="$(suffix)-$(details)")
-
-    # println("Practical optimal mini-batch = ", b_optimal)
-    # println("Empirical optimal mini-batch = ", b_empirical, "\n\n")
 end
