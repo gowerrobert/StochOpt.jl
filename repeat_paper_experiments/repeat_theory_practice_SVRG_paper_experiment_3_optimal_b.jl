@@ -149,10 +149,10 @@ end
     # Thresholding max_epochs too skip poorly performing cases
     if idx_prob == 3 || idx_prob == 4 # YearPredictionMSD_full
         # global max_epochs = 2500
-        global max_epochs = 1000
+        global max_epochs = 1000 # used for the thresholded simulation
     elseif idx_prob == 5 || idx_prob == 6 # slice
         # global max_epochs = 1000
-        global max_epochs = 300
+        global max_epochs = 300 # used for the thresholded simulation
     end
 
     ## Loading the data
