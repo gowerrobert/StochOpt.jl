@@ -204,7 +204,7 @@ skip_errors = [[700 7000 -2. 7000],     # 1)  ijcnn1_full + scaled + 1e-1       
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
     # out_bubeck.name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
-    out_bubeck.name = latexstring("SVRG \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("SVRG \$(m = 20L_{\\max}/\\mu = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
     println("\n")
 
