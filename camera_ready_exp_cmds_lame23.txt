@@ -1,0 +1,18 @@
+## SVRG commands
+
+##########################################################################################
+##########################################################################################
+07/10/2019 : RELAUNCH EVERYTHING for the camera ready version of the paper for NeurIPS
+##########################################################################################
+##########################################################################################
+
+##################################### EXP 1.A ############################################
+
+# all_problems = false
+nohup nice -5 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl false > experiments/theory_practice_SVRG/exp1a/nohups/test_false.out 2> experiments/theory_practice_SVRG/exp1a/nohups/test_false.err &
+
+ERROORRR
+
+
+# all_problems = true
+nohup nice -10 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl true > experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.out 2> experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.err &

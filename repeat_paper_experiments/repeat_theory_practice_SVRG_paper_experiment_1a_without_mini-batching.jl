@@ -32,9 +32,9 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-details = "final"
+# details = "final"
+details = "test-rho"
 # details = "legend"
-# details = "test-rho"
 
 ## Bash input
 all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
