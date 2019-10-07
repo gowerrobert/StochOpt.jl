@@ -43,6 +43,7 @@ experiments/Free_SVRG/*
 experiments/L_SVRG_D/*
 experiments/Leap_SVRG/*
 experiments/SVRG/*
+experiments/theory_practice_SVRG_arxiv/*
 
 # Temporary files
 experiments/theory_practice_SVRG/*
