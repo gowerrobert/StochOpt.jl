@@ -6,8 +6,8 @@ bash download_datasets
 ```
 If it crashes, data can be downloaded manually [here](https://partage.mines-telecom.fr/index.php/s/9MreP5y6evFWyJP). Then, datasets `.jld` files should be placed in the directory `./data`.
 
-# Dependencies
 
+# Dependencies
 Launch the  Julia REPL and press `]` to enter the package REPL mode, then install the required packages with
 ```bash
 (v1.0) pkg> add JLD
@@ -61,7 +61,6 @@ julia ./test/demo_SAGA_nice.jl
 
 
 # Repeating paper results
-
 To re-generate all of the experiments from [1]
 ```julia
 julia ./repeat_paper_experiments/repeat_SVRG2_paper_experiments.jl
@@ -102,7 +101,6 @@ setting `all_problems` to `false` to run the code only on the first problem, sca
 
 
 # Methods implemented
-
 SVRG, the original SVRG algorithm. <br>
 SVRG2, which tracks the gradients using the full Hessian. <br>
 2D, which tracks the gradients using the diagonal of the Hessian. <br>
@@ -117,12 +115,13 @@ SAGA nice, mini-batch version of SAGA with nice sampling. <br>
 
 More details on the methods can be found in [1], [2], [4] and [5] <br>
 
-# Code Philosophy
 
-To provide en enviroment where competing stochastic methods can be compared on equal footing. This is why all methods are called by the same wrapper function "minimizeFunc" (or it's extension minimizeFunc_grid_stepsize). All performance measures such as time taken, test error or epochs are calculated by these wrapper functions. Each new method need only supply a *stepmethod* and a *bootmethod*. The stepmethod returns an update vector d which is then added to x_k to give the next iterate x_{k+1}. The bootmethod is called once to initialize the method.
+# Code Philosophy
+To provide en environment where competing stochastic methods can be compared on equal footing. This is why all methods are called by the same wrapper function "minimizeFunc" (or it's extension minimizeFunc_grid_stepsize). All performance measures such as time taken, test error or epochs are calculated by these wrapper functions. Each new method need only supply a *stepmethod* and a *bootmethod*. The stepmethod returns an update vector d which is then added to x_k to give the next iterate x_{k+1}. The bootmethod is called once to initialize the method.
+
 
 # Adding more data
-To test a new data set, download the raw data of a binary classifiction fomr LIBSVM [3] and place it in the folder ./data.
+To test a new data set, download the raw data of a binary classification from LIBSVM [3] and place it in the folder ./data.
 Then replace "liver-disorders" in the code *src/load_new_LIBSVM_data.jl* and execute. In other words, run the code
 
 ```julia
@@ -138,20 +137,22 @@ end
 ```
 where "liver-disorders" has been replaced with the name of the new raw data file.
 
+
 # Adding new loss functions
 to include new objective function, see load_logistic.jl and copy the same structure
+
 
 # Adding new methods
 to include a new method X, you need to write a descent_X.jl and boot_X.jl function. See descent_grad and boot_grad for an example. I also recommend writing your type and including it in StochOpt or using one of the types there defined already.
 
-# References
 
+# References
 [1]  *Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods* <br>
-RMG, Nicolas Le Roux and Francis Bach.
+Robert M. Gower, Nicolas Le Roux and Francis Bach.
 To appear in AISTATS 2018
 
 [2] *Accelerated stochastic matrix inversion: general theory and speeding up BFGS rules for faster second-order optimization* <br>
-RMG, Filip Hanzely, P. Richtárik and S. Stich.
+Robert M. Gower, Filip Hanzely, P. Richtárik and S. Stich.
 arXiv:1801.05490, 2018
 
 [3]  *LIBSVM : a library for support vector machines.* <br>
@@ -160,13 +161,17 @@ Chih-Chung Chang and Chih-Jen Lin, ACM Transactions on Intelligent Systems and T
 
 [4] *Stochastic Quasi-Gradient Methods:
 Variance Reduction via Jacobian Sketching* <br>
-RMG, Peter Richtárik, Francis Bach
+Robert M. Gower, Peter Richtárik, Francis Bach
 
 [5] *Optimal mini-batch and step sizes for SAGA* <br>
 Nidham Gazagnadou, Robert M. Gower and Joseph Salmon.
 arXiv:1902.00071, 2019
 
+[6] *Towards closing the gap between the theory and practice of SVRG* <br>
+Othmane Sebbouh, Nidham Gazagnadou, Samy Jelassi, Francis Bach, Robert M. Gower. arXiv:1908.02725, 2019
+
 For up-to-date references see https://perso.telecom-paristech.fr/rgower/publications.html
+
 
 # TODO
 * change output type to have a testerrors field. Think where best to load a test problem. Probably outside of minimizeFunc. Where best to place code for test_error ?  Probably best to start a new src file for error calculations? or testing related things?
