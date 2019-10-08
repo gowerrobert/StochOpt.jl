@@ -24,9 +24,9 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-details = "final"
-# details = "1hbis"
-# details = "test-rho"
+# details = "final"
+details = "test-rho"
+# details = "legend"
 
 ## Bash input
 all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
@@ -159,7 +159,7 @@ skip_errors = [[8000   8000     200    300],   # 1)  ijcnn1_full + scaled + 1e-1
 
     ## List of mini-batch sizes
     numinneriters_list   = [n, 2*n, round(Int64, Lmax/mu), m_star]
-    numinneriters_labels = ["n", "2n", "L_{\\max}/\\mu", "3L_{\\max}/\\mu = m^*"] # round? floor?
+    numinneriters_labels = ["n", "2n", "L_{\\max}/\\mu", "3L_{\\max}/\\mu = m^*"]
 
     ## Running methods
     OUTPUTS = [] # list of saved outputs
@@ -204,7 +204,7 @@ skip_errors = [[8000   8000     200    300],   # 1)  ijcnn1_full + scaled + 1e-1
     legendtitle = "Inner loop size m"
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendtitle=legendtitle, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp2b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendtitle=legendtitle, legendfont=9)
 
 end
 end
