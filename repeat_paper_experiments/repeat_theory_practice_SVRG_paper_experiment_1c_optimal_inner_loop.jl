@@ -29,12 +29,12 @@ For each problem (data set + scaling process + regularization)
 ## General settings
 max_epochs = 10^8
 max_time = 60.0*60.0*24.0
-precision = 10.0^(-6) # 10.0^(-6)
+precision = 10.0^(-6)
 
 ## File names
-details = "final"
+# details = "final"
+details = "test-rho"
 # details = "legend"
-# details = "test-rho"
 
 ## Bash input
 all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
@@ -90,7 +90,7 @@ end
 if all_problems
     problems = 1:8
 else
-    problems = 4:4 #1:1
+    problems = 1:1
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
@@ -128,9 +128,7 @@ skip_errors = [[700 200 -2. 150],        # 1)  ijcnn1_full + scaled + 1e-1      
 
     Random.seed!(1)
 
-    if idx_prob == 3
-        global max_epochs = 10
-    elseif idx_prob == 4
+    if idx_prob == 3 || idx_prob == 4
         global max_epochs = 16
     elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100

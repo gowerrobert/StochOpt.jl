@@ -111,8 +111,8 @@ lambdas = [10^(-1), 10^(-3),
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
 skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 25/06 11:14
                [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               25/06 11:14
-               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 11 epochs
-               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 11 epochs
+               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 12 epochs
+               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 12 epochs
                [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
                [50000 40000 -2. 30000],  # 6)  slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
                [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 25/06 11:14
@@ -128,10 +128,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     Random.seed!(1)
 
-    if idx_prob == 3
-        global max_epochs = 10
-    elseif idx_prob == 4
-        global max_epochs = 13
+    if idx_prob == 3 || idx_prob == 4
+        global max_epochs = 16
     elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
     end
