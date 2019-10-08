@@ -6,13 +6,46 @@
 ##########################################################################################
 ##########################################################################################
 
+
+##########################################################################################
 ##################################### EXP 1.A ############################################
-
+##########################################################################################
 # all_problems = false
-nohup nice -5 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl false > experiments/theory_practice_SVRG/exp1a/nohups/test_false.out 2> experiments/theory_practice_SVRG/exp1a/nohups/test_false.err &
-
-ERROORRR
-
+nohup nice -1 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl false > experiments/theory_practice_SVRG/exp1a/nohups/test_false.out 2> experiments/theory_practice_SVRG/exp1a/nohups/test_false.err &
+Launched ================================> SUCCESS
 
 # all_problems = true
-nohup nice -10 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl true > experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.out 2> experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.err &
+nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl true > experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.out 2> experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.err &
+Launched on 08/10/2019 11:16 ================================> ???
+
+
+##########################################################################################
+##################################### EXP 1.B ############################################
+##########################################################################################
+nohup nice -1 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl false > experiments/theory_practice_SVRG/exp1b/nohups/test_false.out 2> experiments/theory_practice_SVRG/exp1b/nohups/test_false.err &
+Launched on 08/10/2019 13:57 ================================> ???
+
+nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl true > experiments/theory_practice_SVRG/exp1b/nohups/exp1b_true.out 2> experiments/theory_practice_SVRG/exp1b/nohups/exp1b_true.err &
+Launched on 08/10/2019 13:57 ================================> ???
+
+##########################################################################################
+##################################### EXP 1.C ############################################
+##########################################################################################
+nohup nice -1 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl false > experiments/theory_practice_SVRG/exp1c/nohups/test_false.out 2> experiments/theory_practice_SVRG/exp1c/nohups/test_false.err &
+Launched on 08/10/2019 11:24 ================================> SUCCESS
+
+nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl true > experiments/theory_practice_SVRG/exp1c/nohups/exp1c_true.out 2> experiments/theory_practice_SVRG/exp1c/nohups/exp1c_true.err &
+Launched on 08/10/2019 13:37 ================================> ???
+
+
+##########################################################################################
+##################################### EXP 2.A ############################################
+##########################################################################################
+
+
+
+
+##########################################################################################
+##################################### EXP 2.B ############################################
+##########################################################################################
+nohup nice -5 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl false > experiments/theory_practice_SVRG/exp2b/nohups/test_false.out 2> experiments/theory_practice_SVRG/exp2b/nohups/test_false.err &

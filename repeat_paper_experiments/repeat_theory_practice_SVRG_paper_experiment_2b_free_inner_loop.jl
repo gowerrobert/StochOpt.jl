@@ -9,7 +9,7 @@ Goal: Comparing Free-SVRG for different inner loop sizes {n, L_max/mu, m^* = L_m
 
 ## --- HOW TO RUN THE CODE ---
 To run this experiment, open a terminal, go into the "StochOpt.jl/" repository and run the following command:
->julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_vs_m.jl
+>julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl
 
 ## --- EXAMPLE OF RUNNING TIME ---
 5min for false
