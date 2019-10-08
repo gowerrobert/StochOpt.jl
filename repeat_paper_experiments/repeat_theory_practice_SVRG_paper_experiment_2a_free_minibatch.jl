@@ -24,9 +24,9 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-details = "final"
-# details = "100_epochs"
-# details = "test-rho"
+# details = "final"
+details = "test-rho"
+# details = "legend"
 
 ## Bash input
 all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
@@ -76,7 +76,7 @@ end
 if all_problems
     problems = 1:8
 else
-    problems = [3, 4, 7, 8] #1:1
+    problems = 1:1
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
