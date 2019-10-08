@@ -98,7 +98,6 @@ datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,       
             "slice", "slice",                                   # scaled,         n =  53,500, d =    384
             "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
 
-
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -299,7 +298,7 @@ skip_errors = [[700 7000 -2. 7000],     # 1)  ijcnn1_full + scaled + 1e-1       
 
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=legendpos, legendfont=6) # Plot and save output
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=9)
 
 end
 println("\n\n--- EXPERIMENT 1.B FINISHED ---")
