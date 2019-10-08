@@ -61,16 +61,19 @@ julia ./test/demo_SAGA_nice.jl
 
 
 # Repeating paper results
+
+## *Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods*
 To re-generate all of the experiments from [1]
 ```julia
 julia ./repeat_paper_experiments/repeat_SVRG2_paper_experiments.jl
 ```
-
+## *Accelerated stochastic matrix inversion: general theory and speeding up BFGS rules for faster second-order optimization*
 To re-generate all of the experiments from [2]
 ```julia
 julia ./repeat_paper_experiments/repeat_BFGS_accel_paper_results.jl
 ```
 
+## *Stochastic Quasi-Gradient Methods: Variance Reduction via Jacobian Sketching*
 To re-generate the experiments from Section 6.1 of [4]
 ```julia
 julia ./repeat_paper_experiments/compare_SAGA_importance_opt_Lis.jl
@@ -81,24 +84,55 @@ To re-generate the experiments from Section 6.1 of [4]
 julia ./repeat_paper_experiments/test_optimal_minibatch_SAGA_nice.jl
 ```
 
-To re-generate the experiments from Section 5.1 & 5.2 of [5] (~1h 30min)
+## *Optimal mini-batch and step sizes for SAGA*
+- To re-generate the experiments from Section 5.1 & 5.2 of [5] (~1h 30min)
 ```julia
 julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, unscaled *uniform* synthetic dataset with $\lambda =10^{-1}$, (~XXXXXmin) or to `true` to run it on all of them (~XXXXXXXXh XXXXXmin).
 
-To re-generate experiments from Section 5.3 of [5]
+- To re-generate experiments from Section 5.3 of [5]
 ```julia
 julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~1min) or to `true` to run it on all of them (~1h 30min).
 
-To re-generate the experiments from Section 5.4 of [5]
+- To re-generate the experiments from Section 5.4 of [5]
 ```julia
 julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~2min) or to `true` to run it on all of them (~XXh XXmin).
 
+## *Towards closing the gap between the theory and practice of SVRG*
+- To re-generate all plots from experiment 1.a of [6]
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
+
+- To re-generate all plots from experiment 1.b of [6]
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
+
+- To re-generate all plots from experiment 1.c of [6]
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
+
+- To re-generate all plots from experiment 2.a of [6]
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
+
+- To re-generate all plots from experiment 2.b of [6]
+```julia
+julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl all_problems
+```
+setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
 
 # Methods implemented
 SVRG, the original SVRG algorithm. <br>
@@ -147,7 +181,7 @@ to include a new method X, you need to write a descent_X.jl and boot_X.jl functi
 
 
 # References
-[1]  *Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods* <br>
+[1] *Tracking the gradients using the Hessian: A new look at variance reducing stochastic methods* <br>
 Robert M. Gower, Nicolas Le Roux and Francis Bach.
 To appear in AISTATS 2018
 
@@ -155,7 +189,7 @@ To appear in AISTATS 2018
 Robert M. Gower, Filip Hanzely, P. Richtárik and S. Stich.
 arXiv:1801.05490, 2018
 
-[3]  *LIBSVM : a library for support vector machines.* <br>
+[3] *LIBSVM : a library for support vector machines.* <br>
 Chih-Chung Chang and Chih-Jen Lin, ACM Transactions on Intelligent Systems and Technology, 2:27:1--27:27, 2011. <bf>
   Software available at http://www.csie.ntu.edu.tw/~cjlin/libsvm
 
