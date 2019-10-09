@@ -194,8 +194,9 @@ skip_errors = [[8000   8000     200    300],   # 1)  ijcnn1_full + scaled + 1e-1
     ## Saving outputs and plots
     if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
+    else
+        suffix = ""
     end
-
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp2b-$(suffix)-$(details)")
     save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
