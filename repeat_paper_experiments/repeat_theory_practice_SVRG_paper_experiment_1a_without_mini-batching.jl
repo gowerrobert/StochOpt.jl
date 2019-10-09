@@ -111,8 +111,15 @@ lambdas = [10^(-1), 10^(-3),
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
 skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 25/06 11:14
                [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               25/06 11:14
-               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 12 epochs
-               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 12 epochs
+               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 16 epochs => WARNING: potential bug spotted:
+                                         # From worker 4:	   3450000  |           0.01132548964563050847           |    14.39  |  47049.4448  |
+                                         # From worker 4:	   3500000  |           0.01224447809451410275           |    14.58  |  47630.2359  |
+                                         # From worker 4:	   3550000  |           0.00970780021823384846           |    14.78  |  48605.9720  |
+                                         # From worker 4:	   3600000  |           0.01258959501736736653           |    14.97  |  49200.2751  |
+                                         # From worker 4:	SVRG-Bubeck outer loop at iteration: 3644286
+                                         # From worker 4:	   3644286  |           0.52289196287182837519           |    16.14  |  50079.2315  | => Divergence at last point, during the outer loop
+
+               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 16 epochs
                [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
                [50000 40000 -2. 30000],  # 6)  slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
                [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 25/06 11:14
