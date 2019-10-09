@@ -46,7 +46,7 @@ options = set_options(tol=10.0^(-16.0), skip_error_calculation=1,
 @time prob = load_logistic_from_matrices(X, y, data, options, lambda=lambda, scaling=scaling);
 
 
-########################################### covtype.binary ############################################
+######################################################################################
 #region
 ## Computing the solution with a serial gridsearch
 # @time get_fsol_logistic!(prob)
@@ -66,10 +66,11 @@ output = minimizeFunc_grid_stepsize(prob, method_input, options);
 ## Result = stepsize = 0.125 for none and lambda = 0.001
 
 ## Running BFGS
-options = set_options(tol=10.0^(-16.0), skip_error_calculation=5,
+stepsize_multiplier = 0.05
+options = set_options(tol=10.0^(-16.0), skip_error_calculation=10,
                       exacterror=false, max_iter=10^8,
-                      max_time=60.0*60.0,
-                      max_epocs=50,
+                      max_time=60.0*60.0*12,
+                      max_epocs=1000,
                       force_continue=true);
 options.stepsize_multiplier = stepsize_multiplier;
 options.batchsize = prob.numdata;
