@@ -117,7 +117,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
                                          # From worker 4:	   3550000  |           0.00970780021823384846           |    14.78  |  48605.9720  |
                                          # From worker 4:	   3600000  |           0.01258959501736736653           |    14.97  |  49200.2751  |
                                          # From worker 4:	SVRG-Bubeck outer loop at iteration: 3644286
-                                         # From worker 4:	   3644286  |           0.52289196287182837519           |    16.14  |  50079.2315  | => Divergence at last point, during the outer loop
+                                         # From worker 4:	   3644286  |           0.52289196287182837519           |    16.14  |  50079.2315  |
+                                         # ====> Divergence at last point, during the outer loop
 
                [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 16 epochs
                [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
@@ -293,6 +294,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     ## Saving outputs and plots
     if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
+    else
+        suffix = ""
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1a-$(suffix)-$(details)")
