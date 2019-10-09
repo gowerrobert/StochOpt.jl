@@ -16,7 +16,7 @@ Launched ================================> SUCCESS
 
 # all_problems = true
 nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl true > experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.out 2> experiments/theory_practice_SVRG/exp1a/nohups/exp1a_true.err &
-Launched on 08/10/2019 11:16 ================================> ???
+Launched on 08/10/2019 11:16 ================================> SUCCESS
 
 
 ##########################################################################################
@@ -32,7 +32,7 @@ nohup ../julia-1.0.2/bin/julia -p 2 repeat_paper_experiments/repeat_theory_pract
 Launched (1:2 only) on 08/10/2019 14:45 ================================> SUCCESS, end at 18:04
 
 nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl true > experiments/theory_practice_SVRG/exp1b/nohups/exp1b_true.out 2> experiments/theory_practice_SVRG/exp1b/nohups/exp1b_true.err &
-Launched on 08/10/2019 18:07 ================================> ???
+Launched on 08/10/2019 18:07 ================================> SUCCESS
 
 ##########################################################################################
 ##################################### EXP 1.C ############################################
@@ -41,7 +41,7 @@ nohup nice -1 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_pr
 Launched on 08/10/2019 11:24 ================================> SUCCESS
 
 nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl true > experiments/theory_practice_SVRG/exp1c/nohups/exp1c_true.out 2> experiments/theory_practice_SVRG/exp1c/nohups/exp1c_true.err &
-Launched on 08/10/2019 13:37 ================================> ???
+Launched on 08/10/2019 13:37 ================================> SUCCESS
 
 
 ##########################################################################################
@@ -51,7 +51,7 @@ nohup nice -1 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_pr
 Launched on 08/10/2019 14:54 ================================> SUCCESS
 
 nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl true > experiments/theory_practice_SVRG/exp2a/nohups/exp2a_true.out 2> experiments/theory_practice_SVRG/exp2a/nohups/exp2a_true.err &
-Launched on 08/10/2019 15:26 ================================> ???
+Launched on 08/10/2019 15:26 ================================> SUCCESS
 
 ##########################################################################################
 ##################################### EXP 2.B ############################################
@@ -60,4 +60,13 @@ nohup nice -1 ../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_pr
 Launched on 08/10/2019 14:36 ================================> SUCCESS
 
 nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl true > experiments/theory_practice_SVRG/exp2b/nohups/exp2b_true.out 2> experiments/theory_practice_SVRG/exp2b/nohups/exp2b_true.err &
-Launched on 08/10/2019 15:29 ================================> ???
+Launched on 08/10/2019 15:29 ================================> SUCCESS
+
+
+##########################################################################################
+################################## LAST CORRECTIONS ######################################
+##########################################################################################
+- Negative fsol for 2.a real-sim 10^-3, problem 8. old_fsol = 0.49100233197235055
+WARNING : negative value for problem 8 : real-sim , 10^-3
+`` From worker 9:	    146000  |           -0.00000052023806371511           |  1089.28  |  8763.7511  | ''
+====> Need to recompute more precisely the solution of the problem ?
