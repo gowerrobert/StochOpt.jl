@@ -1,13 +1,5 @@
 # Debug SVRG-Bubeck for YearPrediction lmbd = 0.1
 
-## General settings
-max_epochs = 2 # at 16 occurs the divergence
-max_time = 60.0*60.0*24.0
-precision = 10.0^(-6)
-
-## File names
-details = "debug"
-
 path = "/home/nidham/phd/StochOpt.jl/"
 using JLD
 using Plots
@@ -24,13 +16,20 @@ using SharedArrays
 include("$(path)src/StochOpt.jl")
 pyplot()
 
+
+## General settings
+max_epochs = 5 # at 16 occurs the divergence
+skip_errors = [[1000 -2. -2. -2.]]
+
+max_time = 60.0*60.0*24.0
+precision = 10.0^(-6)
+
 ## Path settings
 save_path = "$(path)experiments/theory_practice_SVRG/exp1a/"
 
 datasets = ["YearPredictionMSD_full"]
 scalings = ["column-scaling"]
 lambdas = [10^(-1)]
-skip_errors = [[50000 30000 -2. 20000]]
 
 # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 16 epochs => WARNING: potential bug spotted:
 # From worker 4:	   3450000  |           0.01132548964563050847           |    14.39  |  47049.4448  |
@@ -89,7 +88,8 @@ OUTPUTS = [] # list of saved outputs
 ################################# SVRG-BUBECK ##################################
 ################################################################################
 ## SVRG-Bubeck with 1-nice sampling ( m = m^*, b = 1, step size = gamma^* )
-numinneriters = -1                             # theoretical inner loop size (m^* = 20*Lmax/mu) set in initiate_SVRG_bubeck
+# numinneriters = -1                             # theoretical inner loop size (m^* = 20*Lmax/mu) set in initiate_SVRG_bubeck
+numinneriters = 10000
 options.batchsize = 1                          # mini-batch size set to 1
 options.stepsize_multiplier = -1.0             # theoretical step size (gamma^* = 1/10*Lmax) set in boot_SVRG_bubeck
 sampling = build_sampling("nice", n, options)
@@ -98,39 +98,34 @@ bubeck = initiate_SVRG_bubeck(prob, options, sampling, numinneriters=numinnerite
 ## Setting the number of skipped iteration
 options.skip_error_calculation = skip_error[1] # skip error different for each algo
 
-println("-------------------- WARM UP --------------------")
-tmp = options.max_epocs
-options.max_epocs = 1
-minimizeFunc(prob, bubeck, options)
-options.max_epocs = tmp
-bubeck.reset(prob, bubeck, options)
-println("-------------------------------------------------\n")
+# println("-------------------- WARM UP --------------------")
+# tmp = options.max_epocs
+# options.max_epocs = 1
+# minimizeFunc(prob, bubeck, options)
+# options.max_epocs = tmp
+# bubeck.reset(prob, bubeck, options)
+# println("-------------------------------------------------\n")
+
 
 out_bubeck = minimizeFunc(prob, bubeck, options)
 
+
 str_m_bubeck = @sprintf "%d" bubeck.numinneriters
 str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
-# out_bubeck.name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
 out_bubeck.name = latexstring("SVRG \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
 OUTPUTS = [OUTPUTS; out_bubeck]
 options.max_epocs = max_epochs
 println("\n")
 
 ## Saving outputs and plots
-if path == "/home/infres/ngazagnadou/StochOpt.jl/"
-    suffix = "lame23"
-else
-    suffix = ""
-end
 savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
-savename = string(savename, "-exp1a-$(suffix)-$(details)")
+savename = string(savename, "-exp1a-debug")
 save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
 
 pyplot()
-# plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=6) # Plot and save output
-plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-$(suffix)-$(details)", path=save_path, nolegend=true)
+# Plot and save output
+# plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-debug-$(max_epochs)_max_epochs", path=save_path, legendpos=:topright, legendfont=8)
+plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1a-debug", path=save_path, legendpos=:topright, legendfont=8)
 
-println("\nSTRONG CONVEXITY : ", prob.mu, "\n")
 
-end
-println("\n\n--- EXPERIMENT 1.A FINISHED ---")
+println("\n\n--- DEBUG 1.A FINISHED ---")
