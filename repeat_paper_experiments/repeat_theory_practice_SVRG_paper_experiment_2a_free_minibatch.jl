@@ -24,8 +24,8 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "final"
-details = "test-rho"
+details = "final"
+# details = "test-rho"
 # details = "legend"
 
 ## Bash input

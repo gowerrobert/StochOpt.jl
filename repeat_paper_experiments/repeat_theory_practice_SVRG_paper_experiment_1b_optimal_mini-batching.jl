@@ -32,8 +32,8 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "final"
-details = "test-rho"
+details = "final"
+# details = "test-rho"
 # details = "legend"
 
 ## Bash input
@@ -93,10 +93,10 @@ else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -109,14 +109,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[700 7000 -2. 7000],     # 1)  ijcnn1_full + scaled + 1e-1                 midnight retry / FINAL
-               [13000 7000 -2. 5000],   # 2)  ijcnn1_full + scaled + 1e-3               midnight retry / FINAL
-               [50000 30000 -2. 20000], # 3)  YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
-               [60000 15000 -2. 5000],  # 4)  YearPredictionMSD_full + scaled + 1e-3   midnight retry / FINAL
-               [50000 2500 -2. 2500],   # 5)  slice + scaled + 1e-1                     100 epochs / FINAL
-               [50000 2500 -2. 1],      # 6)  slice + scaled + 1e-3                        100 epochs / FINAL
-               [  10 2000 -2. 4000],    # 7)  real-sim + unscaled + 1e-1                 midnight retry / FINAL
-               [500 5000 -2. 2000]]     # 8)  real-sim + unscaled + 1e-3                   midnight retry / FINAL
+skip_errors = [[700 7000 -2. 7000],     # 1) ijcnn1_full + scaled + 1e-1             midnight retry / FINAL
+               [13000 7000 -2. 5000],   # 2) ijcnn1_full + scaled + 1e-3             midnight retry / FINAL
+               [50000 30000 -2. 20000], # 3) YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
+               [60000 15000 -2. 5000],  # 4) YearPredictionMSD_full + scaled + 1e-3  midnight retry / FINAL
+               [50000 2500 -2. 2500],   # 5) slice + scaled + 1e-1                   100 epochs / FINAL
+               [50000 2500 -2. 1],      # 6) slice + scaled + 1e-3                   100 epochs / FINAL
+               [  10 2000 -2. 4000],    # 7) real-sim + unscaled + 1e-1              midnight retry / FINAL
+               [500 5000 -2. 2000]]     # 8) real-sim + unscaled + 1e-3              midnight retry / FINAL
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
