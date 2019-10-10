@@ -32,8 +32,8 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "final"
-details = "test-rho"
+details = "final"
+# details = "test-rho"
 # details = "legend"
 
 ## Bash input
@@ -93,10 +93,10 @@ else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -109,22 +109,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 25/06 11:14
-               [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               25/06 11:14
-               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 16 epochs => WARNING: potential bug spotted:
-                                         # From worker 4:	   3450000  |           0.01132548964563050847           |    14.39  |  47049.4448  |
-                                         # From worker 4:	   3500000  |           0.01224447809451410275           |    14.58  |  47630.2359  |
-                                         # From worker 4:	   3550000  |           0.00970780021823384846           |    14.78  |  48605.9720  |
-                                         # From worker 4:	   3600000  |           0.01258959501736736653           |    14.97  |  49200.2751  |
-                                         # From worker 4:	SVRG-Bubeck outer loop at iteration: 3644286
-                                         # From worker 4:	   3644286  |           0.52289196287182837519           |    16.14  |  50079.2315  |
-                                         # ====> Divergence at last point, during the outer loop
-
-               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 16 epochs
-               [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
-               [50000 40000 -2. 30000],  # 6)  slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
-               [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 25/06 11:14
-               [500 5000 -2. 2000]]  # 8) real-sim + unscaled + 1e-3                   25/06 11:14
+skip_errors = [[700 7000 -2. 7000],     # 1) ijcnn1_full + scaled + 1e-1             25/06 11:14
+               [13000 7000 -2. 5000],   # 2) ijcnn1_full + scaled + 1e-3             25/06 11:14
+               [50000 30000 -2. 20000], # 3) YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 16 epochs
+               [60000 40000 -2. 30000], # 4) YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 16 epochs
+               [50000 40000 -2. 30000], # 5) slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
+               [50000 40000 -2. 30000], # 6) slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
+               [  10 2000 -2. 4000],    # 7) real-sim + unscaled + 1e-1              25/06 11:14
+               [500 5000 -2. 2000]]     # 8) real-sim + unscaled + 1e-3              25/06 11:14
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -242,31 +234,6 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     out_free.name = latexstring("Free-SVRG \$(m = n = $str_m_free, b = 1, \\alpha^*(1) = $str_step_free)\$")
     OUTPUTS = [OUTPUTS; out_free]
     println("\n")
-
-    #region
-    ################################################################################
-    ################################## LEAP-SVRG ###################################
-    ################################################################################
-    # ## Leap-SVRG with 1-nice sampling ( p = 1/n, b = 1, step sizes = {eta^*=1/L, alpha^*(b)} )
-    # proba = 1/n                        # update probability set to the inverse of the number of data points
-    # options.batchsize = 1              # mini-batch size set to 1
-    # options.stepsize_multiplier = -1.0 # theoretical step sizes set in boot_Leap_SVRG
-    # sampling = build_sampling("nice", n, options)
-    # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
-
-    # ## Setting the number of skipped iteration to 1/4*p
-    # options.skip_error_calculation = skip_error[3] # skip error different for each algo
-    # # options.skip_error_calculation = round(Int64, 1/(4*proba))
-
-    # out_leap = minimizeFunc(prob, leap, options)
-
-    # str_proba_leap = @sprintf "%.2e" proba
-    # str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
-    # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
-    # out_leap.name = latexstring("Leap-SVRG \$(p = 1/n = $str_proba_leap, b = 1, \\eta_{Leap}^* = $str_step_grad_leap, \\alpha_{Leap}^*(1) = $str_step_sto_leap)\$")
-    # OUTPUTS = [OUTPUTS; out_leap]
-    # println("\n")
-    #endregion
 
     ################################################################################
     ################################### L-SVRG-D ###################################
