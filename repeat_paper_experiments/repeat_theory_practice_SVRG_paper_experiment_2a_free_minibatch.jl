@@ -79,10 +79,10 @@ else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -95,31 +95,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for more data points
-skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1              b^* = 1
-               [7000 5000 3000 70 7000],      # 2) ijcnn1_full + scaled + 1e-3              b^* = 1
-               [30000 20000 10000 10 30000],  # 3) YearPredictionMSD_full + scaled + 1e-1   b^* = 1          moins de 3h a tourner
-               [30000 20000 10000 10 30000],  # 4) YearPredictionMSD_full + scaled + 1e-3  b^* = 2
-               [25000 2000 1000 1 2500],      # 5) slice + scaled + 1e-1                    b^* = 22         moins de 3h a tourner
-               [25000 2000 1000 1 2500],      # 6) slice + scaled + 1e-3                    b^* = n = 53500  moins de 3h a tourner
-               [2000 2000 1000 1 2000],       # 7) real-sim + unscaled + 1e-1               b^* = 1
-               [5000 5000 2000 1 8000]]       # 8) real-sim + unscaled + 1e-3               b^* = 1
-
-# max_epochs_list = [ 300, # 1)  ijcnn1_full + scaled + 1e-1
-#                    1000, # 2)  ijcnn1_full + scaled + 1e-3
-#                    9999 , # 3)  YearPredictionMSD_full + scaled + 1e-1
-#                    9999, # 4)  YearPredictionMSD_full + scaled + 1e-3
-#                      -2,
-#                      -2,
-#                    9999, # 7)  slice + scaled + 1e-1
-#                    9999, # 8)  slice + scaled + 1e-3
-#                     250, # 9)  real-sim + unscaled + 1e-1
-#                     500, # 10) real-sim + unscaled + 1e-3
-#                      -2,
-#                      -2,
-#                      -2,
-#                      -2,
-#                      -2,
-#                      -2]
+skip_errors = [[7000 5000 3000 3 7000],      # 1) ijcnn1_full + scaled + 1e-1              b^* = 1
+               [7000 5000 3000 70 7000],     # 2) ijcnn1_full + scaled + 1e-3              b^* = 1
+               [30000 20000 10000 10 30000], # 3) YearPredictionMSD_full + scaled + 1e-1   b^* = 1          less than 3h
+               [30000 20000 10000 10 30000], # 4) YearPredictionMSD_full + scaled + 1e-3   b^* = 2
+               [25000 2000 1000 1 2500],     # 5) slice + scaled + 1e-1                    b^* = 22         less than 3h
+               [25000 2000 1000 1 2500],     # 6) slice + scaled + 1e-3                    b^* = n = 53500  less than 3h
+               [2000 2000 1000 1 2000],      # 7) real-sim + unscaled + 1e-1               b^* = 1
+               [5000 5000 2000 1 8000]]      # 8) real-sim + unscaled + 1e-3               b^* = 1
 
 @time begin
 @sync @distributed for idx_prob in problems
