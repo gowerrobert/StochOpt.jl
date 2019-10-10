@@ -70,6 +70,9 @@ end
 if !isdir("$(save_path)figures/")
     mkdir("$(save_path)figures/")
 end
+if !isdir("$(save_path)outputs/")
+    mkdir("$(save_path)outputs/")
+end
 #endregion
 
 ## Experiments settings
