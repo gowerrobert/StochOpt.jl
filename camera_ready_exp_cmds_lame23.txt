@@ -53,6 +53,9 @@ Launched on 08/10/2019 14:54 ================================> SUCCESS
 nohup nice -5 ../julia-1.0.2/bin/julia -p 8 repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl true > experiments/theory_practice_SVRG/exp2a/nohups/exp2a_true.out 2> experiments/theory_practice_SVRG/exp2a/nohups/exp2a_true.err &
 Launched on 08/10/2019 15:26 ================================> SUCCESS
 
+../julia-1.0.2/bin/julia repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl false
+Launched (pb 8 only) on 10/10/2019 10:XX ================================> ???
+
 ##########################################################################################
 ##################################### EXP 2.B ############################################
 ##########################################################################################
