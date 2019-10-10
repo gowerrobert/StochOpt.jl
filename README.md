@@ -1,8 +1,9 @@
 **warning package under development:** it will break. But renewed shall be the code that was broken, the crashless again shall compile.
 
 # Download the datasets
+After cloning it, go into the `StochOpt.jl` repository and download the datasets by running
 ```bash
-bash download_datasets
+./download_datasets
 ```
 If it crashes, data can be downloaded manually [here](https://partage.mines-telecom.fr/index.php/s/9MreP5y6evFWyJP). Then, datasets `.jld` files should be placed in the directory `./data`.
 
@@ -39,6 +40,7 @@ For a simple demo of the use of the package
 ```julia
 julia ./test/demo.jl
 ```
+*WARNING : DEBUG THIS*
 
 For a demo of the SVRG2 type methods from [1]
 ```julia
