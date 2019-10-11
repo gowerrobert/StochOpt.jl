@@ -37,12 +37,13 @@ details = "final"
 # details = "legend"
 
 ## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
+path = ARGS[1]
+all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
 
 using Distributed
 
 @everywhere begin
-    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+    # path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
