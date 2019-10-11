@@ -110,9 +110,9 @@ setting `all_problems` to `false` to run the code only on the first problem, sca
 ```bash
 ./repeat_paper_experiments/theory_practice_svrg.sh <path_to_julia> <absolute_path_to_StochOpt.jl> <exp_number> <all_problems> <number_of_processors>
 ```
-setting `exp_number` to 1a, 1b, 1c, 2a or 2b to select the desired experiment, `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~10 to 20min) or to `true` to run it on all the eight problems (several hours). If you run an experiment on all the problems, set `number_of_processors` to 8 in order to run them in parallel.
+setting `exp_number` to 1a, 1b, 1c, 2a or 2b to select the desired experiment, `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~10 to 20min) or to `true` to run it on all the eight problems (several hours). If you run an experiment on all the problems, set `number_of_processors` (1 by default) to 8 in order to run them in parallel.
 
-```julia
+<!-- ```julia
 julia -p <number_of_processors> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
@@ -139,7 +139,7 @@ setting `all_problems` to `false` to run the code only on the first problem (~XX
 ```julia
 julia -p <number_of_processors> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl all_problems
 ```
-setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
+setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin). -->
 
 # Methods implemented
 SVRG, the original SVRG algorithm. <br>
