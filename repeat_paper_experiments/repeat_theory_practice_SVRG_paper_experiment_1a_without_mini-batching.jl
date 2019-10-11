@@ -36,13 +36,18 @@ details = "final"
 # details = "test-rho"
 # details = "legend"
 
-## Bash input
-path = ARGS[1]
-all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
-
 using Distributed
 
+## Bash input
+path = ARGS[1]
+@eval @everywhere path=$path
+all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
+
+# println(workers()) # print available workers
+
 @everywhere begin
+    # println(myid(), " : ", ARGS)
+    # println(myid(), " : ", path) # print current worker + path
     # path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
 
     using JLD

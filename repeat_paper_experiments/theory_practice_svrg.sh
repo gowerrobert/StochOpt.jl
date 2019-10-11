@@ -9,19 +9,19 @@ number_processors=$5 # set to 1 by default
 
 case $exp in
     "1a")
-        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl"
+        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl"
         ;;
     "1b")
-        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl"
+        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl"
         ;;
     "1c")
-        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl"
+        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl"
         ;;
     "2a")
-        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl"
+        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl"
         ;;
     "2b")
-        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl"
+        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl"
         ;;
     *)
         printf "ERROR: unkown experiment name. It has to be in {1a, 1b, 1c, 2a, 2b}."
@@ -37,7 +37,7 @@ case $all_problems in
         printf "Running experiment $exp only on the first problem (logistic regression on the scaled ijcnn1 dataset with lambda=0.1).\n"
         ;;
     *)
-        printf "ERROR: invalid input for all_problems. It has to be either true or false."
+        printf "ERROR: invalid input for all_problems. It has to be either true or false.\n"
         exit 1
         ;;
 esac
@@ -55,7 +55,15 @@ else
     exit 1
 fi
 
-printf "Running the command:\n$julia_path -p $number_processors $exp_path $stochopt_path $all_problems\n\n"
-$julia_path -p $number_processors $exp_path $stochopt_path $all_problems
+
+if [ $number_processors == 1 ]
+then
+    printf "Running the command:\n$julia_path $exp_path $stochopt_path $all_problems\n\n"
+    $julia_path $exp_path $stochopt_path $all_problems
+else
+    printf "Running the command:\n$julia_path -p $number_processors $exp_path $stochopt_path $all_problems\n\n"
+    $julia_path -p $number_processors $exp_path $stochopt_path $all_problems
+fi
+
 
 printf "\n"

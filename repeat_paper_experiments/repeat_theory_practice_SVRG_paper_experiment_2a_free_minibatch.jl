@@ -28,15 +28,14 @@ details = "final"
 # details = "test-rho"
 # details = "legend"
 
-## Bash input
-path = ARGS[1]
-all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
-
 using Distributed
 
-@everywhere begin
-    # path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+## Bash input
+path = ARGS[1]
+@eval @everywhere path=$path
+all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
 
+@everywhere begin
     using JLD
     using Plots
     using StatsBase
