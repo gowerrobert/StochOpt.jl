@@ -9,19 +9,19 @@ number_processors=$5 # set to 1 by default
 
 case $exp in
     "1a")
-        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl"
+        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl"
         ;;
     "1b")
-        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl"
+        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl"
         ;;
     "1c")
-        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl"
+        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl"
         ;;
     "2a")
-        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl"
+        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl"
         ;;
     "2b")
-        exp_path=$stochopt_path$"repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl"
+        exp_path=$stochopt_path$"/repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl"
         ;;
     *)
         printf "ERROR: unkown experiment name. It has to be in {1a, 1b, 1c, 2a, 2b}."
