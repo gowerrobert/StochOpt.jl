@@ -3,7 +3,7 @@
 # Download the datasets
 After cloning it, go into the `StochOpt.jl` repository and download the datasets by running
 ```bash
-./download_datasets
+./download_datasets.sh
 ```
 If it crashes, data can be downloaded manually [here](https://partage.mines-telecom.fr/index.php/s/9MreP5y6evFWyJP). Then, datasets `.jld` files should be placed in the directory `./data`.
 
@@ -89,50 +89,50 @@ julia ./repeat_paper_experiments/test_optimal_minibatch_SAGA_nice.jl
 ## *Optimal mini-batch and step sizes for SAGA*
 - To re-generate the experiments from Section 5.1 & 5.2 of [5] (~1h 30min)
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2_parallel.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_1_and_2_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, unscaled *uniform* synthetic dataset with $\lambda =10^{-1}$, (~XXXXXmin) or to `true` to run it on all of them (~XXXXXXXXh XXXXXmin).
 
 - To re-generate experiments from Section 5.3 of [5]
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3_parallel.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_3_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~1min) or to `true` to run it on all of them (~1h 30min).
 
 - To re-generate the experiments from Section 5.4 of [5]
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_optimal_minibatch_step_sizes_SAGA_paper_experiment_4_parallel.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~2min) or to `true` to run it on all of them (~XXh XXmin).
 
 ## *Towards closing the gap between the theory and practice of SVRG*
 - To re-generate all plots from experiment 1.a of [6]
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1a_without_mini-batching.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
 
 - To re-generate all plots from experiment 1.b of [6]
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1b_optimal_mini-batching.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
 
 - To re-generate all plots from experiment 1.c of [6]
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_1c_optimal_inner_loop.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
 
 - To re-generate all plots from experiment 2.a of [6]
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2a_free_minibatch.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
 
 - To re-generate all plots from experiment 2.b of [6]
 ```julia
-julia -p <number_of_processors_to_add> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl all_problems
+julia -p <number_of_processors> ./repeat_paper_experiments/repeat_theory_practice_SVRG_paper_experiment_2b_free_inner_loop.jl all_problems
 ```
 setting `all_problems` to `false` to run the code only on the first problem (~XXmin) or to `true` to run it on all of them (~XXh XXmin).
 
