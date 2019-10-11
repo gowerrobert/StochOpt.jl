@@ -108,7 +108,7 @@ setting `all_problems` to `false` to run the code only on the first problem, sca
 ## *Towards closing the gap between the theory and practice of SVRG*
 - To re-generate experiments of [6], enter the `StochOpt.jl` folder and run
 ```bash
-./repeat_paper_experiments/theory_practice_SVRG.sh <path_to_julia> <absolute_path_to_StochOpt.jl> <exp_number> <all_problems> <number_of_processors>
+./repeat_paper_experiments/theory_practice_svrg.sh <path_to_julia> <absolute_path_to_StochOpt.jl> <exp_number> <all_problems> <number_of_processors>
 ```
 setting `exp_number` to 1a, 1b, 1c, 2a or 2b to select the desired experiment, `all_problems` to `false` to run the code only on the first problem, scaled *ijcnn1_full* with $\lambda =10^{-1}$, (~10 to 20min) or to `true` to run it on all the eight problems (several hours). If you run an experiment on all the problems, set `number_of_processors` to 8 in order to run them in parallel.
 

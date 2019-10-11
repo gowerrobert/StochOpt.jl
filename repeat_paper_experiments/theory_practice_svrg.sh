@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# svrg_exp julia_path stochopt_path exp all_problems
+# theory_practice_svrg julia_path stochopt_path exp all_problems
 julia_path=${1?Error: no path for julia given}
 stochopt_path=${2?Error: no path for StochOpt.jl given}
 exp=${3?Error: no experiment name given}
 all_problems=${4?Error: no problems (boolean) given}
-number_processors=$5
+number_processors=$5 # set to 1 by default
 
 case $exp in
     "1a")
@@ -42,7 +42,12 @@ case $all_problems in
         ;;
 esac
 
-if [[ $number_processors =~ ^[1-8]$ ]]
+
+if [[ -z "$number_processors"  || ($all_problems == false) ]]
+then
+    number_processors=1
+    printf "Number of processors automatically set to 1\n"
+elif [[ $number_processors =~ ^[1-8]$ ]]
 then
     echo "Number of processors used in parallel: $number_processors"
 else
@@ -50,7 +55,7 @@ else
     exit 1
 fi
 
-printf "Running the command:\n$julia_path $exp_path $stochopt_path $all_problems\n\n"
-# $julia_path $exp_path $stochopt_path $all_problems
+printf "Running the command:\n$julia_path -p $number_processors $exp_path $stochopt_path $all_problems\n\n"
+# $julia_path -p $number_processors $exp_path $stochopt_path $all_problems
 
-printf "\n\n"
+printf "\n"
