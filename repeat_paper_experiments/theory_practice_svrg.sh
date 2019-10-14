@@ -59,10 +59,10 @@ fi
 if [ $number_processors == 1 ]
 then
     printf "Running the command:\n$julia_path $exp_path $stochopt_path $all_problems\n\n"
-    $julia_path $exp_path $stochopt_path $all_problems
+    $julia_path $exp_path $stochopt_path $all_problems &
 else
     printf "Running the command:\n$julia_path -p $number_processors $exp_path $stochopt_path $all_problems\n\n"
-    $julia_path -p $number_processors $exp_path $stochopt_path $all_problems
+    $julia_path -p $number_processors $exp_path $stochopt_path $all_problems &
 fi
 
 

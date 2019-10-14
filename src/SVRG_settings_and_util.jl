@@ -130,8 +130,12 @@ function optimal_minibatch_L_SVRG_D_nice(p, n, mu, L, Lmax)
         flag = "none"
         ksi_p = ( (7-4*p)*(1-(1-p)^1.5) ) / ( p*(2-p)*(3-2*p) ) # Defined in Theorem 5.1
         if n < 1.5*ksi_p*L/mu
-            minibatch_size = n
-            flag = "n"
+            b_hat = sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
+            if b_hat < 1
+                error("b_hat is non positive")
+            end
+            minibatch_size = max(floor(Int, b_hat), 1)
+            flag = "b_hat"
         elseif 1.5*ksi_p*L/mu <= n <= 1.5*ksi_p*Lmax/mu
             b_hat = sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
             b_tilde = ( 1.5*ksi_p*n*(Lmax-L) ) / ( mu*n*(n-1) - 1.5*ksi_p*(n*L-Lmax) )
