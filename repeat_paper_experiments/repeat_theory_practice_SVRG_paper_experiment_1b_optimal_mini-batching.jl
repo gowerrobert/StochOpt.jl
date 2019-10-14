@@ -90,7 +90,7 @@ end
 if all_problems
     problems = 1:8
 else
-    problems = 1:1
+    problems = 6:6 # corrected b* for L-SVRG-D
 end
 
 datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
