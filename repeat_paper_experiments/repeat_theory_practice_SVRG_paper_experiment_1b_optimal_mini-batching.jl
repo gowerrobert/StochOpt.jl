@@ -114,7 +114,7 @@ skip_errors = [[700 7000 -2. 7000],     # 1) ijcnn1_full + scaled + 1e-1        
                [50000 30000 -2. 20000], # 3) YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
                [60000 15000 -2. 5000],  # 4) YearPredictionMSD_full + scaled + 1e-3  midnight retry / FINAL
                [50000 2500 -2. 2500],   # 5) slice + scaled + 1e-1                   100 epochs / FINAL
-               [50000 2500 -2. 1],      # 6) slice + scaled + 1e-3                   100 epochs / FINAL
+               [50000 2500 -2. 2500],   # 6) slice + scaled + 1e-3                   100 epochs / FINAL
                [  10 2000 -2. 4000],    # 7) real-sim + unscaled + 1e-1              midnight retry / FINAL
                [500 5000 -2. 2000]]     # 8) real-sim + unscaled + 1e-3              midnight retry / FINAL
 
