@@ -2,7 +2,7 @@ function load_logistic(data_path::AbstractString, probname::AbstractString,  opt
     # Load logistic regression problem
     println("loading:  ", probname)
     X, y = loadDataset(data_path,probname);
-    prob = load_logistic_from_matrices(X, y, probname, opts, lambda=-1, scaling = scaling)
+    prob = load_logistic_from_matrices(X, y, probname, opts, lambda=-1, scaling = scaling ; data_path::AbstractString = "./data/")
 
     return prob
 end
