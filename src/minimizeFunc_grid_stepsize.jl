@@ -1,5 +1,5 @@
-function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing, grid::Array{Float64,1}=[0.0])
-    default_path = "./data/";
+function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing, grid::Array{Float64,1}=[0.0] ,  default_path::AbstractString="./",)
+#     default_path = "./data/";
     # savename = string(replace(prob.name, r"[\/]", "-"),'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
     # savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
 
