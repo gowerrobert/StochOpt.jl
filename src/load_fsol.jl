@@ -1,8 +1,10 @@
-function load_fsol!(options, prob)
+function load_fsol!(options, prob  ;  data_path::AbstractString="./data/")
     if(options.exacterror)
         try # getting saved optimal f
-            fsolfilename = get_fsol_filename(prob);
+            fsolfilename = get_fsol_filename(prob, data_path =data_path);
             prob.fsol = load("$(fsolfilename).jld", "fsol")
+            print(fsolfilename)
+            print(prob.fsol)
         catch
             println("No fsol for ", prob.name);
             prob.fsol = 0.0
@@ -12,8 +14,8 @@ function load_fsol!(options, prob)
     end
 end
 
-function get_fsol_filename(prob)
+function get_fsol_filename(prob ;  data_path::AbstractString="./data/")
     savename = string(replace(prob.name, r"[\/]" => "-"), "-fsol");
-    default_path = "./data/";
-    return string(default_path, savename);
+#     data_path = "./data/";
+    return string(data_path, savename);
 end

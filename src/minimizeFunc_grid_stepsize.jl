@@ -1,5 +1,5 @@
-function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing, grid::Array{Float64,1}=[0.0] ,  default_path::AbstractString="./",)
-#     default_path = "./data/";
+function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions; testprob=nothing, grid::Array{Float64,1}=[0.0] ,  data_path::AbstractString="./data/")
+#     data_path = "./data/";
     # savename = string(replace(prob.name, r"[\/]", "-"),'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
     # savename = string(savename,'-',method_name_temp,"-",options.batchsize,"-stepsize") ;
 
@@ -9,7 +9,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
         method_name = method_input.name;
     end
 
-    beststep, savename = get_saved_stepsize(prob.name, method_name, options);
+    beststep, savename = get_saved_stepsize(prob.name, method_name, options, data_path = data_path);
     if beststep == 0.0 || options.repeat_stepsize_calculation == true
         options.force_continue = false;
         if grid == [0.0]
@@ -74,13 +74,13 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
     options.max_epocs *= 2;
     options.max_time *= 3.0; # To adjust
 
-    outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob);
+    outputfirst = minimizeFunc(prob, method_input, options, testprob=testprob, data_path = data_path);
     # for expnum =2: options.rep_number
     #   outputfirst= minimizeFunc(prob, method_name, options); # Repeat a few times account for Julia just intime compiling
     # end
     println("\n=> Best step: ", beststep);
 
-    save("$(default_path)$(savename).jld", "output", outputfirst);
+    save("$(data_path)$(savename).jld", "output", outputfirst);
 
     return outputfirst
 end

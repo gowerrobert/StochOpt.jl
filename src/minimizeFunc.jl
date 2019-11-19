@@ -2,7 +2,7 @@
 # solving the empirical risk minimization problem - 2018 - Robert M. Gower
 # StochOpt Copyright (C) 2018, Robert Gower
 
-function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing, stop_at_tol::Bool=false, skip_decrease::Bool=false)
+function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=nothing, stop_at_tol::Bool=false, skip_decrease::Bool=false, data_path::AbstractString="./data/")
 
     if options.initial_point == "randn" # set initial point
         x = randn(prob.numfeatures);
@@ -35,8 +35,8 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
     ##
     if options.exacterror == false
         prob.fsol = 0.0; # Using suboptimality as a measure of error
-    else
-        load_fsol!(options, prob); # already loaded in load_logistic.jl
+    elseif prob.fsol != 0.0
+        load_fsol!(options, prob, data_path = data_path); # already loaded in load_logistic.jl
     end
     # println("---> fsol set (", prob.fsol, ")")
 

@@ -1,7 +1,7 @@
-function load_logistic(datapath::AbstractString, probname::AbstractString,  opts::MyOptions; scaling="column-scaling")
+function load_logistic(data_path::AbstractString, probname::AbstractString,  opts::MyOptions; scaling="column-scaling")
     # Load logistic regression problem
     println("loading:  ", probname)
-    X, y = loadDataset(datapath,probname);
+    X, y = loadDataset(data_path,probname);
     prob = load_logistic_from_matrices(X, y, probname, opts, lambda=-1, scaling = scaling)
 
     return prob
@@ -142,7 +142,7 @@ function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString,
     prob = initiate_Prob(X=X, y=y, numfeatures=numfeatures, numdata=numdata, name=name, datascaling=datascaling, f_eval=f_eval, g_eval=g_eval, g_eval_mutating=g_eval!, Jac_eval_mutating=Jac_eval!, scalar_grad_eval=scalar_grad_eval, scalar_grad_hess_eval=scalar_grad_hess_eval, Hess_eval=Hess_eval, Hess_eval_mutating=Hess_eval!, Hess_opt=Hess_opt, Hess_opt_mutating=Hess_opt!, Hess_D=Hess_D, Hess_D_mutating=Hess_D!, Hess_C=Hess_C, Hess_C_mutating=Hess_C!, Hess_CC_g_C_mutating=Hess_CC_g_C!, Hess_C2=Hess_C2, lambda=lambda, mu=mu, L=L, Lmax=Lmax, Lbar=Lbar)
 
     ## Try to load the solution of the problem, if already computed
-    load_fsol!(opts, prob);
+    load_fsol!(opts, prob, data_path=data_path);
     if prob.fsol == 0.0
         println("Need to compute the solution of the problem")
         # get_fsol_logistic!(prob); ## getting and saving approximation of the solution fsol
@@ -162,7 +162,8 @@ The solution is obtained by running a BFGS and an accelerated BFGS algorithm.
     - **Prob** prob: logistic regression problem\\
 #OUTPUTS:\\
 """
-function get_fsol_logistic!(prob)
+function get_fsol_logistic!(prob;  data_path::AbstractString="./data/")
+    path = string(replace(data_path, r"data/" => ""));
     if prob.numfeatures < 10000
         options = set_options(tol=10.0^(-16.0), skip_error_calculation=10^2, exacterror=false, max_iter=10^8,
                               max_time=60.0, max_epocs=10^5, repeat_stepsize_calculation=true, rep_number=1); #3
@@ -171,18 +172,18 @@ function get_fsol_logistic!(prob)
         method_input = "BFGS";
         # grid = [2.0^(9), 2.0^(7), 2.0^(5), 2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5)];
         # output = minimizeFunc_grid_stepsize(prob, method_input, options, grid=grid);
-        output = minimizeFunc_grid_stepsize(prob, method_input, options);
+        output = minimizeFunc_grid_stepsize(prob, method_input, options,data_path=data_path);
 
         ## Running accelerated BFGS
         options.embeddim = [prob.numdata, 0.01];  #[0.9, 5];
         method_input = "BFGS_accel";
         # output1 = minimizeFunc_grid_stepsize(prob, method_input, options, grid=grid);
-        output1 = minimizeFunc_grid_stepsize(prob, method_input, options);
+        output1 = minimizeFunc_grid_stepsize(prob, method_input, options, data_path= data_path);
         OUTPUTS = [output; output1];
 
         ## Plotting the two solutions
         gr()# gr() pyplot() # pgfplots() #plotly()
-        plot_outputs_Plots(OUTPUTS, prob, options);
+        plot_outputs_Plots(OUTPUTS, prob, options, path =path);
 
         ## Setting the true solution as the smallest of both
         prob.fsol = minimum([output.fs output1.fs]);#min(output.fs[end],fsol);
@@ -195,11 +196,11 @@ function get_fsol_logistic!(prob)
         options.batchsize = 100;
         # options.batchsize = prob.numdata;
         method_input = "SVRG";
-        output = minimizeFunc_grid_stepsize(prob, method_input, options);
+        output = minimizeFunc_grid_stepsize(prob, method_input, options,data_path = data_path);
 
-        # default_path = "./data/";
+        # data_path = "./data/";
         # _, savename = get_saved_stepsize(prob.name, method_input, options)
-        # save("$(default_path)$(savename).jld", "output", output)
+        # save("$(data_path)$(savename).jld", "output", output)
 
         ## Setting the true solution as the smallest of both
         nanvalues = isnan.(output.fs);
@@ -211,6 +212,6 @@ function get_fsol_logistic!(prob)
     println("----------------------------------------------------------------------\n")
 
     ## Saving the solution in a JLD file
-    fsolfilename = get_fsol_filename(prob); # not coherent with get_saved_stepsize output
+    fsolfilename = get_fsol_filename(prob, data_path=data_path); # not coherent with get_saved_stepsize output
     save("$(fsolfilename).jld", "fsol", prob.fsol)
 end

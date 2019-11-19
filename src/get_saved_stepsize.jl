@@ -1,5 +1,5 @@
-function get_saved_stepsize(probname::AbstractString, method_name::AbstractString, options)
-    default_path = "./data/";
+function get_saved_stepsize(probname::AbstractString, method_name::AbstractString, options ;  data_path::AbstractString="./data/")
+#     data_path = "./data/"; 
     savename = replace(probname, r"[\/]" => "-");
     # if method_name != "SVRG2"
     #     method_name_temp = replace(method_name, r"6" => "");
@@ -19,8 +19,8 @@ function get_saved_stepsize(probname::AbstractString, method_name::AbstractStrin
     beststep = 0.0;
     #repeat =1 means we should repeat all calculations even if there is a saved output already
     try
-        output = load("$(default_path)$(savename).jld", "output");
-        println("found ", "$(default_path)$(savename).jld with stepsize ", output.stepsize_multiplier)
+        output = load("$(data_path)$(savename).jld", "output");
+        println("found ", "$(data_path)$(savename).jld with stepsize ", output.stepsize_multiplier)
         beststep = output.stepsize_multiplier;
     catch loaderror
         println(loaderror)
