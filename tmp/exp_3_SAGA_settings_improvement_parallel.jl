@@ -256,8 +256,8 @@ K = (4.0*tau_hofmann*Lmax) / (n*mu);
 step_hofmann = K / (2*Lmax*(1+K+sqrt(1+K^2)));
 # step_hofmann = tau/(mu*n);
 
-rho = ( n*(n - tau_hofmann) ) / ( tau_hofmann*(n-1) ); # Sketch residual
-rightterm = (rho / n)*Lmax + ( (mu*n) / (4*tau_hofmann) ); # Right-hand side term in the max
+# rho = ( n*(n - tau_hofmann) ) / ( tau_hofmann*(n-1) ); # Sketch residual rho = n*(n-b)/(b*(n-1)) in JacSketch paper, page 35
+rightterm = ( Lmax*(n - tau_hofmann) ) / ( tau_hofmann*(n-1) ) + ( (mu*n) / (4*tau_hofmann) ); # Right-hand side term in the max
 heuristicbound = ( n*(tau_hofmann-1)*L + (n-tau_hofmann)*Lmax ) / ( tau_hofmann*(n-1) );
 step_hofmann_heuristic = 0.25 / max(heuristicbound, rightterm);
 
@@ -266,8 +266,8 @@ step_hofmann_heuristic = 0.25 / max(heuristicbound, rightterm);
 ## YearPredictionMSD scaled + mu = 10^(-1) => 1233
 tau_heuristic = round(Int, 1 + ( mu*(n-1) ) / ( 4*L ) );
 # tau_heuristic = 20;
-rho = ( n*(n - tau_heuristic) ) / ( tau_heuristic*(n-1) ); # Sketch residual
-rightterm = (rho / n)*Lmax + ( (mu*n) / (4*tau_heuristic) ); # Right-hand side term in the max
+# rho = ( n*(n - tau_heuristic) ) / ( tau_heuristic*(n-1) ); # Sketch residual rho = n*(n-b)/(b*(n-1)) in JacSketch paper, page 35
+rightterm = ( Lmax*(n - tau_heuristic) ) / ( tau_heuristic*(n-1) ) + ( (mu*n) / (4*tau_heuristic) ); # Right-hand side term in the max
 heuristicbound = ( n*(tau_heuristic-1)*L + (n-tau_heuristic)*Lmax ) / ( tau_heuristic*(n-1) );
 step_heuristic = 0.25 / max(heuristicbound, rightterm);
 

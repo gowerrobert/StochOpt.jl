@@ -24,18 +24,18 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "FINAL"
-# details = "100_epochs"
-details = "test-rho"
-
-## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
+details = "final"
+# details = "test-rho"
+# details = "legend"
 
 using Distributed
 
-@everywhere begin
-    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+## Bash input
+path = ARGS[1]
+@eval @everywhere path=$path
+all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
 
+@everywhere begin
     using JLD
     using Plots
     using StatsBase
@@ -70,6 +70,9 @@ end
 if !isdir("$(save_path)figures/")
     mkdir("$(save_path)figures/")
 end
+if !isdir("$(save_path)outputs/")
+    mkdir("$(save_path)outputs/")
+end
 #endregion
 
 ## Experiments settings
@@ -79,10 +82,10 @@ else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -95,31 +98,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for more data points
-skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1              b^* = 1
-               [7000 5000 3000 70 7000],      # 2) ijcnn1_full + scaled + 1e-3              b^* = 1
-               [30000 10000 5000 10 30000],   # 3) YearPredictionMSD_full + scaled + 1e-1   b^* = 1          moins de 3h a tourner
-               [30000 10000 5000 10 30000],   # 4) YearPredictionMSD_full + scaled + 1e-3   b^* = 2
-               [25000 2000 1000 1 2500],      # 5) slice + scaled + 1e-1                    b^* = 22         moins de 3h a tourner
-               [25000 2000 1000 1 2500],      # 6) slice + scaled + 1e-3                    b^* = n = 53500  moins de 3h a tourner
-               [2000 1000 500 1 2000],        # 7) real-sim + unscaled + 1e-1               b^* = 1
-               [5000 2500 1000 1 5000]]       # 8) real-sim + unscaled + 1e-3               b^* = 1 (for approx mu)
-
-# max_epochs_list = [ 300, # 1)  ijcnn1_full + scaled + 1e-1
-#                    1000, # 2)  ijcnn1_full + scaled + 1e-3
-#                    9999 , # 3)  YearPredictionMSD_full + scaled + 1e-1
-#                    9999, # 4)  YearPredictionMSD_full + scaled + 1e-3
-#                      -2,
-#                      -2,
-#                    9999, # 7)  slice + scaled + 1e-1
-#                    9999, # 8)  slice + scaled + 1e-3
-#                     250, # 9)  real-sim + unscaled + 1e-1
-#                     500, # 10) real-sim + unscaled + 1e-3
-#                      -2,
-#                      -2,
-#                      -2,
-#                      -2,
-#                      -2,
-#                      -2]
+skip_errors = [[7000 5000 3000 3 7000],      # 1) ijcnn1_full + scaled + 1e-1              b^* = 1
+               [7000 5000 3000 70 7000],     # 2) ijcnn1_full + scaled + 1e-3              b^* = 1
+               [30000 20000 10000 10 30000], # 3) YearPredictionMSD_full + scaled + 1e-1   b^* = 1          less than 3h
+               [30000 20000 10000 10 30000], # 4) YearPredictionMSD_full + scaled + 1e-3   b^* = 2
+               [25000 2000 1000 1 2500],     # 5) slice + scaled + 1e-1                    b^* = 22         less than 3h
+               [25000 2000 1000 1 2500],     # 6) slice + scaled + 1e-3                    b^* = n = 53500  less than 3h
+               [2000 2000 1000 1 2000],      # 7) real-sim + unscaled + 1e-1               b^* = 1
+               [5000 5000 2000 1 8000]]      # 8) real-sim + unscaled + 1e-3               b^* = 1
 
 @time begin
 @sync @distributed for idx_prob in problems
@@ -227,8 +213,9 @@ skip_errors = [[7000 5000 3000 3 7000],       # 1) ijcnn1_full + scaled + 1e-1  
     ## Saving outputs and plots
     if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
+    else
+        suffix = ""
     end
-
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp2a-$(suffix)-$(details)")
     save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)

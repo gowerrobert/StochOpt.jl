@@ -32,18 +32,18 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "final"
+details = "final"
+# details = "test-rho"
 # details = "legend"
-details = "test-rho"
-
-## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
 
 using Distributed
 
-@everywhere begin
-    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+## Bash input
+path = ARGS[1]
+@eval @everywhere path=$path
+all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
 
+@everywhere begin
     using JLD
     using Plots
     using StatsBase
@@ -93,11 +93,10 @@ else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
-
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -110,14 +109,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 midnight retry / FINAL
-               [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               midnight retry / FINAL
-               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
-               [60000 15000 -2. 5000],  # 4)  YearPredictionMSD_full + scaled + 1e-3   midnight retry / FINAL
-               [50000 2500 -2. 2500],  # 5)  slice + scaled + 1e-1                     100 epochs / FINAL
-               [50000 1 -2. 1],  # 6)  slice + scaled + 1e-3                           100 epochs / FINAL
-               [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 midnight retry / FINAL
-               [500 5000 -2. 2000]]  # 8) real-sim + unscaled + 1e-3                   midnight retry / FINAL
+skip_errors = [[700 7000 -2. 7000],     # 1) ijcnn1_full + scaled + 1e-1             midnight retry / FINAL
+               [13000 7000 -2. 5000],   # 2) ijcnn1_full + scaled + 1e-3             midnight retry / FINAL
+               [50000 30000 -2. 20000], # 3) YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
+               [60000 15000 -2. 5000],  # 4) YearPredictionMSD_full + scaled + 1e-3  midnight retry / FINAL
+               [50000 2500 -2. 2500],   # 5) slice + scaled + 1e-1                   100 epochs / FINAL
+               [50000 2500 -2. 2500],   # 6) slice + scaled + 1e-3                   100 epochs / FINAL
+               [  10 2000 -2. 4000],    # 7) real-sim + unscaled + 1e-1              midnight retry / FINAL
+               [500 5000 -2. 2000]]     # 8) real-sim + unscaled + 1e-3              midnight retry / FINAL
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -129,10 +128,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     Random.seed!(1)
 
-    if idx_prob == 3
-        global max_epochs = 10
-    elseif idx_prob == 4
-        global max_epochs = 13
+    if idx_prob == 3 || idx_prob == 4
+        global max_epochs = 16
     elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
     end
@@ -204,7 +201,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     str_m_bubeck = @sprintf "%d" bubeck.numinneriters
     str_step_bubeck = @sprintf "%.2e" bubeck.stepsize
     # out_bubeck.name = latexstring("SVRG-Bubeck \$(m_{Bubeck}^* = $str_m_bubeck, b = 1, \\alpha_{Bubeck}^* = $str_step_bubeck)\$")
-    out_bubeck.name = latexstring("SVRG \$(m^* = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
+    out_bubeck.name = latexstring("SVRG \$(m = 20L_{\\max}/\\mu = $str_m_bubeck, b = 1, \\alpha^* = $str_step_bubeck)\$")
     OUTPUTS = [OUTPUTS; out_bubeck]
     println("\n")
 
@@ -288,12 +285,14 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     ## Saving outputs and plots
     if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
+    else
+        suffix = ""
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1b-$(suffix)-$(details)")
     save("$(save_path)outputs/$(savename).jld", "OUTPUTS", OUTPUTS)
 
-    if idx_prob == 8
+    if idx_prob == 8 || idx_prob == 6
         legendpos = :best
     else
         legendpos = :topright
@@ -301,7 +300,7 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     pyplot()
     # plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(max_epochs)_max_epochs", path=save_path, legendpos=legendpos, legendfont=6) # Plot and save output
-    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=8)
+    plot_outputs_Plots(OUTPUTS, prob, options, suffix="-exp1b-$(suffix)-$(details)", path=save_path, legendpos=legendpos, legendfont=9)
 
 end
 println("\n\n--- EXPERIMENT 1.B FINISHED ---")

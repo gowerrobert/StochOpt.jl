@@ -29,21 +29,21 @@ For each problem (data set + scaling process + regularization)
 ## General settings
 max_epochs = 10^8
 max_time = 60.0*60.0*24.0
-precision = 10.0^(-6) # 10.0^(-6)
+precision = 10.0^(-6)
 
 ## File names
-# details = "final"
+details = "final"
+# details = "test-rho"
 # details = "legend"
-details = "test-rho"
-
-## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
 
 using Distributed
 
-@everywhere begin
-    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+## Bash input
+path = ARGS[1]
+@eval @everywhere path=$path
+all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
 
+@everywhere begin
     using JLD
     using Plots
     using StatsBase
@@ -93,10 +93,10 @@ else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -109,14 +109,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[700 200 -2. 150],        # 1)  ijcnn1_full + scaled + 1e-1                midnight retry / FINAL
-               [25000 6500 -2. 5500],    # 2)  ijcnn1_full + scaled + 1e-3                midnight retry / FINAL
-               [60000 40000 -2. 25000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
-               [30000 20000 -2. 20000],  # 4)  YearPredictionMSD_full + scaled + 1e-3     new try
-               [50000 50000 -2. 50000],  # 5)  slice + scaled + 1e-1                   midnight retry / FINAL
-               [50000 50000 -2. 50000],  # 6)  slice + scaled + 1e-3                   midnight retry / FINAL
-               [   5   3 -2.    3],      # 7)  real-sim + unscaled + 1e-1                  midnight retry / FINAL
-               [600  150 -2.  100]]      # 8)  real-sim + unscaled + 1e-3                  midnight retry / FINAL
+skip_errors = [[700 200 -2. 150],       # 1) ijcnn1_full + scaled + 1e-1             midnight retry / FINAL
+               [25000 6500 -2. 5500],   # 2) ijcnn1_full + scaled + 1e-3             midnight retry / FINAL
+               [60000 40000 -2. 25000], # 3) YearPredictionMSD_full + scaled + 1e-1  midnight retry / FINAL
+               [40000 30000 -2. 20000], # 4) YearPredictionMSD_full + scaled + 1e-3  new try
+               [50000 50000 -2. 50000], # 5) slice + scaled + 1e-1                   midnight retry / FINAL
+               [50000 50000 -2. 50000], # 6) slice + scaled + 1e-3                   midnight retry / FINAL
+               [   5   3 -2.    3],     # 7) real-sim + unscaled + 1e-1              midnight retry / FINAL
+               [600  150 -2.  100]]     # 8) real-sim + unscaled + 1e-3              midnight retry / FINAL
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -128,9 +128,7 @@ skip_errors = [[700 200 -2. 150],        # 1)  ijcnn1_full + scaled + 1e-1      
 
     Random.seed!(1)
 
-    if idx_prob == 3
-        global max_epochs = 10
-    elseif idx_prob == 4
+    if idx_prob == 3 || idx_prob == 4
         global max_epochs = 16
     elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
@@ -276,6 +274,8 @@ skip_errors = [[700 200 -2. 150],        # 1)  ijcnn1_full + scaled + 1e-1      
     ## Saving outputs and plots
     if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
+    else
+        suffix = ""
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1c-$(suffix)-$(details)")

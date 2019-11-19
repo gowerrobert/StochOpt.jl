@@ -130,8 +130,12 @@ function optimal_minibatch_L_SVRG_D_nice(p, n, mu, L, Lmax)
         flag = "none"
         ksi_p = ( (7-4*p)*(1-(1-p)^1.5) ) / ( p*(2-p)*(3-2*p) ) # Defined in Theorem 5.1
         if n < 1.5*ksi_p*L/mu
-            minibatch_size = n
-            flag = "n"
+            b_hat = sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
+            if b_hat < 1
+                error("b_hat is non positive")
+            end
+            minibatch_size = max(floor(Int, b_hat), 1)
+            flag = "b_hat"
         elseif 1.5*ksi_p*L/mu <= n <= 1.5*ksi_p*Lmax/mu
             b_hat = sqrt( ( n*(Lmax-L) ) / ( 2*(n*L-Lmax) ) )
             b_tilde = ( 1.5*ksi_p*n*(Lmax-L) ) / ( mu*n*(n-1) - 1.5*ksi_p*(n*L-Lmax) )
@@ -182,8 +186,8 @@ end
 
 
 """
-    simulate_Free_SVRG_nice(prob, minibatchgrid, options,
-                       numsimu=1, skipped_errors=1, skip_multiplier=0.02, path="./")
+    simulate_Free_SVRG_nice(prob, minibatchgrid, options, save_path,
+                       numsimu=1, skipped_errors=1, skip_multiplier=0.02)
 
 Runs several times (numsimu) mini-batch Free-SVRG with nice sampling for each
 mini-batch size in the given list (minibatchgrid) in order to evaluate the
@@ -193,23 +197,30 @@ corresponding average iteration complexity.
     - **Prob** prob: considered problem, e.g., logistic regression, ridge regression...\\
     - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
     - **MyOptions** options: different options such as the mini-batch size, the stepsize multiplier...\\
+    - **AbstractString** save_path: path to the folder where the plots are saved\\
     - **Int64** numsimu: number of runs of mini-batch Free-SVRG\\
     - **Int64** skipped\\_errors: number iterations between two evaluations of the error (-1 for automatic computation)\\
     - **Float64** skip\\_multiplier: multiplier used to compute automatically "skipped_error" (between 0 and 1)\\
-    - **AbstractString** path: path to the folder where the plots are saved\\
+    - **AbstractString** suffix: suffix added to saved file names\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(minibatchgrid)*numsimu\\
-    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch size over numsimu samples
+    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the mini-batch sizes over numsimu samples
 """
-function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions ;
-                                 numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
+function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, options::MyOptions, save_path::AbstractString ;
+                                 numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, suffix::AbstractString="")
     ## Remarks
     ## - One could set skipped_errors inside the loop with skipped_errors = skipped_errors_base/b
 
-    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
-    path = string(path, "data/")
+    probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
+
+    if suffix != ""
+        suffix = "-$(suffix)"
+    end
 
     n = prob.numdata
+    mu = prob.mu
+    L = prob.L
+    Lmax = prob.Lmax
 
     itercomplex = zeros(length(minibatchgrid), 1) # List of saved outputs
     OUTPUTS = []
@@ -220,7 +231,7 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
         if skipped_errors < -1 || skipped_errors == 0
             error("skipped_errors has to be set to -1 (auto) or to a positive integer")
         elseif skipped_errors == -1
-            options.skip_error_calculation = compute_skip_error_SVRG(n, b, skip_multiplier)
+            options.skip_error_calculation = compute_skip_error_SVRG(n, b, skip_multiplier) ## Maybe a better parametrization exists ...
             println("The number of skipped calculations of the error has been automatically set to ", options.skip_error_calculation)
         else
             options.skip_error_calculation = skipped_errors
@@ -233,11 +244,6 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
         println("---------------------------------- SKIP_ERROR ------------------------------------------")
         println(options.skip_error_calculation)
         println("----------------------------------------------------------------------------------------")
-
-        n = prob.numdata
-        mu = prob.mu
-        L = prob.L
-        Lmax = prob.Lmax
 
         options.batchsize = b
         for i=1:numsimu
@@ -254,7 +260,7 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
 
             println("----------------------------- # EPOCHS[END] -------------------------------------")
             println(output.epochs[end])
-            println("----------------------------------------------------------------------------------------")
+            println("---------------------------------------------------------------------------------")
 
             println("Output fail = ", output.fail, "\n")
             itercomplex[idx_b] += output.iterations
@@ -264,13 +270,13 @@ function simulate_Free_SVRG_nice(prob::Prob, minibatchgrid::Array{Int64,1}, opti
         end
     end
 
-    ## Averaging the last iteration number
+    ## Averaging the iteration complexity
     itercomplex = itercomplex ./ numsimu
     itercomplex = itercomplex[:]
 
     ## Saving the result of the simulations
-    savename = "-exp1a-empcomplex-$(numsimu)-avg"
-    save("$(path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
+    savename = "-exp3-empcomplex-$(numsimu)-avg$(suffix)"
+    save("$(save_path)data/$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
 
     return OUTPUTS, itercomplex
 end
@@ -379,7 +385,7 @@ correpsonding average iteration complexity.
     - **AbstractString** path: path to the folder where the plots are saved\\
 #OUTPUTS:\\
     - OUTPUTS: output of each run, size length(inner_loop_grid)*numsimu\\
-    - **Array{Float64,1}** itercomplex: average iteration complexity for each of the inner loop size over numsimu samples
+    - **Array{Float64,1}** itercomplex: average iter complexity for each of the inner loop sizes over numsimu samples
 """
 function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{Int64,1}, options::MyOptions ;
                                            numsimu::Int64=1, skipped_errors::Int64=-1, skip_multiplier::Float64=0.02, path::AbstractString="./")
@@ -397,6 +403,11 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
         options.skip_error_calculation = skipped_errors
     end
 
+    n = prob.numdata
+    mu = prob.mu
+    L = prob.L
+    Lmax = prob.Lmax
+
     itercomplex = zeros(length(inner_loop_grid), 1) # List of saved outputs
     OUTPUTS = []
     for idx_m in 1:length(inner_loop_grid)
@@ -411,11 +422,6 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
         println(options.skip_error_calculation)
         println("----------------------------------------------------------------------------------------")
 
-        n = prob.numdata
-        mu = prob.mu
-        L = prob.L
-        Lmax = prob.Lmax
-
         for i=1:numsimu
             println("----- Simulation #", i, " -----")
             ################################################################################
@@ -428,6 +434,11 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
             sampling = build_sampling("nice", n, options)
             free = initiate_Free_SVRG(prob, options, sampling, numinneriters=numinneriters, averaged_reference_point=true)
             output = minimizeFunc(prob, free, options)
+
+            println("----------------------------- # EPOCHS[END] -------------------------------------")
+            println(output.epochs[end])
+            println("---------------------------------------------------------------------------------")
+
             println("Output fail = ", output.fail, "\n")
             itercomplex[idx_m] += output.iterations
 
@@ -436,13 +447,13 @@ function simulate_Free_SVRG_nice_inner_loop(prob::Prob, inner_loop_grid::Array{I
         end
     end
 
-    ## Averaging the last iteration number
+    ## Averaging the iteration complexity
     itercomplex = itercomplex ./ numsimu
     itercomplex = itercomplex[:]
 
     ## Saving the result of the simulations
-    savename = "-exp1b-empcomplex-$(numsimu)-avg"
-    save("$(path)$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
+    savename = "-exp4-empcomplex-$(numsimu)-avg$(suffix)"
+    save("$(save_path)data/$(probname)$(savename).jld", "itercomplex", itercomplex, "OUTPUTS", OUTPUTS)
 
     return OUTPUTS, itercomplex
 end
@@ -521,4 +532,34 @@ function plot_empirical_complexity_SVRG(prob::Prob, exp_number::Int64, grid::Arr
         savename = string(savename, suffix)
     end
     savefig("$(save_path)figures/$(probname)$(savename).pdf")
+end
+
+
+
+"""
+    compute_total_complexity_Free_SVRG(prob, numinneriters, precision)
+
+Compute the theoretical total complexity vs the mini-batch or the inner loop size.
+
+#INPUTS:\\
+    - **Prob** prob: considered problem, i.e. logistic regression, ridge ression... (see src/StochOpt.jl)\\
+    - **Int64** numinneriters: size of the inner loop\\
+    - **Float64** precision: precision desired for the optimization quantifying the expected quadratic distance between the last iterate and the solution (epsilon in the paper)\\
+#OUTPUTS:\\
+    - **Array{Float64,1}** total_complexity: theoretical total complexity for all possible mini-batch size from 1 to n\\
+"""
+function compute_total_complexity_Free_SVRG(prob::Prob, numinneriters::Int64, precision::Float64)
+    n = prob.numdata
+    mu = prob.mu
+    Lmax = prob.Lmax
+    L = prob.L
+
+    minibatch_grid = 1:n
+    expected_residual =  (Lmax.*(n.-minibatch_grid)) ./ ((n-1).*minibatch_grid)
+    expected_smoothness = expected_residual .+ ((n*L).*(minibatch_grid .- 1)) ./ ((n-1).*minibatch_grid)
+    left_term = (expected_smoothness + 2 .* expected_residual) ./ mu
+
+    total_complexity = 2 .* (n/numinneriters .+ 2 .* minibatch_grid) .* max.(left_term, numinneriters) .* log(1/precision)
+
+    return total_complexity
 end

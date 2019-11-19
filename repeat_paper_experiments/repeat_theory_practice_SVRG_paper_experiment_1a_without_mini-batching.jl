@@ -32,17 +32,23 @@ max_time = 60.0*60.0*24.0
 precision = 10.0^(-6)
 
 ## File names
-# details = "final"
+details = "final"
+# details = "test-rho"
 # details = "legend"
-details = "test-rho"
-
-## Bash input
-all_problems = parse(Bool, ARGS[1]) # run 1 (false) or all the 8 problems (true)
 
 using Distributed
 
+## Bash input
+path = ARGS[1]
+@eval @everywhere path=$path
+all_problems = parse(Bool, ARGS[2]) # run 1 (false) or all the 8 problems (true)
+
+# println(workers()) # print available workers
+
 @everywhere begin
-    path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
+    # println(myid(), " : ", ARGS)
+    # println(myid(), " : ", path) # print current worker + path
+    # path = "/home/infres/ngazagnadou/StochOpt.jl/" # lame23
 
     using JLD
     using Plots
@@ -93,10 +99,10 @@ else
     problems = 1:1
 end
 
-datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,         n = 141,691, d =     22
-            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,         n = 515,345, d =     90
-            "slice", "slice",                                   # scaled,         n =  53,500, d =    384
-            "real-sim", "real-sim"]                             # unscaled,       n =  72,309, d = 20,958
+datasets = ["ijcnn1_full", "ijcnn1_full",                       # scaled,   n = 141,691, d =     22
+            "YearPredictionMSD_full", "YearPredictionMSD_full", # scaled,   n = 515,345, d =     90
+            "slice", "slice",                                   # scaled,   n =  53,500, d =    384
+            "real-sim", "real-sim"]                             # unscaled, n =  72,309, d = 20,958
 
 scalings = ["column-scaling", "column-scaling",
             "column-scaling", "column-scaling",
@@ -109,14 +115,14 @@ lambdas = [10^(-1), 10^(-3),
            10^(-1), 10^(-3)]
 
 ## Set smaller number of skipped iteration for finer estimations (yet, longer simulations)
-skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1                 25/06 11:14
-               [13000 7000 -2. 5000],  # 2)  ijcnn1_full + scaled + 1e-3               25/06 11:14
-               [50000 30000 -2. 20000],  # 3)  YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 11 epochs
-               [60000 40000 -2. 30000],  # 4)  YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 11 epochs
-               [50000 40000 -2. 30000],  # 5)  slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
-               [50000 40000 -2. 30000],  # 6)  slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
-               [  10 2000 -2. 4000],  # 7)  real-sim + unscaled + 1e-1                 25/06 11:14
-               [500 5000 -2. 2000]]  # 8) real-sim + unscaled + 1e-3                   25/06 11:14
+skip_errors = [[700 7000 -2. 7000],     # 1) ijcnn1_full + scaled + 1e-1             25/06 11:14
+               [13000 7000 -2. 5000],   # 2) ijcnn1_full + scaled + 1e-3             25/06 11:14
+               [50000 30000 -2. 20000], # 3) YearPredictionMSD_full + scaled + 1e-1  25/06 11:14 / 16 epochs
+               [60000 40000 -2. 30000], # 4) YearPredictionMSD_full + scaled + 1e-3  25/06 11:14 / 16 epochs
+               [50000 40000 -2. 30000], # 5) slice + scaled + 1e-1                   25/06 11:14 / 100 epochs
+               [50000 40000 -2. 30000], # 6) slice + scaled + 1e-3                   25/06 11:14 / 100 epochs
+               [  10 2000 -2. 4000],    # 7) real-sim + unscaled + 1e-1              25/06 11:14
+               [500 5000 -2. 2000]]     # 8) real-sim + unscaled + 1e-3              25/06 11:14
 
 @time @sync @distributed for idx_prob in problems
     data = datasets[idx_prob]
@@ -128,10 +134,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
 
     Random.seed!(1)
 
-    if idx_prob == 3
-        global max_epochs = 10
-    elseif idx_prob == 4
-        global max_epochs = 13
+    if idx_prob == 3 || idx_prob == 4
+        global max_epochs = 16
     elseif idx_prob == 5 || idx_prob == 6
         global max_epochs = 100
     end
@@ -237,31 +241,6 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     OUTPUTS = [OUTPUTS; out_free]
     println("\n")
 
-    #region
-    ################################################################################
-    ################################## LEAP-SVRG ###################################
-    ################################################################################
-    # ## Leap-SVRG with 1-nice sampling ( p = 1/n, b = 1, step sizes = {eta^*=1/L, alpha^*(b)} )
-    # proba = 1/n                        # update probability set to the inverse of the number of data points
-    # options.batchsize = 1              # mini-batch size set to 1
-    # options.stepsize_multiplier = -1.0 # theoretical step sizes set in boot_Leap_SVRG
-    # sampling = build_sampling("nice", n, options)
-    # leap = initiate_Leap_SVRG(prob, options, sampling, proba)
-
-    # ## Setting the number of skipped iteration to 1/4*p
-    # options.skip_error_calculation = skip_error[3] # skip error different for each algo
-    # # options.skip_error_calculation = round(Int64, 1/(4*proba))
-
-    # out_leap = minimizeFunc(prob, leap, options)
-
-    # str_proba_leap = @sprintf "%.2e" proba
-    # str_step_sto_leap = @sprintf "%.2e" leap.stochastic_stepsize
-    # str_step_grad_leap = @sprintf "%.2e" leap.gradient_stepsize
-    # out_leap.name = latexstring("Leap-SVRG \$(p = 1/n = $str_proba_leap, b = 1, \\eta_{Leap}^* = $str_step_grad_leap, \\alpha_{Leap}^*(1) = $str_step_sto_leap)\$")
-    # OUTPUTS = [OUTPUTS; out_leap]
-    # println("\n")
-    #endregion
-
     ################################################################################
     ################################### L-SVRG-D ###################################
     ################################################################################
@@ -288,6 +267,8 @@ skip_errors = [[700 7000 -2. 7000],  # 1)  ijcnn1_full + scaled + 1e-1          
     ## Saving outputs and plots
     if path == "/home/infres/ngazagnadou/StochOpt.jl/"
         suffix = "lame23"
+    else
+        suffix = ""
     end
     savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     savename = string(savename, "-exp1a-$(suffix)-$(details)")

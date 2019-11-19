@@ -364,7 +364,7 @@ mutable struct Output
     iterations::Int
     epocsperiter::Float64 #Array{Float64}
     gradsperiter::Float64
-    epochs::Array{Float64} # epochs at which the error is computed if epocsperiter and gradsperiter are not constant
+    epochs::Array{Float64} # array of epochs at which the error is computed if epocsperiter and gradsperiter are not constant
     times::Array{Float64}
     fs::Array{Float64} # recorded function values
     testerrors::Array{Float64}

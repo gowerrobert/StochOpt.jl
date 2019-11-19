@@ -88,7 +88,7 @@ for idx_prob in problems
     # save("$(mu_filename).jld", "mu", mu)
 
     ## Computing mini-batch and step sizes
-    b_practical = round(Int, 1 + (mu*(n-1))/(4*(L+lambda)))
+    b_practical = round(Int, 1 + (mu*(n-1))/(4*L))
 
     @printf "L = %e and mu = %e\n" L mu
     @printf "Condition number = %e\n" L/mu

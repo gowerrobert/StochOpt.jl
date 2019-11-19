@@ -216,7 +216,7 @@ end
 
 """
     plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                              b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", legendpos=:best)
+                              b_optimal::Int64, b_empirical::Int64 ; path::AbstractString="./", legendpos=:best)
 
 Saves the plot of the empirical total complexity.
 
@@ -225,21 +225,27 @@ Saves the plot of the empirical total complexity.
     - **Array{Int64,1}** minibatchgrid: list of the different mini-batch sizes\\
     - **Array{Float64,1}** empcomplex: average total complexity (tau*iteration complexity)
       for each of the mini-batch size (tau) over numsimu samples\\
-    - **Int64** b_practical: heuristic optimal mini-batch size\\
+    - **Int64** b_optimal: optimal mini-batch size given by theory\\
     - **Int64** b_empirical: empirical optimal mini-batch size\\
+    - **Int64** max_epochs: maximal number of epochs passed during optimization\\
     - **AbstractString** path: path to the folder where the plots are saved\\
-    - **Symbol** legendpos: position of the legend
+    - **Symbol** legendpos: position of the legend\\
+    - **AbstractString** suffix: suffix added to saved file names\\
 #OUTPUTS:\\
     - None
 """
 function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, empcomplex::Array{Float64,1},
-                                   b_practical::Int64, b_empirical::Int64 ; path::AbstractString="./", skip_multiplier::Float64=0.0, legendpos::Symbol=:best)
+                                   b_optimal::Int64, b_empirical::Int64 ; max_epochs=0, path::AbstractString="./", skip_multiplier::Float64=0.0, legendpos::Symbol=:best, suffix::AbstractString="")
     numsimu = 1
 
     probname = replace(replace(prob.name, r"[\/]" => "-"), "." => "_")
     default_path = "$(path)figures/"; # new path
 
-    fontmed = 12
+    if suffix != ""
+        suffix = "-$(suffix)"
+    end
+
+    fontmed = 11
     fontbig = 15
     xlabeltxt = "mini-batch size"
     ylabeltxt = "empirical total complexity"
@@ -247,8 +253,8 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
     n = prob.numdata
     d = prob.numfeatures
 
-    labellist = [latexstring("\$b_\\mathrm{empirical} = $b_empirical\$"),
-                 latexstring("\$b_\\mathrm{practical} \\; = $b_practical\$")]
+    labellist = [latexstring("\$b^*_\\mathrm{empirical} = $b_empirical\$"),
+                 latexstring("\$b^*_\\mathrm{theory} \\; = $b_optimal\$")]
 
     plot(minibatchgrid, empcomplex, linestyle=:solid, color=:black,
          xaxis=:log, yaxis=:log,
@@ -259,12 +265,24 @@ function plot_empirical_complexity(prob::Prob, minibatchgrid::Array{Int64,1}, em
          guidefont=font(fontbig), linewidth=3, grid=false)
         #  title=string("Pb: ", probname, ", n=", string(n), ", d=", string(d)))
     vline!([b_empirical], line=(:dash, 3), color=:blue, label=labellist[1],
-           legendfont=font(fontbig), legend=legendpos) #:legend
+           legendfont=font(fontmed), legend=legendpos) #:legend
     #legendtitle="Optimal mini-batch size")
-    vline!([b_practical], line=(:dot, 3), color=:red, label=labellist[2])
+    vline!([b_optimal], line=(:dot, 3), color=:red, label=labellist[2])
+
+    max_complexity = max_epochs * n
+    if max_epochs != 0 && any(i -> i >= max_complexity, empcomplex)
+        println("Max epochs attained")
+        hline!([max_complexity], line=(:dot, 1), color=:black, label="threshold")
+
+        ## Unsucessful attempts to add a tick to the y axis without erasing existing ones
+        # yticks!([max_complexity], [latexstring("\$C^\\mathrm{max}_n\$")])
+        # annotate!([(1, max_complexity, text("max \nepochs", fontmed, :black, :center))])
+    end
+
     savename = "-exp4-empcomplex-$(numsimu)-avg"
     if skip_multiplier > 0.0
         savename = string(savename, "_skip_mult_", replace(string(skip_multiplier), "." => "_")); # Extra suffix to check which skip values to keep
     end
+    savename = "$(savename)$(suffix)"
     savefig("$(default_path)$(probname)$(savename).pdf")
 end
