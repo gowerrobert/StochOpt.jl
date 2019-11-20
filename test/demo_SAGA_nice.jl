@@ -8,7 +8,7 @@ using Printf
 using LinearAlgebra
 using Statistics
 using Base64
-include("./src/StochOpt.jl")
+include("../src/StochOpt.jl")
 
 ## Basic parameters and options for solvers
 options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=150, force_continue=true, initial_point="zeros")

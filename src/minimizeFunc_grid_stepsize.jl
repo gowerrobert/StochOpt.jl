@@ -9,10 +9,7 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
         method_name = method_input.name;
     end
 
-    beststep, savename = get_saved_stepsize(prob.name, method_name, options, data_path = data_path);
-    if beststep == 0.0 || options.repeat_stepsize_calculation == true
-        options.force_continue = false;
-        if grid == [0.0]
+    beststep, savename = get_saved_stepsize(prob.name, method_name, options, data_path = data_path); if beststep == 0.0 || options.repeat_stepsize_calculation == true options.force_continue = false; if grid == [0.0]
             stepsizes = [2.0^(21), 2.0^(17), 2.0^(15), 2.0^(13), 2.0^(11), 2.0^(9), 2.0^(7), 2.0^(5),
                          2.0^(3), 2.0^(1), 2.0^(-1), 2.0^(-3), 2.0^(-5), 2.0^(-7), 2.0^(-9), 2.0^(-11)];
         else
@@ -29,8 +26,8 @@ function minimizeFunc_grid_stepsize(prob::Prob, method_input, options::MyOptions
             beststep = 0.0; #iteratesp = 1;
             for stepind = start_step:length(stepsizes)
                 println("--------------------------------> minfval = ", minfval);
-                recentmethods = [SVRG_vanilla_method, Free_SVRG_method, SAGA_nice_method] # reset if one of these
-                if typeof(method_input) in recentmethods
+
+                if typeof(method_input) in methodswithareset # global definition in stochopt
                     # println("\n\nMONITORING STEPSIZE BEFORE RESET => ", method_input.stepsize, "\n\n")
                     # method_input = method_input.reset(prob, method_input, options); # old implementation
                     method_input.reset(prob, method_input, options); # /!\ new implementation with mutating fucntion. TO CHECK IF IT WORKS!!!

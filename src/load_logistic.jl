@@ -2,7 +2,7 @@ function load_logistic(data_path::AbstractString, probname::AbstractString,  opt
     # Load logistic regression problem
     println("loading:  ", probname)
     X, y = loadDataset(data_path,probname);
-    prob = load_logistic_from_matrices(X, y, probname, opts, lambda=-1, scaling = scaling ; data_path::AbstractString = "./data/")
+    prob = load_logistic_from_matrices(X, y, probname, opts, lambda=-1, scaling = scaling ; data_path = data_path)
 
     return prob
 end
@@ -21,7 +21,7 @@ Load a logistic regression problem. The option input sets the regularization par
 #OUTPUTS:\\
     - **Prob** prob: considered problem, here logistic regression
 """
-function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString, opts::MyOptions; lambda=-1, scaling="column-scaling", verbose=false)
+function load_logistic_from_matrices(X, y::Array{Float64}, name::AbstractString, opts::MyOptions; lambda=-1, scaling="column-scaling", verbose=false, data_path::AbstractString = "./data/")
     # Load logistic regression problem
 
     name = string("lgstc_", name);

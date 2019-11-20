@@ -3,13 +3,13 @@ using JLD, StatsBase, Match
 include("../src/StochOpt.jl")
 ## This is a basic demo showing how to setup and call different optimization methods for the ERM problem
 ## Basic parameters and options for solvers
-options = set_options(max_iter=10^8, max_time=1000.0, max_epocs=50, force_continue=true, initial_point="randn"); #repeat_stepsize_calculation =true, rep_number =10
+options = set_options(max_iter=10^8, max_time=2.0, max_epocs=50, force_continue=true, initial_point="randn"); #repeat_stepsize_calculation =true, rep_number =10
 options.batchsize = 100;
 ## load problem
-datapath = "./data/"
+data_path = "./data/"
 probname = "mushrooms"; # Data tested in paper: w8a mushrooms gisette_scale,  madelon  a9a  phishing  covtype splice  rcv1_train  liver-disorders_scale
 ## Loads logisitc problem
-prob = load_logistic(datapath, probname, options);
+prob = load_logistic(data_path, probname, options);
 
 ## Running methods
 OUTPUTS = [];  # List of saved outputs
@@ -56,7 +56,7 @@ savename = replace(replace(prob.name, r"[\/]" => "-"), "." => "_");
 save("$(default_path)$(savename).jld", "OUTPUTS", OUTPUTS);
 
 #plot and save graphs
-gr()# gr() pyplot() # pgfplots() #plotly()
+pgfplots()# gr() pyplot() # pgfplots() #plotly()
 plot_outputs_Plots(OUTPUTS, prob, options) # Plot and save output
 
 # References

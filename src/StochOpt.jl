@@ -416,3 +416,5 @@ include("calculate_SAGA_rates_and_complexities.jl")
 include("SVRG_settings_and_util.jl")
 include("get_saved_stepsize.jl")
 # include("../tmp/parallel_minimizeFunc_grid_stepsize.jl")
+
+methodswithareset = [SVRG_vanilla_method, Free_SVRG_method, SAGA_nice_method] 

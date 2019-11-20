@@ -92,7 +92,9 @@ function minimizeFunc(prob::Prob, method_input, options::MyOptions; testprob=not
             else
                 method = method_input
                 # println("\nIn minimizeFunc number_computed_gradients: ", method.number_computed_gradients) # for debugging SVRG codes
-                method.reset(prob, method, options)
+                if typeof(method_input) in methodswithareset # Global definition in stochopt
+                    method.reset(prob, method, options)
+                end
                 method.bootmethod(prob, method, options) # SAGA_nice and SVRG implementations
                 # println("In minimizeFunc number_computed_gradients: ", method.number_computed_gradients,"\n") # for debugging SVRG codes
             end
