@@ -20,7 +20,7 @@ output = minimizeFunc_grid_stepsize(prob, "SVRG", options);
 OUTPUTS = [OUTPUTS; output];
 
 ## or the "Action Matching" method call AMprev from [1]
-options.embeddim = 10;
+options.embeddim = 5;
 output = minimizeFunc_grid_stepsize(prob, "AMprev", options);
 OUTPUTS = [OUTPUTS; output];
 

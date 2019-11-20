@@ -10,9 +10,12 @@ function descent_AMprev(x::Array{Float64}, prob::Prob, options::MyOptions, mth::
     if(N%mth.numinneriters == 0)# Reset reference point, grad estimate and Hessian estimate
         mth.prevx[:] = x; # Stores previous x
         prob.Hess_opt!(x, 1:prob.numdata, mth.S, mth.grad, mth.HS);
-        mth.SHS[:] = inv(((mth.S')*(mth.HS).+ 0.0001)^(1/2));
+        mth.SHS[:] = pinv(((mth.S')*(mth.HS))^(1/2));
         mth.S[:] = mth.S*mth.SHS;  #Add on last direction for embedding
         mth.HS[:] = mth.HS*mth.SHS;
+        # mth.SHS[:] = (mth.S')*(mth.HS).+ 0.0001;
+        # mth.S[:] = mth.SHS\mth.S;
+        # mth.HS[:] = mth.SHS\mth.HS;
         mth.Sold[:] = mth.S; #Stores the previous saved embedding space S
         mth.S[:] .= 0;
         d[:] = -mth.grad;
